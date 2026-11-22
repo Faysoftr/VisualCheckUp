@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/doctor_summary_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -23,20 +25,33 @@ class ResultScreen extends StatefulWidget {
 
 class _ResultScreenState extends State<ResultScreen> {
   CategoryBaseline? _savedBaseline;
+  List<AnalysisResult> _allHistory = const [];
   bool _savingBaseline = false;
 
   @override
   void initState() {
     super.initState();
-    _loadBaseline();
+    _loadContextData();
   }
 
-  Future<void> _loadBaseline() async {
+  Future<void> _loadContextData() async {
     final repo = widget.historyRepository;
     if (repo == null) return;
     final baseline = await repo.getBaseline(widget.result.category);
+    final history = await repo.loadHistory();
     if (!mounted) return;
-    setState(() => _savedBaseline = baseline);
+    setState(() {
+      _savedBaseline = baseline;
+      _allHistory = history;
+    });
+  }
+
+  Future<void> _openDoctorSummary() async {
+    final report = DoctorReportBuilder.build(
+      currentResult: widget.result,
+      allHistory: _allHistory,
+    );
+    await DoctorSummarySheet.show(context, report: report);
   }
 
   Future<void> _saveAsPersonalBaseline() async {
@@ -90,11 +105,20 @@ class _ResultScreenState extends State<ResultScreen> {
     final theme = Theme.of(context);
     final riskColor = result.riskLevel.color;
     final dateText = DateFormat('dd.MM.yyyy HH:mm').format(result.createdAt);
+    final previousInCategory = _allHistory
+        .where((e) => e.category == result.category && e.id != result.id)
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Scaffold(
       appBar: AppBar(
         title: Text('${result.category.title} Sonucu'),
         actions: [
+          IconButton(
+            onPressed: _openDoctorSummary,
+            tooltip: 'Doktora Göster Özeti',
+            icon: const Icon(Icons.assignment_outlined),
+          ),
           IconButton(
             onPressed: () => ModuleReferenceSheet.show(context, result.category),
             tooltip: 'Referans Rehberi',
@@ -246,10 +270,101 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     ),
                   ],
+                  if (result.riskLevel != RiskLevel.normal) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_hospital_outlined,
+                            size: 16,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Danışılabilecek bölüm: ${result.category.recommendedSpecialty}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
+
+          if (previousInCategory.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.timeline_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Zaman İçi Değişim Karşılaştırması',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _SwatchBadge(
+                          color: previousInCategory.first.dominantColor,
+                          label: DateFormat('dd.MM')
+                              .format(previousInCategory.first.createdAt),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Icon(Icons.arrow_forward_rounded, size: 16),
+                        ),
+                        _SwatchBadge(
+                          color: result.dominantColor,
+                          label: 'Bugün',
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Önceki kayıt: "${previousInCategory.first.summaryTitle}" (${previousInCategory.first.riskLevel.label}). Toplam ${previousInCategory.length + 1} kayıt takip ediliyor.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.38,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
 
           if (result.baselineComparisonNote != null) ...[
             const SizedBox(height: 12),
@@ -469,7 +584,13 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: _openDoctorSummary,
+            icon: const Icon(Icons.assignment_outlined),
+            label: const Text('Doktora Göster • Özet Hazırla'),
+          ),
+          const SizedBox(height: 10),
           FilledButton.icon(
             onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
             icon: const Icon(Icons.home_outlined),

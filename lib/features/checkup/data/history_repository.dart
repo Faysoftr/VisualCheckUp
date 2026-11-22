@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 
 class HistoryRepository {
   static const String _historyKey = 'visualcheckup_history_v1';
@@ -11,6 +12,7 @@ class HistoryRepository {
   static const String _baselinesKey = 'visualcheckup_baselines_v1';
   static const String _cloudAiEnabledKey = 'visualcheckup_cloud_ai_v1';
   static const String _aiCacheKey = 'visualcheckup_ai_cache_v1';
+  static const String _followUpTracksKey = 'visualcheckup_followup_tracks_v1';
   static const int _maxAiCacheEntries = 20;
 
   Future<List<AnalysisResult>> loadHistory() async {
@@ -57,6 +59,27 @@ class HistoryRepository {
     await prefs.remove(_baselinesKey);
     await prefs.remove(_aiCacheKey);
     await prefs.remove(_cloudAiEnabledKey);
+    await prefs.remove(_followUpTracksKey);
+  }
+
+  Future<Set<FollowUpTrack>> loadFollowUpTracks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getStringList(_followUpTracksKey);
+    if (saved == null) {
+      return FollowUpTrackX.defaultEnabled();
+    }
+    return saved
+        .map(FollowUpTrackX.tryFromId)
+        .whereType<FollowUpTrack>()
+        .toSet();
+  }
+
+  Future<void> saveFollowUpTracks(Set<FollowUpTrack> tracks) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _followUpTracksKey,
+      tracks.map((t) => t.id).toList(),
+    );
   }
 
   Future<bool> isDisclaimerAccepted() async {

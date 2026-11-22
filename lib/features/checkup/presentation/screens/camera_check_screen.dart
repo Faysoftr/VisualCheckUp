@@ -9,6 +9,7 @@ import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
+import 'package:visualcheckup/features/checkup/presentation/screens/quick_color_card_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 
@@ -473,6 +474,50 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                         ),
                       ),
                     ),
+                    if (widget.category.supportsQuickColorCard)
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute<void>(
+                              builder: (_) => QuickColorCardScreen(
+                                category: widget.category,
+                                historyRepository: widget.historyRepository,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white30),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.palette_outlined,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Kamerasız Renk Kartı',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     if (_baseline != null)
                       Container(
                         padding: const EdgeInsets.symmetric(

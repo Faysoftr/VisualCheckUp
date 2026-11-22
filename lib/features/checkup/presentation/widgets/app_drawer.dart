@@ -20,6 +20,8 @@ class AppDrawer extends StatelessWidget {
     required this.onOpenDisclaimer,
     required this.onSignOut,
     required this.onDeleteAccount,
+    this.onOpenFollowUpPlan,
+    this.onOpenQuickColorCard,
   });
 
   final AuthUser currentUser;
@@ -31,6 +33,8 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback onOpenDisclaimer;
   final VoidCallback onSignOut;
   final VoidCallback onDeleteAccount;
+  final VoidCallback? onOpenFollowUpPlan;
+  final VoidCallback? onOpenQuickColorCard;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
     Navigator.of(context).pop();
@@ -181,9 +185,21 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _DrawerTile(
                     icon: Icons.healing_rounded,
-                    label: 'Cilt Hastalıkları',
+                    label: 'Cilt & Ben Takibi',
                     onTap: () => _closeAndRun(context, onOpenSkinModule),
                   ),
+                  if (onOpenQuickColorCard != null)
+                    _DrawerTile(
+                      icon: Icons.palette_outlined,
+                      label: 'Kamerasız Renk Kartı',
+                      onTap: () => _closeAndRun(context, onOpenQuickColorCard!),
+                    ),
+                  if (onOpenFollowUpPlan != null)
+                    _DrawerTile(
+                      icon: Icons.event_repeat_rounded,
+                      label: 'Kişisel Takip Planı',
+                      onTap: () => _closeAndRun(context, onOpenFollowUpPlan!),
+                    ),
                   _DrawerTile(
                     icon: Icons.history_rounded,
                     label: 'Kontrol Geçmişi',

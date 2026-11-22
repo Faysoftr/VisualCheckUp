@@ -138,6 +138,43 @@ extension CheckCategoryX on CheckCategory {
     }
   }
 
+  /// Categories where a camera-free 2-second color chart picker is offered
+  /// alongside camera capture for privacy and convenience.
+  bool get supportsQuickColorCard {
+    switch (this) {
+      case CheckCategory.urine:
+      case CheckCategory.stool:
+        return true;
+      case CheckCategory.eye:
+      case CheckCategory.nail:
+      case CheckCategory.tongue:
+      case CheckCategory.face:
+      case CheckCategory.skinCondition:
+        return false;
+    }
+  }
+
+  /// Non-diagnostic clinic/specialty guidance shown on doctor-visit summaries
+  /// when follow-up or medical consultation is advised.
+  String get recommendedSpecialty {
+    switch (this) {
+      case CheckCategory.eye:
+        return 'Göz Hastalıkları veya Dahiliye';
+      case CheckCategory.nail:
+        return 'Dermatoloji veya Dahiliye';
+      case CheckCategory.tongue:
+        return 'KBB, Ağız & Diş Sağlığı veya Dahiliye';
+      case CheckCategory.face:
+        return 'Dermatoloji veya Dahiliye';
+      case CheckCategory.skinCondition:
+        return 'Dermatoloji';
+      case CheckCategory.urine:
+        return 'Üroloji veya Dahiliye';
+      case CheckCategory.stool:
+        return 'Gastroenteroloji veya Dahiliye';
+    }
+  }
+
   static CheckCategory fromId(String id) {
     return CheckCategory.values.firstWhere(
       (c) => c.name == id,
