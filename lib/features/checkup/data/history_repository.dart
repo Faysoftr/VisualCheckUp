@@ -50,6 +50,15 @@ class HistoryRepository {
     await prefs.remove(_historyKey);
   }
 
+  /// Removes all user-scoped local health check records, baselines, and AI cache.
+  Future<void> clearAllUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_historyKey);
+    await prefs.remove(_baselinesKey);
+    await prefs.remove(_aiCacheKey);
+    await prefs.remove(_cloudAiEnabledKey);
+  }
+
   Future<bool> isDisclaimerAccepted() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_disclaimerAcceptedKey) ?? false;
