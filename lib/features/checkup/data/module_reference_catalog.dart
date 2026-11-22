@@ -465,6 +465,54 @@ class ModuleReferenceCatalog {
           redFlagNote:
               'Ateş, titreme veya kırmızı çizgilenme eşlik ediyorsa acil servise başvurun.',
         ),
+        ReferenceFinding(
+          id: 'skin_non_healing_cancer_cue',
+          title: 'İyileşmeyen Kabuklu Yara / İnci Parlaklığında Nodül (BCC/SCC Uyarı)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFFB75D57),
+          visualSignature:
+              '4 haftadan uzun süredir iyileşmeyen, tekrarlayan kanamalı/kabuklu yara veya kenarı inci parlaklığında kabarık nodül (özellikle güneşe açık yüz/kulak/elde).',
+          possibleAssociations:
+              'Melanom dışı cilt kanserleri (bazal hücreli veya skuamöz hücreli karsinom) dışlanması için dermoskopik dermatoloji muayenesi gerekir.',
+          redFlagNote:
+              '4 haftayı aşan iyileşmeyen veya kanayan her cilt yarası dermatolog tarafından incelenmelidir.',
+        ),
+        ReferenceFinding(
+          id: 'skin_wart_rough_dots_cue',
+          title: 'Pütürlü Kabartı & Küçük Siyah Noktacıklar (Siğil İpucu)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFCCB29A),
+          visualSignature:
+              'Cilt tonunda veya hafif grimsi-sarı sert, pütürlü/karnabahar benzeri kabartı; merkezinde toplu iğne başı kadar siyah noktalar (pıhtılaşmış kapiller).',
+          possibleAssociations:
+              'Yaygın/plantar siğil (HPV) veya nasır/keratoz ön ipucu; yüz, genital bölge ve diyabetik ayakta kendi kendine asit uygulanmamalıdır.',
+        ),
+        ReferenceFinding(
+          id: 'skin_bruise_ecchymosis_cue',
+          title: 'Morluk / Ekimoz Renk Evreleri (Mor → Lacivert → Yeşil-Sarı)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFF66538A),
+          visualSignature:
+              'Taze evrede kırmızı-mor, orta evrede lacivert-mor, iyileşme evresinde (7–14 gün) yeşilimsi-sarı renk değişimi gösteren cilt altı kanama alanı.',
+          possibleAssociations:
+              'Darbe sonrası olağan ekimoz; ancak darbe olmadan sık ve kendiliğinden çıkıyorsa trombosit/pıhtılaşma veya kan sulandırıcı açısından Dahiliye değerlendirmesi gerekir.',
+          redFlagNote:
+              'Darbesiz çoklu morluklar veya diş eti/burun kanaması eşlik ediyorsa hekime başvurun.',
+        ),
+        ReferenceFinding(
+          id: 'skin_facial_hyperpigmentation_cue',
+          title: 'Yüzde Güneş Lekesi / Melazma / Akne Sonrası Pigmentasyon',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFB8845B),
+          visualSignature:
+              'Yanak, alın veya üst dudakta çevre cilde göre daha koyu açık-koyu kahverengi yamalar veya sivilce sonrası pembe-kahverengi izler.',
+          possibleAssociations:
+              'Güneş lekesi (solar lentigo), melazma veya post-inflamatuar hiperpigmentasyon. Asimetrik/çok renkli veya değişen lekelerde önce dermoskopi yapılmalıdır.',
+        ),
       ],
     ),
     CheckCategory.urine: ModuleReferenceSpec(

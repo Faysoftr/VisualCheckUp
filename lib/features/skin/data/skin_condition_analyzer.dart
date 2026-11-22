@@ -23,6 +23,10 @@ class SkinVisualMetrics {
     required this.asymmetryScore,
     required this.scalingIndex,
     required this.yellowCrustRatio,
+    this.bluePurpleRatio = 0.0,
+    this.yellowGreenBruiseRatio = 0.0,
+    this.roughTextureIndex = 0.0,
+    this.blackDotRatio = 0.0,
   });
 
   final Color centerColor;
@@ -47,6 +51,18 @@ class SkinVisualMetrics {
 
   /// Ratio of warm yellow-amber crust-like pixels inside the ROI.
   final double yellowCrustRatio;
+
+  /// Ratio of blue-purple / plum pixels (fresh to mid-stage bruise ecchymosis).
+  final double bluePurpleRatio;
+
+  /// Ratio of olive-green / yellow-green pixels (healing-stage bruise).
+  final double yellowGreenBruiseRatio;
+
+  /// Mean neighbor luminance contrast inside ROI (rough hyperkeratotic wart surface).
+  final double roughTextureIndex;
+
+  /// Ratio of tiny dark pinpoint dots inside ROI (thrombosed wart capillaries).
+  final double blackDotRatio;
 }
 
 /// On-device dermatological pre-awareness analyzer.
@@ -102,7 +118,8 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     var riskLevel = result.riskLevel;
 
     if (options.baseline != null) {
-      final comp = options.baseline!.compare(LabColor.fromColor(metrics.centerColor));
+      final comp =
+          options.baseline!.compare(LabColor.fromColor(metrics.centerColor));
       baselineDeltaE = comp.deltaE;
       baselineNote = comp.note;
       extraObservations.add(comp.note);
@@ -147,9 +164,17 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     int leftN = 0, rightN = 0, topN = 0, bottomN = 0;
     int paleFleckCount = 0;
     int yellowCrustCount = 0;
+    int bluePurpleCount = 0;
+    int yellowGreenBruiseCount = 0;
+    int darkDotCount = 0;
+    double roughGradSum = 0;
+    int roughGradN = 0;
     int centerCount = 0;
 
+    final gridValues = <List<double>>[];
+
     for (int y = cStartY; y < cEndY; y += stepY) {
+      final rowValues = <double>[];
       for (int x = cStartX; x < cEndX; x += stepX) {
         final p = decoded.getPixel(x, y);
         var ri = p.r.round().clamp(0, 255);
@@ -175,6 +200,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         final s = hsv.saturation;
         final hue = hsv.hue;
 
+        rowValues.add(v);
         sumV += v;
         sumV2 += v * v;
         sumS += s;
@@ -201,8 +227,39 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         if (hue >= 34 && hue <= 62 && s >= 0.42 && v >= 0.40) {
           yellowCrustCount++;
         }
+        // Bruise blue-violet / plum / deep purple range
+        if (((hue >= 200 && hue <= 335 && s >= 0.16 && v <= 0.78) ||
+            (bi > gi + 14 && ri >= gi && v <= 0.68))) {
+          bluePurpleCount++;
+        }
+        // Healing bruise olive-green / yellow-green range
+        if (hue >= 48 && hue <= 155 && s >= 0.18 && v >= 0.25 && v <= 0.85) {
+          yellowGreenBruiseCount++;
+        }
+        // Tiny dark pinpoint capillary dots (common in plantar/common warts)
+        if (v < 0.22) {
+          darkDotCount++;
+        }
 
         centerCount++;
+      }
+      if (rowValues.isNotEmpty) {
+        gridValues.add(rowValues);
+      }
+    }
+
+    // Compute local texture roughness from adjacent sampled grid cells.
+    for (int gy = 0; gy < gridValues.length; gy++) {
+      final row = gridValues[gy];
+      for (int gx = 0; gx < row.length; gx++) {
+        if (gx + 1 < row.length) {
+          roughGradSum += (row[gx] - row[gx + 1]).abs();
+          roughGradN++;
+        }
+        if (gy + 1 < gridValues.length && gx < gridValues[gy + 1].length) {
+          roughGradSum += (row[gx] - gridValues[gy + 1][gx]).abs();
+          roughGradN++;
+        }
       }
     }
 
@@ -224,10 +281,10 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     final varS = math.max(0.0, (sumS2 / safeCenter) - meanS * meanS);
     final colorVariegation = math.sqrt(varV) + math.sqrt(varS);
 
-    final lrDiff = ((leftV / math.max(1, leftN)) - (rightV / math.max(1, rightN)))
-        .abs();
-    final tbDiff = ((topV / math.max(1, topN)) - (bottomV / math.max(1, bottomN)))
-        .abs();
+    final lrDiff =
+        ((leftV / math.max(1, leftN)) - (rightV / math.max(1, rightN))).abs();
+    final tbDiff =
+        ((topV / math.max(1, topN)) - (bottomV / math.max(1, bottomN))).abs();
     final asymmetryScore = math.max(lrDiff, tbDiff);
 
     // Sample surrounding skin ring (outer margin 10%..25% & 75%..90%)
@@ -276,6 +333,12 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
 
     final scalingIndex = (paleFleckCount / safeCenter) + math.sqrt(varV) * 0.75;
     final yellowCrustRatio = yellowCrustCount / safeCenter;
+    final bluePurpleRatio = bluePurpleCount / safeCenter;
+    final yellowGreenBruiseRatio = yellowGreenBruiseCount / safeCenter;
+    final roughTextureIndex =
+        roughGradN > 0 ? roughGradSum / roughGradN : 0.0;
+    // Pinpoint black dots only count when overall surface isn't uniformly pitch-black.
+    final blackDotRatio = meanV > 0.30 ? (darkDotCount / safeCenter) : 0.0;
 
     return SkinVisualMetrics(
       centerColor: centerColor,
@@ -288,6 +351,10 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       asymmetryScore: asymmetryScore,
       scalingIndex: scalingIndex,
       yellowCrustRatio: yellowCrustRatio,
+      bluePurpleRatio: bluePurpleRatio,
+      yellowGreenBruiseRatio: yellowGreenBruiseRatio,
+      roughTextureIndex: roughTextureIndex,
+      blackDotRatio: blackDotRatio,
     );
   }
 
@@ -298,10 +365,13 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         ? 'Seçilen bölge: ${skinContext.bodyArea}. '
         : '';
 
-    // Guard for underexposed image unless user specifically checks a dark mole
-    if (m.centerValue < 0.12 &&
-        m.darknessDelta < 0.15 &&
-        skinContext.concernType != SkinConcernType.molePigment) {
+    final allowsDarkTarget =
+        skinContext.concernType == SkinConcernType.molePigment ||
+            skinContext.concernType == SkinConcernType.skinCancerRisk ||
+            skinContext.concernType == SkinConcernType.bruise;
+
+    // Guard for underexposed image unless user checks a dark mole/bruise
+    if (m.centerValue < 0.12 && m.darknessDelta < 0.15 && !allowsDarkTarget) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.skinCondition,
@@ -323,8 +393,8 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       );
     }
 
-    final isDarkPigmented =
-        m.darknessDelta >= 0.22 || (m.centerValue < 0.34 && m.darknessDelta >= 0.12);
+    final isDarkPigmented = m.darknessDelta >= 0.22 ||
+        (m.centerValue < 0.34 && m.darknessDelta >= 0.12);
     final isVariegatedOrAsymmetric =
         m.colorVariegation >= 0.28 || m.asymmetryScore >= 0.14;
     final isStrongRedness = m.erythemaDelta >= 0.08 ||
@@ -332,8 +402,52 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     final hasYellowCrust = m.yellowCrustRatio >= 0.18;
     final hasScaling = m.scalingIndex >= 0.26;
 
+    // Dedicated sub-module routing for the 4 focused dermatological screens.
+    switch (skinContext.concernType) {
+      case SkinConcernType.skinCancerRisk:
+        return _analyzeSkinCancerRisk(
+          id: id,
+          now: now,
+          areaPrefix: areaPrefix,
+          m: m,
+          isDarkPigmented: isDarkPigmented,
+          isVariegatedOrAsymmetric: isVariegatedOrAsymmetric,
+        );
+      case SkinConcernType.bruise:
+        return _analyzeBruise(
+          id: id,
+          now: now,
+          areaPrefix: areaPrefix,
+          m: m,
+        );
+      case SkinConcernType.wart:
+        return _analyzeWart(
+          id: id,
+          now: now,
+          areaPrefix: areaPrefix,
+          m: m,
+        );
+      case SkinConcernType.facialSpot:
+        return _analyzeFacialSpot(
+          id: id,
+          now: now,
+          areaPrefix: areaPrefix,
+          m: m,
+          isDarkPigmented: isDarkPigmented,
+          isVariegatedOrAsymmetric: isVariegatedOrAsymmetric,
+          isStrongRedness: isStrongRedness,
+        );
+      case SkinConcernType.rashRedness:
+      case SkinConcernType.molePigment:
+      case SkinConcernType.scalyDry:
+      case SkinConcernType.blisterPustule:
+      case SkinConcernType.general:
+        break;
+    }
+
     // 1. Urgent ABCDE pigment / mole red flag
-    if ((isDarkPigmented && (isVariegatedOrAsymmetric || skinContext.hasAbcdeRedFlag)) ||
+    if ((isDarkPigmented &&
+            (isVariegatedOrAsymmetric || skinContext.hasAbcdeRedFlag)) ||
         (skinContext.concernType == SkinConcernType.molePigment &&
             skinContext.hasAbcdeRedFlag)) {
       return AnalysisResult(
@@ -368,7 +482,9 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
 
     // 2. Urgent infection / severe inflammatory red flag
     if (skinContext.hasInfectionRedFlag &&
-        (isStrongRedness || hasYellowCrust || skinContext.concernType == SkinConcernType.blisterPustule)) {
+        (isStrongRedness ||
+            hasYellowCrust ||
+            skinContext.concernType == SkinConcernType.blisterPustule)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.skinCondition,
@@ -399,7 +515,8 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
 
     // 3. Yellowish crust / pustular cue -> attention
     if (hasYellowCrust ||
-        (skinContext.concernType == SkinConcernType.blisterPustule && isStrongRedness)) {
+        (skinContext.concernType == SkinConcernType.blisterPustule &&
+            isStrongRedness)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.skinCondition,
@@ -458,14 +575,15 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     }
 
     // 5. Localized erythema / rash (dermatitis, allergy, urticaria, irritation)
-    if (isStrongRedness || skinContext.concernType == SkinConcernType.rashRedness) {
+    if (isStrongRedness ||
+        skinContext.concernType == SkinConcernType.rashRedness) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.skinCondition,
         riskLevel: RiskLevel.attention,
         summaryTitle: 'Bölgesel Kızarıklık / Döküntü İpucu',
         summaryDetail:
-            '$areaPrefixÖrneklenen cilt bölgesinde çevresine kıyasla kızarıklık/pembe ton artışı gözlendi. Kontakt dermatit, alerjik döküntü, egzama veya mekanik/güneş tahrişi kaynaklı olabilir.',
+            '${areaPrefix}Örneklenen cilt bölgesinde çevresine kıyasla kızarıklık/pembe ton artışı gözlendi. Kontakt dermatit, alerjik döküntü, egzama veya mekanik/güneş tahrişi kaynaklı olabilir.',
         dominantColorValue: m.centerColor.toARGB32(),
         observations: [
           if (m.erythemaDelta >= 0.08)
@@ -488,14 +606,15 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     }
 
     // 6. Uniform dark mole / pigment tracking
-    if (isDarkPigmented || skinContext.concernType == SkinConcernType.molePigment) {
+    if (isDarkPigmented ||
+        skinContext.concernType == SkinConcernType.molePigment) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.skinCondition,
         riskLevel: RiskLevel.attention,
         summaryTitle: 'Pigmentli Leke / Ben — Düzenli Takip Önerilir',
         summaryDetail:
-            '$areaPrefixÇevre cilde göre daha koyu pigmentli bir alan gözlendi. Mevcut görüntüde yoğun renk karmaşası saptanmasa da benlerin düzenli aralıklarla takip edilmesi önerilir.',
+            '${areaPrefix}Çevre cilde göre daha koyu pigmentli bir alan gözlendi. Mevcut görüntüde yoğun renk karmaşası saptanmasa da benlerin düzenli aralıklarla takip edilmesi önerilir.',
         dominantColorValue: m.centerColor.toARGB32(),
         observations: [
           'Merkez bölgede pigment yoğunluğu çevre cilde göre daha koyu.',
@@ -524,7 +643,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
           : 'Cilt Yüzeyi Tonu Olağan Görünüyor',
       summaryDetail: skinContext.symptoms.any((s) => s.isHighPriority)
           ? '${areaPrefix}Renk farkı belirgin olmasa da bildirdiğiniz belirtiler nedeniyle bir sağlık uzmanına danışmanız önerilir.'
-          : '$areaPrefixÖrneklenen cilt bölgesinde belirgin kızarıklık kontrastı, koyu pigment karmaşası veya yoğun pullanma tonu saptanmadı.',
+          : '${areaPrefix}Örneklenen cilt bölgesinde belirgin kızarıklık kontrastı, koyu pigment karmaşası veya yoğun pullanma tonu saptanmadı.',
       dominantColorValue: m.centerColor.toARGB32(),
       observations: [
         'Merkez ve çevre cilt tonları birbirine yakın ve dengeli.',
@@ -536,6 +655,387 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       ],
       warningFlags: const [],
       confidence: 0.68,
+      createdAt: now,
+    );
+  }
+
+  AnalysisResult _analyzeSkinCancerRisk({
+    required String id,
+    required DateTime now,
+    required String areaPrefix,
+    required SkinVisualMetrics m,
+    required bool isDarkPigmented,
+    required bool isVariegatedOrAsymmetric,
+  }) {
+    final hasNonHealingSore =
+        skinContext.symptoms.contains(SkinSymptomFlag.nonHealingSore);
+    final highRisk =
+        (isDarkPigmented && isVariegatedOrAsymmetric) ||
+            skinContext.hasAbcdeRedFlag ||
+            hasNonHealingSore;
+
+    if (highRisk) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle:
+            'Cilt Kanseri Risk Ön Tarama — Acil Dermatoloji (Dermoskopi) Önerilir',
+        summaryDetail:
+            '${areaPrefix}ABCDE kriterleri (asimetri, çok renklilik, hızlı değişim/6 mm+) veya iyileşmeyen yara/kanama belirtisi saptandı. Bu bir kesin kanser teşhisi değildir; ancak güvenli dışlama için dermoskopik muayene şarttır.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          if (isDarkPigmented)
+            'Lezyon çevre cilde göre belirgin koyu pigment yoğunluğu gösteriyor.',
+          if (m.colorVariegation >= 0.28)
+            'Tek lezyon içinde çoklu renk/ton farklılığı (ABCDE - C) ölçüldü.',
+          if (m.asymmetryScore >= 0.14)
+            'Merkez alanda belirgin yarı-simetri farkı (ABCDE - A) saptandı.',
+          if (hasNonHealingSore)
+            '4 haftadan uzun süren iyileşmeyen yara/kabuklanma (BCC/SCC açısından uyarı işareti) bildirildi.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Gecikmeden bir dermatoloji (cildiye) uzmanına dermoskopik kontrol için başvurun.',
+          'Sonuç ekranındaki "Doktora Göster" özetini kaydederek tarihli değişimi hekiminizle paylaşın.',
+          'Lezyonu koparmayın, yakmayın ve üzerine kendi başınıza asit/krem sürmeyin.',
+        ],
+        warningFlags: const [
+          'Bu ön tarama kesin teşhis koymaz; asimetrik, çok renkli, büyüyen, kanayan veya 4+ haftadır iyileşmeyen lezyonlar mutlaka dermoskopi ile incelenmelidir.',
+        ],
+        confidence: 0.70,
+        createdAt: now,
+      );
+    }
+
+    return AnalysisResult(
+      id: id,
+      category: CheckCategory.skinCondition,
+      riskLevel: RiskLevel.attention,
+      summaryTitle: 'Ben & Lezyon Ön Tarama — Düzenli ABCDE Takibi Önerilir',
+      summaryDetail:
+          '${areaPrefix}Mevcut görüntüde yüksek renk karmaşası veya belirgin asimetri öne çıkmadı. Ancak hiçbir telefon fotoğrafı cilt kanserini tek başına dışlayamaz; düzenli takip ve yıllık dermatoloji muayenesi önerilir.',
+      dominantColorValue: m.centerColor.toARGB32(),
+      observations: [
+        if (isDarkPigmented)
+          'Çevre cilde göre daha koyu, nispeten tek tonlu pigment alanı gözlendi.'
+        else
+          'Belirgin koyu pigment veya çok renklilik öne çıkmadı.',
+        'Fotoğraf bazlı ön tarama derin dermal yapıları göremez; periyodik kıyas önemlidir.',
+        ..._symptomObservations(),
+      ],
+      recommendations: const [
+        'Aynı aydınlatma altında aylık karşılaştırma yaparak boyut/renk değişimini izleyin.',
+        'Güneş koruyucu (SPF 30–50+) kullanın ve yılda bir kez cildiye kontrolü yaptırın.',
+      ],
+      warningFlags: const [],
+      confidence: 0.62,
+      createdAt: now,
+    );
+  }
+
+  AnalysisResult _analyzeBruise({
+    required String id,
+    required DateTime now,
+    required String areaPrefix,
+    required SkinVisualMetrics m,
+  }) {
+    final isFreshOrMid = m.bluePurpleRatio >= 0.14 ||
+        (m.erythemaDelta >= 0.08 && m.darknessDelta >= 0.08);
+    final isHealing = m.yellowGreenBruiseRatio >= 0.14;
+
+    if (skinContext.hasUnexplainedBruiseRedFlag) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle:
+            'Darbesiz Morluk Uyarısı — Dahiliye / Hematoloji Değerlendirmesi Önerilir',
+        summaryDetail:
+            '${areaPrefix}Bilinen bir çarpma veya darbe olmadan kendiliğinden oluşan morluklar; trombosit/pıhtılaşma dengesi, damar hassasiyeti veya kan sulandırıcı ilaç etkileri açısından doktor değerlendirmesi gerektirir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          if (isFreshOrMid)
+            'Taze/orta evre morlukla uyumlu koyu mor-lacivert veya kırmızımsı ton ölçüldü.',
+          if (isHealing)
+            'İyileşme evresiyle uyumlu yeşilimsi-sarı tonlar gözlendi.',
+          'Darbe olmadan kendiliğinden oluşma öyküsü işaretlendi.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Kısa sürede Dahiliye uzmanına başvurarak tam kan sayımı ve pıhtılaşma değerlerinizi kontrol ettirin.',
+          'Kan sulandırıcı, aspirin veya yeni bir ilaç/takviye kullanıyorsanız doktorunuza mutlaka bildirin.',
+          'Morluğun boyutunu ve sayısını tarihli olarak takip edin.',
+        ],
+        warningFlags: const [
+          'Diş eti/burun kanaması, ateş, halsizlik veya vücutta birden fazla darbesiz morluk varsa gecikmeden sağlık kuruluşuna başvurun.',
+        ],
+        confidence: 0.72,
+        createdAt: now,
+      );
+    }
+
+    if (isFreshOrMid) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Morluk Takibi — Taze / Orta Evre (Kırmızı-Mor / Lacivert)',
+        summaryDetail:
+            '${areaPrefix}Cilt altında kan birikimi (ekimoz) ile uyumlu koyu mor, kırmızımsı veya lacivert tonlar gözlendi. Darbe sonrası genellikle ilk 0–5 gün içinde bu renk evresi görülür.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          'Merkez bölgede mor-lacivert/koyu kırmızı renk oranı belirgin.',
+          'İyileşme sürecinde rengin yeşil-sarıya doğru açılması beklenir.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Darbe sonrası ilk 24–48 saatte havluya sarılı soğuk kompres (15 dk aralıklarla) şişliği azaltmaya yardımcı olur.',
+          '48 saatten sonra ılık kompres iyileşme dolaşımını destekleyebilir.',
+          'Morluk 2 haftada açılmazsa, giderek büyüyorsa veya altında sert ağrılı kitle oluşursa doktora başvurun.',
+        ],
+        warningFlags: const [
+          'Şiddetli şişlik, hareket kısıtlılığı, uyuşma veya kan sulandırıcı kullanımı varsa hekim değerlendirmesi alın.',
+        ],
+        confidence: 0.68,
+        createdAt: now,
+      );
+    }
+
+    if (isHealing) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.normal,
+        summaryTitle: 'Morluk Takibi — İyileşme Evresi (Yeşil / Sarı Ton)',
+        summaryDetail:
+            '${areaPrefix}Yeşilimsi, zeytin veya sarı-kahverengi tonlar morluğun parçalanarak iyileşme evresine (yaklaşık 7–14. gün) geçtiğini gösterir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          'Merkez bölgede iyileşen morlukla uyumlu yeşil-sarı pigment tonu baskın.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Rengin önümüzdeki birkaç gün içinde tamamen açılmasını takip edin.',
+          '3 haftayı geçen kalıcı morluklarda doktora danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.67,
+        createdAt: now,
+      );
+    }
+
+    return AnalysisResult(
+      id: id,
+      category: CheckCategory.skinCondition,
+      riskLevel: RiskLevel.attention,
+      summaryTitle: 'Hafif / Solmakta Olan Morluk Takibi',
+      summaryDetail:
+          '${areaPrefix}Görüntüde yoğun mor-lacivert veya belirgin yeşil-sarı kontrastı saptanmadı; morluk çok hafif olabilir veya ortam ışığı renk tonunu zayıflatmış olabilir.',
+      dominantColorValue: m.centerColor.toARGB32(),
+      observations: [
+        'Renk kontrastı düşük düzeyde ölçüldü.',
+        ..._symptomObservations(),
+      ],
+      recommendations: const [
+        'Doğal gün ışığında tekrar çekerek birkaç gün arayla renk değişimini karşılaştırın.',
+        'Ağrı artışı, şişlik veya yeni morluklar oluşursa hekime danışın.',
+      ],
+      warningFlags: const [],
+      confidence: 0.56,
+      createdAt: now,
+    );
+  }
+
+  AnalysisResult _analyzeWart({
+    required String id,
+    required DateTime now,
+    required String areaPrefix,
+    required SkinVisualMetrics m,
+  }) {
+    final hasRedFlags = skinContext.symptoms.contains(SkinSymptomFlag.bleedingOrOozing) ||
+        skinContext.symptoms.contains(SkinSymptomFlag.rapidChange) ||
+        skinContext.symptoms.contains(SkinSymptomFlag.nonHealingSore);
+    final isSensitiveArea = skinContext.bodyArea == 'Yüz / Boyun';
+    final hasRoughSurface = m.roughTextureIndex >= 0.05 || m.scalingIndex >= 0.22;
+    final hasBlackDots = m.blackDotRatio >= 0.012 ||
+        skinContext.symptoms.contains(SkinSymptomFlag.roughBlackDots);
+
+    if (hasRedFlags) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle:
+            'Kanayan / Hızla Değişen Kabartı — Dermatolog Muayenesi Önerilir',
+        summaryDetail:
+            '${areaPrefix}Siğil sanılan bazı kanamalı, iyileşmeyen veya hızla büyüyen kabartılar farklı cilt lezyonları (skuamöz hücreli lezyonlar dahil) olabilir. Kesin ayrım için dermatoloji muayenesi gerekir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          if (hasRoughSurface)
+            'Yüzeyde belirgin pütürlü/düzensiz doku kontrastı ölçüldü.',
+          if (hasBlackDots)
+            'Yüzeyde koyu noktacık (kapiller veya kabuk) görünümü saptandı.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Kesinlikle kendi başınıza siğil asidi, kesme veya yakma yöntemi uygulamayın.',
+          'Kısa sürede bir dermatoloji uzmanına muayene olun.',
+        ],
+        warningFlags: const [
+          'Kanama, hızlı büyüme veya iyileşmeyen yara görünümü olan kabartılar hekim tarafından değerlendirilmelidir.',
+        ],
+        confidence: 0.70,
+        createdAt: now,
+      );
+    }
+
+    return AnalysisResult(
+      id: id,
+      category: CheckCategory.skinCondition,
+      riskLevel: RiskLevel.attention,
+      summaryTitle: 'Siğil Benzeri Pütürlü Kabartı — Ön Değerlendirme',
+      summaryDetail:
+          '${areaPrefix}${hasRoughSurface || hasBlackDots ? 'Pütürlü yüzey dokusu veya koyu noktacık ipuçları yaygın siğil (verruka) veya nasır görünümüyle uyumlu olabilir.' : 'Görüntüde hafif doku/ton farkı gözlendi; siğil, nasır veya keratoz ayrımı için yakından dermatoloji muayenesi gerekir.'}',
+      dominantColorValue: m.centerColor.toARGB32(),
+      observations: [
+        if (hasRoughSurface)
+          'Merkez alanda pürüzsüz çevre cilde kıyasla pütürlü/hiperkeratotik doku kontrastı ölçüldü.',
+        if (hasBlackDots)
+          'Merkezde siğillerde sık görülen küçük koyu noktacık (pıhtılaşmış kapiller) ipucu saptandı.',
+        if (isSensitiveArea)
+          'Yüz/boyun bölgesi hassas alan olduğundan ev tipi asitli ürünler önerilmez.',
+        ..._symptomObservations(),
+      ],
+      recommendations: [
+        if (isSensitiveArea)
+          'Yüz/boyun bölgesindeki kabartılarda reçetesiz siğil asidi/bandı kullanmayın; dermatoloji uzmanına başvurun.'
+        else
+          'Doğru tedavi (kriyoterapi veya doktor önerili solüsyon) için cildiye uzmanına danışın.',
+        'Diyabetiniz, dolaşım sorununuz veya bağışıklık baskılanmanız varsa ayak/el lezyonlarına asla evde müdahale etmeyin.',
+        'Yayılımı önlemek için lezyonu koparmayın; tırnak makası, törpü ve havluları ortak kullanmayın.',
+      ],
+      warningFlags: const [
+        'Yüz, genital bölge veya diyabetik ayaktaki kabartılar mutlaka doktor kontrolünde tedavi edilmelidir.',
+      ],
+      confidence: hasRoughSurface || hasBlackDots ? 0.66 : 0.56,
+      createdAt: now,
+    );
+  }
+
+  AnalysisResult _analyzeFacialSpot({
+    required String id,
+    required DateTime now,
+    required String areaPrefix,
+    required SkinVisualMetrics m,
+    required bool isDarkPigmented,
+    required bool isVariegatedOrAsymmetric,
+    required bool isStrongRedness,
+  }) {
+    final suspiciousPigment =
+        (isDarkPigmented && isVariegatedOrAsymmetric) ||
+            skinContext.hasAbcdeRedFlag;
+
+    if (suspiciousPigment) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle:
+            'Yüzde Asimetrik / Değişen Koyu Leke — Dermatoloji (Dermoskopi) Önerilir',
+        summaryDetail:
+            '${areaPrefix}Güneşe açık yüz bölgesinde asimetrik, çok tonlu veya değişen koyu lekeler sıradan güneş lekesi olabileceği gibi atipik pigment lezyonları (lentigo maligna vb.) açısından dermoskopik muayene gerektirir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          if (isDarkPigmented)
+            'Leke çevre yüz cildine göre belirgin derecede koyu ölçüldü.',
+          if (m.colorVariegation >= 0.28)
+            'Leke içinde birden fazla kahverengi/koyu ton dağılımı gözlendi.',
+          if (m.asymmetryScore >= 0.14)
+            'Leke alanında belirgin asimetri farkı saptandı.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Leke açıcı krem, peeling veya lazer işlemi yaptırmadan önce mutlaka bir dermatoloğa dermoskopi ile muayene olun.',
+          'Her gün geniş spektrumlu SPF 50+ güneş koruyucu kullanın.',
+        ],
+        warningFlags: const [
+          'Büyüyen, koyulaşan, sınırları düzensizleşen veya kanayan yüz lekeleri dermatoloji muayenesi gerektirir.',
+        ],
+        confidence: 0.69,
+        createdAt: now,
+      );
+    }
+
+    if (isStrongRedness) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Yüzde Kızarık Leke / Hassasiyet İpucu',
+        summaryDetail:
+            '${areaPrefix}Yüzde çevre cilde kıyasla pembe-kırmızı ton artışı gözlendi. Akne sonrası kızarıklık (PIE), rozasea, güneş hassasiyeti veya kozmetik tahrişi ile uyumlu olabilir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          'Örneklenen yüz bölgesinde kızarıklık (eritem) artışı saptandı.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Tahriş edici asit/peeling ürünlerine ara verin; nazik temizleyici ve SPF 50+ güneş koruyucu kullanın.',
+          'Kızarıklık kalıcıysa, yanma/batma yapıyorsa dermatoloji uzmanına danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.65,
+        createdAt: now,
+      );
+    }
+
+    final hasTanPigment = m.darknessDelta >= 0.08 ||
+        skinContext.symptoms.contains(SkinSymptomFlag.sunOrHormoneHistory);
+    if (hasTanPigment) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.attention,
+        summaryTitle:
+            'Yüz Lekesi / Pigmentasyon Ön Kontrol (Güneş / Melazma İpucu)',
+        summaryDetail:
+            '${areaPrefix}Çevre cilde göre daha koyu ancak nispeten dengeli pigment tonu gözlendi. Güneş lekesi (solar lentigo), melazma veya akne sonrası leke (PIH) ile uyumlu olabilir.',
+        dominantColorValue: m.centerColor.toARGB32(),
+        observations: [
+          if (m.darknessDelta >= 0.08)
+            'Merkez alanda çevre yüz tonuna kıyasla lokalize pigment koyulaşması ölçüldü.',
+          'Belirgin çok renklilik veya şiddetli asimetri saptanmadı.',
+          ..._symptomObservations(),
+        ],
+        recommendations: const [
+          'Yaz-kış düzenli SPF 50+ (tercihen görünür ışığa karşı renkli/mineral filtreli) güneş koruyucu kullanın.',
+          'Reçetesiz yüksek oranlı leke açıcı asitler lekeyi koyulaştırabilir; hedefe yönelik bakım için dermatoloğa danışın.',
+          'Aylık fotoğraflarla lekenin solma veya koyulaşma seyrini takip edin.',
+        ],
+        warningFlags: const [],
+        confidence: 0.64,
+        createdAt: now,
+      );
+    }
+
+    return AnalysisResult(
+      id: id,
+      category: CheckCategory.skinCondition,
+      riskLevel: RiskLevel.normal,
+      summaryTitle: 'Yüz Cilt Tonu Dengeli Görünüyor',
+      summaryDetail:
+          '${areaPrefix}Örneklenen alanda belirgin koyu pigment kontrastı veya yoğun kızarıklık farkı saptanmadı.',
+      dominantColorValue: m.centerColor.toARGB32(),
+      observations: [
+        'Merkez ve çevre yüz tonları birbirine yakın ve homojen.',
+        ..._symptomObservations(),
+      ],
+      recommendations: const [
+        'Günlük güneş koruyucu ve düzenli nemlendirme leke oluşumunu önlemeye yardımcı olur.',
+      ],
+      warningFlags: const [],
+      confidence: 0.66,
       createdAt: now,
     );
   }

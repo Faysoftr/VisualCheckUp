@@ -19,6 +19,7 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/category_car
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -78,6 +79,18 @@ class _HomeScreenState extends State<HomeScreen> {
       _allHistory = history;
       _enabledTracks = tracks;
     });
+  }
+
+  Future<void> _openSkinSubModule(SkinConcernType concern) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SkinCheckScreen(
+          historyRepository: widget.historyRepository,
+          initialConcern: concern,
+        ),
+      ),
+    );
+    await _loadDashboardData();
   }
 
   Future<void> _openCategory(CheckCategory category) async {
@@ -586,6 +599,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 14),
+                  Text(
+                    'Özel Cilt Ön Tarama',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final concern
+                            in SkinConcernTypeX.featuredSubModules)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ActionChip(
+                              avatar: Icon(
+                                concern.icon,
+                                size: 17,
+                                color: concern.accentColor,
+                              ),
+                              label: Text(
+                                concern.label,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.5,
+                                ),
+                              ),
+                              onPressed: () => _openSkinSubModule(concern),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Kontrol Kategorileri',

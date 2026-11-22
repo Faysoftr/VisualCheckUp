@@ -51,10 +51,21 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Cilt Hastalıkları Ön Kontrol'), findsOneWidget);
+      expect(find.text('Ben & Cilt Kanseri Risk'), findsOneWidget);
+      expect(find.text('Siğil Ön Kontrol'), findsOneWidget);
+      expect(find.text('Morluk Takibi'), findsOneWidget);
+      expect(find.text('Yüz Lekesi'), findsOneWidget);
+
+      final skinListScrollable = find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first;
       await tester.scrollUntilVisible(
         find.text('Kamera ile Cilt Kontrolünü Başlat'),
         300,
-        scrollable: find.byType(Scrollable).last,
+        scrollable: skinListScrollable,
       );
       expect(find.text('Benler İçin ABCDE Kontrol Rehberi'), findsOneWidget);
       expect(find.text('Kamera ile Cilt Kontrolünü Başlat'), findsOneWidget);

@@ -98,10 +98,18 @@ class DoctorReportBuilder {
     final rgb = currentResult.dominantColorValue & 0x00FFFFFF;
     final colorHex = '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
 
+    var specialty = currentResult.category.recommendedSpecialty;
+    if (currentResult.category == CheckCategory.skinCondition &&
+        currentResult.summaryTitle.toLowerCase().contains('morluk')) {
+      specialty = currentResult.riskLevel == RiskLevel.urgent
+          ? 'Dahiliye veya Hematoloji'
+          : 'Dahiliye veya Dermatoloji';
+    }
+
     return DoctorVisitReport(
       currentResult: currentResult,
       previousCategoryResults: previous.take(4).toList(),
-      recommendedSpecialty: currentResult.category.recommendedSpecialty,
+      recommendedSpecialty: specialty,
       colorHex: colorHex,
       questionsForDoctor: _questionsFor(currentResult),
     );
@@ -111,11 +119,31 @@ class DoctorReportBuilder {
     final questions = <String>[];
     switch (result.category) {
       case CheckCategory.skinCondition:
-        questions.addAll(const [
-          'Bu leke/döküntü için dermatoskopi muayenesi gerekir mi?',
-          'Boyut, renk veya kenar değişimini ne sıklıkla takip etmeliyim?',
-          'Güneşten korunma veya topikal bakım için ne önerirsiniz?',
-        ]);
+        final lower = result.summaryTitle.toLowerCase();
+        if (lower.contains('morluk')) {
+          questions.addAll(const [
+            'Bu morluk için tam kan sayımı (trombosit) veya pıhtılaşma testi yaptırmam gerekir mi?',
+            'Kullandığım ilaç veya takviyeler kolay morarmaya yol açıyor olabilir mi?',
+            'Morluğun kaç gün içinde tamamen açılmasını beklemeliyim?',
+          ]);
+        } else if (lower.contains('siğil')) {
+          questions.addAll(const [
+            'Bu kabartı siğil mi, nasır mı yoksa farklı bir cilt lezyonu mu?',
+            'Bu bölge için en güvenli tedavi yöntemi (kriyoterapi veya reçeteli ürün) hangisidir?',
+            'Çevreye veya diğer bölgelere bulaşmaması için nelere dikkat etmeliyim?',
+          ]);
+        } else if (lower.contains('yüz')) {
+          questions.addAll(const [
+            'Bu yüz lekesi güneş lekesi/melazma mı yoksa dermoskopik takip gerektiren bir pigment lezyonu mu?',
+            'Leke bakımı veya işlem öncesi hangi güneş koruyucu ve içerikleri önerirsiniz?',
+          ]);
+        } else {
+          questions.addAll(const [
+            'Bu leke/ben için dermatoskopi muayenesi gerekir mi?',
+            'Boyut, renk veya kenar değişimini ne sıklıkla takip etmeliyim?',
+            'Güneşten korunma veya topikal bakım için ne önerirsiniz?',
+          ]);
+        }
       case CheckCategory.eye:
         questions.addAll(const [
           'Göz akındaki bu renk değişimi ışık/yorgunluk kaynaklı mı yoksa kan tahlili (bilirubin vb.) gerekir mi?',
