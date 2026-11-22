@@ -264,4 +264,203 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'Conta e Menu';
+
+  @override
+  String get menuSettings => 'Configurações (Permissões e Idioma)';
+
+  @override
+  String get settingsTitle => 'Configurações';
+
+  @override
+  String get settingsLanguageDesc =>
+      'O idioma do telefone é usado por padrão. Você pode escolher outro idioma abaixo.';
+
+  @override
+  String get settingsPermissionsTitle => 'Permissões do App';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'Verifique e gerencie as permissões de câmera e galeria aqui.';
+
+  @override
+  String get settingsCameraPermission => 'Permissão de Câmera';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'Para capturas de olhos, língua, unhas e pele';
+
+  @override
+  String get settingsPhotosPermission => 'Permissão de Galeria e Fotos';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'Para enviar fotos e laudos de exames';
+
+  @override
+  String get settingsOpenSystemPermissions => 'Abrir Permissões do Telefone';
+
+  @override
+  String get permChecking => 'Verificando...';
+
+  @override
+  String get permGranted => 'Concedida';
+
+  @override
+  String get permDenied => 'Permissão Necessária';
+
+  @override
+  String get permPermanent => 'Ativar nas Configurações do Sistema';
+
+  @override
+  String get permUnavailable => 'Gerenciado pelo Dispositivo';
+
+  @override
+  String get permGrantBtn => 'Permitir';
+
+  @override
+  String get permOpenSettingsBtn => 'Abrir Configurações';
+
+  @override
+  String get skinCancerRisk => 'Pinta e Risco Cutâneo';
+
+  @override
+  String get skinWart => 'Pré-avaliação de Verruga';
+
+  @override
+  String get skinBruise => 'Acompanhamento de Hematoma';
+
+  @override
+  String get skinFacialSpot => 'Mancha Facial';
+
+  @override
+  String get trackEyeTitle => 'Verificação Semanal dos Olhos';
+
+  @override
+  String get trackEyeSubtitle => 'Acompanhe vermelhidão ou amarelamento';
+
+  @override
+  String get trackTongueTitle => 'Verificação Semanal da Língua';
+
+  @override
+  String get trackTongueSubtitle => 'Acompanhe cor, saburra e textura';
+
+  @override
+  String get trackNailTitle => 'Verificação Semanal das Unhas';
+
+  @override
+  String get trackNailSubtitle => 'Monitore palidez, tom azulado ou amarelo';
+
+  @override
+  String get trackFaceTitle => 'Tom Facial Quinzenal';
+
+  @override
+  String get trackFaceSubtitle => 'Compare palidez, vermelhidão e tom da pele';
+
+  @override
+  String get trackSkinTitle => 'Verificação Mensal de Pele e Pintas';
+
+  @override
+  String get trackSkinSubtitle =>
+      'Compare mudanças em 30 dias em pintas, verrugas e manchas';
+
+  @override
+  String get trackHydrationTitle => 'Hidratação Diária (Urina)';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'Registre em 2 s com o cartão de cores sem câmera';
+
+  @override
+  String get trackStoolTitle => 'Verificação Semanal das Fezes';
+
+  @override
+  String get trackStoolSubtitle => 'Acompanhe digestão e alertas de coloração';
+
+  @override
+  String get trackBpTitle => 'Pressão Arterial Diária';
+
+  @override
+  String get trackBpSubtitle => 'Registre pressão sistólica/diastólica e pulso';
+
+  @override
+  String get trackSugarTitle => 'Glicemia Diária';
+
+  @override
+  String get trackSugarSubtitle => 'Registre glicemia em jejum ou pós-refeição';
+
+  @override
+  String get trackLabTitle => 'Exame de Sangue Trimestral';
+
+  @override
+  String get trackLabSubtitle =>
+      'Envie laudos hospitalares e compare ao longo do tempo';
+
+  @override
+  String get statusFirstPending => 'Aguardando primeiro registro';
+
+  @override
+  String get statusDueNow => 'Hora de verificar';
+
+  @override
+  String get statusDoneToday => 'Concluído hoje';
+
+  @override
+  String statusNextDays(int days) {
+    return 'Próxima verificação em $days dias';
+  }
+
+  @override
+  String get actionCheckNow => 'Verificar Agora';
+
+  @override
+  String get actionLogReading => 'Registrar';
+
+  @override
+  String get actionAddReport => 'Adicionar Laudo';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • Método de Verificação';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'Escolha em 2 segundos no cartão de cores sem foto ou use a câmera.';
+
+  @override
+  String get colorCardRecommendedTitle =>
+      'Cartão de Cores sem Câmera (Recomendado)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'Registro privado e rápido sem foto (2 s)';
+
+  @override
+  String get cameraMeasureTitle => 'Medição com Câmera';
+
+  @override
+  String get cameraMeasureSubtitle =>
+      'Medição automática com balanço de branco';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'Escolha um módulo para ver referências saudáveis e de alerta.';
+
+  @override
+  String get historyEmpty => 'Nenhuma verificação salva ainda.';
+
+  @override
+  String get filterAll => 'Todos';
+
+  @override
+  String get aiSettingsTitle => 'IA e Privacidade';
+
+  @override
+  String get vitalsBpTab => 'Pressão Arterial';
+
+  @override
+  String get vitalsSugarTab => 'Glicemia';
+
+  @override
+  String get skinScreenTitle => 'Pré-avaliação Cutânea';
 }

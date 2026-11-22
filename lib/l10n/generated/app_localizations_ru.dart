@@ -263,4 +263,203 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'Аккаунт и меню';
+
+  @override
+  String get menuSettings => 'Настройки (Разрешения и Язык)';
+
+  @override
+  String get settingsTitle => 'Настройки';
+
+  @override
+  String get settingsLanguageDesc =>
+      'По умолчанию используется язык телефона. Вы можете выбрать любой язык ниже.';
+
+  @override
+  String get settingsPermissionsTitle => 'Разрешения приложения';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'Проверьте и настройте доступ к камере и галерее.';
+
+  @override
+  String get settingsCameraPermission => 'Доступ к камере';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'Для съемки глаз, языка, ногтей и кожи';
+
+  @override
+  String get settingsPhotosPermission => 'Доступ к галерее и фото';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'Для загрузки фотографий и анализов';
+
+  @override
+  String get settingsOpenSystemPermissions => 'Открыть разрешения на телефоне';
+
+  @override
+  String get permChecking => 'Проверка...';
+
+  @override
+  String get permGranted => 'Разрешено';
+
+  @override
+  String get permDenied => 'Требуется доступ';
+
+  @override
+  String get permPermanent => 'Включите в настройках системы';
+
+  @override
+  String get permUnavailable => 'Управляется устройством';
+
+  @override
+  String get permGrantBtn => 'Разрешить';
+
+  @override
+  String get permOpenSettingsBtn => 'Открыть настройки';
+
+  @override
+  String get skinCancerRisk => 'Родинки и риск меланомы';
+
+  @override
+  String get skinWart => 'Проверка бородавок';
+
+  @override
+  String get skinBruise => 'Отслеживание синяков';
+
+  @override
+  String get skinFacialSpot => 'Пятна на лице';
+
+  @override
+  String get trackEyeTitle => 'Еженедельная проверка глаз';
+
+  @override
+  String get trackEyeSubtitle => 'Отслеживайте покраснение или желтушность';
+
+  @override
+  String get trackTongueTitle => 'Еженедельная проверка языка';
+
+  @override
+  String get trackTongueSubtitle => 'Отслеживайте цвет, налет и текстуру';
+
+  @override
+  String get trackNailTitle => 'Еженедельная проверка ногтей';
+
+  @override
+  String get trackNailSubtitle =>
+      'Следите за бледностью, синюшностью и желтизной';
+
+  @override
+  String get trackFaceTitle => 'Тон лица раз в 2 недели';
+
+  @override
+  String get trackFaceSubtitle => 'Сравнивайте бледность и покраснение лица';
+
+  @override
+  String get trackSkinTitle => 'Ежемесячный осмотр кожи и родинок';
+
+  @override
+  String get trackSkinSubtitle =>
+      'Сравнивайте изменения родинок, бородавок и пятен за 30 дней';
+
+  @override
+  String get trackHydrationTitle => 'Ежедневная гидратация (моча)';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'Запишите за 2 секунды по цветовой карте без камеры';
+
+  @override
+  String get trackStoolTitle => 'Еженедельный контроль стула';
+
+  @override
+  String get trackStoolSubtitle =>
+      'Отслеживайте пищеварение и цветовые сигналы';
+
+  @override
+  String get trackBpTitle => 'Ежедневное измерение давления';
+
+  @override
+  String get trackBpSubtitle => 'Записывайте давление и пульс';
+
+  @override
+  String get trackSugarTitle => 'Ежедневный контроль сахара';
+
+  @override
+  String get trackSugarSubtitle => 'Отслеживайте глюкозу натощак и после еды';
+
+  @override
+  String get trackLabTitle => 'Анализы крови раз в 3 месяца';
+
+  @override
+  String get trackLabSubtitle =>
+      'Загружайте бланки анализов и сравнивайте динамику';
+
+  @override
+  String get statusFirstPending => 'Ожидается первая запись';
+
+  @override
+  String get statusDueNow => 'Пора выполнить проверку';
+
+  @override
+  String get statusDoneToday => 'Выполнено сегодня';
+
+  @override
+  String statusNextDays(int days) {
+    return 'Следующая проверка через $days дн.';
+  }
+
+  @override
+  String get actionCheckNow => 'Проверить';
+
+  @override
+  String get actionLogReading => 'Записать';
+
+  @override
+  String get actionAddReport => 'Добавить отчет';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • Способ проверки';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'Выберите цвет за 2 секунды без фото или используйте камеру.';
+
+  @override
+  String get colorCardRecommendedTitle =>
+      'Цветовая карта без камеры (Рекомендуется)';
+
+  @override
+  String get colorCardRecommendedSubtitle => 'Быстро и приватно без фото (2 с)';
+
+  @override
+  String get cameraMeasureTitle => 'Измерение камерой';
+
+  @override
+  String get cameraMeasureSubtitle => 'Автоматический замер с балансом белого';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'Выберите модуль для просмотра визуальных ориентиров.';
+
+  @override
+  String get historyEmpty => 'Сохраненных проверок пока нет.';
+
+  @override
+  String get filterAll => 'Все';
+
+  @override
+  String get aiSettingsTitle => 'ИИ и приватность';
+
+  @override
+  String get vitalsBpTab => 'Давление';
+
+  @override
+  String get vitalsSugarTab => 'Сахар крови';
+
+  @override
+  String get skinScreenTitle => 'Предварительный осмотр кожи';
 }

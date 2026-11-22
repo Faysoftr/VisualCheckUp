@@ -226,6 +226,7 @@ class _FollowUpTrackTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,13 +248,13 @@ class _FollowUpTrackTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    status.track.title,
+                    status.track.localizedTitle(l10n),
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    status.track.subtitle,
+                    status.track.localizedSubtitle(l10n),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -300,7 +301,7 @@ class _FollowUpTrackTile extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  status.statusLabel,
+                  status.localizedStatusLabel(l10n),
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: status.isDueNow
                         ? colorScheme.primary
@@ -311,7 +312,7 @@ class _FollowUpTrackTile extends StatelessWidget {
               ),
               TextButton(
                 onPressed: onStart,
-                child: Text(status.track.actionButtonLabel),
+                child: Text(status.track.localizedActionLabel(l10n)),
               ),
             ],
           ),

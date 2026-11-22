@@ -263,4 +263,201 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'खाता और मेनू';
+
+  @override
+  String get menuSettings => 'सेटिंग्स (अनुमतियाँ और भाषा)';
+
+  @override
+  String get settingsTitle => 'सेटिंग्स';
+
+  @override
+  String get settingsLanguageDesc =>
+      'डिफ़ॉल्ट रूप से फ़ोन की भाषा उपयोग होती है। आप नीचे से कोई भी भाषा चुन सकते हैं।';
+
+  @override
+  String get settingsPermissionsTitle => 'ऐप अनुमतियाँ';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'यहाँ कैमरा और गैलरी अनुमतियाँ जांचें और प्रबंधित करें।';
+
+  @override
+  String get settingsCameraPermission => 'कैमरा अनुमति';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'आंख, जीभ, नाखून और त्वचा की फोटो के लिए';
+
+  @override
+  String get settingsPhotosPermission => 'गैलरी और फ़ोटो अनुमति';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'फ़ोटो और लैब रिपोर्ट अपलोड करने के लिए';
+
+  @override
+  String get settingsOpenSystemPermissions => 'फ़ोन ऐप अनुमतियाँ खोलें';
+
+  @override
+  String get permChecking => 'जांच हो रही है...';
+
+  @override
+  String get permGranted => 'अनुमति दी गई';
+
+  @override
+  String get permDenied => 'अनुमति आवश्यक';
+
+  @override
+  String get permPermanent => 'सिस्टम सेटिंग्स से चालू करें';
+
+  @override
+  String get permUnavailable => 'डिवाइस द्वारा प्रबंधित';
+
+  @override
+  String get permGrantBtn => 'अनुमति दें';
+
+  @override
+  String get permOpenSettingsBtn => 'सेटिंग्स खोलें';
+
+  @override
+  String get skinCancerRisk => 'तिल और त्वचा कैंसर जोखिम';
+
+  @override
+  String get skinWart => 'मस्सा प्रारंभिक जांच';
+
+  @override
+  String get skinBruise => 'नील (चोट) ट्रैकिंग';
+
+  @override
+  String get skinFacialSpot => 'चेहरे के दाग';
+
+  @override
+  String get trackEyeTitle => 'साप्ताहिक आंख जांच';
+
+  @override
+  String get trackEyeSubtitle => 'लाली या पीलेपन में बदलाव ट्रैक करें';
+
+  @override
+  String get trackTongueTitle => 'साप्ताहिक जीभ जांच';
+
+  @override
+  String get trackTongueSubtitle => 'जीभ का रंग, परत और बनावट देखें';
+
+  @override
+  String get trackNailTitle => 'साप्ताहिक नाखून जांच';
+
+  @override
+  String get trackNailSubtitle => 'पीलापन, नीलापन या सफेदी की निगरानी करें';
+
+  @override
+  String get trackFaceTitle => 'पाक्षिक चेहरा व त्वचा टोन';
+
+  @override
+  String get trackFaceSubtitle => 'चेहरे के रंग और लाली की तुलना करें';
+
+  @override
+  String get trackSkinTitle => 'मासिक त्वचा, तिल और मस्सा जांच';
+
+  @override
+  String get trackSkinSubtitle =>
+      '30 दिनों में तिल, मस्से व दागों में बदलाव देखें';
+
+  @override
+  String get trackHydrationTitle => 'दैनिक हाइड्रेशन (मूत्र) जांच';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'बिना कैमरे कलर कार्ड से 2 सेकंड में रिकॉर्ड करें';
+
+  @override
+  String get trackStoolTitle => 'साप्ताहिक मल रंग जांच';
+
+  @override
+  String get trackStoolSubtitle => 'पाचन और रंग चेतावनी नियमित ट्रैक करें';
+
+  @override
+  String get trackBpTitle => 'दैनिक ब्लड प्रेशर जांच';
+
+  @override
+  String get trackBpSubtitle => 'सिस्टोलिक/डायस्टोलिक और पल्स ट्रेंड सहेजें';
+
+  @override
+  String get trackSugarTitle => 'दैनिक ब्लड शुगर जांच';
+
+  @override
+  String get trackSugarSubtitle => 'फास्टिंग या भोजन के बाद शुगर रिकॉर्ड करें';
+
+  @override
+  String get trackLabTitle => 'त्रैमासिक ब्लड टेस्ट व रिपोर्ट';
+
+  @override
+  String get trackLabSubtitle => 'अस्पताल रिपोर्ट अपलोड करें और तुलना करें';
+
+  @override
+  String get statusFirstPending => 'पहले रिकॉर्ड की प्रतीक्षा';
+
+  @override
+  String get statusDueNow => 'जांच का समय हो गया है';
+
+  @override
+  String get statusDoneToday => 'आज पूरा हुआ';
+
+  @override
+  String statusNextDays(int days) {
+    return 'अगली जांच: $days दिन बाद';
+  }
+
+  @override
+  String get actionCheckNow => 'अभी जांचें';
+
+  @override
+  String get actionLogReading => 'रीडिंग दर्ज करें';
+
+  @override
+  String get actionAddReport => 'रिपोर्ट जोड़ें';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • जांच का तरीका';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'बिना फोटो लिए 2 सेकंड में कलर कार्ड चुनें या कैमरा माप उपयोग करें।';
+
+  @override
+  String get colorCardRecommendedTitle => 'बिना कैमरे का कलर कार्ड (अनुशंसित)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'बिना फोटो के निजी और तेज़ रिकॉर्ड (2 सेकंड)';
+
+  @override
+  String get cameraMeasureTitle => 'कैमरा रंग माप';
+
+  @override
+  String get cameraMeasureSubtitle =>
+      'व्हाइट-बैलेंस कैलिब्रेशन के साथ स्वचालित माप';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'स्वस्थ और असामान्य दृश्य संकेत देखने के लिए मॉड्यूल चुनें।';
+
+  @override
+  String get historyEmpty => 'अभी कोई सहेजी गई जांच नहीं है।';
+
+  @override
+  String get filterAll => 'सभी';
+
+  @override
+  String get aiSettingsTitle => 'AI और गोपनीयता';
+
+  @override
+  String get vitalsBpTab => 'ब्लड प्रेशर';
+
+  @override
+  String get vitalsSugarTab => 'ब्लड शुगर';
+
+  @override
+  String get skinScreenTitle => 'त्वचा स्थिति पूर्व-जांच';
 }

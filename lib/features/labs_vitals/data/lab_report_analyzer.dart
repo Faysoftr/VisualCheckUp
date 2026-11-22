@@ -234,6 +234,357 @@ class LabReportAnalyzer {
           'Vücutta aktif enfeksiyon veya iltihabi süreç işareti olabilir; şikayetlerinizle birlikte doktor değerlendirmesi gerekir.',
       specialtyHint: 'Dahiliye',
     ),
+    LabParameterSpec(
+      code: 'HDL',
+      name: 'HDL Kolesterol',
+      aliases: ['hdl kolesterol', 'hdl-kolesterol', 'hdl'],
+      unit: 'mg/dL',
+      minNormal: 50,
+      maxNormal: 120,
+      lowNote:
+          'Koruyucu HDL kolesterol düşük görünüyor; düzenli egzersiz ve beslenme planı için doktorunuza danışabilirsiniz.',
+      highNote: 'Yüksek HDL kolesterol genellikle kalp-damar sağlığı açısından koruyucu kabul edilir.',
+      specialtyHint: 'Dahiliye veya Kardiyoloji',
+    ),
+    LabParameterSpec(
+      code: 'TOTAL_CHOL',
+      name: 'Total Kolesterol',
+      aliases: ['total kolesterol', 'toplam kolesterol', 'total cholesterol', 'kolesterol'],
+      unit: 'mg/dL',
+      minNormal: 0,
+      maxNormal: 200,
+      criticalHigh: 300,
+      lowNote: 'Referans aralığında.',
+      highNote: 'Toplam kolesterol sınırın üzerinde; LDL, HDL ve trigliserit ile birlikte değerlendirilmelidir.',
+      specialtyHint: 'Dahiliye veya Kardiyoloji',
+    ),
+    LabParameterSpec(
+      code: 'IRON',
+      name: 'Demir (Serum)',
+      aliases: ['serum demir', 'demir (fe)', 'demir', 'iron'],
+      unit: 'µg/dL',
+      minNormal: 60,
+      maxNormal: 180,
+      lowNote: 'Serum demir düşük; ferritin ve tam kan sayımı ile birlikte demir eksikliği açısından değerlendirilebilir.',
+      highNote: 'Serum demir yüksek; demir takviyesi veya karaciğer değerlendirmesi için hekime danışın.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'TIBC',
+      name: 'Demir Bağlama Kapasitesi',
+      aliases: ['demir bağlama kapasitesi', 'demir baglama kapasitesi', 'demir bağlama', 'demir baglama', 'tibc', 'uibc'],
+      unit: 'µg/dL',
+      minNormal: 155,
+      maxNormal: 355,
+      lowNote: 'Demir bağlama kapasitesi düşük; hekiminizle birlikte değerlendirin.',
+      highNote: 'Yüksek demir bağlama kapasitesi sıklıkla demir eksikliğine eşlik edebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'FOLATE',
+      name: 'Folat (Folik Asit)',
+      aliases: ['folik asit', 'folat', 'folate'],
+      unit: 'µg/L',
+      minNormal: 3.2,
+      maxNormal: 20.0,
+      lowNote: 'Folat düşüklüğü kansızlık ve halsizlik ile ilişkili olabilir; B12 ile birlikte değerlendirilir.',
+      highNote: 'Genellikle takviye kullanımına bağlıdır.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'UREA',
+      name: 'Üre',
+      aliases: ['kan üre', 'kan ure', 'üre', 'ure', 'urea', 'bun'],
+      unit: 'mg/dL',
+      minNormal: 17,
+      maxNormal: 43,
+      criticalHigh: 100,
+      lowNote: 'Düşük üre çoğunlukla beslenme veya sıvı fazlalığıyla ilişkilidir.',
+      highNote: 'Üre yüksekliği sıvı azlığı, yüksek protein alımı veya böbrek fonksiyonu açısından kreatinin ile değerlendirilir.',
+      specialtyHint: 'Dahiliye veya Nefroloji',
+    ),
+    LabParameterSpec(
+      code: 'EGFR',
+      name: 'eGFR (Böbrek Süzme Hızı)',
+      aliases: ['egfr', 'gfr', 'glomerüler filtrasyon'],
+      unit: 'mL/dk/1.73m²',
+      minNormal: 60,
+      maxNormal: 150,
+      criticalLow: 30,
+      lowNote: 'Böbrek süzme hızı referansın altında; kreatinin ile birlikte doktor değerlendirmesi gerekir.',
+      highNote: 'Normal böbrek süzme performansı.',
+      specialtyHint: 'Dahiliye veya Nefroloji',
+    ),
+    LabParameterSpec(
+      code: 'HCT',
+      name: 'Hematokrit (HCT)',
+      aliases: ['hematokrit', 'hct'],
+      unit: '%',
+      minNormal: 36,
+      maxNormal: 48,
+      criticalLow: 24,
+      criticalHigh: 58,
+      lowNote: 'Hematokrit düşük; hemoglobin ile birlikte anemi açısından değerlendirilir.',
+      highNote: 'Hematokrit yüksek; sıvı azlığı veya kan yoğunlaşması açısından hekim kontrolü önerilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'RBC',
+      name: 'Eritrosit (RBC)',
+      aliases: ['eritrosit', 'rbc', 'kırmızı küre'],
+      unit: '10^6/mm³',
+      minNormal: 3.5,
+      maxNormal: 5.5,
+      lowNote: 'Kırmızı kan hücresi düşük; HGB ve ferritin ile birlikte değerlendirilebilir.',
+      highNote: 'Kırmızı kan hücresi yüksek; hekim değerlendirmesi önerilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'MCV',
+      name: 'MCV',
+      aliases: ['mcv'],
+      unit: 'fL',
+      minNormal: 80,
+      maxNormal: 100,
+      lowNote: 'Küçük eritrosit hacmi (mikrositoz); demir eksikliği veya talasemi taşıyıcılığı ile ilişkili olabilir.',
+      highNote: 'Büyük eritrosit hacmi (makrositoz); B12 veya folat eksikliği açısından değerlendirilebilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'MCH',
+      name: 'MCH',
+      aliases: ['mch'],
+      unit: 'pg',
+      minNormal: 27,
+      maxNormal: 34,
+      lowNote: 'Referansın altında; MCV ve demir depolarıyla birlikte yorumlanır.',
+      highNote: 'Referansın üzerinde; B12 ve folat ile birlikte değerlendirilebilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'MCHC',
+      name: 'MCHC',
+      aliases: ['mchc'],
+      unit: 'g/dL',
+      minNormal: 32,
+      maxNormal: 36,
+      lowNote: 'Referansın altında; demir durumu ile birlikte değerlendirilir.',
+      highNote: 'Referansın üzerinde; tam kan sayımı bütünüyle değerlendirilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'RDW',
+      name: 'RDW',
+      aliases: ['rdw-cv', 'rdw-sd', 'rdw'],
+      unit: '%',
+      minNormal: 11,
+      maxNormal: 16,
+      lowNote: 'Referans aralığında.',
+      highNote: 'Eritrosit boyut dağılımı artmış; demir, B12 veya folat eksikliği başlangıcında yükselebilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'MPV',
+      name: 'MPV',
+      aliases: ['mpv'],
+      unit: 'fL',
+      minNormal: 6.5,
+      maxNormal: 12.0,
+      lowNote: 'Ortalama trombosit hacmi düşük; PLT ile birlikte yorumlanır.',
+      highNote: 'Ortalama trombosit hacmi yüksek; PLT ile birlikte hekim tarafından değerlendirilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'PCT',
+      name: 'PCT (Plateletkrit)',
+      aliases: ['pct'],
+      unit: '%',
+      minNormal: 0.108,
+      maxNormal: 0.282,
+      lowNote: 'Trombosit hacim oranı düşük; PLT ile birlikte değerlendirilir.',
+      highNote: 'Trombosit hacim oranı sınırın biraz üzerinde; PLT normal ise tek başına klinik anlamı sınırlı olabilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'PDW',
+      name: 'PDW',
+      aliases: ['pdw'],
+      unit: '%',
+      minNormal: 15,
+      maxNormal: 17,
+      lowNote: 'Trombosit dağılım genişliği düşük; PLT ile birlikte yorumlanır.',
+      highNote: 'Trombosit dağılım genişliği yüksek; PLT ile birlikte yorumlanır.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'NEU_ABS',
+      name: 'Nötrofil (NEU#)',
+      aliases: ['neu#', 'neut#', 'nötrofil#', 'notrofil#'],
+      unit: '10^3/mm³',
+      minNormal: 2.0,
+      maxNormal: 7.0,
+      lowNote: 'Nötrofil sayısı düşük; enfeksiyon riski açısından hekim kontrolü önemlidir.',
+      highNote: 'Nötrofil sayısı yüksek; enfeksiyon veya iltihabi yanıtla ilişkili olabilir.',
+      specialtyHint: 'Dahiliye veya Hematoloji',
+    ),
+    LabParameterSpec(
+      code: 'NEU_PCT',
+      name: 'Nötrofil % (NEU%)',
+      aliases: ['neu%', 'neut%', 'nötrofil%', 'notrofil%'],
+      unit: '%',
+      minNormal: 50,
+      maxNormal: 70,
+      lowNote: 'Nötrofil yüzdesi düşük; WBC ve NEU# ile birlikte değerlendirilir.',
+      highNote: 'Nötrofil yüzdesi yüksek; hafif enfeksiyon, stres veya iltihabi süreçlerde görülebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'LYM_ABS',
+      name: 'Lenfosit (LYM#)',
+      aliases: ['lym#', 'lymph#', 'lenfosit#'],
+      unit: '10^3/mm³',
+      minNormal: 0.8,
+      maxNormal: 4.0,
+      lowNote: 'Lenfosit sayısı düşük; WBC ve klinik durumla birlikte değerlendirilir.',
+      highNote: 'Lenfosit sayısı yüksek; viral enfeksiyonlar sonrası görülebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'LYM_PCT',
+      name: 'Lenfosit % (LYM%)',
+      aliases: ['lym%', 'lymph%', 'lenfosit%'],
+      unit: '%',
+      minNormal: 20,
+      maxNormal: 40,
+      lowNote: 'Lenfosit yüzdesi düşük; mutlak lenfosit (LYM#) normal ise genellikle göreceli bir değişikliktir.',
+      highNote: 'Lenfosit yüzdesi yüksek; viral süreçler ve bağışıklık yanıtıyla ilişkili olabilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'MON_ABS',
+      name: 'Monosit (MON#)',
+      aliases: ['mon#', 'mono#', 'monosit#'],
+      unit: '10^3/mm³',
+      minNormal: 0.12,
+      maxNormal: 1.20,
+      lowNote: 'Referansın altında; WBC ile birlikte yorumlanır.',
+      highNote: 'Referansın üzerinde; enfeksiyon iyileşme dönemi veya iltihabi süreçlerde görülebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'MON_PCT',
+      name: 'Monosit % (MON%)',
+      aliases: ['mon%', 'mono%', 'monosit%'],
+      unit: '%',
+      minNormal: 3,
+      maxNormal: 12,
+      lowNote: 'Referansın altında; MON# ile birlikte değerlendirilir.',
+      highNote: 'Referansın üzerinde; MON# ile birlikte değerlendirilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'EOS_ABS',
+      name: 'Eozinofil (EOS#)',
+      aliases: ['eos#', 'eozinofil#'],
+      unit: '10^3/mm³',
+      minNormal: 0.02,
+      maxNormal: 0.70,
+      lowNote: 'Normal aralıkta kabul edilir.',
+      highNote: 'Alerjik durumlar veya paraziter süreçlerle ilişkili olabilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'EOS_PCT',
+      name: 'Eozinofil % (EOS%)',
+      aliases: ['eos%', 'eozinofil%'],
+      unit: '%',
+      minNormal: 0.5,
+      maxNormal: 7.0,
+      lowNote: 'Genellikle klinik sorun oluşturmaz.',
+      highNote: 'Alerjik eğilim açısından EOS# ile birlikte değerlendirilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'BAS_ABS',
+      name: 'Bazofil (BAS#)',
+      aliases: ['bas#', 'baso#', 'bazofil#'],
+      unit: '10^3/mm³',
+      minNormal: 0.0,
+      maxNormal: 0.10,
+      lowNote: 'Normal aralıkta.',
+      highNote: 'Alerjik veya hematolojik değerlendirme açısından hekimle paylaşılabilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'BAS_PCT',
+      name: 'Bazofil % (BAS%)',
+      aliases: ['bas%', 'baso%', 'bazofil%'],
+      unit: '%',
+      minNormal: 0,
+      maxNormal: 1,
+      lowNote: 'Normal aralıkta.',
+      highNote: 'BAS# ile birlikte değerlendirilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'GGT',
+      name: 'GGT',
+      aliases: ['ggt', 'gama glutamil transferaz'],
+      unit: 'U/L',
+      minNormal: 0,
+      maxNormal: 55,
+      lowNote: 'Normal aralıkta.',
+      highNote: 'Safra yolları, karaciğer yağlanması veya ilaç etkisi açısından ALT/AST ile birlikte değerlendirilir.',
+      specialtyHint: 'Dahiliye veya Gastroenteroloji',
+    ),
+    LabParameterSpec(
+      code: 'URIC_ACID',
+      name: 'Ürik Asit',
+      aliases: ['ürik asit', 'urik asit', 'uric acid'],
+      unit: 'mg/dL',
+      minNormal: 2.6,
+      maxNormal: 7.0,
+      lowNote: 'Genellikle klinik sorun oluşturmaz.',
+      highNote: 'Gut eğilimi, beslenme ve böbrek fonksiyonu açısından değerlendirilebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'NA',
+      name: 'Sodyum (Na)',
+      aliases: ['sodyum', 'sodium'],
+      unit: 'mmol/L',
+      minNormal: 136,
+      maxNormal: 145,
+      criticalLow: 125,
+      criticalHigh: 155,
+      lowNote: 'Sodyum düşüklüğü sıvı-elektrolit dengesi açısından doktor değerlendirmesi gerektirir.',
+      highNote: 'Sodyum yüksekliği sıvı eksikliği açısından değerlendirilmelidir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'K',
+      name: 'Potasyum (K)',
+      aliases: ['potasyum', 'potassium'],
+      unit: 'mmol/L',
+      minNormal: 3.5,
+      maxNormal: 5.1,
+      criticalLow: 2.8,
+      criticalHigh: 6.0,
+      lowNote: 'Potasyum düşüklüğü kas güçsüzlüğü ve ritim açısından hekim kontrolü gerektirir.',
+      highNote: 'Potasyum yüksekliği böbrek fonksiyonu ve kalp ritmi açısından acil değerlendirme gerektirebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'CA',
+      name: 'Kalsiyum (Ca)',
+      aliases: ['kalsiyum', 'calcium'],
+      unit: 'mg/dL',
+      minNormal: 8.6,
+      maxNormal: 10.2,
+      lowNote: 'Kalsiyum düşük; D vitamini ve paratiroid ile birlikte değerlendirilir.',
+      highNote: 'Kalsiyum yüksek; hekim değerlendirmesi önerilir.',
+      specialtyHint: 'Dahiliye veya Endokrinoloji',
+    ),
   ];
 
   static LabParameterSpec? specByCode(String code) {
@@ -244,15 +595,20 @@ class LabReportAnalyzer {
     return null;
   }
 
-  /// Evaluates a single known parameter against its adult reference spec.
+  /// Evaluates a single known parameter against its adult reference spec
+  /// (or hospital-supplied unit/reference range when provided).
   static LabTestItem evaluateKnownParameter({
     required LabParameterSpec spec,
     required double value,
+    String? customUnit,
     double? customRefMin,
     double? customRefMax,
   }) {
-    final minRef = customRefMin ?? spec.minNormal;
-    final maxRef = customRefMax ?? spec.maxNormal;
+    final hasCustomRange = customRefMin != null || customRefMax != null;
+    final minRef = hasCustomRange ? customRefMin : spec.minNormal;
+    final maxRef = hasCustomRange ? customRefMax : spec.maxNormal;
+    final unit =
+        (customUnit != null && customUnit.trim().isNotEmpty) ? customUnit.trim() : spec.unit;
 
     final LabStatus status;
     final String note;
@@ -263,22 +619,22 @@ class LabReportAnalyzer {
     } else if (spec.criticalHigh != null && value >= spec.criticalHigh!) {
       status = LabStatus.criticalHigh;
       note = '${spec.highNote} Belirgin yüksek değer; gecikmeden doktora başvurun.';
-    } else if (value < minRef) {
+    } else if (minRef != null && value < minRef) {
       status = LabStatus.low;
       note = spec.lowNote;
-    } else if (value > maxRef) {
+    } else if (maxRef != null && value > maxRef) {
       status = LabStatus.high;
       note = spec.highNote;
     } else {
       status = LabStatus.normal;
-      note = 'Genel yetişkin referans aralığı içinde görünüyor.';
+      note = 'Referans aralığı içinde görünüyor.';
     }
 
     return LabTestItem(
       code: spec.code,
       name: spec.name,
       value: value,
-      unit: spec.unit,
+      unit: unit,
       refMin: minRef,
       refMax: maxRef,
       status: status,
@@ -286,55 +642,515 @@ class LabReportAnalyzer {
     );
   }
 
-  /// Parses raw pasted hospital / e-Nabız report text into evaluated items
-  /// and optionally detects a date written inside the report.
-  static ({List<LabTestItem> items, DateTime? detectedDate}) parseReportText(
+  /// Evaluates ANY extracted lab test row (known catalog OR custom/dynamic
+  /// hospital parameter) into a normalized [LabTestItem] so cross-hospital
+  /// reports align automatically in the comparison table.
+  static LabTestItem evaluateExtractedItem({
+    required String rawName,
+    required double value,
+    String? unit,
+    double? refMin,
+    double? refMax,
+  }) {
+    final cleanName = _cleanLabel(rawName);
+    final matchedSpec = _matchCatalogSpec(cleanName);
+    final cleanUnit = (unit ?? '').trim();
+
+    if (matchedSpec != null) {
+      // Special clinical safeguard for HDL: many Turkish e-Nabız reports print
+      // "< 50 *" as the risk flag threshold rather than an upper limit (HDL < 50
+      // is LOW for women, not high).
+      var adjMin = refMin;
+      var adjMax = refMax;
+      if (matchedSpec.code == 'HDL' && adjMin == null && adjMax != null && adjMax <= 60) {
+        adjMin = adjMax;
+        adjMax = null;
+      }
+
+      return evaluateKnownParameter(
+        spec: matchedSpec,
+        value: value,
+        customUnit: cleanUnit.isNotEmpty ? cleanUnit : null,
+        customRefMin: adjMin,
+        customRefMax: adjMax,
+      );
+    }
+
+    // Dynamic / hospital-specific parameter not in the built-in catalog:
+    final code = _canonicalDynamicCode(cleanName);
+    final LabStatus status;
+    final String note;
+    if (refMin != null && value < refMin) {
+      status = LabStatus.low;
+      note = 'Hastane referans alt sınırının altında; doktorunuzla değerlendirin.';
+    } else if (refMax != null && value > refMax) {
+      status = LabStatus.high;
+      note = 'Hastane referans üst sınırının üzerinde; doktorunuzla değerlendirin.';
+    } else if (refMin != null || refMax != null) {
+      status = LabStatus.normal;
+      note = 'Hastane referans aralığı içinde görünüyor.';
+    } else {
+      status = LabStatus.normal;
+      note = 'Rapordan okundu; önceki ve sonraki tahlillerinizle kıyaslanabilir.';
+    }
+
+    return LabTestItem(
+      code: code,
+      name: cleanName,
+      value: value,
+      unit: cleanUnit,
+      refMin: refMin,
+      refMax: refMax,
+      status: status,
+      note: note,
+    );
+  }
+
+  /// Universal offline parser for hospital / e-Nabız / private-lab report text.
+  ///
+  /// Handles multi-line wrapped rows (e.g. e-Nabız PDFs where unit or reference
+  /// range wraps to the next line), preserves hospital reference ranges and units,
+  /// and captures BOTH known catalog parameters AND any unknown/custom test rows.
+  static ({
+    List<LabTestItem> items,
+    DateTime? detectedDate,
+    String? detectedHospital,
+  }) parseReportText(
     String rawText,
   ) {
     final detectedDate = _extractDate(rawText);
-    final lines = rawText.split(RegExp(r'[\r\n;]+'));
+    final detectedHospital = _extractHospitalName(rawText);
+    final mergedLines = _preprocessReportLines(rawText);
     final byCode = <String, LabTestItem>{};
 
-    // Sort aliases longest-first so "25-oh vitamin d" matches before "d".
+    // Pass 1 & 2 unified per line: extract <name> <value> <unit> <refRange>
+    for (final line in mergedLines) {
+      if (_isNoiseOrHeaderLine(line)) continue;
+
+      final parsedRow = _parseStructuredRow(line);
+      if (parsedRow != null) {
+        final item = evaluateExtractedItem(
+          rawName: parsedRow.name,
+          value: parsedRow.value,
+          unit: parsedRow.unit,
+          refMin: parsedRow.refMin,
+          refMax: parsedRow.refMax,
+        );
+        byCode[item.code] = item;
+        continue;
+      }
+
+      // Fallback for free-form pasted text (e.g. "Hemoglobin: 11.4 g/dL; Ferritin = 14")
+      final knownFallback = _parseKnownAliasFallback(line);
+      if (knownFallback != null) {
+        byCode[knownFallback.code] = knownFallback;
+      }
+    }
+
+    return (
+      items: byCode.values.toList(),
+      detectedDate: detectedDate,
+      detectedHospital: detectedHospital,
+    );
+  }
+
+  /// Reassembles both horizontal multi-line wrapped rows AND vertical
+  /// cell-per-line table exports (e.g. `Demir \n 127 \n ug/L \n 60 - 180`,
+  /// `PCT 0,29 % \n 0,108 - 0,282`, `eGFR 111 mL/dk/1.73 \n m2 \n 60 - 120`).
+  static List<String> _preprocessReportLines(String rawText) {
+    final rawLines = rawText
+        .split(RegExp(r'[\r\n;]+'))
+        .map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
+
+    final standaloneNumberRegex = RegExp(r'^-?\d+(?:[.,]\d+)?$');
+    final standaloneRefRegex = RegExp(
+      r'^(?:[<>≤≥]\s*-?\d+(?:[.,]\d+)?(?:\s*\*)?|-?\d+(?:[.,]\d+)?\s*[-–—]\s*-?\d+(?:[.,]\d+)?(?:\s*\*)?)$',
+    );
+    final standaloneUnitContRegex = RegExp(
+      r'^(?:m2|m²|mm\^?3|/L|/dL|/mL|/uL|/µL|/mm3|/dk/1\.73\s*m2)$',
+      caseSensitive: false,
+    );
+
+    final merged = <String>[];
+    var i = 0;
+    while (i < rawLines.length) {
+      final line = rawLines[i];
+
+      // Case 1: Vertical cell-per-line row:
+      //   Line i:   test label (e.g. "Demir", "HGB", "Demir Bağlama")
+      //   Line i+1: pure numeric value (e.g. "127", "13,7")
+      //   Line i+2 (optional): unit (e.g. "ug/L", "g/dL", "%", "10^3/mm^3")
+      //   Line i+3 (optional): reference range (e.g. "60 - 180", "< 50 *")
+      if (i + 1 < rawLines.length &&
+          _looksLikeStandaloneTestLabel(line) &&
+          standaloneNumberRegex.hasMatch(rawLines[i + 1])) {
+        final buf = StringBuffer('$line ${rawLines[i + 1]}');
+        var next = i + 2;
+        if (next < rawLines.length && _isUnitToken(rawLines[next])) {
+          buf.write(' ${rawLines[next]}');
+          next++;
+          if (next < rawLines.length &&
+              standaloneUnitContRegex.hasMatch(rawLines[next])) {
+            buf.write(' ${rawLines[next]}');
+            next++;
+          }
+        }
+        if (next < rawLines.length &&
+            standaloneRefRegex.hasMatch(rawLines[next])) {
+          buf.write(' ${rawLines[next]}');
+          next++;
+        }
+        merged.add(buf.toString());
+        i = next;
+        continue;
+      }
+
+      // Case 2: Wrapped reference range or unit continuation belonging to the
+      // previous line (e.g. "PCT 0,29 %" followed by "0,108 - 0,282").
+      if (merged.isNotEmpty &&
+          (standaloneRefRegex.hasMatch(line) ||
+              standaloneUnitContRegex.hasMatch(line))) {
+        merged[merged.length - 1] = '${merged.last} $line';
+        i++;
+        continue;
+      }
+
+      merged.add(line);
+      i++;
+    }
+    return merged;
+  }
+
+  static bool _looksLikeStandaloneTestLabel(String line) {
+    if (line.length < 2 || line.length > 56) return false;
+    if (_isUnitToken(line)) return false;
+    if (!RegExp(r'[A-Za-zÇĞİÖŞÜçğıöşü]').hasMatch(line)) return false;
+    final lower = _normalizeTr(line);
+    const nonLabels = [
+      'tarih',
+      'tahlil',
+      'sonuc',
+      'sonuc birimi',
+      'birimi',
+      'referans',
+      'referans degeri',
+      'degeri',
+      'sayfa',
+      'cinsiyet',
+      'adi/soyadi',
+      'dogum tarihi',
+      'saglik tesisi',
+      'tam kan (hemogram)',
+      'hemogram',
+    ];
+    if (nonLabels.contains(lower)) return false;
+    if (lower.startsWith('sayfa ') || lower.contains('enabiz')) return false;
+    return true;
+  }
+
+  /// Returns true when [text] is purely a laboratory measurement unit
+  /// (so it is NEVER mistaken for a lab parameter name).
+  static bool _isUnitToken(String text) {
+    final s = text.trim();
+    if (s.isEmpty || s.length > 24) return false;
+    final norm = s
+        .toLowerCase()
+        .replaceAll('µ', 'u')
+        .replaceAll('μ', 'u')
+        .replaceAll('³', '^3')
+        .replaceAll('²', '2')
+        .replaceAll(' ', '');
+
+    const exactUnits = {
+      '%',
+      'u/l',
+      'iu/l',
+      'iu/ml',
+      'miu/l',
+      'uiu/ml',
+      'g/dl',
+      'g/l',
+      'mg/dl',
+      'mg/l',
+      'ug/dl',
+      'ug/l',
+      'ng/l',
+      'ng/ml',
+      'ng/dl',
+      'pg/ml',
+      'pg',
+      'fl',
+      'mmol/l',
+      'umol/l',
+      'meq/l',
+      'mm/saat',
+      'mm/h',
+      'sn',
+      'saniye',
+      '10^3/mm^3',
+      '10^6/mm^3',
+      '10^3/ul',
+      '10^6/ul',
+      '10^9/l',
+      '10^12/l',
+      'k/ul',
+      'm/ul',
+      'ml/dk/1.73',
+      'ml/dk/1.73m2',
+      'ml/min/1.73m2',
+      'm2',
+    };
+    if (exactUnits.contains(norm)) return true;
+
+    // General pattern for ratio/power units like "10^3/mm^3", "x10^3/uL", "mg/g"
+    if (RegExp(r'^(?:x?10\^\d+/|m?u?n?p?k?[gjl]/|m?i?u/)').hasMatch(norm)) {
+      return true;
+    }
+    return false;
+  }
+
+  static bool _isNoiseOrHeaderLine(String line) {
+    final lower = _normalizeTr(line);
+    if (lower.length < 3) return true;
+
+    // Skip metadata, headers, footers, phone numbers, page counters, dates
+    const skipPrefixes = [
+      'adi/soyadi',
+      'adi soyadi',
+      'hasta adi',
+      'dogum tarihi',
+      'cinsiyet',
+      'saglik tesisi',
+      't.c. saglik',
+      't.c.saglik',
+      'saglik bilgi',
+      'tarih tahlil',
+      'sayfa ',
+      'enabiz',
+      'protokol',
+      'barkod',
+      'tc kimlik',
+      't.c. kimlik',
+      'onay tarihi',
+      'numune',
+      'rapor tarihi',
+      'tarih:',
+      'doktor',
+      'hekim',
+    ];
+    for (final prefix in skipPrefixes) {
+      if (lower.startsWith(prefix)) return true;
+    }
+
+    if (lower.contains('enabiz.gov.tr') ||
+        lower.contains('sayfa ') && RegExp(r'sayfa\s+\d+\s*/\s*\d+').hasMatch(lower)) {
+      return true;
+    }
+
+    // Pure date / time or phone number lines
+    if (RegExp(r'^\d{2}[./-]\d{2}[./-]\d{4}(?:\s+\d{2}:\d{2}(?::\d{2})?)?$')
+        .hasMatch(line)) {
+      return true;
+    }
+    if (RegExp(r'^\d{2}:\d{2}(?::\d{2})?$').hasMatch(line)) return true;
+    if (RegExp(r'^0\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2}$').hasMatch(line)) return true;
+
+    // Must contain at least one letter AND one digit to be a test result row
+    if (!RegExp(r'[a-zA-ZçğıöşüÇĞİÖŞÜ]').hasMatch(line)) return true;
+    if (!RegExp(r'\d').hasMatch(line)) return true;
+
+    return false;
+  }
+
+  /// Parses a general hospital table row in ANY layout:
+  ///   `<TestName> [:|=] <Value> [<Unit>] [<RefRange>]`
+  static ({
+    String name,
+    double value,
+    String unit,
+    double? refMin,
+    double? refMax,
+  })? _parseStructuredRow(String line) {
+    // Strip leading date/time or bullet/status symbols if present on same line
+    var cleaned = line
+        .replaceFirst(
+          RegExp(r'^\d{2}[./-]\d{2}[./-]\d{4}(?:\s+\d{2}:\d{2}(?::\d{2})?)?\s+'),
+          '',
+        )
+        .replaceFirst(RegExp(r'^[✓✔!•\-\*]+\s*'), '')
+        .trim();
+
+    // Match: <name> followed by whitespace or ':'/'=' and a standalone numeric result
+    // Name can contain letters, spaces, #, %, -, /, (, ), digits like B12, HbA1c, 25-OH
+    final rowRegex = RegExp(
+      r'^([A-Za-zÇĞİÖŞÜçğıöşü0-9#%().,/\-\s]+?)(?:\s*[:=]\s*|\s+)(-?\d+(?:[.,]\d+)?)(?:\s+(.*))?$',
+    );
+    final match = rowRegex.firstMatch(cleaned);
+    if (match == null) return null;
+
+    final rawName = (match.group(1) ?? '').trim();
+    final rawVal = (match.group(2) ?? '').replaceAll(',', '.');
+    final tail = (match.group(3) ?? '').trim();
+
+    if (rawName.length < 2 || rawName.length > 56) return null;
+    if (_isUnitToken(rawName)) return null;
+    if (!RegExp(r'[A-Za-zÇĞİÖŞÜçğıöşü]').hasMatch(rawName)) return null;
+    // Reject dates mistakenly split as "07.05" + "2026"
+    if (RegExp(r'^\d+[./-]\d+$').hasMatch(rawName)) return null;
+
+    final value = double.tryParse(rawVal);
+    if (value == null) return null;
+
+    // Extract reference range from tail (either "min - max", "< max", or "> min")
+    double? refMin;
+    double? refMax;
+    var unitPart = tail;
+
+    final rangeMatch = RegExp(
+      r'(-?\d+(?:[.,]\d+)?)\s*[-–—]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+    ).firstMatch(tail);
+    if (rangeMatch != null) {
+      refMin = double.tryParse(rangeMatch.group(1)!.replaceAll(',', '.'));
+      refMax = double.tryParse(rangeMatch.group(2)!.replaceAll(',', '.'));
+      unitPart = tail.substring(0, rangeMatch.start).trim();
+    } else {
+      final upperMatch = RegExp(
+        r'[<≤]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+      ).firstMatch(tail);
+      if (upperMatch != null) {
+        refMax = double.tryParse(upperMatch.group(1)!.replaceAll(',', '.'));
+        unitPart = tail.substring(0, upperMatch.start).trim();
+      } else {
+        final lowerMatch = RegExp(
+          r'[>≥]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+        ).firstMatch(tail);
+        if (lowerMatch != null) {
+          refMin = double.tryParse(lowerMatch.group(1)!.replaceAll(',', '.'));
+          unitPart = tail.substring(0, lowerMatch.start).trim();
+        }
+      }
+    }
+
+    // Clean trailing status markers like "H", "L", "*", "Normal", "Yüksek", "Düşük"
+    unitPart = unitPart
+        .replaceAll(RegExp(r'\s+(?:H|L|HH|LL|\*|Normal|Yüksek|Düşük|Yuksek|Dusuk)$', caseSensitive: false), '')
+        .trim();
+
+    // If neither a known catalog match NOR a unit NOR a reference range exists,
+    // be cautious about random prose lines (e.g. "Sayfa 1").
+    final isKnown = _matchCatalogSpec(rawName) != null;
+    if (!isKnown && unitPart.isEmpty && refMin == null && refMax == null) {
+      return null;
+    }
+
+    return (
+      name: rawName,
+      value: value,
+      unit: unitPart,
+      refMin: refMin,
+      refMax: refMax,
+    );
+  }
+
+  static LabTestItem? _parseKnownAliasFallback(String line) {
+    final lower = _normalizeTr(line);
     final aliasPairs = <(String alias, LabParameterSpec spec)>[];
     for (final spec in catalog) {
       for (final alias in spec.aliases) {
-        aliasPairs.add((alias.toLowerCase(), spec));
+        aliasPairs.add((_normalizeTr(alias), spec));
       }
     }
     aliasPairs.sort((a, b) => b.$1.length.compareTo(a.$1.length));
 
     final numRegex = RegExp(r'(-?\d+(?:[.,]\d+)?)');
+    for (final (normAlias, spec) in aliasPairs) {
+      final match = RegExp(
+        '(^|[^a-z0-9#%])'
+        '${RegExp.escape(normAlias)}'
+        '([^a-z0-9#%]|\$)',
+      ).firstMatch(lower);
+      if (match == null) continue;
 
-    for (final rawLine in lines) {
-      final line = rawLine.trim();
-      if (line.isEmpty) continue;
-      final lower = _normalizeTr(line);
+      final afterAlias = line.substring(match.end);
+      final numMatch = numRegex.firstMatch(afterAlias);
+      if (numMatch == null) continue;
 
-      for (final (alias, spec) in aliasPairs) {
-        final normAlias = _normalizeTr(alias);
-        final match = RegExp(
-          '(^|[^a-z0-9])${RegExp.escape(normAlias)}([^a-z0-9]|\$)',
-        ).firstMatch(lower);
-        if (match == null) continue;
+      final parsed = double.tryParse(numMatch.group(1)!.replaceAll(',', '.'));
+      if (parsed == null) continue;
 
-        final afterAlias = line.substring(match.end);
-        final numMatch = numRegex.firstMatch(afterAlias);
-        if (numMatch == null) continue;
+      return evaluateKnownParameter(spec: spec, value: parsed);
+    }
+    return null;
+  }
 
-        final rawNum = numMatch.group(1)!.replaceAll(',', '.');
-        final parsed = double.tryParse(rawNum);
-        if (parsed == null) continue;
+  static LabParameterSpec? _matchCatalogSpec(String rawName) {
+    final norm = _normalizeTr(rawName)
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (norm.isEmpty) return null;
 
-        byCode[spec.code] = evaluateKnownParameter(
-          spec: spec,
-          value: parsed,
-        );
-        break;
+    // Keep "LDL Kolesterol(Hesaplama)" distinct from direct "LDL Kolesterol"
+    if (norm.contains('hesaplama')) return null;
+
+    // 1. Exact alias match first
+    for (final spec in catalog) {
+      for (final alias in spec.aliases) {
+        if (norm == _normalizeTr(alias)) return spec;
       }
     }
 
-    return (items: byCode.values.toList(), detectedDate: detectedDate);
+    // 2. Word-boundary longest alias match (respecting # and % suffixes!)
+    final aliasPairs = <(String alias, LabParameterSpec spec)>[];
+    for (final spec in catalog) {
+      for (final alias in spec.aliases) {
+        aliasPairs.add((_normalizeTr(alias), spec));
+      }
+    }
+    aliasPairs.sort((a, b) => b.$1.length.compareTo(a.$1.length));
+
+    for (final (normAlias, spec) in aliasPairs) {
+      final match = RegExp(
+        '(^|[^a-z0-9#%])'
+        '${RegExp.escape(normAlias)}'
+        '([^a-z0-9#%]|\$)',
+      ).firstMatch(norm);
+      if (match != null) return spec;
+    }
+
+    return null;
+  }
+
+  static String _cleanLabel(String raw) {
+    var s = raw.trim().replaceAll(RegExp(r'\s+'), ' ');
+    // Balance unclosed parenthesis from OCR/PDF truncation like "LDL Kolesterol(Hesaplama"
+    if (s.contains('(') && !s.contains(')')) {
+      s = '$s)';
+    }
+    return s;
+  }
+
+  static String _canonicalDynamicCode(String name) {
+    final normalized = _normalizeTr(name)
+        .replaceAll('#', '_ABS')
+        .replaceAll('%', '_PCT')
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '')
+        .toUpperCase();
+    return normalized.isEmpty ? 'PARAM' : normalized;
+  }
+
+  static String? _extractHospitalName(String text) {
+    final match = RegExp(
+      r'(?:Sağlık\s+Tesisi|Saglik\s+Tesisi|Hastane|Laboratuvar)\s*:\s*([^\r\n]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+    final name = match?.group(1)?.trim();
+    if (name != null && name.length >= 3) {
+      return name;
+    }
+    return null;
   }
 
   /// Builds a complete storable [LabReportRecord] combining blood test values
@@ -527,10 +1343,9 @@ class LabReportAnalyzer {
       final avgDia =
           bpReadings.map((e) => e.diastolic).reduce((a, b) => a + b) /
               bpReadings.length;
-      buf
-        ..writeln(
-          '\nTansiyon (${bpReadings.length} ölçüm • Ortalama: ${avgSys.round()}/${avgDia.round()} mmHg):',
-        );
+      buf.writeln(
+        '\nTansiyon (${bpReadings.length} ölçüm • Ortalama: ${avgSys.round()}/${avgDia.round()} mmHg):',
+      );
       for (final bp in bpReadings.take(10)) {
         final pulseText = bp.pulse != null ? ' • Nabız ${bp.pulse}' : '';
         buf.writeln(
@@ -543,10 +1358,9 @@ class LabReportAnalyzer {
       final avgSugar =
           sugarReadings.map((e) => e.valueMgDl).reduce((a, b) => a + b) /
               sugarReadings.length;
-      buf
-        ..writeln(
-          '\nKan Şekeri (${sugarReadings.length} ölçüm • Ortalama: ${avgSugar.round()} mg/dL):',
-        );
+      buf.writeln(
+        '\nKan Şekeri (${sugarReadings.length} ölçüm • Ortalama: ${avgSugar.round()} mg/dL):',
+      );
       for (final s in sugarReadings.take(10)) {
         buf.writeln(
           '- ${df.format(s.recordedAt)}: ${s.formatted} [${s.measurementType.label}] (${s.category.label})',
@@ -707,24 +1521,32 @@ class LabReportAnalyzer {
       }
     }
 
-    // 3. Standalone blood test evaluation when diagnosis & complaint are blank
+    // 3. Standalone overview when diagnosis & complaint are blank
     if (hospitalDiagnosis == null && userComplaintNote == null) {
       if (abnormal.isNotEmpty) {
         final details = abnormal
             .map((e) => '${e.name} (${e.formattedValue} — ${e.status.label})')
             .join(', ');
         paragraphs.add(
-          '• Yalnızca kan sonuçlarına göre ön değerlendirme: $details değerleri genel yetişkin referans aralığının dışında. Tek bir test tek başına tanı koymaz; şikayetleriniz ve önceki sonuçlarınızla birlikte doktor değerlendirmesi gerekir.',
+          '• Yalnızca kan sonuçlarına göre ön değerlendirme: $details değerleri referans aralığının dışında. Tek bir test tek başına tanı koymaz; şikayetleriniz ve önceki sonuçlarınızla birlikte doktor değerlendirmesi gerekir.',
         );
       } else if (items.isNotEmpty) {
         paragraphs.add(
-          '• Yalnızca kan sonuçlarına göre ön değerlendirme: Girilen tüm değerler genel yetişkin referans aralığında görünüyor. Şikayetiniz sürüyorsa doktorunuz farklı tetkikler önerebilir.',
+          '• Yalnızca kan sonuçlarına göre ön değerlendirme: Okunan tüm değerler referans aralığında görünüyor. Şikayetiniz sürüyorsa doktorunuz farklı tetkikler önerebilir.',
         );
       } else if (attachmentFileName != null) {
         paragraphs.add(
           '• $attachmentFileName belgesi arşivlendi. Taranmış fotoğraf/PDF içeriğindeki sayılar otomatik okunamadıysa aşağıdan manuel değer ekleyebilir veya isteğe bağlı Bulut Yapay Zeka ile okutabilirsiniz.',
         );
       }
+    }
+
+    // 4. Multi-parameter clinical pattern correlations (always run when items exist)
+    if (items.isNotEmpty) {
+      final correlations = _buildClinicalCorrelations(byCode, items);
+      paragraphs.addAll(correlations.insights);
+      questions.addAll(correlations.questions);
+      specialtyHint ??= correlations.specialtyHint;
     }
 
     // Standard helpful follow-up questions
@@ -739,7 +1561,183 @@ class LabReportAnalyzer {
 
     return (
       interpretation: paragraphs.join('\n\n'),
-      questions: questions.toSet().take(4).toList(),
+      questions: questions.toSet().take(5).toList(),
+      specialtyHint: specialtyHint,
+    );
+  }
+
+  /// Evaluates combinations of lab parameters together (e.g. HGB + Demir/Ferritin,
+  /// NEU% + LYM%, PCT + PLT, HDL + LDL/Trig, Glukoz + HbA1c, ALT + AST,
+  /// Kreatinin + eGFR) to provide holistic, plain-Turkish clinical insights.
+  static ({
+    List<String> insights,
+    List<String> questions,
+    String? specialtyHint,
+  }) _buildClinicalCorrelations(
+    Map<String, LabTestItem> byCode,
+    List<LabTestItem> items,
+  ) {
+    final insights = <String>[];
+    final questions = <String>[];
+    String? specialtyHint;
+
+    bool isLow(String code) {
+      final s = byCode[code]?.status;
+      return s == LabStatus.low || s == LabStatus.criticalLow;
+    }
+
+    bool isHigh(String code) {
+      final s = byCode[code]?.status;
+      return s == LabStatus.high || s == LabStatus.criticalHigh;
+    }
+
+    bool isNormal(String code) => byCode[code]?.status == LabStatus.normal;
+
+    // 1. Anemia & Iron / B12 / Folate pattern
+    final lowHgbOrHct = isLow('HGB') || isLow('HCT') || isLow('RBC');
+    final lowIronOrFerritin = isLow('IRON') || isLow('FERRITIN');
+    final lowB12OrFolate = isLow('B12') || isLow('FOLATE');
+
+    if (lowHgbOrHct && lowIronOrFerritin) {
+      final parts = [
+        if (byCode['HGB'] != null && isLow('HGB'))
+          'HGB (${byCode['HGB']!.formattedValue})',
+        if (byCode['HCT'] != null && isLow('HCT'))
+          'HCT (${byCode['HCT']!.formattedValue})',
+        if (byCode['IRON'] != null && isLow('IRON'))
+          'Demir (${byCode['IRON']!.formattedValue})',
+        if (byCode['FERRITIN'] != null && isLow('FERRITIN'))
+          'Ferritin (${byCode['FERRITIN']!.formattedValue})',
+      ].join(', ');
+      insights.add(
+        '• Demir Eksikliği Anemisi Eğilimi: $parts değerlerinin birlikte düşük olması demir eksikliğine bağlı kansızlık (anemi) ile uyumlu olabilir. Halsizlik, çabuk yorulma, üşüme, saç dökülmesi ve tırnak kırılmasına yol açabilir; doktorunuzla demir tedavisi ve altta yatan nedeni değerlendirmeniz önerilir.',
+      );
+      questions.add(
+        'Hemoglobin ve demir/ferritin düşüklüğüm için demir takviyesi başlamalı mıyım ve nedeni araştırılmalı mı?',
+      );
+      specialtyHint ??= 'Dahiliye veya Hematoloji';
+    } else if (lowHgbOrHct && lowB12OrFolate) {
+      insights.add(
+        '• B12 / Folat İlişkili Kansızlık Eğilimi: Kan değerleri (HGB/HCT) ile birlikte B12 veya Folat düşüklüğü görülüyor. Bu tablo yorgunluk, unutkanlık ve uyuşma yapabilir; hekim değerlendirmesiyle takviye planlanabilir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Hematoloji';
+    } else if (lowIronOrFerritin && isHigh('TIBC')) {
+      insights.add(
+        '• Demir Deposu Azalması: Demir/Ferritin düşükken Demir Bağlama Kapasitesinin (TIBC) yüksek olması, vücudun demire ihtiyaç duyduğunun tipik bir göstergesidir; HGB normal kalsa bile erken dönem demir eksikliği açısından hekime danışılabilir.',
+      );
+      specialtyHint ??= 'Dahiliye';
+    } else if (lowHgbOrHct && isLow('MCV')) {
+      insights.add(
+        '• Mikrositer Anemi Eğilimi: Hemoglobin/Hematokrit ile birlikte MCV değerinin düşük olması sıklıkla demir eksikliği veya talasemi taşıyıcılığı ile ilişkilidir; ferritin ve demir profili ile birlikte hekimce değerlendirilmelidir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Hematoloji';
+    }
+
+    // 2. White blood cell / Infection / Inflammation pattern (e.g. NEU% high + LYM% low)
+    if (isHigh('NEU_PCT') && isLow('LYM_PCT')) {
+      final wbcNormal = isNormal('WBC') && (byCode['NEU_ABS'] == null || isNormal('NEU_ABS'));
+      insights.add(
+        wbcNormal
+            ? '• Nötrofil % Yüksek / Lenfosit % Düşük (WBC Normal): NEU% (${byCode['NEU_PCT']!.formattedValue}) yüksek ve LYM% (${byCode['LYM_PCT']!.formattedValue}) düşük görünüyor; ancak toplam lökosit (WBC) ve mutlak hücre sayıları normal aralıkta. Bu tablo sıklıkla yakın zamanda geçirilen hafif bir enfeksiyon, fiziksel/duygusal stres veya hafif iltihabi tepkide geçici olarak görülebilir.'
+            : '• Enfeksiyon / İltihabi Yanıt Eğilimi: NEU% yüksekliği ile LYM% düşüklüğü birlikte görülüyor; aktif bir enfeksiyon veya iltihabi süreç açısından şikayetlerinizle birlikte doktor değerlendirmesi önerilir.',
+      );
+      questions.add(
+        'NEU% yüksekliği ve LYM% düşüklüğü için yakın zamanda kontrol hemogram yaptırmam gerekir mi?',
+      );
+    } else if (isHigh('WBC') && isHigh('CRP')) {
+      insights.add(
+        '• Aktif Enfeksiyon / İltihap Bulgusu: Hem Lökosit (WBC) hem CRP değerinin birlikte yükselmesi vücutta aktif bir enfeksiyon veya iltihabi sürece işaret edebilir; gecikmeden hekim muayenesi önerilir.',
+      );
+      specialtyHint ??= 'Dahiliye';
+    }
+
+    // 3. Platelet / PCT pattern (e.g. PCT slightly high while PLT is normal)
+    if (isHigh('PCT') && isNormal('PLT')) {
+      insights.add(
+        '• PCT Hafif Yüksek, Trombosit (PLT) Normal: PCT (${byCode['PCT']!.formattedValue}) referansın hemen üzerinde ancak ana trombosit sayısı (PLT: ${byCode['PLT']!.formattedValue}) normal aralıkta. Trombosit sayısı normalken tek başına hafif PCT yüksekliği çoğu zaman klinik olarak önemsiz kabul edilir.',
+      );
+    } else if (isLow('PLT')) {
+      insights.add(
+        '• Trombosit Düşüklüğü: PLT (${byCode['PLT']!.formattedValue}) referansın altında; kolay morarma veya kanama eğilimi açısından hekim kontrolü önemlidir.',
+      );
+      specialtyHint ??= 'Hematoloji veya Dahiliye';
+    }
+
+    // 4. Lipid / Cardiovascular pattern (HDL, LDL, Total Chol, Trig)
+    if (isLow('HDL')) {
+      final otherLipidsNormal =
+          (byCode['LDL'] == null || isNormal('LDL')) &&
+          (byCode['TOTAL_CHOL'] == null || isNormal('TOTAL_CHOL')) &&
+          (byCode['TRIG'] == null || isNormal('TRIG'));
+      insights.add(
+        otherLipidsNormal
+            ? '• Koruyucu HDL Kolesterol Sınırda Düşük: HDL (${byCode['HDL']!.formattedValue}) hedef sınırın hafif altında, buna karşılık LDL, Total Kolesterol ve Trigliserit değerleriniz normal. Düzenli tempolu yürüyüş/egzersiz ve zeytinyağı, balık, ceviz gibi sağlıklı yağlar HDL düzeyini yükseltmeye yardımcı olur.'
+            : '• Kolesterol / Lipid Profili Dikkat Gerektiriyor: Koruyucu HDL düşük iken diğer kan yağlarında da yükselme mevcut; kalp-damar riski açısından doktorunuzla beslenme ve takip planı oluşturmanız önerilir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Kardiyoloji';
+    } else if (isHigh('LDL') && isHigh('TRIG')) {
+      insights.add(
+        '• Kan Yağlarında Birlikte Yükselme: Hem LDL hem Trigliserit referansın üzerinde; kardiyovasküler koruma için beslenme düzeni, hareket ve hekim değerlendirmesi önerilir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Kardiyoloji';
+    }
+
+    // 5. Glucose & HbA1c metabolic pattern
+    if (isHigh('GLU') && isHigh('HBA1C')) {
+      insights.add(
+        '• Kan Şekeri & HbA1c Birlikte Yüksek: Hem açlık şekeri hem 3 aylık ortalama (HbA1c) referans üstünde; insülin direnci, prediyabet veya diyabet takibi açısından Endokrinoloji/Dahiliye değerlendirmesi önemlidir.',
+      );
+      specialtyHint ??= 'Endokrinoloji veya Dahiliye';
+    }
+
+    // 6. Liver panel (ALT + AST)
+    if (isHigh('ALT') && isHigh('AST')) {
+      insights.add(
+        '• Karaciğer Enzimlerinde Eş Zamanlı Yükselme: ALT ve AST birlikte yüksek; karaciğer yağlanması, kullanılan ilaçlar veya viral nedenler açısından hekim değerlendirmesi önerilir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Gastroenteroloji';
+    }
+
+    // 7. Kidney panel (Creatinine + eGFR / Urea)
+    if (isHigh('CREA') && (isLow('EGFR') || isHigh('UREA'))) {
+      insights.add(
+        '• Böbrek Fonksiyon Değerlendirmesi: Kreatinin yüksekliği ile birlikte eGFR düşüklüğü veya Üre yüksekliği görülüyor; sıvı alımı, tansiyon ve böbrek fonksiyonu açısından doktor kontrolü önemlidir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Nefroloji';
+    }
+
+    // 8. Positive summary of normal major panels so the user sees the full picture
+    final normalPanels = <String>[];
+    if (isNormal('HGB') && (byCode['HCT'] == null || isNormal('HCT'))) {
+      normalPanels.add('kan sayımı (HGB/HCT)');
+    }
+    if ((byCode['IRON'] != null && isNormal('IRON')) ||
+        (byCode['FERRITIN'] != null && isNormal('FERRITIN'))) {
+      if (!lowIronOrFerritin) normalPanels.add('demir depoları');
+    }
+    if ((byCode['B12'] != null && isNormal('B12')) ||
+        (byCode['FOLATE'] != null && isNormal('FOLATE'))) {
+      if (!lowB12OrFolate) normalPanels.add('B12/Folat');
+    }
+    if (isNormal('GLU') && (byCode['HBA1C'] == null || isNormal('HBA1C'))) {
+      normalPanels.add('kan şekeri (Glukoz/HbA1c)');
+    }
+    if (isNormal('ALT') && isNormal('AST')) {
+      normalPanels.add('karaciğer enzimleri (ALT/AST)');
+    }
+    if (isNormal('CREA') && (byCode['EGFR'] == null || isNormal('EGFR'))) {
+      normalPanels.add('böbrek fonksiyonları (Kreatinin/eGFR)');
+    }
+
+    if (normalPanels.isNotEmpty) {
+      insights.add(
+        '• Olumlu / Normal Görünen Paneller: ${normalPanels.join(', ')} değerleriniz referans aralığı içinde görünüyor.',
+      );
+    }
+
+    return (
+      insights: insights,
+      questions: questions,
       specialtyHint: specialtyHint,
     );
   }
@@ -899,8 +1897,25 @@ class LabReportAnalyzer {
   }
 
   static DateTime? _extractDate(String text) {
-    final dmy = RegExp(r'\b(\d{2})[./-](\d{2})[./-](\d{4})\b').firstMatch(text);
-    if (dmy != null) {
+    // 1. Prefer explicit report date labels (avoiding Doğum Tarihi / Birth Date)
+    final labeled = RegExp(
+      r'(?:^|[\r\n])\s*(?:Rapor\s+Tarihi|Onay\s+Tarihi|Numune\s+Tarihi|Tarih)\s*:\s*(\d{2})[./-](\d{2})[./-](\d{4})',
+      caseSensitive: false,
+    ).firstMatch(text);
+    if (labeled != null) {
+      final d = int.tryParse(labeled.group(1)!);
+      final m = int.tryParse(labeled.group(2)!);
+      final y = int.tryParse(labeled.group(3)!);
+      if (d != null && m != null && y != null && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+        return DateTime(y, m, d);
+      }
+    }
+
+    // 2. Fall back to first DD.MM.YYYY date not preceded by "Doğum"
+    for (final dmy in RegExp(r'\b(\d{2})[./-](\d{2})[./-](\d{4})\b').allMatches(text)) {
+      final prefixStart = (dmy.start - 24).clamp(0, text.length);
+      final prefix = _normalizeTr(text.substring(prefixStart, dmy.start));
+      if (prefix.contains('dogum') || prefix.contains('birth')) continue;
       final d = int.tryParse(dmy.group(1)!);
       final m = int.tryParse(dmy.group(2)!);
       final y = int.tryParse(dmy.group(3)!);
@@ -908,6 +1923,7 @@ class LabReportAnalyzer {
         return DateTime(y, m, d);
       }
     }
+
     final ymd = RegExp(r'\b(\d{4})-(\d{2})-(\d{2})\b').firstMatch(text);
     if (ymd != null) {
       final y = int.tryParse(ymd.group(1)!);

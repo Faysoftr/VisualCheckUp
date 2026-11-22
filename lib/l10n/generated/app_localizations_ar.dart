@@ -263,4 +263,199 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'الحساب والقائمة';
+
+  @override
+  String get menuSettings => 'الإعدادات (الأذونات واللغة)';
+
+  @override
+  String get settingsTitle => 'الإعدادات';
+
+  @override
+  String get settingsLanguageDesc =>
+      'تُستخدم لغة الهاتف تلقائيًا افتراضيًا، ويمكنك اختيار أي لغة أدناه.';
+
+  @override
+  String get settingsPermissionsTitle => 'أذونات التطبيق';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'تحقق من أذونات الكاميرا والمعرض وأدرها من هنا.';
+
+  @override
+  String get settingsCameraPermission => 'إذن الكاميرا';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'للالتقاط البصري للعين واللسان والأظافر والجلد';
+
+  @override
+  String get settingsPhotosPermission => 'إذن المعرض والصور';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'لرفع الصور وتقارير التحاليل المخبرية';
+
+  @override
+  String get settingsOpenSystemPermissions => 'فتح أذونات التطبيق في الهاتف';
+
+  @override
+  String get permChecking => 'جارٍ التحقق...';
+
+  @override
+  String get permGranted => 'تم السماح';
+
+  @override
+  String get permDenied => 'الإذن مطلوب';
+
+  @override
+  String get permPermanent => 'التفعيل من إعدادات النظام';
+
+  @override
+  String get permUnavailable => 'يُدار عبر الجهاز';
+
+  @override
+  String get permGrantBtn => 'سماح';
+
+  @override
+  String get permOpenSettingsBtn => 'فتح الإعدادات';
+
+  @override
+  String get skinCancerRisk => 'الشامة ومخاطر سرطان الجلد';
+
+  @override
+  String get skinWart => 'فحص مبدئي للثؤلول';
+
+  @override
+  String get skinBruise => 'متابعة الكدمات';
+
+  @override
+  String get skinFacialSpot => 'بقع الوجه';
+
+  @override
+  String get trackEyeTitle => 'فحص العين الأسبوعي';
+
+  @override
+  String get trackEyeSubtitle => 'تابع احمرار أو اصفرار بياض العين';
+
+  @override
+  String get trackTongueTitle => 'فحص اللسان الأسبوعي';
+
+  @override
+  String get trackTongueSubtitle => 'تابع لون اللسان والطبقة السطحية';
+
+  @override
+  String get trackNailTitle => 'فحص الأظافر الأسبوعي';
+
+  @override
+  String get trackNailSubtitle => 'راقب الشحوب أو الازرقاق أو الاصفرار';
+
+  @override
+  String get trackFaceTitle => 'فحص الوجه كل أسبوعين';
+
+  @override
+  String get trackFaceSubtitle => 'قارن الشحوب والاحمرار ولون البشرة';
+
+  @override
+  String get trackSkinTitle => 'فحص الجلد والشامات الشهري';
+
+  @override
+  String get trackSkinSubtitle =>
+      'قارن تغيرات الشامات والثآليل والبقع كل 30 يومًا';
+
+  @override
+  String get trackHydrationTitle => 'متابعة الترطيب اليومية (البول)';
+
+  @override
+  String get trackHydrationSubtitle => 'سجّل الترطيب في ثانيتين ببطاقة الألوان';
+
+  @override
+  String get trackStoolTitle => 'فحص لون البراز الأسبوعي';
+
+  @override
+  String get trackStoolSubtitle => 'تابع الهضم وعلامات التحذير اللونية';
+
+  @override
+  String get trackBpTitle => 'قياس ضغط الدم اليومي';
+
+  @override
+  String get trackBpSubtitle => 'سجّل الضغط الانقباضي/الانبساطي والنبض';
+
+  @override
+  String get trackSugarTitle => 'قياس سكر الدم اليومي';
+
+  @override
+  String get trackSugarSubtitle => 'تابع قراءات السكر صائمًا أو بعد الأكل';
+
+  @override
+  String get trackLabTitle => 'تحليل الدم والتقارير كل 3 أشهر';
+
+  @override
+  String get trackLabSubtitle => 'ارفع تقارير المستشفى وقارنها دوريًا';
+
+  @override
+  String get statusFirstPending => 'بانتظار أول سجل';
+
+  @override
+  String get statusDueNow => 'حان وقت الفحص';
+
+  @override
+  String get statusDoneToday => 'اكتمل اليوم';
+
+  @override
+  String statusNextDays(int days) {
+    return 'الفحص القادم بعد $days يوم';
+  }
+
+  @override
+  String get actionCheckNow => 'افحص الآن';
+
+  @override
+  String get actionLogReading => 'إدخال قراءة';
+
+  @override
+  String get actionAddReport => 'إضافة تقرير';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • طريقة الفحص';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'اختر من بطاقة الألوان خلال ثانيتين دون تصوير أو استخدم الكاميرا.';
+
+  @override
+  String get colorCardRecommendedTitle => 'بطاقة الألوان بدون كاميرا (موصى به)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'تسجيل سريع وخاص دون صورة (ثانيتان)';
+
+  @override
+  String get cameraMeasureTitle => 'القياس بالكاميرا';
+
+  @override
+  String get cameraMeasureSubtitle => 'قياس تلقائي مع معايرة توازن الأبيض';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'اختر وحدة لعرض المراجع البصرية السليمة وغير الطبيعية.';
+
+  @override
+  String get historyEmpty => 'لا توجد فحوصات محفوظة بعد.';
+
+  @override
+  String get filterAll => 'الكل';
+
+  @override
+  String get aiSettingsTitle => 'الذكاء الاصطناعي والخصوصية';
+
+  @override
+  String get vitalsBpTab => 'ضغط الدم';
+
+  @override
+  String get vitalsSugarTab => 'سكر الدم';
+
+  @override
+  String get skinScreenTitle => 'فحص مبدئي لحالات الجلد';
 }

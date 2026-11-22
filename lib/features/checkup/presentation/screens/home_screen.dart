@@ -203,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (sheetContext) {
         final theme = Theme.of(sheetContext);
         final colorScheme = theme.colorScheme;
+        final sheetL10n = sheetContext.l10n;
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -211,14 +212,16 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${category.title} • Kontrol Yöntemi',
+                  sheetL10n.checkMethodTitle(
+                    category.localizedTitle(sheetL10n),
+                  ),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Fotoğraf çekmeden 2 saniyede renk kartından seçebilir veya kamera ölçümünü kullanabilirsiniz.',
+                  sheetL10n.checkMethodSubtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -235,12 +238,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         size: 20,
                       ),
                     ),
-                    title: const Text(
-                      'Kamerasız Renk Kartı (Önerilen)',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    title: Text(
+                      sheetL10n.colorCardRecommendedTitle,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
-                    subtitle: const Text(
-                      'Fotoğraf çekmeden gizli ve hızlı kayıt (2 sn)',
+                    subtitle: Text(
+                      sheetL10n.colorCardRecommendedSubtitle,
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(sheetContext).pop('card'),
@@ -257,12 +260,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         size: 20,
                       ),
                     ),
-                    title: const Text(
-                      'Kamera ile Renk Ölçümü',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    title: Text(
+                      sheetL10n.cameraMeasureTitle,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    subtitle: const Text(
-                      'Beyaz referans kalibrasyonu ile otomatik ölçüm',
+                    subtitle: Text(
+                      sheetL10n.cameraMeasureSubtitle,
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(sheetContext).pop('camera'),
@@ -289,6 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
       showDragHandle: true,
       useSafeArea: true,
       builder: (sheetContext) {
+        final sheetL10n = sheetContext.l10n;
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -297,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kamerasız Renk Kartı',
+                  sheetL10n.menuQuickColorCard,
                   style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -316,10 +320,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Icon(cat.icon, color: cat.accentColor),
                     ),
                     title: Text(
-                      cat.title,
+                      cat.localizedTitle(sheetL10n),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    subtitle: Text(cat.subtitle),
+                    subtitle: Text(cat.localizedSubtitle(sheetL10n)),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.of(sheetContext).pop(cat),
                   ),
@@ -383,9 +387,11 @@ class _HomeScreenState extends State<HomeScreen> {
           themeController: widget.themeController,
           localeController: controller,
           historyRepository: widget.historyRepository,
+          labsVitalsRepository: _labsVitalsRepository,
         ),
       ),
     );
+    await _loadDashboardData();
   }
 
   Future<void> _openHistory() async {
@@ -405,20 +411,21 @@ class _HomeScreenState extends State<HomeScreen> {
       showDragHandle: true,
       useSafeArea: true,
       builder: (sheetContext) {
+        final sheetL10n = sheetContext.l10n;
         return SafeArea(
           child: ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             children: [
               Text(
-                'Görsel Referans Rehberi',
+                sheetL10n.menuReferenceGuide,
                 style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Sağlıklı ve dikkat gerektiren görsel bulguları incelemek için modül seçin.',
+                sheetL10n.referenceGuideSubtitle,
                 style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
                       color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
                     ),
@@ -438,10 +445,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   title: Text(
-                    category.title,
+                    category.localizedTitle(sheetL10n),
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  subtitle: Text(category.subtitle),
+                  subtitle: Text(category.localizedSubtitle(sheetL10n)),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => Navigator.of(sheetContext).pop(category),
                 ),
@@ -513,7 +520,22 @@ class _HomeScreenState extends State<HomeScreen> {
         onDeleteAccount: widget.onDeleteAccount,
       ),
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/app_logo.jpg',
+                width: 28,
+                height: 28,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(l10n.appTitle),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: _openHistory,
@@ -548,8 +570,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/app_bg.jpg',
+            fit: BoxFit.cover,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppTheme.darkCanvas.withValues(alpha: 0.90)
+                  : Colors.white.withValues(alpha: 0.35),
+            ),
+          ),
+          CustomScrollView(
+            slivers: [
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
@@ -699,7 +735,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        nextTrack.track.title,
+                                        nextTrack.track.localizedTitle(l10n),
                                         style: theme.textTheme.labelLarge
                                             ?.copyWith(
                                           fontWeight: FontWeight.w700,
@@ -707,7 +743,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        nextTrack.statusLabel,
+                                        nextTrack.localizedStatusLabel(l10n),
                                         style:
                                             theme.textTheme.bodySmall?.copyWith(
                                           color: nextTrack.isDueNow
@@ -934,6 +970,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ] else
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        ],
+      ),
         ],
       ),
     );

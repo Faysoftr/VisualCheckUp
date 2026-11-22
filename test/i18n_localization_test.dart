@@ -78,11 +78,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Automatically picks English from phone locale
+      // Automatically picks English from phone locale (including Follow-Up track!)
       expect(find.text('Hello, Alex'), findsOneWidget);
       expect(find.text('Personal Follow-Up Plan'), findsOneWidget);
+      expect(find.text('Weekly Eye (Sclera) Check'), findsOneWidget);
 
-      // Open drawer -> Settings (Ayarlar)
+      // Open drawer -> Settings (English!)
       final scaffoldState = tester.firstState<ScaffoldState>(find.byType(Scaffold));
       scaffoldState.openDrawer();
       await tester.pumpAndSettle();
@@ -92,23 +93,24 @@ void main() {
         matching: find.byType(Scrollable),
       ).first;
       await tester.scrollUntilVisible(
-        find.text('Ayarlar (İzinler & Dil)'),
+        find.text('Settings (Permissions & Language)'),
         200,
         scrollable: drawerScrollable,
       );
-      await tester.tap(find.text('Ayarlar (İzinler & Dil)'));
+      await tester.tap(find.text('Settings (Permissions & Language)'));
       await tester.pumpAndSettle();
 
-      // SettingsScreen shows Language & Permissions sections
-      expect(find.text('Uygulama İzinleri'), findsOneWidget);
-      expect(find.text('Kamera İzni'), findsOneWidget);
-      expect(find.text('Galeri & Fotoğraf İzni'), findsOneWidget);
+      // SettingsScreen renders fully in English
+      expect(find.text('App Permissions'), findsOneWidget);
+      expect(find.text('Camera Permission'), findsOneWidget);
+      expect(find.text('Gallery & Photos Permission'), findsOneWidget);
 
-      // Switch live to Arabic (RTL)
+      // Switch live to Arabic (RTL) and confirm Arabic text & RTL direction
       await localeController.setLocale(const Locale('ar'));
       await tester.pumpAndSettle();
+      expect(find.text('أذونات التطبيق'), findsOneWidget);
       final directionality = Directionality.of(
-        tester.element(find.text('Uygulama İzinleri')),
+        tester.element(find.text('أذونات التطبيق')),
       );
       expect(directionality, TextDirection.rtl);
 

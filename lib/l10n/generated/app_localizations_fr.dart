@@ -263,4 +263,205 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'Compte et Menu';
+
+  @override
+  String get menuSettings => 'Paramètres (Autorisations & Langue)';
+
+  @override
+  String get settingsTitle => 'Paramètres';
+
+  @override
+  String get settingsLanguageDesc =>
+      'La langue du téléphone est utilisée par défaut. Vous pouvez choisir une autre langue ci-dessous.';
+
+  @override
+  String get settingsPermissionsTitle => 'Autorisations';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'Consultez et gérez ici les autorisations caméra et photos.';
+
+  @override
+  String get settingsCameraPermission => 'Autorisation Caméra';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'Pour les photos des yeux, de la langue, des ongles et de la peau';
+
+  @override
+  String get settingsPhotosPermission => 'Autorisation Galerie & Photos';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'Pour importer des photos et bilans médicaux';
+
+  @override
+  String get settingsOpenSystemPermissions =>
+      'Ouvrir les Autorisations du Téléphone';
+
+  @override
+  String get permChecking => 'Vérification...';
+
+  @override
+  String get permGranted => 'Accordée';
+
+  @override
+  String get permDenied => 'Autorisation Requise';
+
+  @override
+  String get permPermanent => 'Activer dans les Réglages Système';
+
+  @override
+  String get permUnavailable => 'Géré par l\'appareil';
+
+  @override
+  String get permGrantBtn => 'Autoriser';
+
+  @override
+  String get permOpenSettingsBtn => 'Ouvrir Réglages';
+
+  @override
+  String get skinCancerRisk => 'Grain de Beauté & Risque';
+
+  @override
+  String get skinWart => 'Pré-contrôle Verrue';
+
+  @override
+  String get skinBruise => 'Suivi Ecchymose';
+
+  @override
+  String get skinFacialSpot => 'Tache Faciale';
+
+  @override
+  String get trackEyeTitle => 'Contrôle Hebdomadaire des Yeux';
+
+  @override
+  String get trackEyeSubtitle =>
+      'Suivez rougeurs ou jaunissement de la sclérotique';
+
+  @override
+  String get trackTongueTitle => 'Contrôle Hebdomadaire de la Langue';
+
+  @override
+  String get trackTongueSubtitle => 'Suivez couleur, enduit et texture';
+
+  @override
+  String get trackNailTitle => 'Contrôle Hebdomadaire des Ongles';
+
+  @override
+  String get trackNailSubtitle => 'Surveillez pâleur, cyanose ou jaunissement';
+
+  @override
+  String get trackFaceTitle => 'Teint Facial Bimensuel';
+
+  @override
+  String get trackFaceSubtitle => 'Comparez pâleur, rougeurs et teint';
+
+  @override
+  String get trackSkinTitle => 'Contrôle Mensuel Peau & Grains de Beauté';
+
+  @override
+  String get trackSkinSubtitle => 'Comparez l\'évolution sur 30 jours';
+
+  @override
+  String get trackHydrationTitle => 'Hydratation Quotidienne (Urine)';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'Enregistrez en 2 s avec le nuancier sans caméra';
+
+  @override
+  String get trackStoolTitle => 'Contrôle Hebdomadaire des Selles';
+
+  @override
+  String get trackStoolSubtitle => 'Suivez la digestion et les alertes couleur';
+
+  @override
+  String get trackBpTitle => 'Tension Artérielle Quotidienne';
+
+  @override
+  String get trackBpSubtitle =>
+      'Enregistrez tension systolique/diastolique et pouls';
+
+  @override
+  String get trackSugarTitle => 'Glycémie Quotidienne';
+
+  @override
+  String get trackSugarSubtitle =>
+      'Suivez votre glycémie à jeun ou après repas';
+
+  @override
+  String get trackLabTitle => 'Bilan Sanguin Trimestriel';
+
+  @override
+  String get trackLabSubtitle =>
+      'Importez vos bilans et comparez dans le temps';
+
+  @override
+  String get statusFirstPending => 'En attente du premier relevé';
+
+  @override
+  String get statusDueNow => 'Contrôle à effectuer';
+
+  @override
+  String get statusDoneToday => 'Terminé aujourd\'hui';
+
+  @override
+  String statusNextDays(int days) {
+    return 'Prochain contrôle dans $days jours';
+  }
+
+  @override
+  String get actionCheckNow => 'Contrôler';
+
+  @override
+  String get actionLogReading => 'Saisir';
+
+  @override
+  String get actionAddReport => 'Ajouter Bilan';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • Méthode de Contrôle';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'Choisissez en 2 secondes sur le nuancier sans photo ou utilisez la caméra.';
+
+  @override
+  String get colorCardRecommendedTitle => 'Nuancier sans Caméra (Recommandé)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'Rapide et confidentiel sans photo (2 s)';
+
+  @override
+  String get cameraMeasureTitle => 'Mesure par Caméra';
+
+  @override
+  String get cameraMeasureSubtitle =>
+      'Mesure automatique avec balance des blancs';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'Sélectionnez un module pour consulter les références visuelles.';
+
+  @override
+  String get historyEmpty => 'Aucun contrôle enregistré pour le moment.';
+
+  @override
+  String get filterAll => 'Tous';
+
+  @override
+  String get aiSettingsTitle => 'IA & Confidentialité';
+
+  @override
+  String get vitalsBpTab => 'Tension';
+
+  @override
+  String get vitalsSugarTab => 'Glycémie';
+
+  @override
+  String get skinScreenTitle => 'Pré-contrôle Cutané';
 }

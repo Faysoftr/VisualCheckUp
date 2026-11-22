@@ -5,10 +5,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
 import 'package:visualcheckup/app.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
+import 'package:visualcheckup/features/labs_vitals/data/gemini_lab_report_extractor.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_document_picker.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
@@ -293,7 +296,7 @@ void main() {
       await tester.tap(find.text('PDF veya JPG Yükle'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('2 tahlil parametresi otomatik ayrıştırıldı'), findsOneWidget);
+      expect(find.textContaining('2 tahlil değeri tabloya aktarıldı'), findsOneWidget);
       expect(find.text('PDF • enabiz_tahlil.pdf'), findsOneWidget);
 
       // Enter optional hospital diagnosis and optional user complaint.
@@ -384,6 +387,315 @@ void main() {
 
       expect(find.text('112 mg/dL'), findsOneWidget);
       expect(await repo.loadBloodSugarReadings(), hasLength(1));
+    });
+
+    test('parses complete real 2-page e-Nabız report + unknown custom hospital parameters', () {
+      const realEnabizText = '''
+T.C.SAĞLIK BAKANLIĞI
+Sağlık Bilgi Sistemleri Genel Müdürlüğü
+Adı/Soyadı: SEÇİL YÜKSEK Cinsiyet: Kadın
+Tarih: 07.05.2026 Doğum Tarihi: 27.04.1988
+Sağlık Tesisi: T.C. SAĞLIK BAKANLIĞI ÇUBUK HALİL ŞIVGIN DEVLET HASTANESİ
+Tarih Tahlil Sonuç Sonuç Birimi Referans Değeri
+07.05.2026
+10:52
+ALT 12 U/L 0 - 35
+AST 15 U/L 0 - 35
+Demir 127 ug/L 60 - 180
+Demir Bağlama 304 µg/dL 155 - 355
+Ferritin 34 µg/L 13 - 232
+Folat 14,3 µg/L 3,21 - 20
+Glukoz 85 mg/dL 74 - 100
+HbA1c 4,8 % 4 - 6,5
+HDL Kolesterol 49 mg/dL < 50 *
+Total Kolesterol 141 mg/dL 0 - 200
+Trigliserit 47 mg/dL 0 - 150
+Üre 17 mg/dL 17 - 43
+Vitamin B12 291 ng/L 220 - 1100
+07.05.2026
+10:52
+TAM KAN (HEMOGRAM)
+BAS# 0,02 10^3/mm^3 0,00 - 0,10
+BAS% 0,2 % 0 - 1
+EOS# 0,06 10^3/mm^3 0,02 - 0,70
+EOS% 0,7 % 0,50 - 7
+HCT 40,7 % 36 - 48
+HGB 13,7 g/dL 11 - 17
+LYM# 1,5 10^3/mm^3 0,80 - 4
+LYM% 18,4 % 20 - 40
+MCH 28,7 pg 27 - 34
+MCHC 33,7 mmol/L 32 - 36
+MCV 85,6 fL 80 - 100
+MON# 0,4 10^3/mm^3 0,12 - 1,20
+MON% 5,5 % 3 - 12
+MPV 10,8 fL 6,50 - 12
+NEU# 6 10^3/mm^3 2 - 7
+NEU% 75,2 % 50 - 70
+PCT 0,29 %
+0,108 - 0,282
+PDW 15,7 % 15 - 17
+PLT 266 10^3/mm^3 100 - 380
+RBC 4,76 10^6/mm^3 3,50 - 5
+RDW 13,1 % 11 - 16
+WBC 8,03 10^3/mm^3 4 - 10
+07.05.2026
+10:52
+KREATININ
+eGFR 111 mL/dk/1.73
+m2
+60 - 120
+Kreatinin 0,68 mg/dL 0,66 - 1,09
+07.05.2026
+10:52
+LDL KOLESTROL
+LDL Kolesterol 80 mg/dL 0 - 130
+LDL Kolesterol(Hesaplama 83 mg/dL
+Homosistein 16,4 µmol/L 5 - 15
+enabiz.gov.tr
+0 850 240 03 03
+Sayfa 1 / 2
+''';
+
+      final parsed = LabReportAnalyzer.parseReportText(realEnabizText);
+      expect(parsed.detectedDate, DateTime(2026, 5, 7));
+      expect(
+        parsed.detectedHospital,
+        contains('ÇUBUK HALİL ŞIVGIN DEVLET HASTANESİ'),
+      );
+
+      final byCode = {for (final i in parsed.items) i.code: i};
+      // All 38 e-Nabız rows + 1 custom unknown parameter = 39 parameters!
+      expect(parsed.items.length, greaterThanOrEqualTo(37));
+
+      // Check wrapped rows & special flags
+      expect(byCode['ALT']?.value, 12);
+      expect(byCode['IRON']?.value, 127);
+      expect(byCode['TIBC']?.value, 304);
+      expect(byCode['FOLATE']?.value, closeTo(14.3, 0.01));
+      expect(byCode['HDL']?.value, 49);
+      expect(byCode['HDL']?.status, LabStatus.low);
+      expect(byCode['LYM_PCT']?.value, closeTo(18.4, 0.01));
+      expect(byCode['LYM_PCT']?.status, LabStatus.low);
+      expect(byCode['LYM_ABS']?.value, closeTo(1.5, 0.01));
+      expect(byCode['NEU_PCT']?.value, closeTo(75.2, 0.01));
+      expect(byCode['NEU_PCT']?.status, LabStatus.high);
+      expect(byCode['PCT']?.value, closeTo(0.29, 0.001));
+      expect(byCode['PCT']?.refMax, closeTo(0.282, 0.001));
+      expect(byCode['PCT']?.status, LabStatus.high);
+      expect(byCode['EGFR']?.value, 111);
+      expect(byCode['EGFR']?.status, LabStatus.normal);
+      expect(byCode['CREA']?.value, closeTo(0.68, 0.01));
+      expect(byCode['LDL']?.value, 80);
+
+      // Custom unknown parameter not in built-in catalog
+      expect(byCode['HOMOSISTEIN']?.value, closeTo(16.4, 0.01));
+      expect(byCode['HOMOSISTEIN']?.status, LabStatus.high);
+    });
+
+    test('Syncfusion PDF extractor reads real multi-line PDF generated on-device', () async {
+      final document = sf.PdfDocument();
+      final page = document.pages.add();
+      page.graphics.drawString(
+        'Tarih: 07.05.2026\nALT 12 U/L 0 - 35\nFerritin 34 ug/L 13 - 232\nHomosistein 16,4 umol/L 5 - 15',
+        sf.PdfStandardFont(sf.PdfFontFamily.helvetica, 12),
+      );
+      final bytes = Uint8List.fromList(await document.save());
+      document.dispose();
+
+      final extracted = PdfTextExtractor.extractText(bytes);
+      final parsed = LabReportAnalyzer.parseReportText(extracted);
+      final codes = parsed.items.map((e) => e.code).toSet();
+      expect(codes, containsAll(['ALT', 'FERRITIN', 'HOMOSISTEIN']));
+      expect(parsed.detectedDate, DateTime(2026, 5, 7));
+    });
+
+    test('GeminiLabReportExtractor.parseAiJson maps any hospital JSON into canonical items', () {
+      const sampleJson = '''
+{
+  "hospitalName": "Özel Sağlık Hastanesi",
+  "reportDate": "2026-06-15",
+  "items": [
+    {"name": "ALT", "value": 18, "unit": "U/L", "refMin": 0, "refMax": 35},
+    {"name": "LYM%", "value": 24.5, "unit": "%", "refMin": 20, "refMax": 40},
+    {"name": "D-Dimer", "value": 620, "unit": "ng/mL", "refMin": 0, "refMax": 500}
+  ]
+}
+''';
+      final result = GeminiLabReportExtractor.parseAiJson(sampleJson);
+      expect(result.hospitalName, 'Özel Sağlık Hastanesi');
+      expect(result.detectedDate, DateTime(2026, 6, 15));
+      expect(result.items, hasLength(3));
+      final byCode = {for (final i in result.items) i.code: i};
+      expect(byCode['ALT']?.status, LabStatus.normal);
+      expect(byCode['LYM_PCT']?.status, LabStatus.normal);
+      expect(byCode['D_DIMER']?.status, LabStatus.high);
+    });
+
+    test('reassembles vertical cell-per-line PDF text and never mistakes units for parameter names', () {
+      const verticalEnabiz = '''
+Tarih: 07.05.2026
+Doğum Tarihi: 27.04.1988
+Demir
+127
+ug/L
+60 - 180
+Demir Bağlama
+304
+µg/dL
+155 - 355
+Folat
+14,3
+µg/L
+3,21 - 20
+HCT
+40,7
+%
+36 - 48
+HGB
+13,7
+g/dL
+11 - 17
+WBC
+8,03
+10^3/mm^3
+4 - 10
+''';
+      final parsed = LabReportAnalyzer.parseReportText(verticalEnabiz);
+      expect(parsed.detectedDate, DateTime(2026, 5, 7));
+      final byCode = {for (final i in parsed.items) i.code: i};
+      expect(byCode.keys, containsAll(['IRON', 'TIBC', 'FOLATE', 'HCT', 'HGB', 'WBC']));
+      expect(byCode['IRON']?.value, 127);
+      expect(byCode['TIBC']?.value, 304);
+      expect(byCode['FOLATE']?.value, closeTo(14.3, 0.01));
+      expect(byCode['HGB']?.value, closeTo(13.7, 0.01));
+      expect(byCode['HCT']?.value, closeTo(40.7, 0.01));
+      // Ensure NO unit token leaked in as a parameter name
+      for (final item in parsed.items) {
+        expect(item.name.toLowerCase(), isNot(contains('mg/dl')));
+        expect(item.name.toLowerCase(), isNot(contains('ug/l')));
+        expect(item.name.toLowerCase(), isNot(contains('10^3')));
+      }
+    });
+
+    test('evaluates multi-parameter clinical patterns (HGB + Demir anemia, NEU% + LYM%, HDL + PCT)', () {
+      // 1. Iron deficiency anemia pattern: HGB low + Demir low + Ferritin low
+      final anemiaItems = [
+        LabReportAnalyzer.evaluateExtractedItem(
+          rawName: 'HGB',
+          value: 10.2,
+          unit: 'g/dL',
+          refMin: 11,
+          refMax: 17,
+        ),
+        LabReportAnalyzer.evaluateExtractedItem(
+          rawName: 'Demir',
+          value: 35,
+          unit: 'ug/L',
+          refMin: 60,
+          refMax: 180,
+        ),
+        LabReportAnalyzer.evaluateExtractedItem(
+          rawName: 'Ferritin',
+          value: 9,
+          unit: 'µg/L',
+          refMin: 13,
+          refMax: 232,
+        ),
+      ];
+      final anemiaReport = LabReportAnalyzer.buildReport(
+        title: 'Anemi Kontrol',
+        reportDate: DateTime(2026, 5, 7),
+        source: LabReportSource.pdfUpload,
+        items: anemiaItems,
+      );
+      expect(
+        anemiaReport.contextualInterpretation,
+        contains('Demir Eksikliği Anemisi Eğilimi'),
+      );
+
+      // 2. Real e-Nabız combination: NEU% high + LYM% low + WBC normal + PCT high + PLT normal + HDL low
+      final enabizItems = [
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'NEU%', value: 75.2, unit: '%', refMin: 50, refMax: 70),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'LYM%', value: 18.4, unit: '%', refMin: 20, refMax: 40),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'WBC', value: 8.03, unit: '10^3/mm^3', refMin: 4, refMax: 10),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'PCT', value: 0.29, unit: '%', refMin: 0.108, refMax: 0.282),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'PLT', value: 266, unit: '10^3/mm^3', refMin: 100, refMax: 380),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'HDL Kolesterol', value: 49, unit: 'mg/dL', refMax: 50),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'LDL Kolesterol', value: 80, unit: 'mg/dL', refMin: 0, refMax: 130),
+      ];
+      final enabizReport = LabReportAnalyzer.buildReport(
+        title: 'e-Nabız Raporu',
+        reportDate: DateTime(2026, 5, 7),
+        source: LabReportSource.pdfUpload,
+        items: enabizItems,
+      );
+      expect(enabizReport.contextualInterpretation, contains('Nötrofil % Yüksek / Lenfosit % Düşük'));
+      expect(enabizReport.contextualInterpretation, contains('PCT Hafif Yüksek, Trombosit (PLT) Normal'));
+      expect(enabizReport.contextualInterpretation, contains('Koruyucu HDL Kolesterol Sınırda Düşük'));
+    });
+
+    test('reconstructs geometric multi-column PDF tables accurately via Syncfusion', () async {
+      final document = sf.PdfDocument();
+      final page = document.pages.add();
+      final font = sf.PdfStandardFont(sf.PdfFontFamily.helvetica, 11);
+
+      void drawRow(double y, String name, String val, String unit, String ref) {
+        page.graphics.drawString(name, font, bounds: Rect.fromLTWH(20, y, 140, 16));
+        page.graphics.drawString(val, font, bounds: Rect.fromLTWH(180, y, 60, 16));
+        page.graphics.drawString(unit, font, bounds: Rect.fromLTWH(260, y, 80, 16));
+        page.graphics.drawString(ref, font, bounds: Rect.fromLTWH(360, y, 100, 16));
+      }
+
+      page.graphics.drawString('Tarih: 07.05.2026', font, bounds: const Rect.fromLTWH(20, 10, 200, 16));
+      drawRow(40, 'Demir', '127', 'ug/L', '60 - 180');
+      drawRow(60, 'Demir Baglama', '304', 'ug/dL', '155 - 355');
+      drawRow(80, 'Folat', '14,3', 'ug/L', '3,21 - 20');
+      drawRow(100, 'HGB', '13,7', 'g/dL', '11 - 17');
+      drawRow(120, 'HCT', '40,7', '%', '36 - 48');
+
+      final bytes = Uint8List.fromList(await document.save());
+      document.dispose();
+
+      final extracted = PdfTextExtractor.extractText(bytes);
+      final parsed = LabReportAnalyzer.parseReportText(extracted);
+      final codes = parsed.items.map((e) => e.code).toSet();
+      expect(codes, containsAll(['IRON', 'TIBC', 'FOLATE', 'HGB', 'HCT']));
+      expect(parsed.detectedDate, DateTime(2026, 5, 7));
+    });
+
+    test('LabReportPdfGenerator creates valid doctor summary PDF with comparison table', () async {
+      final prevReport = LabReportAnalyzer.buildReport(
+        title: 'Önceki Tahlil',
+        reportDate: DateTime(2026, 2, 10),
+        source: LabReportSource.pdfUpload,
+        items: [
+          LabReportAnalyzer.evaluateExtractedItem(rawName: 'HGB', value: 11.2, unit: 'g/dL', refMin: 11, refMax: 17),
+          LabReportAnalyzer.evaluateExtractedItem(rawName: 'Demir', value: 52, unit: 'ug/L', refMin: 60, refMax: 180),
+        ],
+      );
+      final currentReport = LabReportAnalyzer.buildReport(
+        title: 'Çubuk Devlet Hastanesi',
+        reportDate: DateTime(2026, 5, 7),
+        source: LabReportSource.pdfUpload,
+        items: [
+          LabReportAnalyzer.evaluateExtractedItem(rawName: 'HGB', value: 13.7, unit: 'g/dL', refMin: 11, refMax: 17),
+          LabReportAnalyzer.evaluateExtractedItem(rawName: 'Demir', value: 127, unit: 'ug/L', refMin: 60, refMax: 180),
+          LabReportAnalyzer.evaluateExtractedItem(rawName: 'HDL Kolesterol', value: 49, unit: 'mg/dL', refMax: 50),
+        ],
+      );
+
+      final pdfBytes = await LabReportPdfGenerator.generateSummaryPdf(
+        report: currentReport,
+        previousReport: prevReport,
+      );
+      expect(pdfBytes.length, greaterThan(1000));
+      expect(utf8.decode(pdfBytes.take(5).toList()), '%PDF-');
+
+      final extracted = PdfTextExtractor.extractText(pdfBytes);
+      expect(extracted, contains('VisualCheckUp'));
+      expect(extracted, contains('07.05.2026'));
+      expect(extracted, contains('13.7'));
+      expect(extracted, contains('127'));
     });
   });
 }

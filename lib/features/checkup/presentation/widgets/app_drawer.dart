@@ -106,9 +106,23 @@ class AppDrawer extends StatelessWidget {
           ).nativeName;
 
     return Drawer(
-      child: SafeArea(
-        child: Column(
-          children: [
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/app_bg.jpg',
+            fit: BoxFit.cover,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppTheme.darkCanvas.withValues(alpha: 0.90)
+                  : Colors.white.withValues(alpha: 0.42),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Container(
@@ -262,7 +276,7 @@ class AppDrawer extends StatelessWidget {
                               in SkinConcernTypeX.featuredSubModules)
                             _DrawerTile(
                               icon: concern.icon,
-                              label: concern.label,
+                              label: concern.localizedLabel(l10n),
                               accentColor: concern.accentColor,
                               onTap: () => _closeAndRun(
                                 context,
@@ -315,7 +329,7 @@ class AppDrawer extends StatelessWidget {
                   if (onOpenSettings != null)
                     _DrawerTile(
                       icon: Icons.settings_outlined,
-                      label: 'Ayarlar (İzinler & Dil)',
+                      label: l10n.menuSettings,
                       onTap: () => _closeAndRun(context, onOpenSettings!),
                     ),
                   if (localeController != null)
@@ -439,6 +453,8 @@ class AppDrawer extends StatelessWidget {
             ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

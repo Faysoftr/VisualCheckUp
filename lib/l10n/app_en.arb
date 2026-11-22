@@ -67,9 +67,15 @@
   "followUpSummaryCounts": "{active} active • {completed} up to date • {due} due",
   "@followUpSummaryCounts": {
     "placeholders": {
-      "active": { "type": "int" },
-      "completed": { "type": "int" },
-      "due": { "type": "int" }
+      "active": {
+        "type": "int"
+      },
+      "completed": {
+        "type": "int"
+      },
+      "due": {
+        "type": "int"
+      }
     }
   },
   "homeCategoriesTitle": "Checkup Categories",
@@ -81,7 +87,9 @@
   "homeLabsCardCount": "{count} saved reports",
   "@homeLabsCardCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "homeVitalsCardTitle": "Blood Pressure & Sugar",
@@ -89,7 +97,9 @@
   "homeVitalsCardCount": "{count} saved readings",
   "@homeVitalsCardCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "homeRecentChecks": "Recent Checks",
@@ -109,5 +119,80 @@
   "catStoolTitle": "Stool Color",
   "catStoolSubtitle": "Digestion and color warning check",
   "tooltipHistory": "History",
-  "tooltipAccountMenu": "Account & Menu"
+  "tooltipAccountMenu": "Account & Menu",
+  "menuSettings": "Settings (Permissions & Language)",
+  "settingsTitle": "Settings",
+  "settingsLanguageDesc": "Your phone language is used automatically by default. You can choose any language below.",
+  "settingsPermissionsTitle": "App Permissions",
+  "settingsPermissionsDesc": "Check and manage camera and gallery/photo permissions here.",
+  "settingsCameraPermission": "Camera Permission",
+  "settingsCameraPermissionDesc": "Used for eye, tongue, nail, and skin captures",
+  "settingsPhotosPermission": "Gallery & Photos Permission",
+  "settingsPhotosPermissionDesc": "Used to upload photos and lab report images",
+  "settingsOpenSystemPermissions": "Open Phone App Permissions",
+  "permChecking": "Checking...",
+  "permGranted": "Granted",
+  "permDenied": "Permission Needed",
+  "permPermanent": "Enable in System Settings",
+  "permUnavailable": "Managed by Device",
+  "permGrantBtn": "Allow",
+  "permOpenSettingsBtn": "Open Settings",
+  "skinCancerRisk": "Mole & Skin Cancer Risk",
+  "skinWart": "Wart Pre-Check",
+  "skinBruise": "Bruise Tracking",
+  "skinFacialSpot": "Facial Spot",
+  "trackEyeTitle": "Weekly Eye (Sclera) Check",
+  "trackEyeSubtitle": "Track redness or yellowing changes in the sclera",
+  "trackTongueTitle": "Weekly Tongue Check",
+  "trackTongueSubtitle": "Track tongue color, coating, and surface changes",
+  "trackNailTitle": "Weekly Nail Check",
+  "trackNailSubtitle": "Monitor nail bed pallor, cyanosis, or yellowing",
+  "trackFaceTitle": "Biweekly Face & Skin Tone",
+  "trackFaceSubtitle": "Compare pallor, redness, and facial tone changes",
+  "trackSkinTitle": "Monthly Skin, Mole & Wart Check",
+  "trackSkinSubtitle": "Compare 30-day changes in moles, warts, bruises & spots",
+  "trackHydrationTitle": "Daily Hydration (Urine) Check",
+  "trackHydrationSubtitle": "Log hydration in 2 seconds with camera-free color card",
+  "trackStoolTitle": "Weekly Stool Color Check",
+  "trackStoolSubtitle": "Track digestion and color warning signs regularly",
+  "trackBpTitle": "Daily Blood Pressure Check",
+  "trackBpSubtitle": "Log systolic/diastolic pressure and pulse trends",
+  "trackSugarTitle": "Daily Blood Sugar Check",
+  "trackSugarSubtitle": "Track fasting or post-meal blood glucose readings",
+  "trackLabTitle": "Quarterly Blood Test & Lab Report",
+  "trackLabSubtitle": "Upload hospital/blood test reports and compare over time",
+  "statusFirstPending": "Waiting for first log",
+  "statusDueNow": "Time for checkup",
+  "statusDoneToday": "Completed today",
+  "statusNextDays": "Next check in {days} days",
+  "@statusNextDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "actionCheckNow": "Check Now",
+  "actionLogReading": "Log Reading",
+  "actionAddReport": "Add Report",
+  "checkMethodTitle": "{category} • Check Method",
+  "@checkMethodTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "checkMethodSubtitle": "Pick from the color card in 2 seconds without taking a photo, or use camera measurement.",
+  "colorCardRecommendedTitle": "Camera-Free Color Card (Recommended)",
+  "colorCardRecommendedSubtitle": "Private, fast 2-second log without a photo",
+  "cameraMeasureTitle": "Camera Color Measurement",
+  "cameraMeasureSubtitle": "Automatic measurement with white-reference calibration",
+  "referenceGuideSubtitle": "Select a module to view healthy vs. abnormal visual findings.",
+  "historyEmpty": "No saved checkups yet.",
+  "filterAll": "All",
+  "aiSettingsTitle": "AI & Privacy Settings",
+  "vitalsBpTab": "Blood Pressure",
+  "vitalsSugarTab": "Blood Sugar",
+  "skinScreenTitle": "Skin Conditions Pre-Check"
 }

@@ -3,6 +3,15 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 
+/// Thrown when the user closes or cancels the native Google/Apple account
+/// chooser without picking an account.
+class AuthCancelledException implements Exception {
+  const AuthCancelledException();
+
+  @override
+  String toString() => 'Oturum açma iptal edildi.';
+}
+
 /// Optional adapter interface for plugging in real `google_sign_in`,
 /// `sign_in_with_apple`, and `firebase_auth` credentials once Firebase and
 /// Apple Developer OAuth keys are configured.
@@ -45,15 +54,21 @@ class LocalAuthService implements AuthService {
   @override
   Future<AuthUser> signInWithGoogle() async {
     final adapter = socialAdapter;
-    final user = (adapter != null
-            ? await adapter.authenticateWithGoogle()
-            : null) ??
-        const AuthUser(
-          id: 'google_local_demo',
-          displayName: 'Google Kullanıcısı',
-          email: 'kullanici@gmail.com',
-          provider: AuthProviderType.google,
-        );
+    final AuthUser user;
+    if (adapter != null) {
+      final result = await adapter.authenticateWithGoogle();
+      if (result == null) {
+        throw const AuthCancelledException();
+      }
+      user = result;
+    } else {
+      user = const AuthUser(
+        id: 'google_local_demo',
+        displayName: 'Google Kullanıcısı',
+        email: 'kullanici@gmail.com',
+        provider: AuthProviderType.google,
+      );
+    }
     await _persistUser(user);
     return user;
   }
@@ -61,15 +76,21 @@ class LocalAuthService implements AuthService {
   @override
   Future<AuthUser> signInWithApple() async {
     final adapter = socialAdapter;
-    final user = (adapter != null
-            ? await adapter.authenticateWithApple()
-            : null) ??
-        const AuthUser(
-          id: 'apple_local_demo',
-          displayName: 'Apple Kullanıcısı',
-          email: 'kullanici@icloud.com',
-          provider: AuthProviderType.apple,
-        );
+    final AuthUser user;
+    if (adapter != null) {
+      final result = await adapter.authenticateWithApple();
+      if (result == null) {
+        throw const AuthCancelledException();
+      }
+      user = result;
+    } else {
+      user = const AuthUser(
+        id: 'apple_local_demo',
+        displayName: 'Apple Kullanıcısı',
+        email: 'kullanici@icloud.com',
+        provider: AuthProviderType.apple,
+      );
+    }
     await _persistUser(user);
     return user;
   }

@@ -589,6 +589,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account & Menu'**
   String get tooltipAccountMenu;
+
+  /// No description provided for @menuSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings (Permissions & Language)'**
+  String get menuSettings;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsLanguageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone language is used automatically by default. You can choose any language below.'**
+  String get settingsLanguageDesc;
+
+  /// No description provided for @settingsPermissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Permissions'**
+  String get settingsPermissionsTitle;
+
+  /// No description provided for @settingsPermissionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Check and manage camera and gallery/photo permissions here.'**
+  String get settingsPermissionsDesc;
+
+  /// No description provided for @settingsCameraPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Permission'**
+  String get settingsCameraPermission;
+
+  /// No description provided for @settingsCameraPermissionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for eye, tongue, nail, and skin captures'**
+  String get settingsCameraPermissionDesc;
+
+  /// No description provided for @settingsPhotosPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery & Photos Permission'**
+  String get settingsPhotosPermission;
+
+  /// No description provided for @settingsPhotosPermissionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Used to upload photos and lab report images'**
+  String get settingsPhotosPermissionDesc;
+
+  /// No description provided for @settingsOpenSystemPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Phone App Permissions'**
+  String get settingsOpenSystemPermissions;
+
+  /// No description provided for @permChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get permChecking;
+
+  /// No description provided for @permGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Granted'**
+  String get permGranted;
+
+  /// No description provided for @permDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Needed'**
+  String get permDenied;
+
+  /// No description provided for @permPermanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable in System Settings'**
+  String get permPermanent;
+
+  /// No description provided for @permUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Managed by Device'**
+  String get permUnavailable;
+
+  /// No description provided for @permGrantBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get permGrantBtn;
+
+  /// No description provided for @permOpenSettingsBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get permOpenSettingsBtn;
+
+  /// No description provided for @skinCancerRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Mole & Skin Cancer Risk'**
+  String get skinCancerRisk;
+
+  /// No description provided for @skinWart.
+  ///
+  /// In en, this message translates to:
+  /// **'Wart Pre-Check'**
+  String get skinWart;
+
+  /// No description provided for @skinBruise.
+  ///
+  /// In en, this message translates to:
+  /// **'Bruise Tracking'**
+  String get skinBruise;
+
+  /// No description provided for @skinFacialSpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Facial Spot'**
+  String get skinFacialSpot;
+
+  /// No description provided for @trackEyeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Eye (Sclera) Check'**
+  String get trackEyeTitle;
+
+  /// No description provided for @trackEyeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track redness or yellowing changes in the sclera'**
+  String get trackEyeSubtitle;
+
+  /// No description provided for @trackTongueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Tongue Check'**
+  String get trackTongueTitle;
+
+  /// No description provided for @trackTongueSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track tongue color, coating, and surface changes'**
+  String get trackTongueSubtitle;
+
+  /// No description provided for @trackNailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Nail Check'**
+  String get trackNailTitle;
+
+  /// No description provided for @trackNailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor nail bed pallor, cyanosis, or yellowing'**
+  String get trackNailSubtitle;
+
+  /// No description provided for @trackFaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Biweekly Face & Skin Tone'**
+  String get trackFaceTitle;
+
+  /// No description provided for @trackFaceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare pallor, redness, and facial tone changes'**
+  String get trackFaceSubtitle;
+
+  /// No description provided for @trackSkinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Skin, Mole & Wart Check'**
+  String get trackSkinTitle;
+
+  /// No description provided for @trackSkinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare 30-day changes in moles, warts, bruises & spots'**
+  String get trackSkinSubtitle;
+
+  /// No description provided for @trackHydrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Hydration (Urine) Check'**
+  String get trackHydrationTitle;
+
+  /// No description provided for @trackHydrationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log hydration in 2 seconds with camera-free color card'**
+  String get trackHydrationSubtitle;
+
+  /// No description provided for @trackStoolTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Stool Color Check'**
+  String get trackStoolTitle;
+
+  /// No description provided for @trackStoolSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track digestion and color warning signs regularly'**
+  String get trackStoolSubtitle;
+
+  /// No description provided for @trackBpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Blood Pressure Check'**
+  String get trackBpTitle;
+
+  /// No description provided for @trackBpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log systolic/diastolic pressure and pulse trends'**
+  String get trackBpSubtitle;
+
+  /// No description provided for @trackSugarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Blood Sugar Check'**
+  String get trackSugarTitle;
+
+  /// No description provided for @trackSugarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track fasting or post-meal blood glucose readings'**
+  String get trackSugarSubtitle;
+
+  /// No description provided for @trackLabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarterly Blood Test & Lab Report'**
+  String get trackLabTitle;
+
+  /// No description provided for @trackLabSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload hospital/blood test reports and compare over time'**
+  String get trackLabSubtitle;
+
+  /// No description provided for @statusFirstPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for first log'**
+  String get statusFirstPending;
+
+  /// No description provided for @statusDueNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for checkup'**
+  String get statusDueNow;
+
+  /// No description provided for @statusDoneToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today'**
+  String get statusDoneToday;
+
+  /// No description provided for @statusNextDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Next check in {days} days'**
+  String statusNextDays(int days);
+
+  /// No description provided for @actionCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Now'**
+  String get actionCheckNow;
+
+  /// No description provided for @actionLogReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Reading'**
+  String get actionLogReading;
+
+  /// No description provided for @actionAddReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Report'**
+  String get actionAddReport;
+
+  /// No description provided for @checkMethodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} • Check Method'**
+  String checkMethodTitle(String category);
+
+  /// No description provided for @checkMethodSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from the color card in 2 seconds without taking a photo, or use camera measurement.'**
+  String get checkMethodSubtitle;
+
+  /// No description provided for @colorCardRecommendedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera-Free Color Card (Recommended)'**
+  String get colorCardRecommendedTitle;
+
+  /// No description provided for @colorCardRecommendedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private, fast 2-second log without a photo'**
+  String get colorCardRecommendedSubtitle;
+
+  /// No description provided for @cameraMeasureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Color Measurement'**
+  String get cameraMeasureTitle;
+
+  /// No description provided for @cameraMeasureSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic measurement with white-reference calibration'**
+  String get cameraMeasureSubtitle;
+
+  /// No description provided for @referenceGuideSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a module to view healthy vs. abnormal visual findings.'**
+  String get referenceGuideSubtitle;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved checkups yet.'**
+  String get historyEmpty;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @aiSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & Privacy Settings'**
+  String get aiSettingsTitle;
+
+  /// No description provided for @vitalsBpTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure'**
+  String get vitalsBpTab;
+
+  /// No description provided for @vitalsSugarTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Sugar'**
+  String get vitalsSugarTab;
+
+  /// No description provided for @skinScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skin Conditions Pre-Check'**
+  String get skinScreenTitle;
 }
 
 class _AppLocalizationsDelegate

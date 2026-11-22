@@ -255,4 +255,191 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => '账户与菜单';
+
+  @override
+  String get menuSettings => '设置（权限与语言）';
+
+  @override
+  String get settingsTitle => '设置';
+
+  @override
+  String get settingsLanguageDesc => '默认自动使用手机系统语言，您也可以在下方手动切换。';
+
+  @override
+  String get settingsPermissionsTitle => '应用权限';
+
+  @override
+  String get settingsPermissionsDesc => '在此查看和管理相机与相册权限。';
+
+  @override
+  String get settingsCameraPermission => '相机权限';
+
+  @override
+  String get settingsCameraPermissionDesc => '用于眼睛、舌头、指甲和皮肤拍摄';
+
+  @override
+  String get settingsPhotosPermission => '相册与照片权限';
+
+  @override
+  String get settingsPhotosPermissionDesc => '用于从相册上传照片和化验单';
+
+  @override
+  String get settingsOpenSystemPermissions => '打开手机应用权限';
+
+  @override
+  String get permChecking => '检查中...';
+
+  @override
+  String get permGranted => '已授权';
+
+  @override
+  String get permDenied => '需要权限';
+
+  @override
+  String get permPermanent => '请在系统设置中开启';
+
+  @override
+  String get permUnavailable => '由设备管理';
+
+  @override
+  String get permGrantBtn => '授权';
+
+  @override
+  String get permOpenSettingsBtn => '打开设置';
+
+  @override
+  String get skinCancerRisk => '黑痣与皮肤癌风险';
+
+  @override
+  String get skinWart => '疣体预检';
+
+  @override
+  String get skinBruise => '淤青追踪';
+
+  @override
+  String get skinFacialSpot => '面部色斑';
+
+  @override
+  String get trackEyeTitle => '每周眼睛（巩膜）检查';
+
+  @override
+  String get trackEyeSubtitle => '追踪巩膜红血丝或发黄变化';
+
+  @override
+  String get trackTongueTitle => '每周舌苔观察';
+
+  @override
+  String get trackTongueSubtitle => '追踪舌色、舌苔及表面变化';
+
+  @override
+  String get trackNailTitle => '每周指甲观察';
+
+  @override
+  String get trackNailSubtitle => '关注甲床苍白、发紫或发黄';
+
+  @override
+  String get trackFaceTitle => '每两周面部肤色';
+
+  @override
+  String get trackFaceSubtitle => '对比面部苍白、泛红与肤色变化';
+
+  @override
+  String get trackSkinTitle => '每月皮肤、痣与疣检查';
+
+  @override
+  String get trackSkinSubtitle => '对比30天内痣、疣、淤青和色斑变化';
+
+  @override
+  String get trackHydrationTitle => '每日水分（尿液）追踪';
+
+  @override
+  String get trackHydrationSubtitle => '使用无相机比色卡2秒记录水分状态';
+
+  @override
+  String get trackStoolTitle => '每周大便颜色追踪';
+
+  @override
+  String get trackStoolSubtitle => '定期记录消化与颜色警示';
+
+  @override
+  String get trackBpTitle => '每日血压记录';
+
+  @override
+  String get trackBpSubtitle => '记录收缩压/舒张压与脉搏趋势';
+
+  @override
+  String get trackSugarTitle => '每日血糖追踪';
+
+  @override
+  String get trackSugarSubtitle => '记录空腹或餐后血糖数值';
+
+  @override
+  String get trackLabTitle => '每季度血液化验报告';
+
+  @override
+  String get trackLabSubtitle => '上传医院化验单并按期对比';
+
+  @override
+  String get statusFirstPending => '等待首次记录';
+
+  @override
+  String get statusDueNow => '该检查了';
+
+  @override
+  String get statusDoneToday => '今日已完成';
+
+  @override
+  String statusNextDays(int days) {
+    return '下次检查：$days 天后';
+  }
+
+  @override
+  String get actionCheckNow => '立即检查';
+
+  @override
+  String get actionLogReading => '记录数值';
+
+  @override
+  String get actionAddReport => '添加报告';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • 检查方式';
+  }
+
+  @override
+  String get checkMethodSubtitle => '无需拍照2秒通过比色卡选择，或使用相机色彩测量。';
+
+  @override
+  String get colorCardRecommendedTitle => '无相机比色卡（推荐）';
+
+  @override
+  String get colorCardRecommendedSubtitle => '无需拍照，私密快速记录（2秒）';
+
+  @override
+  String get cameraMeasureTitle => '相机色彩测量';
+
+  @override
+  String get cameraMeasureSubtitle => '带白平衡校准的自动测量';
+
+  @override
+  String get referenceGuideSubtitle => '选择模块查看健康与异常视觉参考。';
+
+  @override
+  String get historyEmpty => '暂无保存的检查记录。';
+
+  @override
+  String get filterAll => '全部';
+
+  @override
+  String get aiSettingsTitle => 'AI 与隐私设置';
+
+  @override
+  String get vitalsBpTab => '血压';
+
+  @override
+  String get vitalsSugarTab => '血糖';
+
+  @override
+  String get skinScreenTitle => '皮肤状况预检';
 }

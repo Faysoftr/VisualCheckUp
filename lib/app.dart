@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/cloud/cloud_backup_service.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
@@ -9,6 +10,7 @@ import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/home_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
+import 'package:visualcheckup/features/splash/presentation/screens/splash_screen.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
 class VisualCheckUpApp extends StatefulWidget {
@@ -21,6 +23,7 @@ class VisualCheckUpApp extends StatefulWidget {
     this.labsVitalsRepository,
     this.analyzer,
     this.initialUser,
+    this.showSplash,
   });
 
   final AuthService? authService;
@@ -30,6 +33,7 @@ class VisualCheckUpApp extends StatefulWidget {
   final LabsVitalsRepository? labsVitalsRepository;
   final ColorHealthAnalyzer? analyzer;
   final AuthUser? initialUser;
+  final bool? showSplash;
 
   @override
   State<VisualCheckUpApp> createState() => _VisualCheckUpAppState();
@@ -47,6 +51,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
 
   AuthUser? _currentUser;
   bool _bootstrapping = true;
+  bool _splashCompleted = false;
 
   @override
   void initState() {
@@ -62,6 +67,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     _analyzer = widget.analyzer ?? ColorHealthAnalyzer();
     _currentUser = widget.initialUser;
     _bootstrapping = widget.initialUser == null;
+    final shouldShowSplash = widget.showSplash ?? (widget.initialUser == null);
+    _splashCompleted = !shouldShowSplash;
     _bootstrap();
   }
 
@@ -104,12 +111,20 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   }
 
   Future<void> _handleDeleteAccount() async {
+    await const CloudBackupService().deleteAllCloudData();
     await _historyRepository.clearAllUserData();
     await _labsVitalsRepository.clearAll();
     await _authService.deleteAccount();
     if (!mounted) return;
     setState(() {
       _currentUser = null;
+    });
+  }
+
+  void _handleSplashComplete() {
+    if (!mounted) return;
+    setState(() {
+      _splashCompleted = true;
     });
   }
 
@@ -122,7 +137,9 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
           valueListenable: _localeController,
           builder: (context, locale, _) {
             final Widget home;
-            if (_bootstrapping) {
+            if (!_splashCompleted) {
+              home = SplashScreen(onComplete: _handleSplashComplete);
+            } else if (_bootstrapping) {
               home = const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
@@ -154,7 +171,21 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
               theme: AppTheme.light(),
               darkTheme: AppTheme.dark(),
               themeMode: themeMode,
-              home: home,
+              home: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                child: KeyedSubtree(
+                  key: ValueKey<String>(
+                    !_splashCompleted
+                        ? 'splash'
+                        : _bootstrapping
+                            ? 'bootstrapping'
+                            : _currentUser == null
+                                ? 'login'
+                                : 'home',
+                  ),
+                  child: home,
+                ),
+              ),
             );
           },
         );

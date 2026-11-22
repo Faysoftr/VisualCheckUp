@@ -263,4 +263,209 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'Hesap ve Menü';
+
+  @override
+  String get menuSettings => 'Ayarlar (İzinler & Dil)';
+
+  @override
+  String get settingsTitle => 'Ayarlar';
+
+  @override
+  String get settingsLanguageDesc =>
+      'Varsayılan olarak telefonun sistem dili kullanılır. İstersen aşağıdan istediğin dili seçebilirsin.';
+
+  @override
+  String get settingsPermissionsTitle => 'Uygulama İzinleri';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'Kamera ve fotoğraf/galeri izinlerini buradan kontrol edip yönetebilirsin.';
+
+  @override
+  String get settingsCameraPermission => 'Kamera İzni';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'Göz, dil, tırnak ve cilt çekimleri için';
+
+  @override
+  String get settingsPhotosPermission => 'Galeri & Fotoğraf İzni';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'Galeriden fotoğraf ve tahlil görseli yüklemek için';
+
+  @override
+  String get settingsOpenSystemPermissions => 'Telefon Uygulama İzinlerini Aç';
+
+  @override
+  String get permChecking => 'Kontrol ediliyor...';
+
+  @override
+  String get permGranted => 'İzin Verildi';
+
+  @override
+  String get permDenied => 'İzin Gerekli';
+
+  @override
+  String get permPermanent => 'Sistem Ayarından Açılmalı';
+
+  @override
+  String get permUnavailable => 'Cihaz Tarafından Yönetiliyor';
+
+  @override
+  String get permGrantBtn => 'İzin Ver';
+
+  @override
+  String get permOpenSettingsBtn => 'Ayarları Aç';
+
+  @override
+  String get skinCancerRisk => 'Ben & Cilt Kanseri Risk';
+
+  @override
+  String get skinWart => 'Siğil Ön Kontrol';
+
+  @override
+  String get skinBruise => 'Morluk Takibi';
+
+  @override
+  String get skinFacialSpot => 'Yüz Lekesi';
+
+  @override
+  String get trackEyeTitle => 'Haftalık Göz (Sklera) Kontrolü';
+
+  @override
+  String get trackEyeSubtitle =>
+      'Göz akında kızarıklık veya sarılık değişimini izle';
+
+  @override
+  String get trackTongueTitle => 'Haftalık Dil Gözlemi';
+
+  @override
+  String get trackTongueSubtitle =>
+      'Dil rengi, beyaz/sarı kaplama ve doku değişimlerini takip et';
+
+  @override
+  String get trackNailTitle => 'Haftalık Tırnak Gözlemi';
+
+  @override
+  String get trackNailSubtitle =>
+      'Tırnak yatağı solukluğu, morarma veya sararma kontrolü';
+
+  @override
+  String get trackFaceTitle => '2 Haftalık Yüz & Cilt Tonu';
+
+  @override
+  String get trackFaceSubtitle =>
+      'Yüzde solgunluk, kızarıklık ve ton değişimini kıyasla';
+
+  @override
+  String get trackSkinTitle => 'Aylık Cilt, Ben & Siğil Kontrolü';
+
+  @override
+  String get trackSkinSubtitle =>
+      'Ben, siğil, morluk ve yüz lekelerinde 30 günlük değişimi izle';
+
+  @override
+  String get trackHydrationTitle => 'Günlük Hidrasyon (İdrar) Takibi';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'Kamerasız renk kartıyla 2 saniyede su dengeni kaydet';
+
+  @override
+  String get trackStoolTitle => 'Haftalık Dışkı Rengi Takibi';
+
+  @override
+  String get trackStoolSubtitle =>
+      'Sindirim ve renk uyarılarını düzenli takip et';
+
+  @override
+  String get trackBpTitle => 'Günlük Tansiyon Ölçümü';
+
+  @override
+  String get trackBpSubtitle =>
+      'Büyük/küçük tansiyon ve nabız trendini günlük kaydet';
+
+  @override
+  String get trackSugarTitle => 'Günlük Kan Şekeri Takibi';
+
+  @override
+  String get trackSugarSubtitle =>
+      'Açlık veya tokluk kan şekeri değerlerini izle';
+
+  @override
+  String get trackLabTitle => '3 Aylık Kan Tahlili & Rapor';
+
+  @override
+  String get trackLabSubtitle =>
+      'Hastane/kan testi raporlarını yükleyip dönemsel karşılaştır';
+
+  @override
+  String get statusFirstPending => 'İlk kayıt bekleniyor';
+
+  @override
+  String get statusDueNow => 'Kontrol zamanı geldi';
+
+  @override
+  String get statusDoneToday => 'Bugün tamamlandı';
+
+  @override
+  String statusNextDays(int days) {
+    return 'Sonraki kontrol: $days gün sonra';
+  }
+
+  @override
+  String get actionCheckNow => 'Şimdi Kontrol Et';
+
+  @override
+  String get actionLogReading => 'Ölçüm Gir';
+
+  @override
+  String get actionAddReport => 'Rapor Ekle';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • Kontrol Yöntemi';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'Fotoğraf çekmeden 2 saniyede renk kartından seçebilir veya kamera ölçümünü kullanabilirsiniz.';
+
+  @override
+  String get colorCardRecommendedTitle => 'Kamerasız Renk Kartı (Önerilen)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'Fotoğraf çekmeden gizli ve hızlı kayıt (2 sn)';
+
+  @override
+  String get cameraMeasureTitle => 'Kamera ile Renk Ölçümü';
+
+  @override
+  String get cameraMeasureSubtitle =>
+      'Beyaz referans kalibrasyonu ile otomatik ölçüm';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'Sağlıklı ve dikkat gerektiren görsel bulguları incelemek için modül seçin.';
+
+  @override
+  String get historyEmpty => 'Henüz kayıtlı bir kontrol yok.';
+
+  @override
+  String get filterAll => 'Tümü';
+
+  @override
+  String get aiSettingsTitle => 'Yapay Zeka & Gizlilik';
+
+  @override
+  String get vitalsBpTab => 'Tansiyon';
+
+  @override
+  String get vitalsSugarTab => 'Kan Şekeri';
+
+  @override
+  String get skinScreenTitle => 'Cilt Hastalıkları Ön Kontrol';
 }

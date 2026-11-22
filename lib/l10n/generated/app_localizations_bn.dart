@@ -263,4 +263,202 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get tooltipAccountMenu => 'অ্যাকাউন্ট ও মেনু';
+
+  @override
+  String get menuSettings => 'সেটিংস (অনুমতি ও ভাষা)';
+
+  @override
+  String get settingsTitle => 'সেটিংস';
+
+  @override
+  String get settingsLanguageDesc =>
+      'ডিফল্টভাবে ফোনের ভাষা ব্যবহার হয়। নিচ থেকে যেকোনো ভাষা বেছে নিতে পারেন।';
+
+  @override
+  String get settingsPermissionsTitle => 'অ্যাপ অনুমতি';
+
+  @override
+  String get settingsPermissionsDesc =>
+      'এখান থেকে ক্যামেরা ও গ্যালারি অনুমতি পরিচালনা করুন।';
+
+  @override
+  String get settingsCameraPermission => 'ক্যামেরা অনুমতি';
+
+  @override
+  String get settingsCameraPermissionDesc =>
+      'চোখ, জিহ্বা, নখ ও ত্বকের ছবির জন্য';
+
+  @override
+  String get settingsPhotosPermission => 'গ্যালারি ও ফটো অনুমতি';
+
+  @override
+  String get settingsPhotosPermissionDesc =>
+      'ছবি ও ল্যাব রিপোর্ট আপলোড করার জন্য';
+
+  @override
+  String get settingsOpenSystemPermissions => 'ফোনের অ্যাপ অনুমতি খুলুন';
+
+  @override
+  String get permChecking => 'যাচাই হচ্ছে...';
+
+  @override
+  String get permGranted => 'অনুমোদিত';
+
+  @override
+  String get permDenied => 'অনুমতি প্রয়োজন';
+
+  @override
+  String get permPermanent => 'সিস্টেম সেটিংস থেকে চালু করুন';
+
+  @override
+  String get permUnavailable => 'ডিভাইস দ্বারা পরিচালিত';
+
+  @override
+  String get permGrantBtn => 'অনুমতি দিন';
+
+  @override
+  String get permOpenSettingsBtn => 'সেটিংস খুলুন';
+
+  @override
+  String get skinCancerRisk => 'তিল ও ত্বকের ক্যান্সার ঝুঁকি';
+
+  @override
+  String get skinWart => 'আঁচিল প্রাথমিক পরীক্ষা';
+
+  @override
+  String get skinBruise => 'কালশিটে পর্যবেক্ষণ';
+
+  @override
+  String get skinFacialSpot => 'মুখের দাগ';
+
+  @override
+  String get trackEyeTitle => 'সাপ্তাহিক চোখ পরীক্ষা';
+
+  @override
+  String get trackEyeSubtitle => 'চোখের লালচে বা হলুদ ভাব পর্যবেক্ষণ করুন';
+
+  @override
+  String get trackTongueTitle => 'সাপ্তাহিক জিহ্বা পরীক্ষা';
+
+  @override
+  String get trackTongueSubtitle => 'জিহ্বার রঙ ও আস্তরণের পরিবর্তন দেখুন';
+
+  @override
+  String get trackNailTitle => 'সাপ্তাহিক নখ পরীক্ষা';
+
+  @override
+  String get trackNailSubtitle => 'ফ্যাকাশে, নীলচে বা হলুদ ভাব নজরে রাখুন';
+
+  @override
+  String get trackFaceTitle => 'পাক্ষিক মুখ ও ত্বকের রঙ';
+
+  @override
+  String get trackFaceSubtitle => 'ফ্যাকাশে ভাব ও লালচে ভাব তুলনা করুন';
+
+  @override
+  String get trackSkinTitle => 'মাসিক ত্বক, তিল ও আঁচিল পরীক্ষা';
+
+  @override
+  String get trackSkinSubtitle => '৩০ দিনে তিল, আঁচিল ও দাগের পরিবর্তন দেখুন';
+
+  @override
+  String get trackHydrationTitle => 'দৈনিক হাইড্রেশন (প্রস্রাব) ট্র্যাকিং';
+
+  @override
+  String get trackHydrationSubtitle =>
+      'কালার কার্ডে ২ সেকেন্ডে পানির ভারসাম্য লিখুন';
+
+  @override
+  String get trackStoolTitle => 'সাপ্তাহিক মলের রঙ পরীক্ষা';
+
+  @override
+  String get trackStoolSubtitle => 'হজম ও রঙের সতর্কতা নিয়মিত ট্র্যাক করুন';
+
+  @override
+  String get trackBpTitle => 'দৈনিক রক্তচাপ পরিমাপ';
+
+  @override
+  String get trackBpSubtitle =>
+      'সিস্টোলিক/ডায়াস্টোলিক ও পালস ট্রেন্ড সংরক্ষণ করুন';
+
+  @override
+  String get trackSugarTitle => 'দৈনিক ব্লাড সুগার ট্র্যাকিং';
+
+  @override
+  String get trackSugarSubtitle => 'খালি পেটে বা খাওয়ার পর সুগার রেকর্ড করুন';
+
+  @override
+  String get trackLabTitle => 'ত্রৈমাসিক রক্ত পরীক্ষা ও রিপোর্ট';
+
+  @override
+  String get trackLabSubtitle => 'হাসপাতালের রিপোর্ট আপলোড করে তুলনা করুন';
+
+  @override
+  String get statusFirstPending => 'প্রথম রেকর্ডের অপেক্ষায়';
+
+  @override
+  String get statusDueNow => 'পরীক্ষার সময় হয়েছে';
+
+  @override
+  String get statusDoneToday => 'আজ সম্পন্ন হয়েছে';
+
+  @override
+  String statusNextDays(int days) {
+    return 'পরবর্তী পরীক্ষা: $days দিন পর';
+  }
+
+  @override
+  String get actionCheckNow => 'এখনই পরীক্ষা করুন';
+
+  @override
+  String get actionLogReading => 'রিডিং দিন';
+
+  @override
+  String get actionAddReport => 'রিপোর্ট যোগ করুন';
+
+  @override
+  String checkMethodTitle(String category) {
+    return '$category • পরীক্ষার পদ্ধতি';
+  }
+
+  @override
+  String get checkMethodSubtitle =>
+      'ছবি না তুলে ২ সেকেন্ডে কালার কার্ড বেছে নিন অথবা ক্যামেরা ব্যবহার করুন।';
+
+  @override
+  String get colorCardRecommendedTitle =>
+      'ক্যামেরাবিহীন কালার কার্ড (প্রস্তাবিত)';
+
+  @override
+  String get colorCardRecommendedSubtitle =>
+      'ছবি ছাড়াই ব্যক্তিগত ও দ্রুত রেকর্ড (২ সেকেন্ড)';
+
+  @override
+  String get cameraMeasureTitle => 'ক্যামেরা রঙ পরিমাপ';
+
+  @override
+  String get cameraMeasureSubtitle =>
+      'হোয়াইট-ব্যালেন্স ক্যালিব্রেশনসহ স্বয়ংক্রিয় পরিমাপ';
+
+  @override
+  String get referenceGuideSubtitle =>
+      'স্বাভাবিক ও অস্বাভাবিক লক্ষণ দেখতে মডিউল নির্বাচন করুন।';
+
+  @override
+  String get historyEmpty => 'এখনো কোনো পরীক্ষা সংরক্ষিত হয়নি।';
+
+  @override
+  String get filterAll => 'সব';
+
+  @override
+  String get aiSettingsTitle => 'AI ও গোপনীয়তা';
+
+  @override
+  String get vitalsBpTab => 'রক্তচাপ';
+
+  @override
+  String get vitalsSugarTab => 'ব্লাড সুগার';
+
+  @override
+  String get skinScreenTitle => 'ত্বকের সমস্যার প্রাথমিক পরীক্ষা';
 }

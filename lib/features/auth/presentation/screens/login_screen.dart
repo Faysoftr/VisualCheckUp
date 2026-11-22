@@ -36,6 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await action();
       if (!mounted) return;
       widget.onAuthenticated(user);
+    } on AuthCancelledException {
+      // User dismissed the native account picker; stay quietly on LoginScreen.
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,63 +62,79 @@ class _LoginScreenState extends State<LoginScreen> {
     final activeLangCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isDark
-                ? const [Color(0xFF0E2222), AppTheme.darkCanvas]
-                : const [AppTheme.softMintTint, AppTheme.lightCanvas],
-            stops: const [0.0, 0.45],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/app_bg.jpg',
+            fit: BoxFit.cover,
           ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 20,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 20),
-                        Center(
-                          child: Container(
-                            width: 84,
-                            height: 84,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppTheme.primaryTeal,
-                                  AppTheme.secondaryMint,
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        const Color(0xFF0E2222).withValues(alpha: 0.90),
+                        AppTheme.darkCanvas.withValues(alpha: 0.94),
+                      ]
+                    : [
+                        AppTheme.softMintTint.withValues(alpha: 0.50),
+                        AppTheme.lightCanvas.withValues(alpha: 0.60),
+                      ],
+                stops: const [0.0, 0.55],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 420),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 20),
+                          Center(
+                            child: Container(
+                              width: 92,
+                              height: 92,
+                              padding: const EdgeInsets.all(2.5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(26),
+                                border: Border.all(
+                                  color: const Color(0xFF2EFFD6).withValues(
+                                    alpha: isDark ? 0.65 : 0.45,
+                                  ),
+                                  width: 1.6,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF17A398).withValues(
+                                      alpha: isDark ? 0.45 : 0.30,
+                                    ),
+                                    blurRadius: 24,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 8),
+                                  ),
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(26),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.primaryTeal.withValues(
-                                    alpha: isDark ? 0.35 : 0.22,
-                                  ),
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 10),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(23),
+                                child: Image.asset(
+                                  'assets/images/app_logo.jpg',
+                                  fit: BoxFit.cover,
                                 ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.health_and_safety_rounded,
-                              color: Colors.white,
-                              size: 44,
+                              ),
                             ),
                           ),
-                        ),
                         const SizedBox(height: 22),
                         Text(
                           l10n.appTitle,
@@ -303,9 +321,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

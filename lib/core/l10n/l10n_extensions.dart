@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
+import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
 extension BuildContextL10n on BuildContext {
@@ -44,6 +46,100 @@ extension CheckCategoryL10n on CheckCategory {
       case CheckCategory.stool:
         return l10n.catStoolSubtitle;
     }
+  }
+}
+
+extension SkinConcernTypeL10n on SkinConcernType {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case SkinConcernType.skinCancerRisk:
+        return l10n.skinCancerRisk;
+      case SkinConcernType.wart:
+        return l10n.skinWart;
+      case SkinConcernType.bruise:
+        return l10n.skinBruise;
+      case SkinConcernType.facialSpot:
+        return l10n.skinFacialSpot;
+      case SkinConcernType.rashRedness:
+      case SkinConcernType.molePigment:
+      case SkinConcernType.scalyDry:
+      case SkinConcernType.blisterPustule:
+      case SkinConcernType.general:
+        return label;
+    }
+  }
+}
+
+extension FollowUpTrackL10n on FollowUpTrack {
+  String localizedTitle(AppLocalizations l10n) {
+    switch (this) {
+      case FollowUpTrack.eyeWeekly:
+        return l10n.trackEyeTitle;
+      case FollowUpTrack.tongueWeekly:
+        return l10n.trackTongueTitle;
+      case FollowUpTrack.nailTongueWeekly:
+        return l10n.trackNailTitle;
+      case FollowUpTrack.faceBiWeekly:
+        return l10n.trackFaceTitle;
+      case FollowUpTrack.skinMonthly:
+        return l10n.trackSkinTitle;
+      case FollowUpTrack.hydrationDaily:
+        return l10n.trackHydrationTitle;
+      case FollowUpTrack.stoolWeekly:
+        return l10n.trackStoolTitle;
+      case FollowUpTrack.bloodPressureDaily:
+        return l10n.trackBpTitle;
+      case FollowUpTrack.bloodSugarDaily:
+        return l10n.trackSugarTitle;
+      case FollowUpTrack.labReportQuarterly:
+        return l10n.trackLabTitle;
+    }
+  }
+
+  String localizedSubtitle(AppLocalizations l10n) {
+    switch (this) {
+      case FollowUpTrack.eyeWeekly:
+        return l10n.trackEyeSubtitle;
+      case FollowUpTrack.tongueWeekly:
+        return l10n.trackTongueSubtitle;
+      case FollowUpTrack.nailTongueWeekly:
+        return l10n.trackNailSubtitle;
+      case FollowUpTrack.faceBiWeekly:
+        return l10n.trackFaceSubtitle;
+      case FollowUpTrack.skinMonthly:
+        return l10n.trackSkinSubtitle;
+      case FollowUpTrack.hydrationDaily:
+        return l10n.trackHydrationSubtitle;
+      case FollowUpTrack.stoolWeekly:
+        return l10n.trackStoolSubtitle;
+      case FollowUpTrack.bloodPressureDaily:
+        return l10n.trackBpSubtitle;
+      case FollowUpTrack.bloodSugarDaily:
+        return l10n.trackSugarSubtitle;
+      case FollowUpTrack.labReportQuarterly:
+        return l10n.trackLabSubtitle;
+    }
+  }
+
+  String localizedActionLabel(AppLocalizations l10n) {
+    switch (dataSource) {
+      case FollowUpDataSource.bloodPressure:
+      case FollowUpDataSource.bloodSugar:
+        return l10n.actionLogReading;
+      case FollowUpDataSource.labReport:
+        return l10n.actionAddReport;
+      case FollowUpDataSource.visualCheckup:
+        return l10n.actionCheckNow;
+    }
+  }
+}
+
+extension FollowUpTrackStatusL10n on FollowUpTrackStatus {
+  String localizedStatusLabel(AppLocalizations l10n) {
+    if (lastCheckedAt == null) return l10n.statusFirstPending;
+    if (isDueNow) return l10n.statusDueNow;
+    if (track.intervalDays == 1) return l10n.statusDoneToday;
+    return l10n.statusNextDays(daysRemaining);
   }
 }
 

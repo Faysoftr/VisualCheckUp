@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/labs_vitals/data/gemini_lab_report_extractor.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_document_picker.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/widgets/trend_sparkline_card.dart';
@@ -14,10 +16,12 @@ class LabReportsScreen extends StatefulWidget {
     super.key,
     required this.repository,
     this.documentPicker = const DeviceLabDocumentPicker(),
+    this.aiExtractor,
   });
 
   final LabsVitalsRepository repository;
   final LabDocumentPicker documentPicker;
+  final LabDocumentAiExtractor? aiExtractor;
 
   @override
   State<LabReportsScreen> createState() => _LabReportsScreenState();
@@ -26,6 +30,11 @@ class LabReportsScreen extends StatefulWidget {
 class _LabReportsScreenState extends State<LabReportsScreen> {
   List<LabReportRecord> _reports = const [];
   bool _loading = true;
+  bool _showComparisonTable = true;
+  bool _onlyAbnormalInTable = false;
+
+  LabDocumentAiExtractor get _effectiveAiExtractor =>
+      widget.aiExtractor ?? GeminiLabReportExtractor();
 
   @override
   void initState() {
@@ -48,7 +57,10 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (_) => _AddLabReportSheet(documentPicker: widget.documentPicker),
+      builder: (_) => _AddLabReportSheet(
+        documentPicker: widget.documentPicker,
+        aiExtractor: _effectiveAiExtractor,
+      ),
     );
     if (created != null) {
       await widget.repository.saveLabReport(created);
@@ -258,12 +270,17 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               if (report.items.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
-                  'Parametre Değerlendirmesi (${report.items.length})',
+                  'Parametre Tablosu & Değerlendirme (${report.items.length})',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
+                _ReportComparisonSummaryTable(
+                  report: report,
+                  previousReport: _findPreviousReport(report),
+                ),
+                const SizedBox(height: 10),
                 for (final item in report.items)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
@@ -315,10 +332,12 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(
-                                  'Ref: ${item.referenceRangeText}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
+                                Expanded(
+                                  child: Text(
+                                    'Ref: ${item.referenceRangeText}',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -387,6 +406,28 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               const SizedBox(height: 14),
               FilledButton.icon(
                 onPressed: () async {
+                  try {
+                    await LabReportPdfGenerator.saveAndShareSummaryPdf(
+                      report: report,
+                      previousReport: _findPreviousReport(report),
+                    );
+                  } catch (e) {
+                    if (sheetContext.mounted) {
+                      ScaffoldMessenger.of(sheetContext).showSnackBar(
+                        SnackBar(
+                          content: Text('PDF oluşturulamadı: $e'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: const Text('Doktora Göster • Özet PDF Oluştur'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () async {
                   await Clipboard.setData(
                     ClipboardData(
                       text: LabReportAnalyzer.formatReportForDoctor(report),
@@ -395,14 +436,14 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                   if (sheetContext.mounted) {
                     ScaffoldMessenger.of(sheetContext).showSnackBar(
                       const SnackBar(
-                        content: Text('Tahlil özeti panoya kopyalandı.'),
+                        content: Text('Tahlil özeti metin olarak panoya kopyalandı.'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   }
                 },
-                icon: const Icon(Icons.copy_rounded),
-                label: const Text('Doktora Göster • Özeti Kopyala'),
+                icon: const Icon(Icons.copy_rounded, size: 18),
+                label: const Text('Metin Olarak Kopyala'),
               ),
             ],
           ),
@@ -561,6 +602,19 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
     );
   }
 
+  LabReportRecord? _findPreviousReport(LabReportRecord current) {
+    final earlier = _reports
+        .where(
+          (r) =>
+              r.id != current.id &&
+              r.items.isNotEmpty &&
+              !r.reportDate.isAfter(current.reportDate),
+        )
+        .toList()
+      ..sort((a, b) => b.reportDate.compareTo(a.reportDate));
+    return earlier.isEmpty ? null : earlier.first;
+  }
+
   Widget _buildTrendsTab(
     BuildContext context,
     List<LabParameterTrend> trends,
@@ -573,7 +627,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
         child: Padding(
           padding: const EdgeInsets.all(28),
           child: Text(
-            'Farklı tarihlerde kan testi kaydettiğinizde Hemoglobin, Ferritin, Glukoz, TSH, Vitamin D gibi değerlerin zaman içi değişim grafikleri burada oluşur.',
+            'Kan tahlili raporlarınızı yüklediğinizde tüm parametreler tarih sırasıyla karşılaştırma tablosuna eklenir ve zaman içi değişim grafikleri burada oluşur.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
@@ -584,80 +638,140 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
       );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 92),
-      itemCount: trends.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final trend = trends[index];
-        final latest = trend.latest;
+    final datedReports = _reports.where((r) => r.items.isNotEmpty).toList()
+      ..sort((a, b) => a.reportDate.compareTo(b.reportDate));
+    final visibleTrends = _onlyAbnormalInTable
+        ? trends.where((t) => t.latest.status.isAbnormal).toList()
+        : trends;
 
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 92),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment<bool>(
+                    value: true,
+                    icon: Icon(Icons.table_chart_outlined, size: 17),
+                    label: Text('Kıyas Tablosu'),
+                  ),
+                  ButtonSegment<bool>(
+                    value: false,
+                    icon: Icon(Icons.show_chart_rounded, size: 17),
+                    label: Text('Grafikler'),
+                  ),
+                ],
+                selected: {_showComparisonTable},
+                onSelectionChanged: (selection) {
+                  setState(() => _showComparisonTable = selection.first);
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (_showComparisonTable) ...[
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${datedReports.length} rapor • ${visibleTrends.length} parametre',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              FilterChip(
+                label: const Text('Sadece Referans Dışı'),
+                selected: _onlyAbnormalInTable,
+                onSelected: (v) => setState(() => _onlyAbnormalInTable = v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _MultiReportComparisonTable(
+            reports: datedReports,
+            trends: visibleTrends,
+          ),
+        ] else ...[
+          for (final trend in visibleTrends) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        trend.name,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            trend.name,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: trend.latest.status.color
+                                .withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${trend.latest.value.toStringAsFixed(trend.latest.value == trend.latest.value.roundToDouble() ? 0 : 1)} ${trend.unit}',
+                            style: TextStyle(
+                              color: trend.latest.status.color,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${trend.points.length} kayıt • Değişim: ${trend.deltaSummary} • Son durum: ${trend.latest.status.label}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: latest.status.color.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${latest.value.toStringAsFixed(latest.value == latest.value.roundToDouble() ? 0 : 1)} ${trend.unit}',
-                        style: TextStyle(
-                          color: latest.status.color,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                        ),
-                      ),
+                    const SizedBox(height: 12),
+                    TrendLineChart(
+                      points: trend.points
+                          .map((p) => TrendChartPoint(date: p.date, value: p.value))
+                          .toList(),
+                      primaryColor: AppTheme.primaryTeal,
+                      normalMin: trend.refMin,
+                      normalMax: trend.refMax,
+                      height: 112,
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${trend.points.length} kayıt • Değişim: ${trend.deltaSummary} • Son durum: ${latest.status.label}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TrendLineChart(
-                  points: trend.points
-                      .map((p) => TrendChartPoint(date: p.date, value: p.value))
-                      .toList(),
-                  primaryColor: AppTheme.primaryTeal,
-                  normalMin: trend.refMin,
-                  normalMax: trend.refMax,
-                  height: 112,
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 12),
+          ],
+        ],
+      ],
     );
   }
 }
 
 class _AddLabReportSheet extends StatefulWidget {
-  const _AddLabReportSheet({required this.documentPicker});
+  const _AddLabReportSheet({
+    required this.documentPicker,
+    required this.aiExtractor,
+  });
 
   final LabDocumentPicker documentPicker;
+  final LabDocumentAiExtractor aiExtractor;
 
   @override
   State<_AddLabReportSheet> createState() => _AddLabReportSheetState();
@@ -678,12 +792,14 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   PickedLabDocument? _attachedDocument;
   String? _parseFeedback;
   bool _pickingFile = false;
+  bool _readingDocument = false;
 
   bool get _canSave =>
-      _itemsByCode.isNotEmpty ||
-      _attachedDocument != null ||
-      _diagnosisController.text.trim().isNotEmpty ||
-      _complaintController.text.trim().isNotEmpty;
+      !_readingDocument &&
+      (_itemsByCode.isNotEmpty ||
+          _attachedDocument != null ||
+          _diagnosisController.text.trim().isNotEmpty ||
+          _complaintController.text.trim().isNotEmpty);
 
   @override
   void initState() {
@@ -721,12 +837,12 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   }
 
   Future<void> _pickPdfOrJpg() async {
-    if (_pickingFile) return;
+    if (_pickingFile || _readingDocument) return;
     setState(() => _pickingFile = true);
     try {
       final doc = await widget.documentPicker.pickPdfOrImage();
       if (doc != null && mounted) {
-        _applyPickedDocument(doc);
+        await _applyPickedDocument(doc);
       }
     } catch (_) {
       if (mounted) {
@@ -741,12 +857,12 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   }
 
   Future<void> _pickCameraReport() async {
-    if (_pickingFile) return;
+    if (_pickingFile || _readingDocument) return;
     setState(() => _pickingFile = true);
     try {
       final doc = await widget.documentPicker.pickCameraPhoto();
       if (doc != null && mounted) {
-        _applyPickedDocument(doc);
+        await _applyPickedDocument(doc);
       }
     } catch (_) {
       if (mounted) {
@@ -760,10 +876,20 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
     }
   }
 
-  void _applyPickedDocument(PickedLabDocument doc) {
-    var feedback =
+  Future<void> _applyPickedDocument(PickedLabDocument doc) async {
+    setState(() {
+      _attachedDocument = doc;
+      _source = doc.isPdf ? LabReportSource.pdfUpload : LabReportSource.photoScan;
+      _readingDocument = true;
+      _parseFeedback =
+          '${doc.badgeLabel} (${doc.fileName}) okunuyor ve tüm tahlil değerleri çıkarılıyor...';
+    });
+
+    var extractedCount = 0;
+    String feedback =
         '${doc.badgeLabel} yüklendi: ${doc.fileName} (${doc.sizeKb} KB).';
 
+    // 1. On-device instant PDF text + geometric row + universal table extraction (0 cost)
     if (doc.isPdf) {
       final extracted = PdfTextExtractor.extractText(doc.bytes);
       if (extracted.isNotEmpty) {
@@ -771,30 +897,105 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
         if (parsed.detectedDate != null) {
           _reportDate = parsed.detectedDate!;
         }
+        if (parsed.detectedHospital != null &&
+            _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+          _titleController.text = parsed.detectedHospital!;
+        }
         for (final item in parsed.items) {
           _itemsByCode[item.code] = item;
         }
-        if (parsed.items.isNotEmpty) {
+        extractedCount = parsed.items.length;
+        if (extractedCount > 0) {
+          final dateInfo = parsed.detectedDate != null
+              ? ' • Tarih: ${DateFormat('dd.MM.yyyy').format(parsed.detectedDate!)}'
+              : '';
           feedback =
-              'PDF okundu (${doc.fileName}): ${parsed.items.length} tahlil parametresi otomatik ayrıştırıldı.';
-        } else {
-          feedback =
-              'PDF yüklendi (${doc.fileName}). Taranmış görsel PDF ise aşağıdan değer ekleyebilir veya teşhis/not ile kaydedebilirsiniz.';
+              'PDF okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.';
         }
-      } else {
-        feedback =
-            'PDF yüklendi (${doc.fileName}). Taranmış PDF ise değerleri aşağıdan hızlıca girebilir ya da doğrudan kaydedebilirsiniz.';
       }
-    } else {
-      feedback =
-          'JPG/Görsel yüklendi (${doc.fileName}). İsterseniz aşağıdan değerleri veya hastane teşhisini ekleyip değerlendirebilirsiniz.';
     }
 
+    // 2. Universal AI Document/Vision fallback when PDF is scanned (0 items),
+    //    sparse (< 3 items on a multi-line hospital doc), or an image/photo is
+    //    uploaded and Gemini AI is available.
+    if ((extractedCount == 0 || (doc.isPdf && extractedCount < 3)) &&
+        widget.aiExtractor.isAvailable) {
+      try {
+        final aiResult = await widget.aiExtractor.extractFromDocument(doc);
+        if (!mounted) return;
+        if (aiResult.detectedDate != null) {
+          _reportDate = aiResult.detectedDate!;
+        }
+        if (aiResult.hospitalName != null &&
+            _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+          _titleController.text = aiResult.hospitalName!;
+        }
+        if (aiResult.items.length > extractedCount) {
+          for (final item in aiResult.items) {
+            _itemsByCode[item.code] = item;
+          }
+          extractedCount = _itemsByCode.length;
+          final dateInfo = aiResult.detectedDate != null
+              ? ' • Tarih: ${DateFormat('dd.MM.yyyy').format(aiResult.detectedDate!)}'
+              : '';
+          feedback =
+              'Yapay Zeka ile okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.';
+        }
+      } catch (_) {
+        if (extractedCount == 0) {
+          feedback = doc.isPdf
+              ? 'PDF yüklendi (${doc.fileName}). Otomatik okunamadı; metni yapıştırabilir veya değer ekleyebilirsiniz.'
+              : 'Görsel yüklendi (${doc.fileName}). Yapay zeka okuması şu an tamamlanamadı; değerleri aşağıdan ekleyebilirsiniz.';
+        }
+      }
+    } else if (extractedCount == 0) {
+      feedback = doc.isPdf
+          ? 'PDF yüklendi (${doc.fileName}). Taranmış görsel PDF ise değerleri aşağıdan ekleyebilir veya teşhis/not ile kaydedebilirsiniz.'
+          : 'JPG/Görsel yüklendi (${doc.fileName}). İsterseniz aşağıdan değerleri veya hastane teşhisini ekleyip değerlendirebilirsiniz.';
+    }
+
+    if (!mounted) return;
     setState(() {
-      _attachedDocument = doc;
-      _source = doc.isPdf ? LabReportSource.pdfUpload : LabReportSource.photoScan;
+      _readingDocument = false;
       _parseFeedback = feedback;
     });
+  }
+
+  Future<void> _reReadWithAi() async {
+    final doc = _attachedDocument;
+    if (doc == null || _readingDocument || !widget.aiExtractor.isAvailable) {
+      return;
+    }
+    setState(() {
+      _readingDocument = true;
+      _parseFeedback = 'Belge Yapay Zeka (Gemini) ile yeniden okunuyor...';
+    });
+    try {
+      final aiResult = await widget.aiExtractor.extractFromDocument(doc);
+      if (!mounted) return;
+      if (aiResult.detectedDate != null) {
+        _reportDate = aiResult.detectedDate!;
+      }
+      if (aiResult.hospitalName != null &&
+          _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+        _titleController.text = aiResult.hospitalName!;
+      }
+      for (final item in aiResult.items) {
+        _itemsByCode[item.code] = item;
+      }
+      setState(() {
+        _readingDocument = false;
+        _parseFeedback =
+            'Yapay Zeka ile okundu (${doc.fileName}): ${aiResult.items.length} tahlil değeri tabloya aktarıldı.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _readingDocument = false;
+        _parseFeedback =
+            'Yapay Zeka ile okuma tamamlanamadı; mevcut değerleri düzenleyip kaydedebilirsiniz.';
+      });
+    }
   }
 
   void _parsePastedText() {
@@ -925,22 +1126,42 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
               ),
               if (_attachedDocument != null) ...[
                 const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InputChip(
-                    avatar: Icon(
-                      _attachedDocument!.isPdf
-                          ? Icons.picture_as_pdf_outlined
-                          : Icons.image_outlined,
-                      size: 16,
-                      color: colorScheme.primary,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    InputChip(
+                      avatar: Icon(
+                        _attachedDocument!.isPdf
+                            ? Icons.picture_as_pdf_outlined
+                            : Icons.image_outlined,
+                        size: 16,
+                        color: colorScheme.primary,
+                      ),
+                      label: Text(
+                        '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
+                      ),
+                      onDeleted: _readingDocument
+                          ? null
+                          : () => setState(() => _attachedDocument = null),
                     ),
-                    label: Text(
-                      '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
-                    ),
-                    onDeleted: () => setState(() => _attachedDocument = null),
-                  ),
+                    if (widget.aiExtractor.isAvailable)
+                      ActionChip(
+                        avatar: Icon(
+                          Icons.auto_awesome_outlined,
+                          size: 16,
+                          color: colorScheme.primary,
+                        ),
+                        label: const Text('Yapay Zeka ile Oku'),
+                        onPressed: _readingDocument ? null : _reReadWithAi,
+                      ),
+                  ],
                 ),
+              ],
+              if (_readingDocument) ...[
+                const SizedBox(height: 10),
+                const LinearProgressIndicator(),
               ],
               if (_parseFeedback != null) ...[
                 const SizedBox(height: 8),
@@ -1065,28 +1286,81 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
               if (_itemsByCode.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
-                  'Okunan Değerler (${_itemsByCode.length})',
+                  'Okunan Değerler Tablosu (${_itemsByCode.length})',
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 6),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _itemsByCode.values.map((item) {
-                    return Chip(
-                      avatar: CircleAvatar(
-                        backgroundColor: item.status.color,
-                        radius: 6,
-                      ),
-                      label: Text(
-                        '${item.code}: ${item.formattedValue} (${item.status.label})',
-                      ),
-                      onDeleted: () =>
-                          setState(() => _itemsByCode.remove(item.code)),
-                    );
-                  }).toList(),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      headingRowHeight: 36,
+                      dataRowMinHeight: 38,
+                      dataRowMaxHeight: 48,
+                      columnSpacing: 14,
+                      horizontalMargin: 12,
+                      columns: const [
+                        DataColumn(label: Text('Parametre')),
+                        DataColumn(label: Text('Sonuç')),
+                        DataColumn(label: Text('Referans')),
+                        DataColumn(label: Text('Durum')),
+                        DataColumn(label: Text('')),
+                      ],
+                      rows: _itemsByCode.values.map((item) {
+                        return DataRow(
+                          cells: [
+                            DataCell(
+                              Text(
+                                item.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.5,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                item.formattedValue,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12.5,
+                                  color: item.status.color,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                item.referenceRangeText,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                item.status.label,
+                                style: TextStyle(
+                                  color: item.status.color,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                icon: const Icon(Icons.close_rounded, size: 16),
+                                onPressed: () => setState(
+                                  () => _itemsByCode.remove(item.code),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
               ],
                   ],
@@ -1107,4 +1381,238 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       ),
     );
   }
+}
+
+class _ReportComparisonSummaryTable extends StatelessWidget {
+  const _ReportComparisonSummaryTable({
+    required this.report,
+    required this.previousReport,
+  });
+
+  final LabReportRecord report;
+  final LabReportRecord? previousReport;
+
+  @override
+  Widget build(BuildContext context) {
+    final prevByCode = <String, LabTestItem>{
+      if (previousReport != null)
+        for (final item in previousReport!.items) item.code: item,
+    };
+    final hasPrev = prevByCode.isNotEmpty;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowHeight: 38,
+          dataRowMinHeight: 38,
+          dataRowMaxHeight: 48,
+          columnSpacing: 16,
+          horizontalMargin: 12,
+          columns: [
+            const DataColumn(label: Text('Parametre')),
+            const DataColumn(label: Text('Sonuç')),
+            const DataColumn(label: Text('Referans')),
+            const DataColumn(label: Text('Durum')),
+            if (hasPrev) const DataColumn(label: Text('Öncekiyle Kıyas')),
+          ],
+          rows: report.items.map((item) {
+            final prev = prevByCode[item.code];
+            final String deltaLabel;
+            if (prev == null) {
+              deltaLabel = '—';
+            } else {
+              final d = item.value - prev.value;
+              if (d.abs() < 0.005) {
+                deltaLabel = '= Sabit';
+              } else {
+                final arrow = d > 0 ? '▲ +' : '▼ ';
+                deltaLabel = '$arrow${_fmtCompact(d)}';
+              }
+            }
+
+            return DataRow(
+              color: item.status.isAbnormal
+                  ? WidgetStatePropertyAll(
+                      item.status.color.withValues(alpha: 0.08),
+                    )
+                  : null,
+              cells: [
+                DataCell(
+                  Text(
+                    item.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    item.formattedValue,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12.5,
+                      color: item.status.color,
+                    ),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    item.referenceRangeText,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    item.status.label,
+                    style: TextStyle(
+                      color: item.status.color,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                if (hasPrev)
+                  DataCell(
+                    Text(
+                      deltaLabel,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _MultiReportComparisonTable extends StatelessWidget {
+  const _MultiReportComparisonTable({
+    required this.reports,
+    required this.trends,
+  });
+
+  final List<LabReportRecord> reports;
+  final List<LabParameterTrend> trends;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final df = DateFormat('dd.MM.yy');
+
+    if (trends.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            'Seçili filtreye uyan tahlil parametresi yok.',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ),
+      );
+    }
+
+    final itemsByReport = reports
+        .map((r) => {for (final i in r.items) i.code: i})
+        .toList();
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowHeight: 42,
+          dataRowMinHeight: 40,
+          dataRowMaxHeight: 50,
+          columnSpacing: 16,
+          horizontalMargin: 12,
+          columns: [
+            const DataColumn(label: Text('Parametre')),
+            const DataColumn(label: Text('Referans')),
+            for (final report in reports)
+              DataColumn(label: Text(df.format(report.reportDate))),
+            const DataColumn(label: Text('Değişim')),
+          ],
+          rows: trends.map((trend) {
+            final refText = trend.refMin != null && trend.refMax != null
+                ? '${_fmtCompact(trend.refMin!)}–${_fmtCompact(trend.refMax!)}'
+                : trend.refMax != null
+                    ? '< ${_fmtCompact(trend.refMax!)}'
+                    : trend.refMin != null
+                        ? '> ${_fmtCompact(trend.refMin!)}'
+                        : '—';
+
+            final d = trend.delta;
+            final deltaText = d == null
+                ? 'İlk'
+                : d.abs() < 0.005
+                    ? '='
+                    : '${d > 0 ? '▲ +' : '▼ '}${_fmtCompact(d)}';
+
+            return DataRow(
+              color: trend.latest.status.isAbnormal
+                  ? WidgetStatePropertyAll(
+                      trend.latest.status.color.withValues(alpha: 0.07),
+                    )
+                  : null,
+              cells: [
+                DataCell(
+                  Text(
+                    '${trend.name}${trend.unit.isNotEmpty ? ' (${trend.unit})' : ''}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ),
+                DataCell(
+                  Text(refText, style: const TextStyle(fontSize: 12)),
+                ),
+                for (final byCode in itemsByReport)
+                  DataCell(
+                    byCode[trend.code] == null
+                        ? const Text('—')
+                        : Text(
+                            _fmtCompact(byCode[trend.code]!.value),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                              color: byCode[trend.code]!.status.color,
+                            ),
+                          ),
+                  ),
+                DataCell(
+                  Text(
+                    deltaText,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      color: d == null || d.abs() < 0.005
+                          ? theme.colorScheme.onSurfaceVariant
+                          : theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+String _fmtCompact(double v) {
+  if ((v - v.roundToDouble()).abs() < 0.001) {
+    return v.round().toString();
+  }
+  final two = v.toStringAsFixed(2);
+  return two.endsWith('0') ? v.toStringAsFixed(1) : two;
 }
