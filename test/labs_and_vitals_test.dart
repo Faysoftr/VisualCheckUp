@@ -1,16 +1,70 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/app.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_document_picker.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
+import 'package:visualcheckup/features/labs_vitals/presentation/screens/lab_reports_screen.dart';
+
+Uint8List _buildSyntheticFlatePdf(List<String> lines) {
+  final contentStream = StringBuffer('BT\n/F1 12 Tf\n');
+  for (final line in lines) {
+    final escaped = line.replaceAll('(', r'\(').replaceAll(')', r'\)');
+    contentStream.writeln('($escaped) Tj');
+  }
+  contentStream.writeln('ET');
+
+  final compressed = zlib.encode(utf8.encode(contentStream.toString()));
+  final bytes = BytesBuilder();
+  bytes.add(latin1.encode('%PDF-1.4\n1 0 obj\n<< /Filter /FlateDecode /Length ${compressed.length} >>\nstream\n'));
+  bytes.add(compressed);
+  bytes.add(latin1.encode('\nendstream\nendobj\n%%EOF'));
+  return bytes.toBytes();
+}
+
+class _FakeLabDocumentPicker implements LabDocumentPicker {
+  const _FakeLabDocumentPicker(this.doc);
+
+  final PickedLabDocument doc;
+
+  @override
+  Future<PickedLabDocument?> pickPdfOrImage() async => doc;
+
+  @override
+  Future<PickedLabDocument?> pickCameraPhoto() async => doc;
+}
 
 void main() {
-  group('LabReportAnalyzer — hospital/e-Nabız parsing, evaluation & trends', () {
-    test('parses Turkish lab report text with date, decimals, and evaluates statuses', () {
+  group('LabReportAnalyzer & PdfTextExtractor', () {
+    test('extracts lab parameters and date from a FlateDecode PDF on-device', () {
+      final pdfBytes = _buildSyntheticFlatePdf(const [
+        'Tarih: 18.05.2026',
+        'Hemoglobin (HGB): 10.4 g/dL',
+        'Ferritin: 11 ng/mL',
+        'TSH: 6.2 mIU/L',
+      ]);
+
+      final extracted = PdfTextExtractor.extractText(pdfBytes);
+      expect(extracted, contains('Hemoglobin'));
+
+      final parsed = LabReportAnalyzer.parseReportText(extracted);
+      expect(parsed.detectedDate, DateTime(2026, 5, 18));
+      expect(parsed.items, hasLength(3));
+      final byCode = {for (final i in parsed.items) i.code: i};
+      expect(byCode['HGB']!.status, LabStatus.low);
+      expect(byCode['FERRITIN']!.status, LabStatus.low);
+      expect(byCode['TSH']!.status, LabStatus.high);
+    });
+
+    test('explains hospital diagnosis + user complaint alongside blood test results and supports blank diagnosis', () {
       const sampleText = '''
       Tarih: 14.04.2026
       Hemoglobin (HGB): 10,6 g/dL
@@ -22,26 +76,63 @@ void main() {
 
       final parsed = LabReportAnalyzer.parseReportText(sampleText);
 
-      expect(parsed.detectedDate, DateTime(2026, 4, 14));
-      expect(parsed.items.length, 5);
-
-      final byCode = {for (final i in parsed.items) i.code: i};
-      expect(byCode['HGB']!.status, LabStatus.low);
-      expect(byCode['FERRITIN']!.status, LabStatus.low);
-      expect(byCode['GLU']!.status, LabStatus.high);
-      expect(byCode['TSH']!.status, LabStatus.high);
-      expect(byCode['VITD']!.status, LabStatus.normal);
-
-      final report = LabReportAnalyzer.buildReport(
+      // 1) With hospital diagnosis + user complaint
+      final contextualReport = LabReportAnalyzer.buildReport(
         title: 'e-Nabız Kan Tahlili',
+        reportDate: parsed.detectedDate!,
+        source: LabReportSource.pdfUpload,
+        items: parsed.items,
+        hospitalDiagnosis: 'Hipotiroidi ve Demir eksikliği anemisi',
+        userComplaintNote: 'Sürekli halsizim ve saçlarım dökülüyor',
+        attachmentFileName: 'tahlil_nisan.pdf',
+        attachmentMimeType: 'application/pdf',
+      );
+
+      expect(contextualReport.hospitalDiagnosis, contains('Hipotiroidi'));
+      expect(contextualReport.userComplaintNote, contains('halsizim'));
+      expect(
+        contextualReport.contextualInterpretation,
+        contains('Tiroid bezinin'),
+      );
+      expect(
+        contextualReport.contextualInterpretation,
+        contains('kırmızı kan hücrelerinin'),
+      );
+      expect(
+        contextualReport.contextualInterpretation,
+        contains('halsizlik / yorgunluk'),
+      );
+      expect(contextualReport.followUpQuestions, isNotEmpty);
+
+      final shareText = LabReportAnalyzer.formatReportForDoctor(contextualReport);
+      expect(shareText, contains('tahlil_nisan.pdf'));
+      expect(shareText, contains('Hipotiroidi'));
+
+      final aiPrompt = LabReportAnalyzer.buildContextualAiPrompt(
+        items: parsed.items,
+        hospitalDiagnosis: 'Hipotiroidi',
+        userComplaintNote: 'Çok yorgunum',
+        attachmentFileName: 'tahlil_nisan.pdf',
+      );
+      expect(aiPrompt, contains('Hipotiroidi'));
+      expect(aiPrompt, contains('Çok yorgunum'));
+      expect(aiPrompt, contains('TSH=5.4'));
+
+      // 2) With BLANK diagnosis and BLANK user complaint
+      final standaloneReport = LabReportAnalyzer.buildReport(
+        title: 'Sadece Kan Testi',
         reportDate: parsed.detectedDate!,
         source: LabReportSource.pastedText,
         items: parsed.items,
+        hospitalDiagnosis: '   ',
+        userComplaintNote: '',
       );
-      expect(report.abnormalCount, 4);
+
+      expect(standaloneReport.hospitalDiagnosis, isNull);
+      expect(standaloneReport.userComplaintNote, isNull);
       expect(
-        LabReportAnalyzer.formatReportForDoctor(report),
-        contains('e-Nabız Kan Tahlili'),
+        standaloneReport.contextualInterpretation,
+        contains('Yalnızca kan sonuçlarına göre'),
       );
     });
 
@@ -118,7 +209,7 @@ void main() {
       expect(highFasting.category, BloodSugarCategory.high);
     });
 
-    test('LabsVitalsRepository persists and clears lab reports, BP, and sugar logs', () async {
+    test('LabsVitalsRepository persists and clears lab reports (with diagnosis/attachment), BP, and sugar logs', () async {
       SharedPreferences.setMockInitialValues({});
       final repo = LabsVitalsRepository();
 
@@ -127,8 +218,12 @@ void main() {
         LabReportAnalyzer.buildReport(
           title: 'Kontrol',
           reportDate: DateTime(2026, 5, 1),
-          source: LabReportSource.pastedText,
+          source: LabReportSource.pdfUpload,
           items: parsed.items,
+          hospitalDiagnosis: 'Grade 1 hepatosteatoz',
+          userComplaintNote: 'Kontrol amaçlı',
+          attachmentFileName: 'rapor.pdf',
+          attachmentMimeType: 'application/pdf',
         ),
       );
       await repo.saveBloodPressure(
@@ -149,7 +244,10 @@ void main() {
         ),
       );
 
-      expect(await repo.loadLabReports(), hasLength(1));
+      final savedLabs = await repo.loadLabReports();
+      expect(savedLabs, hasLength(1));
+      expect(savedLabs.first.hospitalDiagnosis, 'Grade 1 hepatosteatoz');
+      expect(savedLabs.first.attachmentFileName, 'rapor.pdf');
       expect(await repo.loadBloodPressureReadings(), hasLength(1));
       expect(await repo.loadBloodSugarReadings(), hasLength(1));
 
@@ -160,63 +258,72 @@ void main() {
     });
   });
 
-  group('Widget flows — Lab Reports & Vitals Tracker from HomeScreen', () {
-    testWidgets('parses pasted hospital report text, saves dated report, and renders trend tab', (
+  group('Widget flows — PDF/JPG Lab Upload, Diagnosis Interpretation & Vitals Tracker', () {
+    testWidgets('uploads PDF, auto-reads blood values, interprets optional hospital diagnosis & complaint', (
       tester,
     ) async {
-      SharedPreferences.setMockInitialValues({
-        'visualcheckup_disclaimer_v1': true,
-      });
+      SharedPreferences.setMockInitialValues({});
       final repo = LabsVitalsRepository();
+      final fakePdfBytes = _buildSyntheticFlatePdf(const [
+        'Tarih: 18.05.2026',
+        'Hemoglobin: 10.5 g/dL',
+        'TSH: 5.8 mIU/L',
+      ]);
+      final picker = _FakeLabDocumentPicker(
+        PickedLabDocument(
+          fileName: 'enabiz_tahlil.pdf',
+          mimeType: 'application/pdf',
+          bytes: fakePdfBytes,
+        ),
+      );
 
       await tester.pumpWidget(
-        VisualCheckUpApp(
-          labsVitalsRepository: repo,
-          initialUser: const AuthUser(
-            id: 'u_lab',
-            displayName: 'Can Kaya',
-            provider: AuthProviderType.google,
+        MaterialApp(
+          home: LabReportsScreen(
+            repository: repo,
+            documentPicker: picker,
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.text('Tahlil & Raporlar'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(find.text('Tahlil & Raporlar'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Tahlil & Raporlar'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Tahlil & Hastane Raporları'), findsOneWidget);
       await tester.tap(find.text('Rapor / Kan Testi Ekle'));
       await tester.pumpAndSettle();
 
-      // Paste Turkish blood test lines into the second TextField.
-      final textFields = find.byType(TextField);
+      await tester.tap(find.text('PDF veya JPG Yükle'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('2 tahlil parametresi otomatik ayrıştırıldı'), findsOneWidget);
+      expect(find.text('PDF • enabiz_tahlil.pdf'), findsOneWidget);
+
+      // Enter optional hospital diagnosis and optional user complaint.
       await tester.enterText(
-        textFields.at(1),
-        'Tarih: 10.05.2026\nHemoglobin: 11.0\nGlukoz: 95\nTSH: 4.8',
+        find.widgetWithText(
+          TextField,
+          'Hastane / Doktor Teşhisi (Boş Bırakılabilir)',
+        ),
+        'Hipotiroidi',
       );
-      await tester.tap(find.text('Metni Oku ve Ayrıştır'));
-      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(
+          TextField,
+          'Şikayetiniz / Kendi Metniniz (Boş Bırakılabilir)',
+        ),
+        'Çok halsizim ve üşüyorum',
+      );
 
-      expect(find.textContaining('3 tahlil parametresi'), findsOneWidget);
-
-      await tester.ensureVisible(find.text('Değerlendir ve Tarihli Kaydet'));
-      await tester.pumpAndSettle();
       await tester.tap(find.text('Değerlendir ve Tarihli Kaydet'));
       await tester.pumpAndSettle();
 
-      // Detail bottom sheet shows parsed evaluation.
-      expect(find.text('Parametre Değerlendirmesi (3)'), findsOneWidget);
+      // Detail sheet shows PDF attachment, diagnosis, and plain-Turkish interpretation.
+      expect(find.text('enabiz_tahlil.pdf'), findsOneWidget);
+      expect(find.text('Girilen Hastane / Doktor Teşhisi'), findsOneWidget);
+      expect(find.text('Anlaşılır Değerlendirme & Yorum'), findsOneWidget);
+      expect(find.textContaining('Tiroid bezinin'), findsOneWidget);
       expect(await repo.loadLabReports(), hasLength(1));
     });
 
-    testWidgets('logs Blood Pressure and Blood Sugar readings with trends in VitalsTrackerScreen', (
+    testWidgets('logs Blood Pressure and Blood Sugar readings with trends from HomeScreen', (
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({

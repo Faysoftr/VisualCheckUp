@@ -54,6 +54,7 @@ enum LabReportSource {
   manual,
   pastedText,
   photoScan,
+  pdfUpload,
 }
 
 extension LabReportSourceX on LabReportSource {
@@ -64,7 +65,9 @@ extension LabReportSourceX on LabReportSource {
       case LabReportSource.pastedText:
         return 'Rapor Metninden Okundu';
       case LabReportSource.photoScan:
-        return 'Rapor Fotoğrafı';
+        return 'JPG / Fotoğraf Raporu';
+      case LabReportSource.pdfUpload:
+        return 'PDF Raporu';
     }
   }
 
@@ -178,6 +181,12 @@ class LabReportRecord {
     required this.suggestedSpecialty,
     this.rawReportText,
     this.notes,
+    this.hospitalDiagnosis,
+    this.userComplaintNote,
+    this.attachmentFileName,
+    this.attachmentMimeType,
+    this.contextualInterpretation,
+    this.followUpQuestions = const [],
   });
 
   final String id;
@@ -190,8 +199,27 @@ class LabReportRecord {
   final String? rawReportText;
   final String? notes;
 
+  /// Optional hospital/doctor diagnosis or epicrisis text entered by the user.
+  final String? hospitalDiagnosis;
+
+  /// Optional user's own complaint, symptoms, or question text.
+  final String? userComplaintNote;
+
+  /// Optional uploaded PDF or JPG file metadata.
+  final String? attachmentFileName;
+  final String? attachmentMimeType;
+
+  /// Plain-Turkish combined interpretation connecting the lab values with the
+  /// optional hospital diagnosis and/or user complaint.
+  final String? contextualInterpretation;
+
+  /// Tailored questions the user can ask their doctor at follow-up.
+  final List<String> followUpQuestions;
+
   int get abnormalCount => items.where((i) => i.status.isAbnormal).length;
   bool get hasCritical => items.any((i) => i.status.isCritical);
+  bool get hasAttachment =>
+      attachmentFileName != null && attachmentFileName!.trim().isNotEmpty;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -203,6 +231,16 @@ class LabReportRecord {
         'suggestedSpecialty': suggestedSpecialty,
         if (rawReportText != null) 'rawReportText': rawReportText,
         if (notes != null) 'notes': notes,
+        if (hospitalDiagnosis != null) 'hospitalDiagnosis': hospitalDiagnosis,
+        if (userComplaintNote != null) 'userComplaintNote': userComplaintNote,
+        if (attachmentFileName != null)
+          'attachmentFileName': attachmentFileName,
+        if (attachmentMimeType != null)
+          'attachmentMimeType': attachmentMimeType,
+        if (contextualInterpretation != null)
+          'contextualInterpretation': contextualInterpretation,
+        if (followUpQuestions.isNotEmpty)
+          'followUpQuestions': followUpQuestions,
       };
 
   factory LabReportRecord.fromJson(Map<String, dynamic> json) {
@@ -218,6 +256,15 @@ class LabReportRecord {
       suggestedSpecialty: json['suggestedSpecialty'] as String,
       rawReportText: json['rawReportText'] as String?,
       notes: json['notes'] as String?,
+      hospitalDiagnosis: json['hospitalDiagnosis'] as String?,
+      userComplaintNote: json['userComplaintNote'] as String?,
+      attachmentFileName: json['attachmentFileName'] as String?,
+      attachmentMimeType: json['attachmentMimeType'] as String?,
+      contextualInterpretation: json['contextualInterpretation'] as String?,
+      followUpQuestions: (json['followUpQuestions'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
     );
   }
 }
