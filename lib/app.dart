@@ -7,6 +7,7 @@ import 'package:visualcheckup/features/auth/presentation/screens/login_screen.da
 import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/home_screen.dart';
+import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 
 class VisualCheckUpApp extends StatefulWidget {
   const VisualCheckUpApp({
@@ -14,6 +15,7 @@ class VisualCheckUpApp extends StatefulWidget {
     this.authService,
     this.themeController,
     this.historyRepository,
+    this.labsVitalsRepository,
     this.analyzer,
     this.initialUser,
   });
@@ -21,6 +23,7 @@ class VisualCheckUpApp extends StatefulWidget {
   final AuthService? authService;
   final ThemeController? themeController;
   final HistoryRepository? historyRepository;
+  final LabsVitalsRepository? labsVitalsRepository;
   final ColorHealthAnalyzer? analyzer;
   final AuthUser? initialUser;
 
@@ -33,6 +36,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   late final ThemeController _themeController;
   late final bool _ownsThemeController;
   late final HistoryRepository _historyRepository;
+  late final LabsVitalsRepository _labsVitalsRepository;
   late final ColorHealthAnalyzer _analyzer;
 
   AuthUser? _currentUser;
@@ -45,6 +49,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     _ownsThemeController = widget.themeController == null;
     _themeController = widget.themeController ?? ThemeController();
     _historyRepository = widget.historyRepository ?? HistoryRepository();
+    _labsVitalsRepository =
+        widget.labsVitalsRepository ?? LabsVitalsRepository();
     _analyzer = widget.analyzer ?? ColorHealthAnalyzer();
     _currentUser = widget.initialUser;
     _bootstrapping = widget.initialUser == null;
@@ -87,6 +93,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
 
   Future<void> _handleDeleteAccount() async {
     await _historyRepository.clearAllUserData();
+    await _labsVitalsRepository.clearAll();
     await _authService.deleteAccount();
     if (!mounted) return;
     setState(() {
@@ -113,6 +120,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
           home = HomeScreen(
             analyzer: _analyzer,
             historyRepository: _historyRepository,
+            labsVitalsRepository: _labsVitalsRepository,
             currentUser: _currentUser!,
             themeController: _themeController,
             onSignOut: _handleSignOut,

@@ -117,13 +117,21 @@ void main() {
 
       expect(find.text('Zeynep Kaya'), findsOneWidget);
       expect(find.text('Apple Hesabı'), findsOneWidget);
-      expect(find.text('Görsel Referans Rehberi'), findsOneWidget);
+      expect(find.text('Tahlil & Hastane Raporları'), findsOneWidget);
+      expect(find.text('Tansiyon & Şeker Takibi'), findsOneWidget);
 
       // Switch theme mode live from Drawer.
       final drawerScrollable = find.descendant(
         of: find.byType(Drawer),
         matching: find.byType(Scrollable),
       );
+      await tester.scrollUntilVisible(
+        find.text('Görsel Referans Rehberi'),
+        150,
+        scrollable: drawerScrollable,
+      );
+      expect(find.text('Görsel Referans Rehberi'), findsOneWidget);
+
       await tester.scrollUntilVisible(
         find.text('Koyu'),
         150,

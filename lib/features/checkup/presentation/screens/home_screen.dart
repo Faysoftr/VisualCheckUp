@@ -19,6 +19,9 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/category_car
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
+import 'package:visualcheckup/features/labs_vitals/presentation/screens/lab_reports_screen.dart';
+import 'package:visualcheckup/features/labs_vitals/presentation/screens/vitals_tracker_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 
@@ -31,10 +34,12 @@ class HomeScreen extends StatefulWidget {
     required this.themeController,
     required this.onSignOut,
     required this.onDeleteAccount,
+    this.labsVitalsRepository,
   });
 
   final ColorHealthAnalyzer analyzer;
   final HistoryRepository historyRepository;
+  final LabsVitalsRepository? labsVitalsRepository;
   final AuthUser currentUser;
   final ThemeController themeController;
   final VoidCallback onSignOut;
@@ -46,14 +51,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late final LabsVitalsRepository _labsVitalsRepository;
   List<AnalysisResult> _allHistory = const [];
   Set<FollowUpTrack> _enabledTracks = FollowUpTrackX.defaultEnabled();
+  int _labReportCount = 0;
+  int _vitalsCount = 0;
 
   List<AnalysisResult> get _recent => _allHistory.take(3).toList();
 
   @override
   void initState() {
     super.initState();
+    _labsVitalsRepository =
+        widget.labsVitalsRepository ?? LabsVitalsRepository();
     _bootstrap();
   }
 
@@ -74,11 +84,37 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadDashboardData() async {
     final history = await widget.historyRepository.loadHistory();
     final tracks = await widget.historyRepository.loadFollowUpTracks();
+    final labs = await _labsVitalsRepository.loadLabReports();
+    final bp = await _labsVitalsRepository.loadBloodPressureReadings();
+    final sugar = await _labsVitalsRepository.loadBloodSugarReadings();
     if (!mounted) return;
     setState(() {
       _allHistory = history;
       _enabledTracks = tracks;
+      _labReportCount = labs.length;
+      _vitalsCount = bp.length + sugar.length;
     });
+  }
+
+  Future<void> _openLabReports() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => LabReportsScreen(repository: _labsVitalsRepository),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openVitalsTracker({int initialTabIndex = 0}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => VitalsTrackerScreen(
+          repository: _labsVitalsRepository,
+          initialTabIndex: initialTabIndex,
+        ),
+      ),
+    );
+    await _loadDashboardData();
   }
 
   Future<void> _openSkinSubModule(SkinConcernType concern) async {
@@ -400,6 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
         currentUser: widget.currentUser,
         themeController: widget.themeController,
         onOpenSkinModule: () => _openCategory(CheckCategory.skinCondition),
+        onOpenLabReports: _openLabReports,
+        onOpenVitalsTracker: _openVitalsTracker,
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,
         onOpenHistory: _openHistory,
@@ -673,6 +711,57 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tahlil, Tansiyon & Şeker',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Hastane/kan testi raporlarını oku, tansiyon ve şeker değişimini tarihli izle.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _DashboardModuleCard(
+                          icon: Icons.biotech_outlined,
+                          accentColor: AppTheme.primaryTeal,
+                          title: 'Tahlil & Raporlar',
+                          subtitle: _labReportCount == 0
+                              ? 'Kan testi oku & değerlendir'
+                              : '$_labReportCount kayıtlı rapor',
+                          onTap: _openLabReports,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _DashboardModuleCard(
+                          icon: Icons.monitor_heart_outlined,
+                          accentColor: const Color(0xFFC8553D),
+                          title: 'Tansiyon & Şeker',
+                          subtitle: _vitalsCount == 0
+                              ? 'Ölçüm gir & trend izle'
+                              : '$_vitalsCount kayıtlı ölçüm',
+                          onTap: () => _openVitalsTracker(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
           if (_recent.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: Padding(
@@ -738,6 +827,62 @@ class _HomeScreenState extends State<HomeScreen> {
           ] else
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
+      ),
+    );
+  }
+}
+
+class _DashboardModuleCard extends StatelessWidget {
+  const _DashboardModuleCard({
+    required this.icon,
+    required this.accentColor,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color accentColor;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: accentColor.withValues(alpha: 0.14),
+                child: Icon(icon, color: accentColor, size: 22),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -22,6 +22,8 @@ class AppDrawer extends StatelessWidget {
     required this.onDeleteAccount,
     this.onOpenFollowUpPlan,
     this.onOpenQuickColorCard,
+    this.onOpenLabReports,
+    this.onOpenVitalsTracker,
   });
 
   final AuthUser currentUser;
@@ -35,6 +37,8 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback onDeleteAccount;
   final VoidCallback? onOpenFollowUpPlan;
   final VoidCallback? onOpenQuickColorCard;
+  final VoidCallback? onOpenLabReports;
+  final VoidCallback? onOpenVitalsTracker;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
     Navigator.of(context).pop();
@@ -188,6 +192,18 @@ class AppDrawer extends StatelessWidget {
                     label: 'Cilt & Ben Takibi',
                     onTap: () => _closeAndRun(context, onOpenSkinModule),
                   ),
+                  if (onOpenLabReports != null)
+                    _DrawerTile(
+                      icon: Icons.biotech_outlined,
+                      label: 'Tahlil & Hastane Raporları',
+                      onTap: () => _closeAndRun(context, onOpenLabReports!),
+                    ),
+                  if (onOpenVitalsTracker != null)
+                    _DrawerTile(
+                      icon: Icons.monitor_heart_outlined,
+                      label: 'Tansiyon & Şeker Takibi',
+                      onTap: () => _closeAndRun(context, onOpenVitalsTracker!),
+                    ),
                   if (onOpenQuickColorCard != null)
                     _DrawerTile(
                       icon: Icons.palette_outlined,
