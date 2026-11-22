@@ -8,12 +8,22 @@ import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 
-/// Structured payload sent to a multimodal Vision AI backend (Gemini, OpenAI,
-/// or custom backend API).
+enum AiModelTier {
+  lite,
+  standard,
+}
+
+/// Structured, token-optimized payload sent to a multimodal Vision AI backend
+/// (Firebase AI Logic / Gemini API / custom REST proxy).
 class AiVisionRequest {
   const AiVisionRequest({
     required this.category,
     required this.imageBytes,
+    required this.mimeType,
+    required this.modelTier,
+    required this.recommendedModel,
+    required this.maxOutputTokens,
+    required this.thinkingLevel,
     required this.systemInstruction,
     required this.userPrompt,
     required this.allowedFindingIds,
@@ -21,115 +31,138 @@ class AiVisionRequest {
 
   final CheckCategory category;
   final Uint8List imageBytes;
+  final String mimeType;
+  final AiModelTier modelTier;
+
+  /// Tiered Gemini model ID (cost-efficient Flash-Lite for color-primary
+  /// modules; Flash for high-detail skin & nail morphology).
+  final String recommendedModel;
+
+  /// Hard cap on output tokens to prevent verbose, costly responses.
+  final int maxOutputTokens;
+
+  /// Recommended thinking level ('minimal' or 'low') to avoid hidden thinking
+  /// token spikes on classification tasks.
+  final String thinkingLevel;
+
   final String systemInstruction;
   final String userPrompt;
   final List<String> allowedFindingIds;
 }
 
-/// Abstract client that your backend / Vision AI SDK (e.g. Firebase Vertex AI,
-/// Gemini API, or a private REST proxy) can implement to plug directly into
-/// [HybridHealthAnalyzer].
+/// Abstract client that Firebase AI Logic (`firebase_ai`) or a backend proxy
+/// implements to plug directly into [HybridHealthAnalyzer].
 abstract class VisionAiClient {
   Future<String> analyzeWithVisionAi(AiVisionRequest request);
 }
 
-/// Builds grounded, medically safe Vision AI prompts combining:
-/// 1. The module's healthy vs. abnormal reference catalog,
+/// Builds compact, low-token Vision AI prompts grounded in:
+/// 1. Only the active module's healthy vs. abnormal reference rubric,
 /// 2. On-device CIE L*a*b* + white-balance calibration telemetry,
-/// 3. User's optional personal baseline and skin symptom context,
-/// 4. Strict JSON output schema.
+/// 3. Optional personal baseline ΔE and skin symptom flags,
+/// 4. Strict minimal JSON output schema.
 class AiVisionPromptBuilder {
   AiVisionPromptBuilder._();
 
+  static const String liteModelId = 'gemini-3.5-flash-lite';
+  static const String standardModelId = 'gemini-3.8-flash';
+
+  /// Constant system instruction kept identical across all calls so Gemini's
+  /// automatic implicit context caching maximizes input-token savings.
   static const String systemInstruction =
-      'Sen VisualCheckUp uygulaması için çalışan görsel sağlık ön farkındalık asistanısın. '
-      'Tıbbi cihaz değilsin ve kesin tıbbi teşhis koymazsın. '
-      'Görevin, gönderilen fotoğrafı verilen SAĞLIKLI REFERANS ve SAĞLIKSIZ/UYARI BULGULARI kataloğu ile '
-      'görsel olarak kıyaslamak, ortam ışığı/kalibrasyon telemetrisini dikkate almak ve yalnızca istenen JSON şemasında '
-      'Türkçe ön değerlendirme döndürmektir. Görüntü bulanık, aşırı karanlık veya ilgisizse image_quality_ok=false döndür.';
+      'VisualCheckUp görsel ön farkındalık asistanısın. Tıbbi teşhis koymazsın. '
+      'Fotoğrafı verilen modülün sağlıklı/sağlıksız referanslarıyla ve kalibrasyon '
+      'telemetrisiyle kıyasla. Yalnızca geçerli, kısa Türkçe JSON döndür: '
+      '{"image_quality_ok":bool,"matched_finding_ids":[str],'
+      '"risk_level":"normal|attention|urgent","summary_title":str,'
+      '"summary_detail":str,"observations":[str],"recommendations":[str],'
+      '"warning_flags":[str],"confidence":0..1}. '
+      'Görüntü net değilse image_quality_ok=false ver.';
+
+  static AiModelTier tierForCategory(CheckCategory category) {
+    switch (category) {
+      case CheckCategory.skinCondition:
+      case CheckCategory.nail:
+        return AiModelTier.standard;
+      case CheckCategory.eye:
+      case CheckCategory.tongue:
+      case CheckCategory.face:
+      case CheckCategory.urine:
+      case CheckCategory.stool:
+        return AiModelTier.lite;
+    }
+  }
+
+  static String modelForCategory(CheckCategory category) {
+    return tierForCategory(category) == AiModelTier.standard
+        ? standardModelId
+        : liteModelId;
+  }
 
   static AiVisionRequest build({
     required CheckCategory category,
     required Uint8List imageBytes,
+    String mimeType = 'image/jpeg',
     CalibratedSample? calibratedSample,
     CategoryBaseline? baseline,
     SkinCheckContext? skinContext,
   }) {
     final spec = ModuleReferenceCatalog.forCategory(category);
-    final rubricPayload = {
-      'module': category.id,
-      'module_title': category.title,
-      'healthy_summary': spec.healthySummary,
-      'reference_findings': spec.findings.map((f) => f.toAiRubricMap()).toList(),
-    };
+    final tier = tierForCategory(category);
 
-    final telemetry = <String, dynamic>{};
+    // Compact pipe-delimited rubric cuts ~55% of prompt tokens vs verbose JSON.
+    final rubricLines = spec.findings
+        .map(
+          (f) =>
+              '- ${f.id}|${f.isHealthyReference ? 'healthy' : f.riskLevel.name}: ${f.title} (${f.visualSignature})',
+        )
+        .join('\n');
+
+    final telemetryParts = <String>[];
     if (calibratedSample != null) {
       final c = calibratedSample.calibratedColor;
-      telemetry['calibrated_rgb'] = [
-        (c.r * 255).round().clamp(0, 255),
-        (c.g * 255).round().clamp(0, 255),
-        (c.b * 255).round().clamp(0, 255),
-      ];
-      telemetry['cie_lab'] = {
-        'L': double.parse(calibratedSample.lab.l.toStringAsFixed(2)),
-        'a': double.parse(calibratedSample.lab.a.toStringAsFixed(2)),
-        'b': double.parse(calibratedSample.lab.b.toStringAsFixed(2)),
-      };
-      telemetry['white_balance_calibrated'] =
-          calibratedSample.whiteBalanceApplied;
-      telemetry['lighting_cast'] = calibratedSample.lightingCast.name;
-      telemetry['glare_filtered_ratio'] =
-          double.parse(calibratedSample.glareFilteredRatio.toStringAsFixed(3));
+      final r = (c.r * 255).round().clamp(0, 255);
+      final g = (c.g * 255).round().clamp(0, 255);
+      final b = (c.b * 255).round().clamp(0, 255);
+      telemetryParts.add(
+        'rgb=($r,$g,$b) cie_lab=(L:${calibratedSample.lab.l.toStringAsFixed(1)},'
+        'a:${calibratedSample.lab.a.toStringAsFixed(1)},'
+        'b:${calibratedSample.lab.b.toStringAsFixed(1)}) '
+        'wb=${calibratedSample.whiteBalanceApplied ? 1 : 0} '
+        'cast=${calibratedSample.lightingCast.name}',
+      );
     }
 
     if (baseline != null && calibratedSample != null) {
       final comp = baseline.compare(calibratedSample.lab);
-      telemetry['personal_baseline'] = {
-        'baseline_lab': {
-          'L': double.parse(baseline.labL.toStringAsFixed(2)),
-          'a': double.parse(baseline.labA.toStringAsFixed(2)),
-          'b': double.parse(baseline.labB.toStringAsFixed(2)),
-        },
-        'delta_e': double.parse(comp.deltaE.toStringAsFixed(2)),
-        'comparison_note': comp.note,
-      };
+      telemetryParts.add(
+        'baseline_deltaE=${comp.deltaE.toStringAsFixed(1)} (${comp.note})',
+      );
     }
 
     if (skinContext != null) {
-      telemetry['skin_user_context'] = {
-        'concern_type': skinContext.concernType.label,
-        'symptoms': skinContext.symptoms.map((s) => s.label).toList(),
-        if (skinContext.bodyArea != null) 'body_area': skinContext.bodyArea,
-      };
+      final sym = skinContext.symptoms.map((s) => s.label).join(',');
+      final area = skinContext.bodyArea ?? '-';
+      telemetryParts.add(
+        'skin_concern=${skinContext.concernType.label};area=$area;symptoms=${sym.isEmpty ? 'yok' : sym}',
+      );
     }
 
     final userPrompt = '''
-Aşağıdaki görüntüyü verilen referans kataloğundaki SAĞLIKLI ve SAĞLIKSIZ bulgularla karşılaştır.
-
-### REFERANS KATALOĞU (JSON)
-${jsonEncode(rubricPayload)}
-
-### CİHAZ İÇİ RENK KALİBRASYON TELEMETRİSİ
-${jsonEncode(telemetry)}
-
-### İSTENEN ÇIKTI FORMATI (Sadece geçerli JSON döndür, ek açıklama yazma)
-{
-  "image_quality_ok": true,
-  "matched_finding_ids": ["finding_id_1"],
-  "risk_level": "normal | attention | urgent",
-  "summary_title": "Kısa başlık (Türkçe)",
-  "summary_detail": "Sağlıklı referansla karşılaştırmalı, teşhis koymayan 2-3 cümlelik özet",
-  "observations": ["Gözlem 1", "Gözlem 2"],
-  "recommendations": ["Öneri 1", "Öneri 2"],
-  "warning_flags": ["Varsa acil/doktor uyarısı"],
-  "confidence": 0.78
-}
-''';
+Modül: ${category.title} (${category.id})
+Referanslar:
+$rubricLines
+Telemetri: ${telemetryParts.isEmpty ? 'yok' : telemetryParts.join(' | ')}
+Kural: Sadece listedeki matched_finding_ids kullan, en fazla 2 gözlem ve 2 öneri yaz, yalnızca JSON döndür.''';
 
     return AiVisionRequest(
       category: category,
       imageBytes: imageBytes,
+      mimeType: mimeType,
+      modelTier: tier,
+      recommendedModel: modelForCategory(category),
+      maxOutputTokens: 320,
+      thinkingLevel: tier == AiModelTier.standard ? 'low' : 'minimal',
       systemInstruction: systemInstruction,
       userPrompt: userPrompt,
       allowedFindingIds: spec.findings.map((f) => f.id).toList(),

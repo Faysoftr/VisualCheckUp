@@ -313,12 +313,14 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
 
   Future<void> _processBytes(Uint8List bytes) async {
     try {
+      final allowCloudAi = await widget.historyRepository.isCloudAiEnabled();
       final result = await widget.analyzer.analyzeImage(
         category: widget.category,
         imageBytes: bytes,
         options: AnalysisOptions(
           useWhiteReference: _useWhiteReference,
           baseline: _baseline,
+          allowCloudAi: allowCloudAi,
         ),
       );
       await _openResult(result);

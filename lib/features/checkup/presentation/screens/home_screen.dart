@@ -7,6 +7,7 @@ import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/camera_check_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/history_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/ai_settings_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/category_card.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
@@ -102,6 +103,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('VisualCheckUp'),
         actions: [
+          IconButton(
+            onPressed: () => AiSettingsSheet.show(
+              context,
+              historyRepository: widget.historyRepository,
+            ),
+            tooltip: 'Yapay Zeka Ayarları',
+            icon: const Icon(Icons.auto_awesome_outlined),
+          ),
           IconButton(
             onPressed: _openHistory,
             tooltip: 'Geçmiş',

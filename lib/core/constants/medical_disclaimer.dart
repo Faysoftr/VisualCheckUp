@@ -11,5 +11,7 @@ class MedicalDisclaimer {
       '• Ortam ışığı, kamera sensörü ve telefon ekranı renk algısını doğrudan etkiler.\n'
       '• Şiddetli ağrı, kanama, yüksek ateş, sarılık, siyah/beyaz dışkı veya ani görme '
       'değişimi gibi belirtilerde vakit kaybetmeden bir sağlık kuruluşuna başvurun.\n'
-      '• Gizlilik: Çekilen görüntüler yalnızca cihazınızda işlenir ve dış sunuculara gönderilmez.';
+      '• Gizlilik: Varsayılan olarak tüm görüntüler yalnızca cihazınızda işlenir. '
+      'İsteğe bağlı Bulut Yapay Zeka (Gemini) analizini açtığınızda fotoğraf küçültülerek '
+      'yalnızca anlık değerlendirme için güvenli bağlantı üzerinden işlenir.';
 }
