@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import 'package:visualcheckup/core/color/color_calibrator.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
@@ -51,8 +52,9 @@ class SkinVisualMetrics {
 /// On-device dermatological pre-awareness analyzer.
 ///
 /// Compares the central lesion region (35%..65%) with the surrounding border
-/// ring (10%..25% & 75%..90%) and combines visual cues with optional user
-/// symptom context. This is NOT a medical diagnostic tool.
+/// ring (10%..25% & 75%..90%), applies optional Von Kries white-balance
+/// calibration, and combines visual cues with optional user symptom context
+/// and personal baseline. This is NOT a medical diagnostic tool.
 class SkinConditionAnalyzer implements HealthAnalyzer {
   const SkinConditionAnalyzer({
     this.skinContext = const SkinCheckContext(),
@@ -64,17 +66,68 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
   Future<AnalysisResult> analyzeImage({
     required CheckCategory category,
     required Uint8List imageBytes,
+    AnalysisOptions options = const AnalysisOptions(),
   }) async {
     final decoded = img.decodeImage(imageBytes);
     if (decoded == null) {
       throw const FormatException('Görüntü çözümlenemedi.');
     }
 
-    final metrics = extractMetrics(decoded);
-    return analyzeMetrics(metrics);
+    final calibratedSample = ColorCalibrator.sampleImage(
+      image: decoded,
+      useWhiteReference: options.useWhiteReference,
+    );
+
+    final metrics = extractMetrics(decoded, gains: calibratedSample.gains);
+    var result = analyzeMetrics(metrics);
+
+    final extraObservations = <String>[];
+    var confidence = result.confidence;
+
+    if (calibratedSample.whiteBalanceApplied) {
+      confidence = (confidence + 0.08).clamp(0.25, 0.92);
+      extraObservations.add(
+        'Beyaz referans kutusu ile cihaz ve ortam ışığı dengelendi.',
+      );
+    } else if (calibratedSample.lightingCast == LightingCast.warmYellow ||
+        calibratedSample.lightingCast == LightingCast.coolBlue) {
+      confidence = (confidence - 0.10).clamp(0.25, 0.90);
+      if (calibratedSample.lightingNote != null) {
+        extraObservations.add(calibratedSample.lightingNote!);
+      }
+    }
+
+    double? baselineDeltaE;
+    String? baselineNote;
+    var riskLevel = result.riskLevel;
+
+    if (options.baseline != null) {
+      final comp = options.baseline!.compare(LabColor.fromColor(metrics.centerColor));
+      baselineDeltaE = comp.deltaE;
+      baselineNote = comp.note;
+      extraObservations.add(comp.note);
+      if (riskLevel == RiskLevel.normal && comp.isSignificantShift) {
+        riskLevel = RiskLevel.attention;
+      }
+    }
+
+    result = result.copyWith(
+      riskLevel: riskLevel,
+      confidence: confidence,
+      whiteBalanceCalibrated: calibratedSample.whiteBalanceApplied,
+      lightingNote: calibratedSample.lightingNote,
+      baselineDeltaE: baselineDeltaE,
+      baselineComparisonNote: baselineNote,
+      observations: [...result.observations, ...extraObservations],
+    );
+
+    return result;
   }
 
-  SkinVisualMetrics extractMetrics(img.Image decoded) {
+  SkinVisualMetrics extractMetrics(
+    img.Image decoded, {
+    WhiteBalanceGains? gains,
+  }) {
     final w = decoded.width;
     final h = decoded.height;
 
@@ -99,21 +152,25 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     for (int y = cStartY; y < cEndY; y += stepY) {
       for (int x = cStartX; x < cEndX; x += stepX) {
         final p = decoded.getPixel(x, y);
-        final r = p.r.toDouble();
-        final g = p.g.toDouble();
-        final b = p.b.toDouble();
+        var ri = p.r.round().clamp(0, 255);
+        var gi = p.g.round().clamp(0, 255);
+        var bi = p.b.round().clamp(0, 255);
+        // Skip pure specular glare spots on shiny skin
+        if (ri >= 250 && gi >= 250 && bi >= 250) continue;
+        if (gains != null) {
+          final (nr, ng, nb) = gains.applyToRgb(ri, gi, bi);
+          ri = nr;
+          gi = ng;
+          bi = nb;
+        }
+        final r = ri.toDouble();
+        final g = gi.toDouble();
+        final b = bi.toDouble();
         sumR += r;
         sumG += g;
         sumB += b;
 
-        final hsv = HSVColor.fromColor(
-          Color.fromARGB(
-            255,
-            r.round().clamp(0, 255),
-            g.round().clamp(0, 255),
-            b.round().clamp(0, 255),
-          ),
-        );
+        final hsv = HSVColor.fromColor(Color.fromARGB(255, ri, gi, bi));
         final v = hsv.value;
         final s = hsv.saturation;
         final hue = hsv.hue;
@@ -186,10 +243,20 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
             y >= (h * 0.25) &&
             y <= (h * 0.75);
         if (inInner) continue;
+        if (gains != null && y >= (h * 0.72)) continue;
         final p = decoded.getPixel(x, y);
-        final r = p.r.toDouble();
-        final g = p.g.toDouble();
-        final b = p.b.toDouble();
+        var ri = p.r.round().clamp(0, 255);
+        var gi = p.g.round().clamp(0, 255);
+        var bi = p.b.round().clamp(0, 255);
+        if (gains != null) {
+          final (nr, ng, nb) = gains.applyToRgb(ri, gi, bi);
+          ri = nr;
+          gi = ng;
+          bi = nb;
+        }
+        final r = ri.toDouble();
+        final g = gi.toDouble();
+        final b = bi.toDouble();
         ringR += r;
         ringG += g;
         ringV += math.max(r, math.max(g, b)) / 255.0;

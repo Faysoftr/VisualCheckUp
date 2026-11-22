@@ -122,6 +122,22 @@ extension CheckCategoryX on CheckCategory {
     }
   }
 
+  /// Categories where placing a white paper/surface inside the secondary frame
+  /// is practical and yields the highest white-balance calibration accuracy.
+  bool get recommendsWhiteReference {
+    switch (this) {
+      case CheckCategory.nail:
+      case CheckCategory.urine:
+      case CheckCategory.stool:
+        return true;
+      case CheckCategory.eye:
+      case CheckCategory.tongue:
+      case CheckCategory.face:
+      case CheckCategory.skinCondition:
+        return false;
+    }
+  }
+
   static CheckCategory fromId(String id) {
     return CheckCategory.values.firstWhere(
       (c) => c.name == id,

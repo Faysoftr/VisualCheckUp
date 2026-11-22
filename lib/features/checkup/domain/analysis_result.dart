@@ -62,6 +62,10 @@ class AnalysisResult {
     required this.warningFlags,
     required this.confidence,
     required this.createdAt,
+    this.whiteBalanceCalibrated = false,
+    this.lightingNote,
+    this.baselineDeltaE,
+    this.baselineComparisonNote,
   });
 
   final String id;
@@ -75,8 +79,46 @@ class AnalysisResult {
   final List<String> warningFlags;
   final double confidence;
   final DateTime createdAt;
+  final bool whiteBalanceCalibrated;
+  final String? lightingNote;
+  final double? baselineDeltaE;
+  final String? baselineComparisonNote;
 
   Color get dominantColor => Color(dominantColorValue);
+
+  AnalysisResult copyWith({
+    RiskLevel? riskLevel,
+    String? summaryTitle,
+    String? summaryDetail,
+    List<String>? observations,
+    List<String>? recommendations,
+    List<String>? warningFlags,
+    double? confidence,
+    bool? whiteBalanceCalibrated,
+    String? lightingNote,
+    double? baselineDeltaE,
+    String? baselineComparisonNote,
+  }) {
+    return AnalysisResult(
+      id: id,
+      category: category,
+      riskLevel: riskLevel ?? this.riskLevel,
+      summaryTitle: summaryTitle ?? this.summaryTitle,
+      summaryDetail: summaryDetail ?? this.summaryDetail,
+      dominantColorValue: dominantColorValue,
+      observations: observations ?? this.observations,
+      recommendations: recommendations ?? this.recommendations,
+      warningFlags: warningFlags ?? this.warningFlags,
+      confidence: confidence ?? this.confidence,
+      createdAt: createdAt,
+      whiteBalanceCalibrated:
+          whiteBalanceCalibrated ?? this.whiteBalanceCalibrated,
+      lightingNote: lightingNote ?? this.lightingNote,
+      baselineDeltaE: baselineDeltaE ?? this.baselineDeltaE,
+      baselineComparisonNote:
+          baselineComparisonNote ?? this.baselineComparisonNote,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -91,6 +133,11 @@ class AnalysisResult {
       'warningFlags': warningFlags,
       'confidence': confidence,
       'createdAt': createdAt.toIso8601String(),
+      'whiteBalanceCalibrated': whiteBalanceCalibrated,
+      if (lightingNote != null) 'lightingNote': lightingNote,
+      if (baselineDeltaE != null) 'baselineDeltaE': baselineDeltaE,
+      if (baselineComparisonNote != null)
+        'baselineComparisonNote': baselineComparisonNote,
     };
   }
 
@@ -108,6 +155,11 @@ class AnalysisResult {
       warningFlags: (json['warningFlags'] as List<dynamic>).cast<String>(),
       confidence: (json['confidence'] as num).toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      whiteBalanceCalibrated:
+          (json['whiteBalanceCalibrated'] as bool?) ?? false,
+      lightingNote: json['lightingNote'] as String?,
+      baselineDeltaE: (json['baselineDeltaE'] as num?)?.toDouble(),
+      baselineComparisonNote: json['baselineComparisonNote'] as String?,
     );
   }
 }

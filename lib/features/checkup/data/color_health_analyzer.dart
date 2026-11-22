@@ -1,57 +1,76 @@
-import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
+import 'package:visualcheckup/core/color/color_calibrator.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
-import 'package:image/image.dart' as img;
 
-/// On-device RGB/HSV color sampling analyzer for MVP screening.
-///
-/// Samples the central 40% x 40% region of the captured image (matching the
-/// camera framing guide) and evaluates lighting quality plus category-specific
-/// visual cues. Designed to be replaced or augmented by TFLite / Vision AI.
+/// On-device CIE L*a*b* + HSV color analyzer with optional white-reference
+/// chromatic adaptation (Von Kries), glare/shadow filtering, lighting-cast
+/// detection, and personal baseline comparison.
 class ColorHealthAnalyzer implements HealthAnalyzer {
   @override
   Future<AnalysisResult> analyzeImage({
     required CheckCategory category,
     required Uint8List imageBytes,
+    AnalysisOptions options = const AnalysisOptions(),
   }) async {
     final decoded = img.decodeImage(imageBytes);
     if (decoded == null) {
       throw const FormatException('Görüntü çözümlenemedi.');
     }
 
-    final startX = (decoded.width * 0.30).round().clamp(0, decoded.width - 1);
-    final endX = (decoded.width * 0.70).round().clamp(startX + 1, decoded.width);
-    final startY = (decoded.height * 0.30).round().clamp(0, decoded.height - 1);
-    final endY =
-        (decoded.height * 0.70).round().clamp(startY + 1, decoded.height);
+    final sample = ColorCalibrator.sampleImage(
+      image: decoded,
+      useWhiteReference: options.useWhiteReference,
+    );
 
-    final stepX = math.max(1, ((endX - startX) / 40).round());
-    final stepY = math.max(1, ((endY - startY) / 40).round());
+    final c = sample.calibratedColor;
+    final r = (c.r * 255).round().clamp(0, 255);
+    final g = (c.g * 255).round().clamp(0, 255);
+    final b = (c.b * 255).round().clamp(0, 255);
 
-    double sumR = 0;
-    double sumG = 0;
-    double sumB = 0;
-    int count = 0;
+    var result = analyzeRgb(
+      category: category,
+      r: r,
+      g: g,
+      b: b,
+      baseline: options.baseline,
+    );
 
-    for (int y = startY; y < endY; y += stepY) {
-      for (int x = startX; x < endX; x += stepX) {
-        final pixel = decoded.getPixel(x, y);
-        sumR += pixel.r.toDouble();
-        sumG += pixel.g.toDouble();
-        sumB += pixel.b.toDouble();
-        count++;
+    final extraObservations = <String>[];
+    var adjustedConfidence = result.confidence;
+
+    if (sample.whiteBalanceApplied) {
+      adjustedConfidence = (adjustedConfidence + 0.08).clamp(0.25, 0.92);
+      extraObservations.add(
+        'Beyaz referans kutusu ile cihaz ve ortam ışığı dengelendi.',
+      );
+    } else if (sample.lightingCast == LightingCast.warmYellow ||
+        sample.lightingCast == LightingCast.coolBlue) {
+      adjustedConfidence = (adjustedConfidence - 0.12).clamp(0.25, 0.90);
+      if (sample.lightingNote != null) {
+        extraObservations.add(sample.lightingNote!);
       }
     }
 
-    final avgR = (sumR / math.max(1, count)).round().clamp(0, 255);
-    final avgG = (sumG / math.max(1, count)).round().clamp(0, 255);
-    final avgB = (sumB / math.max(1, count)).round().clamp(0, 255);
+    if (sample.glareFilteredRatio >= 0.12) {
+      extraObservations.add(
+        'Islak/parlak yüzey yansıması otomatik filtrelenerek ölçüldü.',
+      );
+    }
 
-    return analyzeRgb(category: category, r: avgR, g: avgG, b: avgB);
+    result = result.copyWith(
+      confidence: adjustedConfidence,
+      whiteBalanceCalibrated: sample.whiteBalanceApplied,
+      lightingNote: sample.lightingNote,
+      observations: [...result.observations, ...extraObservations],
+    );
+
+    return result;
   }
 
   AnalysisResult analyzeRgb({
@@ -59,9 +78,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     required int r,
     required int g,
     required int b,
+    CategoryBaseline? baseline,
   }) {
     final color = Color.fromARGB(255, r, g, b);
     final hsv = HSVColor.fromColor(color);
+    final lab = LabColor.fromRgb(r, g, b);
     final h = hsv.hue; // 0..360
     final s = hsv.saturation; // 0..1
     final v = hsv.value; // 0..1
@@ -92,22 +113,43 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
+    AnalysisResult result;
     switch (category) {
       case CheckCategory.eye:
-        return _evaluateEye(id, color, h, s, v, now);
+        result = _evaluateEye(id, color, h, s, v, lab, now);
       case CheckCategory.nail:
-        return _evaluateNail(id, color, h, s, v, now);
+        result = _evaluateNail(id, color, h, s, v, lab, now);
       case CheckCategory.tongue:
-        return _evaluateTongue(id, color, h, s, v, now);
+        result = _evaluateTongue(id, color, h, s, v, lab, now);
       case CheckCategory.face:
-        return _evaluateFace(id, color, h, s, v, now);
       case CheckCategory.skinCondition:
-        return _evaluateFace(id, color, h, s, v, now);
+        result = _evaluateFace(id, color, h, s, v, lab, now);
       case CheckCategory.urine:
-        return _evaluateUrine(id, color, h, s, v, now);
+        result = _evaluateUrine(id, color, h, s, v, lab, now);
       case CheckCategory.stool:
-        return _evaluateStool(id, color, h, s, v, now);
+        result = _evaluateStool(id, color, h, s, v, now);
     }
+
+    if (baseline != null) {
+      final comparison = baseline.compare(lab);
+      final updatedObservations = [
+        ...result.observations,
+        comparison.note,
+      ];
+      // Escalate normal -> attention when a significant personal shift occurs.
+      final updatedRisk =
+          result.riskLevel == RiskLevel.normal && comparison.isSignificantShift
+              ? RiskLevel.attention
+              : result.riskLevel;
+      result = result.copyWith(
+        riskLevel: updatedRisk,
+        baselineDeltaE: comparison.deltaE,
+        baselineComparisonNote: comparison.note,
+        observations: updatedObservations,
+      );
+    }
+
+    return result;
   }
 
   AnalysisResult _evaluateEye(
@@ -116,10 +158,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     double h,
     double s,
     double v,
+    LabColor lab,
     DateTime now,
   ) {
-    // Yellowish sclera check
-    if (h >= 38 && h <= 68 && s >= 0.25) {
+    // Yellowish sclera check (HSV hue + perceptual Lab b* yellow channel)
+    if ((h >= 38 && h <= 68 && s >= 0.25) || (lab.b >= 18.0 && lab.l >= 55.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.eye,
@@ -196,10 +239,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     double h,
     double s,
     double v,
+    LabColor lab,
     DateTime now,
   ) {
-    // Bluish / cyanotic tint
-    if (h >= 190 && h <= 275 && s >= 0.22) {
+    // Bluish / cyanotic tint (HSV hue + Lab negative b* blue channel)
+    if ((h >= 190 && h <= 275 && s >= 0.22) || lab.b <= -10.0) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.nail,
@@ -224,7 +268,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     }
 
     // Yellowish nail
-    if (h >= 38 && h <= 68 && s >= 0.32) {
+    if ((h >= 38 && h <= 68 && s >= 0.32) || (lab.b >= 24.0 && lab.a < 15.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.nail,
@@ -293,6 +337,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     double h,
     double s,
     double v,
+    LabColor lab,
     DateTime now,
   ) {
     // Whitish coating
@@ -318,8 +363,8 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
-    // Yellowish coating
-    if (h >= 35 && h <= 70 && s >= 0.25) {
+    // Yellowish coating (HSV + Lab b* channel)
+    if ((h >= 35 && h <= 70 && s >= 0.25) || (lab.b >= 22.0 && lab.a < 18.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.tongue,
@@ -391,9 +436,10 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     double h,
     double s,
     double v,
+    LabColor lab,
     DateTime now,
   ) {
-    if (h >= 40 && h <= 65 && s >= 0.42) {
+    if ((h >= 40 && h <= 65 && s >= 0.42) || (lab.b >= 34.0 && lab.a < 18.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.face,
@@ -417,7 +463,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
-    if ((h <= 15 || h >= 345) && s >= 0.48) {
+    if (((h <= 15 || h >= 345) && s >= 0.48) || lab.a >= 32.0) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.face,
@@ -464,10 +510,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     double h,
     double s,
     double v,
+    LabColor lab,
     DateTime now,
   ) {
     // Reddish / pinkish -> possible hematuria (or beetroot/medication)
-    if ((h <= 18 || h >= 335) && s >= 0.30) {
+    if (((h <= 18 || h >= 335) && s >= 0.30) || (lab.a >= 24.0 && lab.b < 28.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.urine,
@@ -492,7 +539,8 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     }
 
     // Dark amber / brown -> strong dehydration or liver/bile signal
-    if (h >= 18 && h <= 45 && v < 0.58 && s >= 0.45) {
+    if ((h >= 18 && h <= 45 && v < 0.58 && s >= 0.45) ||
+        (lab.l < 48.0 && lab.b >= 22.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.urine,
@@ -517,7 +565,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     }
 
     // Saturated yellow -> mild/moderate dehydration
-    if (h >= 38 && h <= 68 && s >= 0.45) {
+    if ((h >= 38 && h <= 68 && s >= 0.45) || lab.b >= 38.0) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.urine,

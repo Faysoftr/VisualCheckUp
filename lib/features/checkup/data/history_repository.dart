@@ -1,11 +1,14 @@
 import 'dart:convert';
 
-import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 class HistoryRepository {
   static const String _historyKey = 'visualcheckup_history_v1';
   static const String _disclaimerAcceptedKey = 'visualcheckup_disclaimer_v1';
+  static const String _baselinesKey = 'visualcheckup_baselines_v1';
 
   Future<List<AnalysisResult>> loadHistory() async {
     final prefs = await SharedPreferences.getInstance();
@@ -52,5 +55,56 @@ class HistoryRepository {
   Future<void> setDisclaimerAccepted() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_disclaimerAcceptedKey, true);
+  }
+
+  Future<Map<CheckCategory, CategoryBaseline>> loadBaselines() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_baselinesKey);
+    if (raw == null || raw.isEmpty) return {};
+
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final map = <CheckCategory, CategoryBaseline>{};
+      for (final entry in decoded.entries) {
+        try {
+          final baseline = CategoryBaseline.fromJson(
+            entry.value as Map<String, dynamic>,
+          );
+          map[baseline.category] = baseline;
+        } catch (_) {
+          // Skip malformed baseline entry
+        }
+      }
+      return map;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<CategoryBaseline?> getBaseline(CheckCategory category) async {
+    final baselines = await loadBaselines();
+    return baselines[category];
+  }
+
+  Future<void> saveBaseline(CategoryBaseline baseline) async {
+    final prefs = await SharedPreferences.getInstance();
+    final baselines = await loadBaselines();
+    baselines[baseline.category] = baseline;
+    final payload = {
+      for (final entry in baselines.entries)
+        entry.key.id: entry.value.toJson(),
+    };
+    await prefs.setString(_baselinesKey, jsonEncode(payload));
+  }
+
+  Future<void> deleteBaseline(CheckCategory category) async {
+    final prefs = await SharedPreferences.getInstance();
+    final baselines = await loadBaselines();
+    baselines.remove(category);
+    final payload = {
+      for (final entry in baselines.entries)
+        entry.key.id: entry.value.toJson(),
+    };
+    await prefs.setString(_baselinesKey, jsonEncode(payload));
   }
 }

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
@@ -37,14 +38,24 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   bool _isProcessing = false;
   bool _torchEnabled = false;
   bool _openedSettings = false;
+  late bool _useWhiteReference;
+  CategoryBaseline? _baseline;
   CameraPermissionState _permissionState = CameraPermissionState.granted;
   String? _cameraError;
 
   @override
   void initState() {
     super.initState();
+    _useWhiteReference = widget.category.recommendsWhiteReference;
     WidgetsBinding.instance.addObserver(this);
+    _loadBaseline();
     _initCamera();
+  }
+
+  Future<void> _loadBaseline() async {
+    final saved = await widget.historyRepository.getBaseline(widget.category);
+    if (!mounted) return;
+    setState(() => _baseline = saved);
   }
 
   @override
@@ -304,6 +315,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       final result = await widget.analyzer.analyzeImage(
         category: widget.category,
         imageBytes: bytes,
+        options: AnalysisOptions(
+          useWhiteReference: _useWhiteReference,
+          baseline: _baseline,
+        ),
       );
       await _openResult(result);
     } catch (_) {
@@ -323,7 +338,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     setState(() => _isProcessing = false);
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => ResultScreen(result: result),
+        builder: (_) => ResultScreen(
+          result: result,
+          historyRepository: widget.historyRepository,
+        ),
       ),
     );
   }
@@ -349,7 +367,9 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
               onPressed: _toggleTorch,
               tooltip: _torchEnabled ? 'Işığı Kapat' : 'Işığı Aç',
               icon: Icon(
-                _torchEnabled ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                _torchEnabled
+                    ? Icons.flash_on_rounded
+                    : Icons.flash_off_rounded,
               ),
             ),
           if (_cameras.length > 1)
@@ -362,34 +382,131 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       ),
       body: Column(
         children: [
-          // Top guidance bar
+          // Top guidance & calibration bar
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
             color: const Color(0xFF141A1A),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.wb_sunny_outlined,
-                  size: 18,
-                  color: widget.category.accentColor,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    widget.category.captureGuide,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      height: 1.35,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.wb_sunny_outlined,
+                      size: 18,
+                      color: widget.category.accentColor,
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        widget.category.captureGuide,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => setState(
+                        () => _useWhiteReference = !_useWhiteReference,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _useWhiteReference
+                              ? const Color(0xFF17A398).withValues(alpha: 0.25)
+                              : Colors.white10,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: _useWhiteReference
+                                ? const Color(0xFF17A398)
+                                : Colors.white24,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _useWhiteReference
+                                  ? Icons.wb_auto_rounded
+                                  : Icons.wb_auto_outlined,
+                              size: 14,
+                              color: _useWhiteReference
+                                  ? const Color(0xFF5CE1D6)
+                                  : Colors.white60,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _useWhiteReference
+                                  ? 'Beyaz Referans: Açık'
+                                  : 'Beyaz Referans: Kapalı',
+                              style: TextStyle(
+                                color: _useWhiteReference
+                                    ? Colors.white
+                                    : Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_baseline != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: _baseline!.color,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white70),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'Kişisel Normal Aktif',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Camera preview + framing reticle
+          // Camera preview + framing reticles
           Expanded(
             child: Stack(
               fit: StackFit.expand,
@@ -397,18 +514,65 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                 _buildPreviewArea(),
                 if (_controller != null && _controller!.value.isInitialized)
                   IgnorePointer(
-                    child: Center(
-                      child: Container(
-                        width: 220,
-                        height: 220,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            width: 2.5,
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                      ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final h = constraints.maxHeight;
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Center(
+                              child: Container(
+                                width: 210,
+                                height: 210,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    width: 2.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                              ),
+                            ),
+                            if (_useWhiteReference)
+                              Positioned(
+                                top: h * 0.74,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: Container(
+                                    width: 170,
+                                    height: (h * 0.14).clamp(44.0, 76.0),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.10),
+                                      border: Border.all(
+                                        color: const Color(0xFF5CE1D6),
+                                        width: 1.8,
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'Beyaz Referans\n(Kağıt / Beyaz Zemin)',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black87,
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 if (_isProcessing)
@@ -421,7 +585,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                           CircularProgressIndicator(color: Colors.white),
                           SizedBox(height: 12),
                           Text(
-                            'Görsel ton ve ipuçları analiz ediliyor...',
+                            'Renk kalibrasyonu ve analiz yapılıyor...',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],

@@ -155,8 +155,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute<void>(
-                                      builder: (_) =>
-                                          ResultScreen(result: item),
+                                      builder: (_) => ResultScreen(
+                                        result: item,
+                                        historyRepository:
+                                            widget.historyRepository,
+                                      ),
                                     ),
                                   );
                                 },

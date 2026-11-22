@@ -1,19 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
-import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
-import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:intl/intl.dart';
+import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/features/checkup/data/history_repository.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   const ResultScreen({
     super.key,
     required this.result,
+    this.historyRepository,
   });
 
   final AnalysisResult result;
+  final HistoryRepository? historyRepository;
+
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  CategoryBaseline? _savedBaseline;
+  bool _savingBaseline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBaseline();
+  }
+
+  Future<void> _loadBaseline() async {
+    final repo = widget.historyRepository;
+    if (repo == null) return;
+    final baseline = await repo.getBaseline(widget.result.category);
+    if (!mounted) return;
+    setState(() => _savedBaseline = baseline);
+  }
+
+  Future<void> _saveAsPersonalBaseline() async {
+    final repo = widget.historyRepository;
+    if (repo == null || _savingBaseline) return;
+    setState(() => _savingBaseline = true);
+
+    final baseline = CategoryBaseline.fromColor(
+      category: widget.result.category,
+      color: widget.result.dominantColor,
+      calibratedWithWhiteRef: widget.result.whiteBalanceCalibrated,
+    );
+    await repo.saveBaseline(baseline);
+
+    if (!mounted) return;
+    setState(() {
+      _savedBaseline = baseline;
+      _savingBaseline = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${widget.result.category.title} için kişisel normal tonunuz kaydedildi.',
+        ),
+      ),
+    );
+  }
+
+  Future<void> _clearPersonalBaseline() async {
+    final repo = widget.historyRepository;
+    if (repo == null || _savingBaseline) return;
+    setState(() => _savingBaseline = true);
+    await repo.deleteBaseline(widget.result.category);
+    if (!mounted) return;
+    setState(() {
+      _savedBaseline = null;
+      _savingBaseline = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${widget.result.category.title} kişisel normal kaydı kaldırıldı.',
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final result = widget.result;
     final theme = Theme.of(context);
     final riskColor = result.riskLevel.color;
     final dateText = DateFormat('dd.MM.yyyy HH:mm').format(result.createdAt);
@@ -108,7 +180,9 @@ class ResultScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Örneklenen Baskın Renk Tonu',
+                              result.whiteBalanceCalibrated
+                                  ? 'Kalibre Edilmiş Renk Tonu'
+                                  : 'Örneklenen Baskın Renk Tonu',
                               style: theme.textTheme.labelMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -124,10 +198,108 @@ class ResultScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (result.whiteBalanceCalibrated ||
+                      result.lightingNote != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: result.whiteBalanceCalibrated
+                            ? const Color(0xFF1B8A5A).withValues(alpha: 0.10)
+                            : const Color(0xFFD9822B).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            result.whiteBalanceCalibrated
+                                ? Icons.wb_auto_rounded
+                                : Icons.wb_incandescent_outlined,
+                            size: 16,
+                            color: result.whiteBalanceCalibrated
+                                ? const Color(0xFF1B8A5A)
+                                : const Color(0xFFD9822B),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              result.lightingNote ??
+                                  'Beyaz referans ile renk dengelendi.',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                height: 1.35,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
+
+          if (result.baselineComparisonNote != null) ...[
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.compare_outlined,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kişisel Normal Karşılaştırması',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        if (_savedBaseline != null) ...[
+                          _SwatchBadge(
+                            color: _savedBaseline!.color,
+                            label: 'Normaliniz',
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.arrow_forward_rounded, size: 16),
+                          ),
+                        ],
+                        _SwatchBadge(
+                          color: result.dominantColor,
+                          label: 'Bugün',
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            result.baselineComparisonNote!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
 
           if (result.warningFlags.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -197,6 +369,68 @@ class ResultScreen extends StatelessWidget {
             ),
           ],
 
+          if (widget.historyRepository != null) ...[
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kişisel Normal (Bazal) Kalibrasyon',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Kendinizi sağlıklı hissettiğiniz bir günde bu ölçümü kişisel normaliniz olarak kaydedin; telefonunuzun kamera sensörüne özel sapmaları azaltır.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed:
+                              _savingBaseline ? null : _saveAsPersonalBaseline,
+                          icon: const Icon(Icons.bookmark_add_outlined),
+                          label: Text(
+                            _savedBaseline == null
+                                ? 'Kişisel Normalim Olarak Kaydet'
+                                : 'Kişisel Normalimi Güncelle',
+                          ),
+                        ),
+                        if (_savedBaseline != null)
+                          TextButton.icon(
+                            onPressed:
+                                _savingBaseline ? null : _clearPersonalBaseline,
+                            icon: const Icon(Icons.delete_outline, size: 18),
+                            label: const Text('Kaydı Sil'),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
@@ -235,6 +469,42 @@ class ResultScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SwatchBadge extends StatelessWidget {
+  const _SwatchBadge({
+    required this.color,
+    required this.label,
+  });
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 }

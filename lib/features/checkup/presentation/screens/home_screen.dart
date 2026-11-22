@@ -239,7 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute<void>(
-                            builder: (_) => ResultScreen(result: item),
+                            builder: (_) => ResultScreen(
+                              result: item,
+                              historyRepository: widget.historyRepository,
+                            ),
                           ),
                         );
                       },
