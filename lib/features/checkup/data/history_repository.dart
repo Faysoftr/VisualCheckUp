@@ -1,0 +1,56 @@
+import 'dart:convert';
+
+import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class HistoryRepository {
+  static const String _historyKey = 'healthcheck_history_v1';
+  static const String _disclaimerAcceptedKey = 'healthcheck_disclaimer_v1';
+
+  Future<List<AnalysisResult>> loadHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rawList = prefs.getStringList(_historyKey) ?? <String>[];
+    final results = <AnalysisResult>[];
+    for (final raw in rawList) {
+      try {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        results.add(AnalysisResult.fromJson(decoded));
+      } catch (_) {
+        // Ignore malformed legacy entries safely
+      }
+    }
+    results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return results;
+  }
+
+  Future<void> saveResult(AnalysisResult result) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await loadHistory();
+    final updated = [result, ...current].take(100).toList();
+    final encoded = updated.map((e) => jsonEncode(e.toJson())).toList();
+    await prefs.setStringList(_historyKey, encoded);
+  }
+
+  Future<void> deleteResult(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = await loadHistory();
+    final updated = current.where((e) => e.id != id).toList();
+    final encoded = updated.map((e) => jsonEncode(e.toJson())).toList();
+    await prefs.setStringList(_historyKey, encoded);
+  }
+
+  Future<void> clearHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_historyKey);
+  }
+
+  Future<bool> isDisclaimerAccepted() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_disclaimerAcceptedKey) ?? false;
+  }
+
+  Future<void> setDisclaimerAccepted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_disclaimerAcceptedKey, true);
+  }
+}
