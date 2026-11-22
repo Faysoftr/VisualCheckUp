@@ -1,4 +1,4 @@
-# HealthCheck (Android & iOS)
+# VisualCheckUp (Android & iOS)
 
 Kamera yardımıyla **göz (sklera), tırnak, dil, yüz/cilt, idrar rengi ve dışkı rengi** üzerinden görsel ön farkındalık değerlendirmesi sunan Flutter tabanlı mobil uygulama temeli.
 

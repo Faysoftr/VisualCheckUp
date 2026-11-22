@@ -5,7 +5,7 @@ class MedicalDisclaimer {
       'Bu uygulama tıbbi teşhis koymaz; yalnızca bilgilendirme ve ön farkındalık amaçlıdır.';
 
   static const String fullText =
-      'HealthCheck, kamera görüntüleri üzerinden genel renk ve görsel ipuçlarına dayalı '
+      'VisualCheckUp, kamera görüntüleri üzerinden genel renk ve görsel ipuçlarına dayalı '
       'bir ön değerlendirme sunar. Tıbbi bir cihaz değildir ve kesinlikle doktor muayenesi, '
       'laboratuvar testi veya tıbbi teşhis yerine geçmez.\n\n'
       '• Ortam ışığı, kamera sensörü ve telefon ekranı renk algısını doğrudan etkiler.\n'

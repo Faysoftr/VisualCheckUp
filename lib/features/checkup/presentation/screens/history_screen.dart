@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/features/checkup/data/history_repository.dart';
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
-import 'package:healthcheck/features/checkup/presentation/screens/result_screen.dart';
+import 'package:visualcheckup/features/checkup/data/history_repository.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
 import 'package:intl/intl.dart';
 
 class HistoryScreen extends StatefulWidget {

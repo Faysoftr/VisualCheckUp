@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 class CategoryCard extends StatelessWidget {
   const CategoryCard({

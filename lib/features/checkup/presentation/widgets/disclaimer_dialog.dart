@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
 
 class DisclaimerDialog extends StatelessWidget {
   const DisclaimerDialog({super.key});

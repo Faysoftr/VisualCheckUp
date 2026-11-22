@@ -1,4 +1,4 @@
-package com.faysoft.healthcheck
+package com.faysoft.visualcheckup
 
 import io.flutter.embedding.android.FlutterActivity
 

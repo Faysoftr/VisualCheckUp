@@ -2,9 +2,9 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
-import 'package:healthcheck/features/checkup/domain/health_analyzer.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
 import 'package:image/image.dart' as img;
 
 /// On-device RGB/HSV color sampling analyzer for MVP screening.

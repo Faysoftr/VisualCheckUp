@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 /// Abstraction for image-based health screening analyzers.
 ///

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/core/theme/app_theme.dart';
-import 'package:healthcheck/features/checkup/data/color_health_analyzer.dart';
-import 'package:healthcheck/features/checkup/data/history_repository.dart';
-import 'package:healthcheck/features/checkup/presentation/screens/home_screen.dart';
+import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
+import 'package:visualcheckup/features/checkup/data/history_repository.dart';
+import 'package:visualcheckup/features/checkup/presentation/screens/home_screen.dart';
 
-class HealthCheckApp extends StatelessWidget {
-  const HealthCheckApp({super.key});
+class VisualCheckUpApp extends StatelessWidget {
+  const VisualCheckUpApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class HealthCheckApp extends StatelessWidget {
     final historyRepository = HistoryRepository();
 
     return MaterialApp(
-      title: 'HealthCheck',
+      title: 'VisualCheckUp',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

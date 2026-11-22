@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryRepository {
-  static const String _historyKey = 'healthcheck_history_v1';
-  static const String _disclaimerAcceptedKey = 'healthcheck_disclaimer_v1';
+  static const String _historyKey = 'visualcheckup_history_v1';
+  static const String _disclaimerAcceptedKey = 'visualcheckup_disclaimer_v1';
 
   Future<List<AnalysisResult>> loadHistory() async {
     final prefs = await SharedPreferences.getInstance();

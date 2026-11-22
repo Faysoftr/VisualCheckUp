@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/core/constants/medical_disclaimer.dart';
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:intl/intl.dart';
 
 class ResultScreen extends StatelessWidget {
