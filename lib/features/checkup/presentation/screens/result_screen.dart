@@ -5,6 +5,7 @@ import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({
@@ -93,6 +94,13 @@ class _ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${result.category.title} Sonucu'),
+        actions: [
+          IconButton(
+            onPressed: () => ModuleReferenceSheet.show(context, result.category),
+            tooltip: 'Referans Rehberi',
+            icon: const Icon(Icons.menu_book_outlined),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),

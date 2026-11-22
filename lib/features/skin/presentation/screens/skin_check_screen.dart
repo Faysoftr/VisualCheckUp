@@ -4,6 +4,7 @@ import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/camera_check_screen.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 import 'package:visualcheckup/features/skin/data/skin_condition_analyzer.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 
@@ -65,6 +66,16 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cilt Hastalıkları Ön Kontrol'),
+        actions: [
+          IconButton(
+            onPressed: () => ModuleReferenceSheet.show(
+              context,
+              CheckCategory.skinCondition,
+            ),
+            tooltip: 'Cilt Referans Rehberi',
+            icon: const Icon(Icons.menu_book_outlined),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),

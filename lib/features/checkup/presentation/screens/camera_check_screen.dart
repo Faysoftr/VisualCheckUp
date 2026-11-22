@@ -10,6 +10,7 @@ import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 
 class CameraCheckScreen extends StatefulWidget {
   const CameraCheckScreen({
@@ -362,6 +363,11 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
         foregroundColor: Colors.white,
         title: Text('${widget.category.title} Kontrolü'),
         actions: [
+          IconButton(
+            onPressed: () => ModuleReferenceSheet.show(context, widget.category),
+            tooltip: 'Referans Rehberi',
+            icon: const Icon(Icons.menu_book_outlined),
+          ),
           if (_supportsTorch)
             IconButton(
               onPressed: _toggleTorch,
