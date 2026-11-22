@@ -101,6 +101,8 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         return _evaluateTongue(id, color, h, s, v, now);
       case CheckCategory.face:
         return _evaluateFace(id, color, h, s, v, now);
+      case CheckCategory.skinCondition:
+        return _evaluateFace(id, color, h, s, v, now);
       case CheckCategory.urine:
         return _evaluateUrine(id, color, h, s, v, now);
       case CheckCategory.stool:

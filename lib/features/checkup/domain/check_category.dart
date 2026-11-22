@@ -5,6 +5,7 @@ enum CheckCategory {
   nail,
   tongue,
   face,
+  skinCondition,
   urine,
   stool,
 }
@@ -22,6 +23,8 @@ extension CheckCategoryX on CheckCategory {
         return 'Dil';
       case CheckCategory.face:
         return 'Yüz & Cilt';
+      case CheckCategory.skinCondition:
+        return 'Cilt Hastalıkları';
       case CheckCategory.urine:
         return 'İdrar Rengi';
       case CheckCategory.stool:
@@ -39,6 +42,8 @@ extension CheckCategoryX on CheckCategory {
         return 'Renk, beyaz/sarı tabaka ve kuruluk';
       case CheckCategory.face:
         return 'Cilt tonu, solgunluk ve kızarıklık';
+      case CheckCategory.skinCondition:
+        return 'Döküntü, leke, pullanma ve ben ön kontrolü';
       case CheckCategory.urine:
         return 'Hidrasyon ve renk skalası kontrolü';
       case CheckCategory.stool:
@@ -56,6 +61,8 @@ extension CheckCategoryX on CheckCategory {
         return Icons.record_voice_over_outlined;
       case CheckCategory.face:
         return Icons.face_retouching_natural_outlined;
+      case CheckCategory.skinCondition:
+        return Icons.healing_outlined;
       case CheckCategory.urine:
         return Icons.water_drop_outlined;
       case CheckCategory.stool:
@@ -73,6 +80,8 @@ extension CheckCategoryX on CheckCategory {
         return const Color(0xFFD65A6F);
       case CheckCategory.face:
         return const Color(0xFFE07A5F);
+      case CheckCategory.skinCondition:
+        return const Color(0xFFC8553D);
       case CheckCategory.urine:
         return const Color(0xFFD99B26);
       case CheckCategory.stool:
@@ -90,6 +99,8 @@ extension CheckCategoryX on CheckCategory {
         return 'Yemek/içecekten en az 30 dk sonra, gün ışığında dilinizi hafifçe dışarı çıkarıp çerçeveleyin.';
       case CheckCategory.face:
         return 'Makyajsız ve doğrudan gün ışığı alan bir ortamda yüzünüzü çerçeveye ortalayın.';
+      case CheckCategory.skinCondition:
+        return 'Doğal gün ışığında, 10–15 cm mesafeden lezyon veya döküntüyü ortalayın; çevresinde sağlıklı ciltten de küçük bir alan bulunsun.';
       case CheckCategory.urine:
         return 'İyi aydınlatılmış beyaz bir arka plan önünde örneği çerçeve içine alın.';
       case CheckCategory.stool:
@@ -104,6 +115,7 @@ extension CheckCategoryX on CheckCategory {
       case CheckCategory.face:
         return true;
       case CheckCategory.nail:
+      case CheckCategory.skinCondition:
       case CheckCategory.urine:
       case CheckCategory.stool:
         return false;

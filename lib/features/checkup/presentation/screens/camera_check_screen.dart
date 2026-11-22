@@ -2,12 +2,13 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CameraCheckScreen extends StatefulWidget {
   const CameraCheckScreen({
@@ -15,31 +16,92 @@ class CameraCheckScreen extends StatefulWidget {
     required this.category,
     required this.analyzer,
     required this.historyRepository,
+    this.permissionService = const PermissionHandlerCameraService(),
   });
 
   final CheckCategory category;
-  final ColorHealthAnalyzer analyzer;
+  final HealthAnalyzer analyzer;
   final HistoryRepository historyRepository;
+  final CameraPermissionService permissionService;
 
   @override
   State<CameraCheckScreen> createState() => _CameraCheckScreenState();
 }
 
-class _CameraCheckScreenState extends State<CameraCheckScreen> {
+class _CameraCheckScreenState extends State<CameraCheckScreen>
+    with WidgetsBindingObserver {
   List<CameraDescription> _cameras = const [];
   CameraController? _controller;
   int _selectedCameraIndex = 0;
   bool _isInitializing = true;
   bool _isProcessing = false;
+  bool _torchEnabled = false;
+  bool _openedSettings = false;
+  CameraPermissionState _permissionState = CameraPermissionState.granted;
   String? _cameraError;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initCamera();
   }
 
-  Future<void> _initCamera() async {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final controller = _controller;
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      if (controller != null && controller.value.isInitialized) {
+        _controller = null;
+        _torchEnabled = false;
+        controller.dispose();
+      }
+      return;
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      if (_openedSettings) {
+        _openedSettings = false;
+        _initCamera(requestIfDenied: false);
+      } else if (_permissionState == CameraPermissionState.granted &&
+          _controller == null &&
+          !_isInitializing) {
+        _initCamera(requestIfDenied: false);
+      }
+    }
+  }
+
+  Future<void> _initCamera({bool requestIfDenied = true}) async {
+    if (mounted) {
+      setState(() {
+        _isInitializing = true;
+        _cameraError = null;
+      });
+    }
+
+    var permission = await widget.permissionService.checkCamera();
+    if (permission == CameraPermissionState.denied && requestIfDenied) {
+      permission = await widget.permissionService.requestCamera();
+    }
+
+    if (!mounted) return;
+
+    if (permission != CameraPermissionState.granted) {
+      setState(() {
+        _permissionState = permission;
+        _isInitializing = false;
+        _cameraError = permission == CameraPermissionState.permanentlyDenied ||
+                permission == CameraPermissionState.restricted
+            ? 'Kamera izni cihaz ayarlarından kapatılmış. Ayarlardan VisualCheckUp için kamera iznini açabilir veya galeriden fotoğraf seçebilirsiniz.'
+            : 'Görsel ön kontrol yapabilmek için kamera izni gerekiyor. Görüntüler yalnızca cihazınızda işlenir ve sunucuya gönderilmez.';
+      });
+      return;
+    }
+
+    _permissionState = CameraPermissionState.granted;
+
     try {
       final cameras = await availableCameras();
       if (!mounted) return;
@@ -62,7 +124,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
 
       _cameras = cameras;
       await _startController(index);
-    } catch (e) {
+    } on CameraException catch (e) {
+      if (!mounted) return;
+      _handleCameraException(e);
+    } catch (_) {
       if (!mounted) return;
       setState(() {
         _isInitializing = false;
@@ -72,9 +137,57 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
     }
   }
 
+  void _handleCameraException(CameraException e) {
+    final code = e.code.toLowerCase();
+    if (code.contains('accessdeniedwithoutprompt') ||
+        code.contains('restricted')) {
+      setState(() {
+        _permissionState = CameraPermissionState.permanentlyDenied;
+        _isInitializing = false;
+        _cameraError =
+            'Kamera erişimi cihaz ayarlarından engellenmiş. Ayarları açıp VisualCheckUp için kamera iznini etkinleştirin.';
+      });
+      return;
+    }
+    if (code.contains('accessdenied')) {
+      setState(() {
+        _permissionState = CameraPermissionState.denied;
+        _isInitializing = false;
+        _cameraError =
+            'Kamera izni verilmedi. Devam etmek için kamera izni verebilir veya galeriden fotoğraf seçebilirsiniz.';
+      });
+      return;
+    }
+    setState(() {
+      _isInitializing = false;
+      _cameraError =
+          'Kamera erişimi sağlanamadı. Galeriden fotoğraf seçebilirsiniz.';
+    });
+  }
+
+  Future<void> _requestPermissionAgain() async {
+    await _initCamera(requestIfDenied: true);
+  }
+
+  Future<void> _openAppSettings() async {
+    _openedSettings = true;
+    final opened = await widget.permissionService.openSettings();
+    if (!opened && mounted) {
+      _openedSettings = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Uygulama ayarları açılamadı. Lütfen cihaz ayarlarından kamera iznini manuel etkinleştirin.',
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _startController(int index) async {
     final previous = _controller;
     _controller = null;
+    _torchEnabled = false;
     await previous?.dispose();
 
     final controller = CameraController(
@@ -95,7 +208,11 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
         _isInitializing = false;
         _cameraError = null;
       });
-    } catch (e) {
+    } on CameraException catch (e) {
+      await controller.dispose();
+      if (!mounted) return;
+      _handleCameraException(e);
+    } catch (_) {
       await controller.dispose();
       if (!mounted) return;
       setState(() {
@@ -113,6 +230,31 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
     await _startController(nextIndex);
   }
 
+  bool get _supportsTorch {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return false;
+    if (_cameras.isEmpty) return false;
+    return _cameras[_selectedCameraIndex].lensDirection ==
+        CameraLensDirection.back;
+  }
+
+  Future<void> _toggleTorch() async {
+    final controller = _controller;
+    if (controller == null || !_supportsTorch || _isProcessing) return;
+    final next = !_torchEnabled;
+    try {
+      await controller.setFlashMode(next ? FlashMode.torch : FlashMode.off);
+      if (mounted) {
+        setState(() => _torchEnabled = next);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bu kamerada ışık/flaş açılamadı.')),
+      );
+    }
+  }
+
   Future<void> _captureAndAnalyze() async {
     final controller = _controller;
     if (controller == null || !controller.value.isInitialized || _isProcessing) {
@@ -124,7 +266,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
       final file = await controller.takePicture();
       final bytes = await file.readAsBytes();
       await _processBytes(bytes);
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Fotoğraf çekilirken bir hata oluştu.')),
@@ -148,7 +290,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
       }
       final bytes = await picked.readAsBytes();
       await _processBytes(bytes);
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Fotoğraf seçilemedi.')),
@@ -164,7 +306,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
         imageBytes: bytes,
       );
       await _openResult(result);
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -188,6 +330,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
   }
@@ -201,6 +344,14 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
         foregroundColor: Colors.white,
         title: Text('${widget.category.title} Kontrolü'),
         actions: [
+          if (_supportsTorch)
+            IconButton(
+              onPressed: _toggleTorch,
+              tooltip: _torchEnabled ? 'Işığı Kapat' : 'Işığı Aç',
+              icon: Icon(
+                _torchEnabled ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+              ),
+            ),
           if (_cameras.length > 1)
             IconButton(
               onPressed: _switchCamera,
@@ -270,7 +421,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
                           CircularProgressIndicator(color: Colors.white),
                           SizedBox(height: 12),
                           Text(
-                            'Renk tonu analiz ediliyor...',
+                            'Görsel ton ve ipuçları analiz ediliyor...',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -335,14 +486,21 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
     }
 
     if (_cameraError != null || _controller == null) {
+      final isPermanentlyDenied =
+          _permissionState == CameraPermissionState.permanentlyDenied ||
+              _permissionState == CameraPermissionState.restricted;
+      final isDenied = _permissionState == CameraPermissionState.denied;
+
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.no_photography_outlined,
+              Icon(
+                isPermanentlyDenied || isDenied
+                    ? Icons.lock_outline_rounded
+                    : Icons.no_photography_outlined,
                 color: Colors.white54,
                 size: 56,
               ),
@@ -350,14 +508,38 @@ class _CameraCheckScreenState extends State<CameraCheckScreen> {
               Text(
                 _cameraError ?? 'Kamera kullanılamıyor.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, height: 1.4),
+                style: const TextStyle(color: Colors.white70, height: 1.45),
               ),
               const SizedBox(height: 20),
-              FilledButton.icon(
-                onPressed: _pickFromGallery,
-                icon: const Icon(Icons.photo_library_outlined),
-                label: const Text('Galeriden Fotoğraf Seç'),
-              ),
+              if (isPermanentlyDenied)
+                FilledButton.icon(
+                  onPressed: _openAppSettings,
+                  icon: const Icon(Icons.settings_outlined),
+                  label: const Text('Ayarları Aç'),
+                )
+              else if (isDenied)
+                FilledButton.icon(
+                  onPressed: _requestPermissionAgain,
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Kamera İzni Ver'),
+                ),
+              if (isPermanentlyDenied || isDenied) const SizedBox(height: 10),
+              if (isPermanentlyDenied || isDenied)
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white38),
+                  ),
+                  onPressed: _pickFromGallery,
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: const Text('Galeriden Fotoğraf Seç'),
+                )
+              else
+                FilledButton.icon(
+                  onPressed: _pickFromGallery,
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: const Text('Galeriden Fotoğraf Seç'),
+                ),
             ],
           ),
         ),

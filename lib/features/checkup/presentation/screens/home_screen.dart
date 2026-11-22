@@ -9,6 +9,7 @@ import 'package:visualcheckup/features/checkup/presentation/screens/history_scre
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/category_card.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
+import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -57,6 +58,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openCategory(CheckCategory category) async {
+    if (category == CheckCategory.skinCondition) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => SkinCheckScreen(
+            historyRepository: widget.historyRepository,
+          ),
+        ),
+      );
+      await _loadRecent();
+      return;
+    }
+
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => CameraCheckScreen(
