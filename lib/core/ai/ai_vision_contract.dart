@@ -103,6 +103,7 @@ class AiVisionPromptBuilder {
     required CheckCategory category,
     required Uint8List imageBytes,
     String mimeType = 'image/jpeg',
+    String languageCode = 'tr',
     CalibratedSample? calibratedSample,
     CategoryBaseline? baseline,
     SkinCheckContext? skinContext,
@@ -150,10 +151,11 @@ class AiVisionPromptBuilder {
 
     final userPrompt = '''
 Modül: ${category.title} (${category.id})
+Yanıt dili (ISO-639-1): $languageCode
 Referanslar:
 $rubricLines
 Telemetri: ${telemetryParts.isEmpty ? 'yok' : telemetryParts.join(' | ')}
-Kural: Sadece listedeki matched_finding_ids kullan, en fazla 2 gözlem ve 2 öneri yaz, yalnızca JSON döndür.''';
+Kural: Sadece listedeki matched_finding_ids kullan, tüm metin alanlarını $languageCode dilinde yaz, en fazla 2 gözlem ve 2 öneri yaz, yalnızca JSON döndür.''';
 
     return AiVisionRequest(
       category: category,

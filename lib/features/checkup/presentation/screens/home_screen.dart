@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/ai/gemini_vision_ai_client.dart';
+import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
+import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
@@ -20,8 +23,11 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_d
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/screens/lab_reports_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/screens/vitals_tracker_screen.dart';
+import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 
@@ -34,6 +40,7 @@ class HomeScreen extends StatefulWidget {
     required this.themeController,
     required this.onSignOut,
     required this.onDeleteAccount,
+    this.localeController,
     this.labsVitalsRepository,
   });
 
@@ -42,6 +49,7 @@ class HomeScreen extends StatefulWidget {
   final LabsVitalsRepository? labsVitalsRepository;
   final AuthUser currentUser;
   final ThemeController themeController;
+  final LocaleController? localeController;
   final VoidCallback onSignOut;
   final VoidCallback onDeleteAccount;
 
@@ -53,9 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final LabsVitalsRepository _labsVitalsRepository;
   List<AnalysisResult> _allHistory = const [];
+  List<LabReportRecord> _labReports = const [];
+  List<BloodPressureReading> _bpReadings = const [];
+  List<BloodSugarReading> _sugarReadings = const [];
   Set<FollowUpTrack> _enabledTracks = FollowUpTrackX.defaultEnabled();
-  int _labReportCount = 0;
-  int _vitalsCount = 0;
+
+  int get _labReportCount => _labReports.length;
+  int get _vitalsCount => _bpReadings.length + _sugarReadings.length;
 
   List<AnalysisResult> get _recent => _allHistory.take(3).toList();
 
@@ -91,8 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _allHistory = history;
       _enabledTracks = tracks;
-      _labReportCount = labs.length;
-      _vitalsCount = bp.length + sugar.length;
+      _labReports = labs;
+      _bpReadings = bp;
+      _sugarReadings = sugar;
     });
   }
 
@@ -151,11 +164,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openCameraFor(CheckCategory category) async {
+    final hybridAnalyzer = HybridHealthAnalyzer(
+      fallbackAnalyzer: widget.analyzer,
+      aiClient: GeminiVisionAiClient.fromEnvironment(),
+      cacheRepository: widget.historyRepository,
+    );
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => CameraCheckScreen(
           category: category,
-          analyzer: widget.analyzer,
+          analyzer: hybridAnalyzer,
           historyRepository: widget.historyRepository,
         ),
       ),
@@ -322,17 +340,52 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       historyRepository: widget.historyRepository,
       history: _allHistory,
+      bloodPressureReadings: _bpReadings,
+      bloodSugarReadings: _sugarReadings,
+      labReports: _labReports,
       onStartTrack: _startTrack,
     );
     await _loadDashboardData();
   }
 
   Future<void> _startTrack(FollowUpTrack track) async {
-    if (track == FollowUpTrack.hydrationDaily) {
-      await _openQuickColorCard(CheckCategory.urine);
-      return;
+    switch (track) {
+      case FollowUpTrack.hydrationDaily:
+        await _openQuickColorCard(CheckCategory.urine);
+        return;
+      case FollowUpTrack.stoolWeekly:
+        await _openQuickColorCard(CheckCategory.stool);
+        return;
+      case FollowUpTrack.bloodPressureDaily:
+        await _openVitalsTracker(initialTabIndex: 0);
+        return;
+      case FollowUpTrack.bloodSugarDaily:
+        await _openVitalsTracker(initialTabIndex: 1);
+        return;
+      case FollowUpTrack.labReportQuarterly:
+        await _openLabReports();
+        return;
+      case FollowUpTrack.eyeWeekly:
+      case FollowUpTrack.tongueWeekly:
+      case FollowUpTrack.nailTongueWeekly:
+      case FollowUpTrack.faceBiWeekly:
+      case FollowUpTrack.skinMonthly:
+        await _openCategory(track.primaryCategory);
+        return;
     }
-    await _openCategory(track.primaryCategory);
+  }
+
+  Future<void> _openSettings() async {
+    final controller = widget.localeController ?? LocaleController();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SettingsScreen(
+          themeController: widget.themeController,
+          localeController: controller,
+          historyRepository: widget.historyRepository,
+        ),
+      ),
+    );
   }
 
   Future<void> _openHistory() async {
@@ -403,18 +456,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  String _greetingText() {
+  String _greetingText(BuildContext context) {
+    final l10n = context.l10n;
     if (widget.currentUser.isGuest) {
-      return 'Cilt & Görsel Sağlık Takibi';
+      return l10n.guestGreeting;
     }
     final firstName = widget.currentUser.displayName.trim().split(' ').first;
-    return 'Merhaba, $firstName';
+    return l10n.userGreeting(firstName);
   }
 
   FollowUpTrackStatus? _nextHighlightedTrack() {
     final active = FollowUpEvaluator.evaluate(
       enabledTracks: _enabledTracks,
       history: _allHistory,
+      bloodPressureReadings: _bpReadings,
+      bloodSugarReadings: _sugarReadings,
+      labReports: _labReports,
     ).where((s) => s.enabled).toList();
     if (active.isEmpty) return null;
     for (final status in active) {
@@ -428,6 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
     final nextTrack = _nextHighlightedTrack();
 
     return Scaffold(
@@ -435,6 +493,10 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: AppDrawer(
         currentUser: widget.currentUser,
         themeController: widget.themeController,
+        localeController: widget.localeController,
+        onOpenSettings: _openSettings,
+        onOpenCategory: _openCategory,
+        onOpenSkinConcern: _openSkinSubModule,
         onOpenSkinModule: () => _openCategory(CheckCategory.skinCondition),
         onOpenLabReports: _openLabReports,
         onOpenVitalsTracker: _openVitalsTracker,
@@ -451,17 +513,17 @@ class _HomeScreenState extends State<HomeScreen> {
         onDeleteAccount: widget.onDeleteAccount,
       ),
       appBar: AppBar(
-        title: const Text('VisualCheckUp'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
             onPressed: _openHistory,
-            tooltip: 'Geçmiş',
+            tooltip: l10n.tooltipHistory,
             icon: const Icon(Icons.history_rounded),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsetsDirectional.only(end: 12),
             child: Tooltip(
-              message: 'Hesap ve Menü',
+              message: l10n.tooltipAccountMenu,
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
                 onTap: () => _scaffoldKey.currentState?.openDrawer(),
@@ -512,7 +574,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                _greetingText(),
+                                _greetingText(context),
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: isDark
@@ -565,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                MedicalDisclaimer.shortBanner,
+                                l10n.disclaimerShort,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: isDark
                                       ? colorScheme.onSurfaceVariant
@@ -580,108 +642,154 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  if (nextTrack != null) ...[
-                    const SizedBox(height: 12),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Icon(
-                                nextTrack.track.icon,
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.event_repeat_rounded,
+                                size: 18,
                                 color: colorScheme.primary,
-                                size: 20,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    nextTrack.track.title,
-                                    style: theme.textTheme.labelLarge?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  l10n.followUpCardTitle,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    nextTrack.statusLabel,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: nextTrack.isDueNow
-                                          ? colorScheme.primary
-                                          : const Color(0xFF1B8A5A),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => _startTrack(nextTrack.track),
-                              child: const Text('Başla'),
-                            ),
-                            IconButton(
-                              tooltip: 'Takip Planını Düzenle',
-                              onPressed: _openFollowUpPlan,
-                              icon: const Icon(
-                                Icons.tune_rounded,
-                                size: 19,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 14),
-                  Text(
-                    'Özel Cilt Ön Tarama',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        for (final concern
-                            in SkinConcernTypeX.featuredSubModules)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ActionChip(
-                              avatar: Icon(
-                                concern.icon,
-                                size: 17,
-                                color: concern.accentColor,
-                              ),
-                              label: Text(
-                                concern.label,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12.5,
                                 ),
                               ),
-                              onPressed: () => _openSkinSubModule(concern),
-                            ),
+                              TextButton.icon(
+                                onPressed: _openFollowUpPlan,
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                ),
+                                icon: const Icon(Icons.tune_rounded, size: 16),
+                                label: Text(l10n.followUpSelectEdit),
+                              ),
+                            ],
                           ),
-                      ],
+                          const Divider(height: 14),
+                          if (nextTrack != null)
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: colorScheme.primaryContainer,
+                                  child: Icon(
+                                    nextTrack.track.icon,
+                                    color: colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        nextTrack.track.title,
+                                        style: theme.textTheme.labelLarge
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        nextTrack.statusLabel,
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: nextTrack.isDueNow
+                                              ? colorScheme.primary
+                                              : const Color(0xFF1B8A5A),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      if (nextTrack.latestValueSummary !=
+                                          null) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          nextTrack.latestValueSummary!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () =>
+                                      _startTrack(nextTrack.track),
+                                  style: FilledButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                  ),
+                                  child: Text(l10n.followUpStart),
+                                ),
+                              ],
+                            )
+                          else
+                            InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: _openFollowUpPlan,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.add_task_rounded,
+                                      size: 20,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        l10n.followUpEmptyHint,
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Kontrol Kategorileri',
+                    l10n.homeCategoriesTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Kamera veya kamerasız renk kartı ile görsel değişim takibi yapın.',
+                    l10n.homeCategoriesSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -718,14 +826,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tahlil, Tansiyon & Şeker',
+                    l10n.homeLabsVitalsTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Hastane/kan testi raporlarını oku, tansiyon ve şeker değişimini tarihli izle.',
+                    l10n.homeLabsVitalsSubtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -737,10 +845,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _DashboardModuleCard(
                           icon: Icons.biotech_outlined,
                           accentColor: AppTheme.primaryTeal,
-                          title: 'Tahlil & Raporlar',
+                          title: l10n.homeLabsCardTitle,
                           subtitle: _labReportCount == 0
-                              ? 'Kan testi oku & değerlendir'
-                              : '$_labReportCount kayıtlı rapor',
+                              ? l10n.homeLabsCardEmpty
+                              : l10n.homeLabsCardCount(_labReportCount),
                           onTap: _openLabReports,
                         ),
                       ),
@@ -749,10 +857,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _DashboardModuleCard(
                           icon: Icons.monitor_heart_outlined,
                           accentColor: const Color(0xFFC8553D),
-                          title: 'Tansiyon & Şeker',
+                          title: l10n.homeVitalsCardTitle,
                           subtitle: _vitalsCount == 0
-                              ? 'Ölçüm gir & trend izle'
-                              : '$_vitalsCount kayıtlı ölçüm',
+                              ? l10n.homeVitalsCardEmpty
+                              : l10n.homeVitalsCardCount(_vitalsCount),
                           onTap: () => _openVitalsTracker(),
                         ),
                       ),
@@ -770,14 +878,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Son Kontroller',
+                      l10n.homeRecentChecks,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     TextButton(
                       onPressed: _openHistory,
-                      child: const Text('Tümünü Gör'),
+                      child: Text(l10n.seeAll),
                     ),
                   ],
                 ),

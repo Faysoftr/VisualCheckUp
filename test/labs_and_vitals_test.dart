@@ -326,6 +326,8 @@ void main() {
     testWidgets('logs Blood Pressure and Blood Sugar readings with trends from HomeScreen', (
       tester,
     ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });

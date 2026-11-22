@@ -1,0 +1,266 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appTitle => 'VisualCheckUp';
+
+  @override
+  String get disclaimerShort =>
+      'This app does not provide a medical diagnosis; it is for informational and visual self-awareness purposes only.';
+
+  @override
+  String get disclaimerTitle => 'Important Medical Notice';
+
+  @override
+  String get disclaimerFull =>
+      'VisualCheckUp provides a visual self-awareness pre-assessment based on color and appearance cues. It is not a medical device and never replaces a doctor\'s examination, lab testing, or medical diagnosis.\n\n• Ambient lighting, camera sensors, and screen calibration directly affect color perception.\n• Seek medical attention promptly for severe pain, bleeding, high fever, jaundice, black/clay stools, sudden vision changes, or breathing difficulty.\n• Privacy: Captured images are processed on your device by default.';
+
+  @override
+  String get disclaimerAccept => 'I Understand';
+
+  @override
+  String get loginTagline =>
+      'Personal visual wellness tracker and doctor visit preparation assistant for skin, moles, and daily signs.';
+
+  @override
+  String get featureColorCalibration => 'Color Calibration';
+
+  @override
+  String get featurePrivacyFirst => 'Privacy First';
+
+  @override
+  String get featureOptionalAi => 'Optional AI';
+
+  @override
+  String get loginCardTitle => 'Continue with your account';
+
+  @override
+  String get loginCardSubtitle =>
+      'Keep your personal color baselines and checkup history organized.';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get guestGreeting => 'Skin & Visual Wellness Tracking';
+
+  @override
+  String userGreeting(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String accountTypeLabel(String provider) {
+    return '$provider Account';
+  }
+
+  @override
+  String get localOnlyLabel => 'Stored on this device only';
+
+  @override
+  String get menuHome => 'Home';
+
+  @override
+  String get menuSectionVisualChecks => 'VISUAL CHECKS';
+
+  @override
+  String get menuSkinGroup => 'Skin (Mole, Wart, Bruise, Spot)';
+
+  @override
+  String get menuSkinGeneral => 'General Skin & Rash';
+
+  @override
+  String get menuSectionTracking => 'TRACKING, LABS & VITALS';
+
+  @override
+  String get menuFollowUpPlan => 'Personal Follow-Up Plan';
+
+  @override
+  String get menuVitalsTracker => 'Blood Pressure & Sugar';
+
+  @override
+  String get menuLabReports => 'Lab & Hospital Reports';
+
+  @override
+  String get menuQuickColorCard => 'Camera-Free Color Card';
+
+  @override
+  String get menuHistory => 'Checkup History';
+
+  @override
+  String get menuReferenceGuide => 'Visual Reference Guide';
+
+  @override
+  String get menuSectionSettings => 'SETTINGS & PRIVACY';
+
+  @override
+  String get menuAiSettings => 'AI & Privacy';
+
+  @override
+  String get menuDisclaimer => 'Medical Disclaimer';
+
+  @override
+  String get menuTheme => 'Appearance Theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get menuLanguage => 'App Language';
+
+  @override
+  String get languageSystem => 'System Default';
+
+  @override
+  String get signInGoogleOrApple => 'Sign in with Google or Apple';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountTitle => 'Delete Account and Local Data';
+
+  @override
+  String get deleteAccountBody =>
+      'You will be signed out and your checkup history and personal color baselines on this device will be permanently deleted. Continue?';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get followUpCardTitle => 'Personal Follow-Up Plan';
+
+  @override
+  String get followUpSelectEdit => 'Select / Edit';
+
+  @override
+  String get followUpStart => 'Start';
+
+  @override
+  String get followUpEmptyHint =>
+      'Tap to select eye, urine, blood pressure, blood sugar, and other routines.';
+
+  @override
+  String get followUpSheetSubtitle =>
+      'Track eye, tongue, nail, skin, urine, stool, blood pressure, blood sugar, and lab reports in one plan.';
+
+  @override
+  String followUpSummaryCounts(int active, int completed, int due) {
+    return '$active active • $completed up to date • $due due';
+  }
+
+  @override
+  String get homeCategoriesTitle => 'Checkup Categories';
+
+  @override
+  String get homeCategoriesSubtitle =>
+      'Track visual changes with camera calibration or camera-free color cards.';
+
+  @override
+  String get homeLabsVitalsTitle => 'Labs, Blood Pressure & Sugar';
+
+  @override
+  String get homeLabsVitalsSubtitle =>
+      'Read hospital/blood test reports and track blood pressure & glucose trends.';
+
+  @override
+  String get homeLabsCardTitle => 'Labs & Reports';
+
+  @override
+  String get homeLabsCardEmpty => 'Read & review blood tests';
+
+  @override
+  String homeLabsCardCount(int count) {
+    return '$count saved reports';
+  }
+
+  @override
+  String get homeVitalsCardTitle => 'Blood Pressure & Sugar';
+
+  @override
+  String get homeVitalsCardEmpty => 'Log readings & view trends';
+
+  @override
+  String homeVitalsCardCount(int count) {
+    return '$count saved readings';
+  }
+
+  @override
+  String get homeRecentChecks => 'Recent Checks';
+
+  @override
+  String get seeAll => 'See All';
+
+  @override
+  String get catEyeTitle => 'Eye (Sclera)';
+
+  @override
+  String get catEyeSubtitle => 'Redness, yellowing, and sclera tone';
+
+  @override
+  String get catNailTitle => 'Nail';
+
+  @override
+  String get catNailSubtitle => 'Pallor, cyanosis, yellowing & shape';
+
+  @override
+  String get catTongueTitle => 'Tongue';
+
+  @override
+  String get catTongueSubtitle => 'Color, white/yellow coating & texture';
+
+  @override
+  String get catFaceTitle => 'Face & Skin';
+
+  @override
+  String get catFaceSubtitle => 'Skin tone, pallor, and redness';
+
+  @override
+  String get catSkinTitle => 'Skin Conditions';
+
+  @override
+  String get catSkinSubtitle => 'Mole, wart, bruise, facial spot & rash';
+
+  @override
+  String get catUrineTitle => 'Urine Color';
+
+  @override
+  String get catUrineSubtitle => 'Hydration and color scale check';
+
+  @override
+  String get catStoolTitle => 'Stool Color';
+
+  @override
+  String get catStoolSubtitle => 'Digestion and color warning check';
+
+  @override
+  String get tooltipHistory => 'History';
+
+  @override
+  String get tooltipAccountMenu => 'Account & Menu';
+}

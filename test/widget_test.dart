@@ -7,6 +7,8 @@ void main() {
   testWidgets(
     'VisualCheckUpApp boots to login, enters home screen with 7 categories, and opens skin module',
     (tester) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });

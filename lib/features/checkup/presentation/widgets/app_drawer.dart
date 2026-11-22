@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
+import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 
 /// Main side navigation drawer for VisualCheckUp.
-///
-/// Houses secondary navigation (history, reference guide, AI/privacy settings,
-/// live theme selector, medical disclaimer, and account management) so the
-/// main home screen stays calm and focused on the 7 checkup modules.
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
     super.key,
@@ -20,6 +20,10 @@ class AppDrawer extends StatelessWidget {
     required this.onOpenDisclaimer,
     required this.onSignOut,
     required this.onDeleteAccount,
+    this.localeController,
+    this.onOpenSettings,
+    this.onOpenCategory,
+    this.onOpenSkinConcern,
     this.onOpenFollowUpPlan,
     this.onOpenQuickColorCard,
     this.onOpenLabReports,
@@ -28,7 +32,11 @@ class AppDrawer extends StatelessWidget {
 
   final AuthUser currentUser;
   final ThemeController themeController;
+  final LocaleController? localeController;
+  final VoidCallback? onOpenSettings;
   final VoidCallback onOpenSkinModule;
+  final ValueChanged<CheckCategory>? onOpenCategory;
+  final ValueChanged<SkinConcernType>? onOpenSkinConcern;
   final VoidCallback onOpenHistory;
   final VoidCallback onOpenReferenceGuide;
   final VoidCallback onOpenAiSettings;
@@ -46,17 +54,16 @@ class AppDrawer extends StatelessWidget {
   }
 
   Future<void> _confirmDeleteAccount(BuildContext context) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Hesabı ve Yerel Verileri Sil'),
-        content: const Text(
-          'Oturumunuz kapatılacak ve bu cihazdaki kontrol geçmişiniz ile kişisel renk referanslarınız kalıcı olarak silinecek. Devam etmek istiyor musunuz?',
-        ),
+        title: Text(l10n.deleteAccountTitle),
+        content: Text(l10n.deleteAccountBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Vazgeç'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -64,7 +71,7 @@ class AppDrawer extends StatelessWidget {
               foregroundColor: Theme.of(dialogContext).colorScheme.onError,
             ),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Hesabı Sil'),
+            child: Text(l10n.deleteAccount),
           ),
         ],
       ),
@@ -81,6 +88,22 @@ class AppDrawer extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
+
+    const nonSkinCategories = [
+      CheckCategory.eye,
+      CheckCategory.tongue,
+      CheckCategory.nail,
+      CheckCategory.face,
+      CheckCategory.urine,
+      CheckCategory.stool,
+    ];
+
+    final activeLangLabel = localeController?.value == null
+        ? l10n.languageSystem
+        : LocaleController.optionForCode(
+            localeController!.value!.languageCode,
+          ).nativeName;
 
     return Drawer(
       child: SafeArea(
@@ -131,7 +154,7 @@ class AppDrawer extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            currentUser.email ?? 'Yalnızca bu cihazda kayıtlı',
+                            currentUser.email ?? l10n.localOnlyLabel,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -158,12 +181,18 @@ class AppDrawer extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                                 const SizedBox(width: 4),
-                                Text(
-                                  '${currentUser.provider.label} Hesabı',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                                Flexible(
+                                  child: Text(
+                                    l10n.accountTypeLabel(
+                                      currentUser.provider.label,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -180,63 +209,149 @@ class AppDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 children: [
-                  const _DrawerSectionLabel('MODÜLLER & TAKİP'),
                   _DrawerTile(
                     icon: Icons.grid_view_rounded,
-                    label: 'Ana Ekran',
+                    label: l10n.menuHome,
                     selected: true,
                     onTap: () => Navigator.of(context).pop(),
                   ),
-                  _DrawerTile(
-                    icon: Icons.healing_rounded,
-                    label: 'Cilt & Ben Takibi',
-                    onTap: () => _closeAndRun(context, onOpenSkinModule),
+                  _DrawerSectionLabel(l10n.menuSectionVisualChecks),
+                  for (final category in nonSkinCategories)
+                    if (onOpenCategory != null)
+                      _DrawerTile(
+                        icon: category.icon,
+                        label: category.localizedTitle(l10n),
+                        accentColor: category.accentColor,
+                        onTap: () => _closeAndRun(
+                          context,
+                          () => onOpenCategory!(category),
+                        ),
+                      ),
+                  Theme(
+                    data: theme.copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                      childrenPadding:
+                          const EdgeInsetsDirectional.only(start: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      collapsedShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      leading: Icon(
+                        Icons.healing_rounded,
+                        color: CheckCategory.skinCondition.accentColor,
+                        size: 21,
+                      ),
+                      title: Text(
+                        l10n.menuSkinGroup,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      children: [
+                        _DrawerTile(
+                          icon: Icons.dashboard_customize_outlined,
+                          label: l10n.menuSkinGeneral,
+                          onTap: () => _closeAndRun(context, onOpenSkinModule),
+                        ),
+                        if (onOpenSkinConcern != null)
+                          for (final concern
+                              in SkinConcernTypeX.featuredSubModules)
+                            _DrawerTile(
+                              icon: concern.icon,
+                              label: concern.label,
+                              accentColor: concern.accentColor,
+                              onTap: () => _closeAndRun(
+                                context,
+                                () => onOpenSkinConcern!(concern),
+                              ),
+                            ),
+                      ],
+                    ),
                   ),
-                  if (onOpenLabReports != null)
+                  const SizedBox(height: 6),
+                  const Divider(indent: 12, endIndent: 12),
+                  _DrawerSectionLabel(l10n.menuSectionTracking),
+                  if (onOpenFollowUpPlan != null)
                     _DrawerTile(
-                      icon: Icons.biotech_outlined,
-                      label: 'Tahlil & Hastane Raporları',
-                      onTap: () => _closeAndRun(context, onOpenLabReports!),
+                      icon: Icons.event_repeat_rounded,
+                      label: l10n.menuFollowUpPlan,
+                      onTap: () => _closeAndRun(context, onOpenFollowUpPlan!),
                     ),
                   if (onOpenVitalsTracker != null)
                     _DrawerTile(
                       icon: Icons.monitor_heart_outlined,
-                      label: 'Tansiyon & Şeker Takibi',
+                      label: l10n.menuVitalsTracker,
                       onTap: () => _closeAndRun(context, onOpenVitalsTracker!),
+                    ),
+                  if (onOpenLabReports != null)
+                    _DrawerTile(
+                      icon: Icons.biotech_outlined,
+                      label: l10n.menuLabReports,
+                      onTap: () => _closeAndRun(context, onOpenLabReports!),
                     ),
                   if (onOpenQuickColorCard != null)
                     _DrawerTile(
                       icon: Icons.palette_outlined,
-                      label: 'Kamerasız Renk Kartı',
+                      label: l10n.menuQuickColorCard,
                       onTap: () => _closeAndRun(context, onOpenQuickColorCard!),
-                    ),
-                  if (onOpenFollowUpPlan != null)
-                    _DrawerTile(
-                      icon: Icons.event_repeat_rounded,
-                      label: 'Kişisel Takip Planı',
-                      onTap: () => _closeAndRun(context, onOpenFollowUpPlan!),
                     ),
                   _DrawerTile(
                     icon: Icons.history_rounded,
-                    label: 'Kontrol Geçmişi',
+                    label: l10n.menuHistory,
                     onTap: () => _closeAndRun(context, onOpenHistory),
                   ),
                   _DrawerTile(
                     icon: Icons.menu_book_rounded,
-                    label: 'Görsel Referans Rehberi',
+                    label: l10n.menuReferenceGuide,
                     onTap: () => _closeAndRun(context, onOpenReferenceGuide),
                   ),
                   const SizedBox(height: 8),
                   const Divider(indent: 12, endIndent: 12),
-                  const _DrawerSectionLabel('AYARLAR & GİZLİLİK'),
+                  _DrawerSectionLabel(l10n.menuSectionSettings),
+                  if (onOpenSettings != null)
+                    _DrawerTile(
+                      icon: Icons.settings_outlined,
+                      label: 'Ayarlar (İzinler & Dil)',
+                      onTap: () => _closeAndRun(context, onOpenSettings!),
+                    ),
+                  if (localeController != null)
+                    ListTile(
+                      dense: true,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      leading: const Icon(Icons.language_rounded, size: 21),
+                      title: Text(
+                        l10n.menuLanguage,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      trailing: Text(
+                        activeLangLabel,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      onTap: () => LanguagePickerSheet.show(
+                        context,
+                        localeController: localeController!,
+                      ),
+                    ),
                   _DrawerTile(
                     icon: Icons.auto_awesome_outlined,
-                    label: 'Yapay Zeka & Gizlilik',
+                    label: l10n.menuAiSettings,
                     onTap: () => _closeAndRun(context, onOpenAiSettings),
                   ),
                   _DrawerTile(
                     icon: Icons.info_outline_rounded,
-                    label: 'Tıbbi Bilgilendirme',
+                    label: l10n.menuDisclaimer,
                     onTap: () => _closeAndRun(context, onOpenDisclaimer),
                   ),
                   Padding(
@@ -245,7 +360,7 @@ class AppDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Görünüm Teması',
+                          l10n.menuTheme,
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w600,
@@ -262,18 +377,18 @@ class AppDrawer extends StatelessWidget {
                                 style: const ButtonStyle(
                                   visualDensity: VisualDensity.compact,
                                 ),
-                                segments: const [
+                                segments: [
                                   ButtonSegment<ThemeMode>(
                                     value: ThemeMode.system,
-                                    label: Text('Sistem'),
+                                    label: Text(l10n.themeSystem),
                                   ),
                                   ButtonSegment<ThemeMode>(
                                     value: ThemeMode.light,
-                                    label: Text('Açık'),
+                                    label: Text(l10n.themeLight),
                                   ),
                                   ButtonSegment<ThemeMode>(
                                     value: ThemeMode.dark,
-                                    label: Text('Koyu'),
+                                    label: Text(l10n.themeDark),
                                   ),
                                 ],
                                 selected: {mode},
@@ -302,19 +417,19 @@ class AppDrawer extends StatelessWidget {
                   if (currentUser.isGuest)
                     _DrawerTile(
                       icon: Icons.login_rounded,
-                      label: 'Google veya Apple ile Giriş Yap',
+                      label: l10n.signInGoogleOrApple,
                       accentColor: colorScheme.primary,
                       onTap: () => _closeAndRun(context, onSignOut),
                     )
                   else ...[
                     _DrawerTile(
                       icon: Icons.logout_rounded,
-                      label: 'Çıkış Yap',
+                      label: l10n.signOut,
                       onTap: () => _closeAndRun(context, onSignOut),
                     ),
                     _DrawerTile(
                       icon: Icons.delete_outline_rounded,
-                      label: 'Hesabı Sil',
+                      label: l10n.deleteAccount,
                       accentColor: colorScheme.error,
                       onTap: () => _confirmDeleteAccount(context),
                     ),

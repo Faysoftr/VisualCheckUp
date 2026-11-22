@@ -104,10 +104,11 @@ class ModuleReferenceCatalog {
     CheckCategory.nail: ModuleReferenceSpec(
       category: CheckCategory.nail,
       healthySummary:
-          'Sağlıklı tırnak plağı pürüzsüz, yarı saydam ve esnektir; altındaki tırnak yatağı canlı doğal pembe tondadır, belirgin sararma, morarma, çökme, kalınlaşma veya koyu dikey bant içermez.',
+          'Sağlıklı tırnak plağı pürüzsüz, yarı saydam, esnek ve hafif kavisli yapıdadır; altındaki tırnak yatağı canlı doğal pembe tondadır, belirgin sararma, yeşerme, morarma, yaygın beyazlaşma, çökme, saat camı bombeleşmesi, ayrılma veya koyu dikey bant içermez. Kesin tanı için dermatoloji muayenesi ve kan testleri gerekir.',
       captureQualityChecklist: [
-        'Tırnakta oje, cila veya jel bulunmamalıdır.',
-        'Eller oda sıcaklığındayken (üşümemişken) beyaz bir kâğıt/zemin üzerinde, gün ışığında çekin.',
+        'Tırnakta oje, cila veya kalıcı jel bulunmamalıdır.',
+        'Eller oda sıcaklığındayken (üşümemişken) beyaz bir kâğıt/zemin üzerinde, doğal gün ışığında çekin.',
+        'Çomak parmak (bombeleşme) veya kaşık tırnak şüphesinde tırnağı hem üstten hem yandan inceleyin.',
       ],
       findings: [
         ReferenceFinding(
@@ -122,14 +123,25 @@ class ModuleReferenceCatalog {
         ),
         ReferenceFinding(
           id: 'nail_pale_bed',
-          title: 'Soluk / Beyazımsı Tırnak Yatağı',
+          title: 'Soluk Tırnak Yatağı',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFEEE4E2),
           visualSignature:
-              'Normal pembe tona kıyasla belirgin derecede soluk, kansız/beyazımsı tırnak yatağı (Terry veya soluk tırnak görünümü).',
+              'Normal pembe tona kıyasla belirgin derecede soluk, kansız görünümlü tırnak yatağı.',
           possibleAssociations:
-              'Demir eksikliği/anemi, periferik dolaşım yavaşlığı veya beslenme eksiklikleri açısından kan sayımıyla değerlendirilebilir.',
+              'Demir eksikliği anemisi (kansızlık), periferik dolaşım yavaşlığı veya beslenme eksiklikleri açısından kan sayımıyla değerlendirilebilir.',
+        ),
+        ReferenceFinding(
+          id: 'nail_terry_or_half_and_half',
+          title: 'Yaygın Beyaz (Terry) veya Yarım-Yarım (Lindsay) Tırnak',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFF3EFEA),
+          visualSignature:
+              'Tırnağın büyük kısmının opak beyaz olup ucunda ince pembe şerit kalması (Terry), yarı beyaz / yarı kahverengi-pembe görünüm (Lindsay) veya enine beyaz bantlar (Muehrcke/Mees çizgileri).',
+          possibleAssociations:
+              'Karaciğer hastalıkları (siroz), kronik böbrek yetmezliği, kandaki albümin/protein düşüklüğü, diyabet veya kalp yetmezliği açısından dahiliye değerlendirmesi önerilir.',
         ),
         ReferenceFinding(
           id: 'nail_yellow_thickened',
@@ -138,42 +150,90 @@ class ModuleReferenceCatalog {
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFD8BE67),
           visualSignature:
-              'Tırnak plağında sarımsı-mat renklenme, kalınlaşma, ufalanma veya tırnak yatağından ayrılma (onikoliz).',
+              'Tırnak plağında sarımsı-mat renklenme, kalınlaşma, ufalanma veya yavaş büyüme.',
           possibleAssociations:
-              'Oje/sigara boyanması, tırnak mantarı (onikomikoz), sedef veya nadiren kronik solunum/lenf hassasiyetleri.',
+              'En sık tırnak mantarı (onikomikoz) veya sürekli oje/sigara kullanımı; nadiren lenfödem, kronik akciğer hastalıkları, sedef veya tiroid sorunları.',
+        ),
+        ReferenceFinding(
+          id: 'nail_green_pseudomonas',
+          title: 'Yeşilimsi Tırnak (Kloronişi / Yeşil Tırnak Sendromu)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFF8CA66B),
+          visualSignature:
+              'Tırnak plağında lokalize veya yaygın sarı-yeşil ya da koyu yeşil renk değişimi.',
+          possibleAssociations:
+              'Pseudomonas bakteriyel enfeksiyonu veya mantar enfeksiyonu (özellikle sık su/nem teması ve tırnak ayrılması sonrası).',
+          redFlagNote:
+              'Ağrı, akıntı veya yayılma varsa dermatoloji muayenesi ile uygun tedavi gerekir.',
         ),
         ReferenceFinding(
           id: 'nail_white_spots_leukonychia',
-          title: 'Beyaz Noktalar / Çizgiler (Lökonişi)',
+          title: 'Beyaz Noktalar (Lökonişi)',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFF4F1EC),
           visualSignature:
-              'Tırnak plağı içinde noktasal veya yatay beyaz bulutlanmalar.',
+              'Tırnak plağı içinde küçük, noktasal beyaz bulutlanmalar.',
           possibleAssociations:
-              'Çoğunlukla mikro travmalar veya manikür darbesi; tüm tırnaklarda yaygınsa çinko/protein dengesi değerlendirilebilir.',
+              'Çoğunlukla tırnağa alınan hafif darbeler (mikro travma) veya manikür kaynaklıdır; yaygın olduğunda çinko/protein dengesi değerlendirilebilir.',
         ),
         ReferenceFinding(
           id: 'nail_pitting_or_ridges',
-          title: 'Çukurlaşma (Pitting) veya Enine Oluklar (Beau Çizgileri)',
+          title: 'Yüzük Yüksüğü Çukurları (Pitting) & Enine Oluklar (Beau Çizgileri)',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFD6B4AE),
           visualSignature:
-              'Tırnak yüzeyinde toplu iğne başı gibi küçük çukurlar veya tırnağı enine kesen belirgin çökük oluklar.',
+              'Tırnak yüzeyinde toplu iğne başı gibi küçük çukurcuklar (pitting) veya tırnağı enine kesen derin çöküntüler (Beau çizgileri).',
           possibleAssociations:
-              'Sedef (psöriyazis), egzama, alopecia areata veya birkaç ay önce geçirilmiş ağır enfeksiyon/yüksek ateş sonrası büyüme duraksaması.',
+              'Çukurcuklar sedef (psöriyazis), egzama veya alopesi areata ile; enine Beau çizgileri ağır enfeksiyon, yüksek ateş, kontrolsüz diyabet veya kemoterapi sonrası geçici büyüme duraksamasıyla ilişkilidir.',
         ),
         ReferenceFinding(
           id: 'nail_spoon_koilonychia',
-          title: 'Kaşık Tırnak (Koilonişi) / Aşırı Kırılganlık',
+          title: 'Kaşık Tırnak (Koilonişi)',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFE3C9C4),
           visualSignature:
-              'Tırnak orta kısmının içe doğru çökük, kenarlarının yukarı kalkık ve ince olması.',
+              'Tırnak orta kısmının içe doğru çukurlaşıp kenarlarının yukarı kalkması ve plağın incelmesi.',
           possibleAssociations:
-              'Uzun süreli demir eksikliği anemisi veya tiroid/mineral dengesizliği ön ipucu.',
+              'Klasik olarak demir eksikliği anemisi ve hipotiroidi (tiroid bezinin az çalışması) ile ilişkilendirilir.',
+        ),
+        ReferenceFinding(
+          id: 'nail_onycholysis',
+          title: 'Tırnak Yatağından Ayrılma (Onikoliz)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFEBD9B7),
+          visualSignature:
+              'Tırnağın uç kısmından başlayarak alttaki pembe yataktan boşalması ve ayrılan alanın beyaz/sarımsı görünmesi.',
+          possibleAssociations:
+              'Travma, tırnak mantarı, sedef hastalığı (psöriyazis), kimyasal/su teması veya tiroid (özellikle hipertiroidi) hastalıkları.',
+        ),
+        ReferenceFinding(
+          id: 'nail_brittle_splitting_vertical',
+          title: 'Kırılma, Soyulma, İncelme & Dikey Çizgiler',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFE2C6BF),
+          visualSignature:
+              'Tırnak ucunda katman katman soyulma, kolay kırılma, kuruluk veya tırnak boyunca ince dikey çizgilenmeler.',
+          possibleAssociations:
+              'Sık su/deterjan teması ve yaşlanma dışında demir, çinko, biyotin, B12 eksikliği ve tiroid hormon bozukluklarında sık görülür.',
+        ),
+        ReferenceFinding(
+          id: 'nail_clubbing_hippocratic',
+          title: 'Çomak Parmak (Hipokrat Tırnağı / Saat Camı Bombeleşmesi)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFFDCA69E),
+          visualSignature:
+              'Tırnakların saat camı gibi belirgin bombeli hâle gelmesi ve parmak uçlarının genişleyip yumuşaması.',
+          possibleAssociations:
+              'Kronik akciğer hastalıkları, doğumsal kalp rahatsızlıkları, kalp yetmezliği, karaciğer veya inflamatuvar bağırsak hastalıklarının önemli bir bulgusudur.',
+          redFlagNote:
+              'Nefes darlığı, kronik öksürük veya çabuk yorulma eşlik ediyorsa gecikmeden Dahiliye, Göğüs Hastalıkları veya Kardiyoloji değerlendirmesi alın.',
         ),
         ReferenceFinding(
           id: 'nail_cyanotic_blue',
@@ -184,22 +244,22 @@ class ModuleReferenceCatalog {
           visualSignature:
               'Tırnak yatağında soğuk ortam dışı kalıcı mavi-mor veya kurşuni renk değişimi.',
           possibleAssociations:
-              'Düşük kan oksijenlenmesi, Raynaud fenomeni, solunum veya dolaşım sistemi değerlendirmesi gerekir.',
+              'Düşük kan oksijen düzeyi (hipoksemi), Raynaud fenomeni, kalp-akciğer veya periferik dolaşım sorunları açısından değerlendirme gerekir.',
           redFlagNote:
               'Nefes darlığı, göğüs ağrısı, dudak morarması veya baş dönmesi varsa acil tıbbi yardım alın.',
         ),
         ReferenceFinding(
           id: 'nail_dark_vertical_band',
-          title: 'Koyu Kahverengi / Siyah Dikey Şerit (Melanoniki)',
+          title: 'Koyu Kahverengi / Siyah Dikey Bant veya Leke (Melanoniki)',
           isHealthyReference: false,
           riskLevel: RiskLevel.urgent,
           swatchColor: Color(0xFF42312C),
           visualSignature:
-              'Tırnak kökünden ucuna uzanan tekil koyu kahverengi/siyah dikey bant (özellikle genişleyen veya tırnak etine taşan — Hutchinson işareti).',
+              'Tırnak kökünden ucuna uzanan koyu kahverengi/siyah dikey şerit (özellikle tek tırnakta, 3 mm’den geniş, düzensiz koyulaşan veya tırnak dibine taşan — Hutchinson işareti) ya da travmasız koyu tırnak altı lekesi.',
           possibleAssociations:
-              'Darbe sonrası kanama (hematom) olabileceği gibi subungual melanom açısından mutlaka dermoskopik dermatoloji muayenesi gerekir.',
+              'Darbe sonrası kanama (hematom) veya ilaç yan etkisi olabileceği gibi cilt kanseri (subungual melanom) açısından acil dermoskopik dermatoloji muayenesi gerekir.',
           redFlagNote:
-              'Bilinen darbe yoksa, bant genişliyorsa veya tırnak etinde koyulaşma varsa gecikmeden dermatoloğa başvurun.',
+              'Bilinen darbe yoksa, tek tırnakta >3 mm genişlikteyse, giderek koyulaşıyorsa veya tırnak etine taşıyorsa vakit kaybetmeden dermatoloğa başvurun.',
         ),
         ReferenceFinding(
           id: 'nail_splinter_hemorrhage',
@@ -210,19 +270,33 @@ class ModuleReferenceCatalog {
           visualSignature:
               'Tırnak altında uzunlamasına uzanan çok ince, kıymık benzeri koyu kırmızı veya kahverengi çizgiler.',
           possibleAssociations:
-              'Tek tırnakta darbe kaynaklı olabilir; birden fazla tırnakta travmasız görülüyorsa damar/kalp/sistemik değerlendirme önerilir.',
+              'Tek tırnakta darbe kaynaklı olabilir; birden fazla tırnakta travmasız görülüyorsa sedef, damar iltihabı veya kalp kapak enfeksiyonu (endokardit) açısından tıbbi değerlendirme gerekir.',
           redFlagNote:
-              'Ateş, halsizlik veya birden fazla tırnakta kendiliğinden oluşuyorsa hekime başvurun.',
+              'Ateş, halsizlik veya birden fazla tırnakta kendiliğinden oluşuyorsa gecikmeden hekime başvurun.',
+        ),
+        ReferenceFinding(
+          id: 'nail_paronychia_inflamed',
+          title: 'Tırnak Çevresinde Kızarıklık, Şişlik veya Akıntı (Paronişi)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFFC94A5A),
+          visualSignature:
+              'Tırnak etinde (katlantıda) parlak kırmızı şişlik, hassasiyet, sıcaklık veya iltihaplı akıntı.',
+          possibleAssociations:
+              'Bakteriyel veya mantar kaynaklı tırnak eti enfeksiyonu (paronişi), batık tırnak ya da nadiren bağ dokusu hastalıkları.',
+          redFlagNote:
+              'Şiddetli ağrı, zonklama, iltihap akıntısı veya diyabet öykünüz varsa vakit kaybetmeden dermatoloji/sağlık kuruluşuna başvurun.',
         ),
       ],
     ),
     CheckCategory.tongue: ModuleReferenceSpec(
       category: CheckCategory.tongue,
       healthySummary:
-          'Sağlıklı dil nemli, esnek, doğal canlı pembe tonda ve üzerinde çok ince şeffaf/hafif beyazımsı bir tabaka bulunur; kalın pas, yoğun kızarıklık veya iyileşmeyen yara yoktur.',
+          'Sağlıklı dil nemli, esnek, doğal canlı pembe tonda ve üzerinde çok ince şeffaf/hafif beyazımsı fizyolojik bir tabaka bulunur; kalın pas, yoğun kızarıklık, morarma, pürüzsüz parlaklık veya 2 haftadan uzun süren yara/plak yoktur. (Kanıta dayalı modern tıbbi değerlendirme esas alınır; geleneksel organ haritası yaklaşımları tanı aracı değildir.)',
       captureQualityChecklist: [
-        'Kahve, çay, renkli yiyecek veya ağız gargarası sonrası en az 30 dakika bekleyin.',
-        'Doğal gün ışığında dilinizi germeden hafifçe dışarı çıkarıp çerçeveleyin.',
+        'Kahve, çay, renkli yiyecek, sigara veya ağız gargarası sonrası en az 30 dakika bekleyin.',
+        'Doğal gün ışığında dilinizi aşırı germeden dışarı çıkararak üst yüzeyi ve mümkünse kenarları net çerçeveleyin.',
+        'Sarı ampul altında dil olduğundan daha sarı/turuncu görünebilir; mümkünse beyaz referans kalibrasyonu kullanın.',
       ],
       findings: [
         ReferenceFinding(
@@ -232,65 +306,141 @@ class ModuleReferenceCatalog {
           riskLevel: RiskLevel.normal,
           swatchColor: Color(0xFFDC8D96),
           visualSignature:
-              'Nemli, eşit pembe yüzey, ince doğal papilla dokusu, belirgin kalın tabaka veya yara yok.',
-          possibleAssociations: 'Olağan ağız ve dil görünümü.',
+              'Nemli, eşit doğal pembe yüzey, düzenli ince papilla dokusu; kalın tabaka, belirgin renk kayması veya yara yok.',
+          possibleAssociations: 'Olağan ağız ve dil mukozası görünümü.',
         ),
         ReferenceFinding(
           id: 'tongue_thick_white_coating',
-          title: 'Kalın Beyaz Tabaka / Pamukçuk İpucu',
+          title: 'Beyaz Dil / Kalın Beyaz Tabaka (Pamukçuk & Ağız Kuruluğu)',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFECE6E2),
           visualSignature:
-              'Dil sırtını kaplayan kalın beyazımsı-kremsi tabaka veya peynirimsi beyaz plaklar.',
+              'Dil sırtını kaplayan kalın beyazımsı-kremsi tabaka veya fırçalama/silme ile kısmen kalkabilen peynirimsi beyaz plaklar.',
           possibleAssociations:
-              'Ağız kuruluğu, yetersiz su tüketimi, ağızdan nefes alma, ağız hijyeni veya silinmeyen/ağrılı plaklarda oral mantar (kandida).',
+              'Ağız kuruluğu, yetersiz su tüketimi, ağız hijyeni yetersizliği, sigara, reflü/gastrit kaynaklı ağız ortamı değişimi veya oral mantar enfeksiyonu (kandida/pamukçuk).',
+          redFlagNote:
+              'Silinmeyen beyaz plaklar 2 haftadan uzun sürüyorsa veya yutma güçlüğü/ağrı eşlik ediyorsa diş hekimi ya da KBB uzmanına başvurun.',
         ),
         ReferenceFinding(
-          id: 'tongue_yellow_brown_coating',
-          title: 'Sarımsı / Kahverengimsi Pas Tabakası',
+          id: 'tongue_leukoplakia_plaque',
+          title: 'Silinmeyen Kalın Beyaz Plak (Lökoplaki / Liken Planus İpucu)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFFF3F0EB),
+          visualSignature:
+              'Dil üstünde veya özellikle yan kenarlarında kazınmakla/silinmekle çıkmayan kalın, sertleşmiş beyaz plak veya dantel görünümlü beyaz çizgiler.',
+          possibleAssociations:
+              'Lökoplaki (sigara/kronik tahriş ile ilişkili, bazı formları premalign olabileceğinden izlem gerekir) veya oral liken planus.',
+          redFlagNote:
+              'Silinmeyen beyaz veya kırmızı-beyaz karışık lezyonlar 2 haftadan uzun sürüyorsa kesin değerlendirme için diş hekimi/KBB muayenesi gerekir.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_yellow_orange_coating',
+          title: 'Sarı / Turuncu Kaplama',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
-          swatchColor: Color(0xFFD6B96E),
+          swatchColor: Color(0xFFD9B65B),
           visualSignature:
-              'Özellikle dil arka-orta kısmında sarımsı veya kahverengimsi renkli birikim.',
+              'Özellikle dil arka-orta bölgesinde sarımsı veya turuncuya çalan pas tabakası ve belirginleşmiş papillalar.',
           possibleAssociations:
-              'Çay/kahve/tütün, ağız kuruluğu, antibiyotik sonrası flora değişimi veya reflü/sindirim hassasiyeti.',
+              'Ağız kuruluğu, ağız hijyeni yetersizliği, bakteri/keratin birikimi, sigara, çay/kahve, antibiyotik kullanımı, beta-karoten içeren gıdalar veya reflü/sindirim hassasiyeti.',
         ),
         ReferenceFinding(
-          id: 'tongue_geographic_patches',
-          title: 'Harita Görünümlü Kızarık Yamalar',
+          id: 'tongue_greenish_coating',
+          title: 'Yeşilimsi Kaplama',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
-          swatchColor: Color(0xFFD26D7B),
+          swatchColor: Color(0xFFA2B986),
           visualSignature:
-              'Beyazımsı kenarlı, ortası pürüzsüz pembe-kırmızı harita benzeri düzensiz adacıklar.',
+              'Dil yüzeyinde soluk yeşil veya sarı-yeşil renkte birikim/tabaka.',
           possibleAssociations:
-              'Coğrafi dil (genellikle iyi huylu, stres veya baharatlı/asitli gıdalara hassasiyet gösterebilir).',
+              'Bakteri veya mantar biyofilm artışı, ağız hijyeni yetersizliği, tütün kullanımı, antibiyotik sonrası oral flora değişimi veya gıda boyaları.',
+          redFlagNote:
+              'Düzenli dil fırçalama ve sıvı alımına rağmen 1–2 hafta içinde düzelmiyorsa hekime danışın.',
         ),
         ReferenceFinding(
-          id: 'tongue_beefy_red_smooth',
-          title: 'Yoğun Kırmızı / Pürüzsüz Dil (Atrofik / Çilek Dil)',
+          id: 'tongue_black_hairy',
+          title: 'Siyah / Koyu Kahverengi Kıllı Dil (Lingua Villosa Nigra)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFF4B3D36),
+          visualSignature:
+              'Dil ortasında ve arkasında uzamış filiform papillalara bağlı tüylü/halımsı koyu kahverengi veya siyah görünüm.',
+          possibleAssociations:
+              'Çoğunlukla iyi huylu keratin birikimi; bizmut içeren mide ilaçları, antibiyotikler, yoğun kahve/çay, sigara veya ağız kuruluğu ile ilişkilidir.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_pale_anemic',
+          title: 'Soluk / Mat Dil',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFE5C4C8),
+          visualSignature:
+              'Canlı doğal pembe yerine belirgin soluk, mat veya kansız görünümlü dil mukozası.',
+          possibleAssociations:
+              'Demir, B12 vitamini veya folik asit eksikliğine bağlı kansızlık (anemi) ve genel beslenme eksiklikleri açısından kan sayımıyla değerlendirilebilir.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_strawberry_or_atrophic_red',
+          title: 'Kırmızı, Çilek Görünümlü veya Pürüzsüz Parlak Dil (Atrofik Glossit)',
           isHealthyReference: false,
           riskLevel: RiskLevel.attention,
           swatchColor: Color(0xFFC93D4C),
           visualSignature:
-              'Normal pembeden belirgin derecede parlak-koyu kırmızı, papillaların silindiği pürüzsüz veya şiş görünümlü dil.',
+              'Parlak-koyu kırmızı renk; papillaların silinmesiyle pürüzsüz ve parlak yüzey (atrofik glossit) ya da belirgin kabarcıklı "çilek" görünümü.',
           possibleAssociations:
-              'B12, folik asit veya demir eksikliği, sıcak yiyecek tahrişi veya ateşli enfeksiyonlar.',
+              'Demir, B12 veya folik asit eksikliği (atrofik glossit), kızıl, Kawasaki hastalığı, ateşli enfeksiyonlar, alerjik reaksiyon veya sıcak yiyecek tahrişi.',
+          redFlagNote:
+              'Yüksek ateş, döküntü, şiddetli yanma veya dil şişliği eşlik ediyorsa gecikmeden doktora başvurun.',
         ),
         ReferenceFinding(
-          id: 'tongue_purple_or_nonhealing_ulcer',
-          title: 'Morarma, Belirgin Şişlik veya İyileşmeyen Yara',
+          id: 'tongue_geographic_patches',
+          title: 'Coğrafi Dil (Benign Migrator Glossit)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFD26D7B),
+          visualSignature:
+              'Yükseltili beyazımsı/gri kenarlı, ortası pürüzsüz pembe-kırmızı, günler içinde yer değiştirebilen harita benzeri düzensiz adacıklar.',
+          possibleAssociations:
+              'Genellikle tamamen iyi huylu (benign) kronik varyasyon; bazen sedef hastalığı (psöriyazis), stres veya baharatlı/asitli gıdalara yanma hassasiyeti eşlik edebilir.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_fissured_grooves',
+          title: 'Çatlak / Yarık Dil (Lingua Plicata)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.attention,
+          swatchColor: Color(0xFFD47B86),
+          visualSignature:
+              'Dil sırtında ve kenarlarında tek orta hat veya çoklu derin oluklar/yarıklar.',
+          possibleAssociations:
+              'Çoğunlukla doğuştan veya yaşla belirginleşen iyi huylu anatomik varyasyondur; nadiren B vitamini/demir/çinko eksikliği, sedef hastalığı, sindirim hassasiyetleri veya Melkersson-Rosenthal sendromu ile birlikte görülebilir. Olukların nazikçe temizlenmesi tahrişi önler.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_cyanotic_purple_blue',
+          title: 'Mor / Mavi Dil (Siyanoz / Dolaşım Uyarısı)',
           isHealthyReference: false,
           riskLevel: RiskLevel.urgent,
-          swatchColor: Color(0xFF834C73),
+          swatchColor: Color(0xFF7B5B8C),
           visualSignature:
-              'Dil yüzeyinde koyu mor/mavimsi renk, belirgin ödem/şişlik veya 2 haftadan uzun süren sert kenarlı yara/beyaz-kırmızı leke.',
+              'Gıda boyası olmaksızın dil mukozasında belirgin mor, eflatun veya mavimsi renk değişimi (santral siyanoz).',
           possibleAssociations:
-              'Oksijenlenme/dolaşım hassasiyeti, alerjik ödem (anjiyoödem) veya KBB/diş hekimi değerlendirmesi gereken oral lezyonlar.',
+              'Kanda düşük oksijen düzeyi (hipoksemi), kalp-akciğer veya dolaşım sistemi sorunları ya da ileri B2/B12 eksikliği açısından tıbbi değerlendirme gerekir.',
           redFlagNote:
-              'Dil şişmesi, nefes alma veya yutma güçlüğü varsa acil servise başvurun.',
+              'Ani başlayan mavi/mor dil, nefes darlığı, göğüs ağrısı veya baş dönmesi acil tıbbi müdahale gerektirir.',
+        ),
+        ReferenceFinding(
+          id: 'tongue_swelling_or_nonhealing_ulcer',
+          title: 'Belirgin Şişlik, Sert Kitle veya İyileşmeyen Yara',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFF9C3B4F),
+          visualSignature:
+              'Dilde belirgin ödem/büyüme, kenarlarda derin diş izleriyle şişlik, kanamalı/sert kenarlı ülser veya 2 haftadan uzun süren yara/kitle.',
+          possibleAssociations:
+              'Alerjik reaksiyon/anjiyoödem, travma/sürtünme, aft, viral enfeksiyonlar, tiroid/sistemik ödem veya erken tanı gerektiren oral mukoza lezyonları.',
+          redFlagNote:
+              'Dil şişmesi, yutma/konuşma veya nefes alma güçlüğü varsa derhal acil servise; 2 haftadan uzun süren yara, kanama veya sertlik varsa KBB/diş hekimine başvurun.',
         ),
       ],
     ),

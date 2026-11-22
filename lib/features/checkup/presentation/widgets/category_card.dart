@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -50,7 +51,7 @@ class CategoryCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                category.title,
+                category.localizedTitle(context.l10n),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -59,7 +60,7 @@ class CategoryCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                category.subtitle,
+                category.localizedSubtitle(context.l10n),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       height: 1.25,

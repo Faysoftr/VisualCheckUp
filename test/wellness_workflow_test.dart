@@ -9,6 +9,8 @@ import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 import 'package:visualcheckup/features/checkup/domain/quick_color_swatch.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 
 void main() {
   group('DoctorReportBuilder', () {
@@ -150,12 +152,76 @@ void main() {
       expect(skin.isDueNow, isTrue);
       expect(skin.statusLabel, 'İlk kayıt bekleniyor');
     });
+
+    test('integrates eye, urine, blood pressure, blood sugar, and lab report data in holistic follow-up plan', () {
+      final now = DateTime(2026, 5, 10, 12, 0);
+      final eyeResult = AnalysisResult(
+        id: 'e1',
+        category: CheckCategory.eye,
+        riskLevel: RiskLevel.normal,
+        summaryTitle: 'Göz Akı Tonu Olağan',
+        summaryDetail: 'Sarılık yok',
+        dominantColorValue: 0xFFF3F4F2,
+        observations: const [],
+        recommendations: const [],
+        warningFlags: const [],
+        confidence: 0.85,
+        createdAt: now.subtract(const Duration(days: 1)),
+      );
+      final bp = BloodPressureReading(
+        id: 'bp1',
+        recordedAt: now.subtract(const Duration(hours: 3)),
+        systolic: 118,
+        diastolic: 76,
+        pulse: 68,
+      );
+      final sugar = BloodSugarReading(
+        id: 'bs1',
+        recordedAt: now.subtract(const Duration(hours: 2)),
+        valueMgDl: 94,
+        measurementType: SugarMeasurementType.fasting,
+      );
+      final lab = LabReportRecord(
+        id: 'lab1',
+        title: 'Hemogram',
+        reportDate: now.subtract(const Duration(days: 5)),
+        source: LabReportSource.pdfUpload,
+        items: const [],
+        overallSummary: 'Normal',
+        suggestedSpecialty: 'Dahiliye',
+      );
+
+      final statuses = FollowUpEvaluator.evaluate(
+        enabledTracks: FollowUpTrack.values.toSet(),
+        history: [eyeResult],
+        bloodPressureReadings: [bp],
+        bloodSugarReadings: [sugar],
+        labReports: [lab],
+        now: now,
+      );
+
+      final eyeStatus = statuses.firstWhere((s) => s.track == FollowUpTrack.eyeWeekly);
+      final bpStatus = statuses.firstWhere((s) => s.track == FollowUpTrack.bloodPressureDaily);
+      final sugarStatus = statuses.firstWhere((s) => s.track == FollowUpTrack.bloodSugarDaily);
+      final labStatus = statuses.firstWhere((s) => s.track == FollowUpTrack.labReportQuarterly);
+
+      expect(eyeStatus.isDueNow, isFalse);
+      expect(eyeStatus.latestValueSummary, contains('Göz Akı Tonu Olağan'));
+      expect(bpStatus.isDueNow, isFalse);
+      expect(bpStatus.latestValueSummary, contains('118/76 mmHg'));
+      expect(sugarStatus.isDueNow, isFalse);
+      expect(sugarStatus.latestValueSummary, contains('94 mg/dL'));
+      expect(labStatus.isDueNow, isFalse);
+      expect(labStatus.latestValueSummary, contains('Hemogram'));
+    });
   });
 
   group('End-to-end Quick Color Card -> Result -> Doctor Summary widget flow', () {
     testWidgets('logs urine via camera-free color card and opens DoctorSummarySheet', (
       tester,
     ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });

@@ -87,6 +87,8 @@ void main() {
     testWidgets('Apple sign-in opens HomeScreen, Drawer switches theme, and Sign Out returns to Login', (
       tester,
     ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });
@@ -117,14 +119,22 @@ void main() {
 
       expect(find.text('Zeynep Kaya'), findsOneWidget);
       expect(find.text('Apple Hesabı'), findsOneWidget);
-      expect(find.text('Tahlil & Hastane Raporları'), findsOneWidget);
-      expect(find.text('Tansiyon & Şeker Takibi'), findsOneWidget);
+      expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
+      expect(find.text('Dil'), findsAtLeastNWidgets(1));
+      expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
 
       // Switch theme mode live from Drawer.
       final drawerScrollable = find.descendant(
         of: find.byType(Drawer),
         matching: find.byType(Scrollable),
       );
+      await tester.scrollUntilVisible(
+        find.text('Tahlil & Hastane Raporları'),
+        150,
+        scrollable: drawerScrollable,
+      );
+      expect(find.text('Tansiyon & Şeker Takibi'), findsOneWidget);
+      expect(find.text('Tahlil & Hastane Raporları'), findsOneWidget);
       await tester.scrollUntilVisible(
         find.text('Görsel Referans Rehberi'),
         150,
@@ -158,6 +168,8 @@ void main() {
     testWidgets('Google sign-in and Delete Account clears local history and returns to Login', (
       tester,
     ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });

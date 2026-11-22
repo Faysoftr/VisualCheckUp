@@ -1,3 +1,10 @@
+# Local secrets & API keys (never commit)
+dart_defines.local.json
+.env
+.env.local
+l10n_missing.txt
+android/build/
+
 # Miscellaneous
 *.class
 *.log

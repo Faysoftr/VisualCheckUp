@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/data/auth_service.dart';
@@ -8,12 +9,14 @@ import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/home_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
+import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
 class VisualCheckUpApp extends StatefulWidget {
   const VisualCheckUpApp({
     super.key,
     this.authService,
     this.themeController,
+    this.localeController,
     this.historyRepository,
     this.labsVitalsRepository,
     this.analyzer,
@@ -22,6 +25,7 @@ class VisualCheckUpApp extends StatefulWidget {
 
   final AuthService? authService;
   final ThemeController? themeController;
+  final LocaleController? localeController;
   final HistoryRepository? historyRepository;
   final LabsVitalsRepository? labsVitalsRepository;
   final ColorHealthAnalyzer? analyzer;
@@ -35,6 +39,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   late final AuthService _authService;
   late final ThemeController _themeController;
   late final bool _ownsThemeController;
+  late final LocaleController _localeController;
+  late final bool _ownsLocaleController;
   late final HistoryRepository _historyRepository;
   late final LabsVitalsRepository _labsVitalsRepository;
   late final ColorHealthAnalyzer _analyzer;
@@ -48,6 +54,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     _authService = widget.authService ?? const LocalAuthService();
     _ownsThemeController = widget.themeController == null;
     _themeController = widget.themeController ?? ThemeController();
+    _ownsLocaleController = widget.localeController == null;
+    _localeController = widget.localeController ?? LocaleController();
     _historyRepository = widget.historyRepository ?? HistoryRepository();
     _labsVitalsRepository =
         widget.labsVitalsRepository ?? LabsVitalsRepository();
@@ -59,6 +67,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
 
   Future<void> _bootstrap() async {
     await _themeController.load();
+    await _localeController.load();
     if (widget.initialUser == null) {
       final restoredUser = await _authService.loadCurrentUser();
       if (!mounted) return;
@@ -73,6 +82,9 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   void dispose() {
     if (_ownsThemeController) {
       _themeController.dispose();
+    }
+    if (_ownsLocaleController) {
+      _localeController.dispose();
     }
     super.dispose();
   }
@@ -106,35 +118,45 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: _themeController,
       builder: (context, themeMode, _) {
-        final Widget home;
-        if (_bootstrapping) {
-          home = const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        } else if (_currentUser == null) {
-          home = LoginScreen(
-            authService: _authService,
-            onAuthenticated: _handleAuthenticated,
-          );
-        } else {
-          home = HomeScreen(
-            analyzer: _analyzer,
-            historyRepository: _historyRepository,
-            labsVitalsRepository: _labsVitalsRepository,
-            currentUser: _currentUser!,
-            themeController: _themeController,
-            onSignOut: _handleSignOut,
-            onDeleteAccount: _handleDeleteAccount,
-          );
-        }
+        return ValueListenableBuilder<Locale?>(
+          valueListenable: _localeController,
+          builder: (context, locale, _) {
+            final Widget home;
+            if (_bootstrapping) {
+              home = const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            } else if (_currentUser == null) {
+              home = LoginScreen(
+                authService: _authService,
+                localeController: _localeController,
+                onAuthenticated: _handleAuthenticated,
+              );
+            } else {
+              home = HomeScreen(
+                analyzer: _analyzer,
+                historyRepository: _historyRepository,
+                labsVitalsRepository: _labsVitalsRepository,
+                currentUser: _currentUser!,
+                themeController: _themeController,
+                localeController: _localeController,
+                onSignOut: _handleSignOut,
+                onDeleteAccount: _handleDeleteAccount,
+              );
+            }
 
-        return MaterialApp(
-          title: 'VisualCheckUp',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
-          themeMode: themeMode,
-          home: home,
+            return MaterialApp(
+              title: 'VisualCheckUp',
+              debugShowCheckedModeBanner: false,
+              locale: locale,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              theme: AppTheme.light(),
+              darkTheme: AppTheme.dark(),
+              themeMode: themeMode,
+              home: home,
+            );
+          },
         );
       },
     );

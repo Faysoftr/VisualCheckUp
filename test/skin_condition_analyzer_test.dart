@@ -300,9 +300,11 @@ void main() {
       expect(suspiciousResult.summaryTitle, contains('Dermoskopi'));
     });
 
-    testWidgets('HomeScreen quick strip launches SkinCheckScreen directly into Morluk Takibi', (
+    testWidgets('Drawer Cilt category launches SkinCheckScreen directly into Morluk Takibi', (
       tester,
     ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('tr')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
         'visualcheckup_disclaimer_v1': true,
       });
@@ -318,9 +320,34 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Özel Cilt Ön Tarama'), findsOneWidget);
-      await tester.ensureVisible(find.text('Morluk Takibi'));
+      // Open left drawer and expand Cilt (Ben, Siğil, Morluk, Leke)
+      final scaffoldState = tester.firstState<ScaffoldState>(find.byType(Scaffold));
+      scaffoldState.openDrawer();
       await tester.pumpAndSettle();
+
+      expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
+      expect(find.text('Dil'), findsAtLeastNWidgets(1));
+      expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
+
+      await tester.scrollUntilVisible(
+        find.text('Cilt (Ben, Siğil, Morluk, Leke)'),
+        200,
+        scrollable: find.descendant(
+          of: find.byType(Drawer),
+          matching: find.byType(Scrollable),
+        ).first,
+      );
+      await tester.tap(find.text('Cilt (Ben, Siğil, Morluk, Leke)'));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Morluk Takibi'),
+        200,
+        scrollable: find.descendant(
+          of: find.byType(Drawer),
+          matching: find.byType(Scrollable),
+        ).first,
+      );
       await tester.tap(find.text('Morluk Takibi'));
       await tester.pumpAndSettle();
 

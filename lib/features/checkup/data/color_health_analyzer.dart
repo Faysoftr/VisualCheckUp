@@ -267,46 +267,118 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
+    // Dark brown / black pigment (melanonychia / subungual hematoma)
+    if (v >= 0.18 && v < 0.34 && s < 0.55) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.nail,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle: 'Tırnakta Koyu Kahverengi / Siyah Ton (Melanoniki Uyarısı)',
+        summaryDetail:
+            'Yeterli ışıkta çekildiyse koyu tırnak altı lekesi veya dikey siyah/kahverengi bant; darbe kaynaklı kanama olabileceği gibi cilt kanseri (melanom) açısından dermatolojik inceleme gerektirir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Tırnak bölgesinde belirgin düşük parlaklıkta koyu kahverengi/siyah ton saptandı.',
+        ],
+        recommendations: const [
+          'Bilinen bir çarpma/darbe yoksa ve özellikle tek tırnakta >3 mm genişlikte dikey çizgi görüyorsanız dermatoloji muayenesi alın.',
+        ],
+        warningFlags: const [
+          'Koyu çizgi genişliyorsa, düzensiz koyulaşıyorsa veya tırnak dibi etine taşıyorsa (Hutchinson işareti) acil dermatoloji değerlendirmesi gerekir.',
+        ],
+        confidence: 0.64,
+        createdAt: now,
+      );
+    }
+
+    // Greenish nail (Pseudomonas / chloronychia / fungal)
+    if (h >= 72 && h <= 165 && s >= 0.20) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.nail,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Tırnakta Yeşilimsi Renklenme (Kloronişi İpucu)',
+        summaryDetail:
+            'Tırnak plağındaki yeşilimsi ton çoğunlukla Pseudomonas bakteriyel enfeksiyonu veya mantar enfeksiyonu ile ilişkilidir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Tırnak yüzeyinde yeşil renk spektrumunda belirgin ton saptandı.',
+        ],
+        recommendations: const [
+          'Tırnağı kuru tutun, nemli/kimyasal teması azaltın ve uygun tedavi için dermatoloji uzmanına danışın.',
+        ],
+        warningFlags: const [
+          'Ağrı, şişlik, akıntı veya tırnak ayrılması eşlik ediyorsa gecikmeden doktora başvurun.',
+        ],
+        confidence: 0.65,
+        createdAt: now,
+      );
+    }
+
     // Yellowish nail
     if ((h >= 38 && h <= 68 && s >= 0.32) || (lab.b >= 24.0 && lab.a < 15.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.nail,
         riskLevel: RiskLevel.attention,
-        summaryTitle: 'Tırnakta Sararma Eğilimi',
+        summaryTitle: 'Tırnakta Sararma / Kalınlaşma Eğilimi',
         summaryDetail:
-            'Sarımsı tırnak tonu oje kalıntısı, mantar enfeksiyonu veya vitamin/mineral dengesizlikleri ile ilişkili olabilir.',
+            'Sarımsı tırnak tonu en sık tırnak mantarı (onikomikoz) veya sürekli oje/sigara kullanımına bağlıdır; nadiren lenfödem, kronik akciğer veya tiroid sorunlarıyla ilişkili olabilir.',
         dominantColorValue: color.toARGB32(),
         observations: const [
           'Tırnak yüzeyinde sarı ton doygunluğu yüksek.',
         ],
         recommendations: const [
-          'Tırnakta kalınlaşma veya kırılma eşlik ediyorsa dermatoloğa danışın.',
+          'Kalınlaşma, ufalanma veya tırnak yatağından ayrılma eşlik ediyorsa dermatoloğa danışın.',
         ],
         warningFlags: const [],
-        confidence: 0.64,
+        confidence: 0.65,
         createdAt: now,
       );
     }
 
-    // Very pale nail bed
+    // Intense redness (paronychia / nail fold inflammation)
+    if (((h <= 14 || h >= 346) && s >= 0.55) || lab.a >= 36.0) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.nail,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Tırnak Çevresinde Yoğun Kızarıklık İpucu',
+        summaryDetail:
+            'Tırnak veya tırnak etinde belirgin kızarıklık saptandı. Tırnak eti iltihabı (paronişi), batık tırnak veya tahriş ile ilişkili olabilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Kırmızı renk yoğunluğu doğal pembe tırnak yatağının üzerinde.',
+        ],
+        recommendations: const [
+          'Tırnak etlerini koparmaktan kaçının; şişlik, ağrı veya akıntı varsa dermatoloji uzmanına başvurun.',
+        ],
+        warningFlags: const [
+          'Zonklayan ağrı, iltihap akıntısı veya diyabet öyküsü varsa gecikmeden tıbbi değerlendirme alın.',
+        ],
+        confidence: 0.63,
+        createdAt: now,
+      );
+    }
+
+    // Very pale / white nail bed (anemia / Terry / Lindsay)
     if (s < 0.14 && v > 0.72) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.nail,
         riskLevel: RiskLevel.attention,
-        summaryTitle: 'Soluk Tırnak Tonu',
+        summaryTitle: 'Soluk / Yaygın Beyaz Tırnak Tonu',
         summaryDetail:
-            'Tırnak yatağı normal pembe tona göre oldukça soluk görünüyor. Işık yansıması değilse demir/kansızlık açısından takip edilebilir.',
+            'Tırnak yatağı normal pembe tona göre oldukça soluk veya beyaz görünüyor. Işık yansıması değilse demir eksikliği anemisi; tüm tırnaklarda yaygın beyazlaşma varsa karaciğer, böbrek veya albümin/protein düzeyleri açısından değerlendirilebilir.',
         dominantColorValue: color.toARGB32(),
         observations: const [
-          'Düşük renk doygunluğu ve yüksek parlaklık (soluk görünüm).',
+          'Düşük renk doygunluğu ve yüksek parlaklık (soluk/beyaz görünüm).',
         ],
         recommendations: const [
-          'Halsizlik veya çabuk yorulma yaşıyorsanız kan sayımı için doktora danışın.',
+          'Halsizlik, çabuk yorulma veya birden fazla tırnakta yaygın beyazlaşma varsa kan sayımı ve biyokimya için doktora danışın.',
         ],
         warningFlags: const [],
-        confidence: 0.60,
+        confidence: 0.62,
         createdAt: now,
       );
     }
@@ -320,10 +392,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
           'Tırnak yatağı sağlıklı pembe/doğal ton aralığına yakın görünüyor.',
       dominantColorValue: color.toARGB32(),
       observations: const [
-        'Belirgin morarma, aşırı solukluk veya yoğun sararma görülmedi.',
+        'Belirgin morarma, yeşerme, aşırı solukluk veya yoğun sararma görülmedi.',
       ],
       recommendations: const [
         'Tırnak bakımı ve dengeli beslenmeye devam edin.',
+        'Renk normal görünse bile çomaklaşma (saat camı bombeleşmesi), kaşık tırnak, enine derin oluk veya yeni dikey koyu çizgi fark ederseniz dermatoloğa danışın.',
       ],
       warningFlags: const [],
       confidence: 0.70,
@@ -340,45 +413,70 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     LabColor lab,
     DateTime now,
   ) {
-    // Whitish coating
-    if (s < 0.18 && v > 0.68) {
+    // Purple / bluish tongue (central cyanosis / low oxygen / circulation)
+    if (h >= 195 && h <= 305 && s >= 0.18) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.tongue,
-        riskLevel: RiskLevel.attention,
-        summaryTitle: 'Dilde Beyazımsı Tabaka İpucu',
+        riskLevel: RiskLevel.urgent,
+        summaryTitle: 'Mor / Mavimsi Dil Tonu (Siyanoz Uyarısı)',
         summaryDetail:
-            'Dil yüzeyinde açık/beyazımsı ton baskın. Ağız kuruluğu, yetersiz su tüketimi veya ağız hijyeni ile ilişkili olabilir.',
+            'Renkli yiyecek/içecek kaynaklı değilse dilde mor veya mavi renk, kanda oksijen azlığı (siyanoz) ya da dolaşım sorunlarına işaret edebilir.',
         dominantColorValue: color.toARGB32(),
         observations: const [
-          'Pembe dil tonuna kıyasla düşük doygunluk ve açık renk gözlemlendi.',
+          'Mavi-mor spektrumda doğal pembe mukozadan sapma saptandı.',
         ],
         recommendations: const [
-          'Gün içinde su tüketiminizi artırın ve dil temizliğini ihmal etmeyin.',
-          'Tabaka silinmiyor veya ağrı yapıyorsa diş hekimi/doktora görünün.',
+          'Son 30 dakikada boyayıcı gıda/içecek tüketmediyseniz doğal gün ışığında tekrar kontrol edin.',
+          'Kalıcı morarma veya mavilik görüyorsanız gecikmeden bir sağlık kuruluşuna başvurun.',
         ],
-        warningFlags: const [],
-        confidence: 0.64,
+        warningFlags: const [
+          'Nefes darlığı, göğüs ağrısı, baş dönmesi veya dudak morarması eşlik ediyorsa acil servise başvurun.',
+        ],
+        confidence: 0.68,
         createdAt: now,
       );
     }
 
-    // Yellowish coating (HSV + Lab b* channel)
-    if ((h >= 35 && h <= 70 && s >= 0.25) || (lab.b >= 22.0 && lab.a < 18.0)) {
+    // Dark brown / black hairy tongue (lingua villosa nigra)
+    if (v >= 0.18 && v < 0.34 && s < 0.45) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.tongue,
         riskLevel: RiskLevel.attention,
-        summaryTitle: 'Dilde Sarımsı Ton',
+        summaryTitle: 'Koyu Kahverengi / Siyahımsı Dil Tabakası',
         summaryDetail:
-            'Kahve/çay tüketimi, ağız kuruluğu veya sindirim hassasiyeti dilde sarımsı tabakaya yol açabilir.',
+            'Yeterli ışık altında çekildiyse bu görünüm çoğunlukla iyi huylu kıllı dil (keratin birikimi), bizmut içeren mide ilaçları, antibiyotik veya tütün/kahve ile ilişkilidir.',
         dominantColorValue: color.toARGB32(),
         observations: const [
-          'Dil yüzeyinde sarımsı renk ağırlığı tespit edildi.',
+          'Dil yüzeyinde düşük parlaklıkta koyu kahverengi/siyah ton ölçüldü.',
         ],
         recommendations: const [
-          'Ağız bakımınızı düzenli yapın ve bol su tüketin.',
-          'Uzun süre geçmezse bir hekime danışın.',
+          'Nazik dil fırçalama, bol su tüketimi ve tetikleyici ilaç/tütün gözden geçirmesi genellikle düzelme sağlar.',
+          'Renk değişimi 2 haftadan uzun sürüyorsa diş hekimi veya KBB uzmanına danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.60,
+        createdAt: now,
+      );
+    }
+
+    // Greenish coating
+    if (h >= 75 && h <= 165 && s >= 0.20) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.tongue,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Dilde Yeşilimsi Kaplama İpucu',
+        summaryDetail:
+            'Gıda boyası kaynaklı değilse yeşilimsi tabaka bakteri/mantar biyofilm artışı, ağız hijyeni yetersizliği, sigara veya antibiyotik sonrası flora değişimiyle ilişkili olabilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Dil yüzeyinde yeşil renk spektrumunda belirgin ton saptandı.',
+        ],
+        recommendations: const [
+          'Düzenli diş ve dil temizliği yapın, yeterli su tüketin.',
+          '1–2 hafta içinde gerilemiyorsa veya ağızda yanma/koku eşlik ediyorsa hekime başvurun.',
         ],
         warningFlags: const [],
         confidence: 0.62,
@@ -386,26 +484,97 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
-    // Intense red tongue
-    if ((h <= 15 || h >= 345) && s >= 0.58) {
+    // Whitish coating (oral thrush / dry mouth / hygiene / reflux / leukoplakia)
+    if (s < 0.18 && v > 0.68) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.tongue,
         riskLevel: RiskLevel.attention,
-        summaryTitle: 'Yoğun Kırmızı Dil Tonu',
+        summaryTitle: 'Dilde Beyaz Tabaka / Kaplama İpucu',
         summaryDetail:
-            'Dil rengi normal pembeden daha yoğun kırmızı görünüyor. Sıcak yiyecek tahrişi, B vitamini eksikliği veya ateşle ilişkili olabilir.',
+            'Dil yüzeyinde beyazımsı ton baskın. Ağız kuruluğu, yetersiz su tüketimi, ağız hijyeni, sigara, reflü/sindirim hassasiyeti veya oral mantar (pamukçuk) ile ilişkili olabilir.',
         dominantColorValue: color.toARGB32(),
         observations: const [
-          'Kırmızı renk doygunluğu yüksek ölçüldü.',
+          'Doğal pembe dil tonuna kıyasla düşük doygunluk ve açık beyazımsı yüzey gözlemlendi.',
         ],
         recommendations: const [
-          'Yanma, ağrı veya şişlik eşlik ediyorsa doktor değerlendirmesi alın.',
+          'Su tüketiminizi artırın ve yumuşak fırçayla dil temizliği yapın.',
+          'Silinmeyen/kazınmayan kalın beyaz plaklar (lökoplaki riski) veya ağrı varsa diş hekimi/KBB uzmanına görünün.',
         ],
         warningFlags: const [
-          'Dil şişmesi veya yutma güçlüğü varsa acil tıbbi destek alın.',
+          'Beyaz tabaka/plak 2 haftadan uzun sürüyorsa veya silinmiyorsa tıbbi değerlendirme gerekir.',
         ],
         confidence: 0.65,
+        createdAt: now,
+      );
+    }
+
+    // Yellow / orange coating (HSV + Lab b* channel)
+    if ((h >= 20 && h <= 70 && s >= 0.25) || (lab.b >= 22.0 && lab.a < 18.0)) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.tongue,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Dilde Sarı / Turuncu Kaplama İpucu',
+        summaryDetail:
+            'Ağız kuruluğu, bakteri/keratin birikimi, çay/kahve/sigara, antibiyotik kullanımı veya reflü/sindirim sistemi hassasiyetleri sarı-turuncu pas tabakasına yol açabilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Dil yüzeyinde sarı-turuncu renk ağırlığı tespit edildi.',
+        ],
+        recommendations: const [
+          'Ağız bakımınızı düzenli yapın, bol su tüketin ve 30 dk yeme-içme sonrası gün ışığında tekrar bakın.',
+          '2 haftadan uzun süre geçmezse veya mide/reflü şikayetleri eşlik ediyorsa hekime danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.63,
+        createdAt: now,
+      );
+    }
+
+    // Pale / dull tongue (anemia screening cue)
+    if (s < 0.20 && v >= 0.48 && v <= 0.68) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.tongue,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Soluk / Mat Dil Görünümü',
+        summaryDetail:
+            'Dil tonu canlı doğal pembeden daha soluk görünüyor. Işık kaynaklı değilse demir, B12 veya folik asit eksikliği (kansızlık) açısından takip edilebilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Pembe mukoza doygunluğu olağan aralığın altında ölçüldü.',
+        ],
+        recommendations: const [
+          'Halsizlik, çabuk yorulma veya baş dönmesi eşlik ediyorsa kan sayımı ve vitamin düzeyleri için doktora danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.60,
+        createdAt: now,
+      );
+    }
+
+    // Intense red / strawberry / atrophic glossy tongue
+    if (((h <= 15 || h >= 345) && s >= 0.55) || lab.a >= 36.0) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.tongue,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Yoğun Kırmızı / Çilek veya Pürüzsüz Dil İpucu',
+        summaryDetail:
+            'Dil rengi normal pembeden daha yoğun kırmızı görünüyor. B12, folik asit veya demir eksikliği (atrofik glossit), kızıl/ateşli enfeksiyonlar (çilek dil), alerji veya sıcak tahrişiyle ilişkili olabilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Kırmızı renk yoğunluğu (HSV/CIE a*) doğal pembe aralığın üzerinde ölçüldü.',
+        ],
+        recommendations: const [
+          'Pürüzsüz parlak görünüm, yanma veya ağrı varsa vitamin/kan değerleri için hekime başvurun.',
+          '2 haftadan uzun süren kızarıklık veya hassasiyette KBB/diş hekimi muayenesi önerilir.',
+        ],
+        warningFlags: const [
+          'Dil şişmesi, yüksek ateş, yutma/konuşma veya nefes alma güçlüğü varsa acil tıbbi destek alın.',
+        ],
+        confidence: 0.66,
         createdAt: now,
       );
     }
@@ -416,13 +585,14 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       riskLevel: RiskLevel.normal,
       summaryTitle: 'Dil Rengi Olağan Pembe Tonda',
       summaryDetail:
-          'Dil yüzeyinde belirgin yoğun beyaz, sarı veya aşırı kırmızı ton saptanmadı.',
+          'Dil yüzeyinde belirgin beyaz/sarı/yeşil kaplama, morarma veya aşırı kızarıklık saptanmadı.',
       dominantColorValue: color.toARGB32(),
       observations: const [
         'Renk tonu doğal pembe aralığında.',
       ],
       recommendations: const [
         'Düzenli ağız hijyeni ve yeterli sıvı alımını sürdürün.',
+        '2 haftadan uzun süren yara, çatlak ağrısı, şişlik veya sertlik fark ederseniz renk normal görünse bile hekime başvurun.',
       ],
       warningFlags: const [],
       confidence: 0.70,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
+import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/auth/data/auth_service.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
@@ -9,10 +10,12 @@ class LoginScreen extends StatefulWidget {
     super.key,
     required this.authService,
     required this.onAuthenticated,
+    this.localeController,
   });
 
   final AuthService authService;
   final ValueChanged<AuthUser> onAuthenticated;
+  final LocaleController? localeController;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -53,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
+    final activeLangCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       body: Container(
@@ -67,201 +72,238 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 84,
-                        height: 84,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppTheme.primaryTeal,
-                              AppTheme.secondaryMint,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(26),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryTeal.withValues(
-                                alpha: isDark ? 0.35 : 0.22,
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 20),
+                        Center(
+                          child: Container(
+                            width: 84,
+                            height: 84,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppTheme.primaryTeal,
+                                  AppTheme.secondaryMint,
+                                ],
                               ),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.health_and_safety_rounded,
-                          color: Colors.white,
-                          size: 44,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Text(
-                      'VisualCheckUp',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.6,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Cilt, ben ve görsel sağlık değişimleri için kişisel takip ve doktor randevusuna hazırlık asistanı.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        height: 1.45,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: const [
-                        _FeaturePill(
-                          icon: Icons.tune_rounded,
-                          label: 'Renk Kalibrasyonu',
-                        ),
-                        _FeaturePill(
-                          icon: Icons.lock_outline_rounded,
-                          label: 'Gizlilik Öncelikli',
-                        ),
-                        _FeaturePill(
-                          icon: Icons.auto_awesome_outlined,
-                          label: 'Opsiyonel AI',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              'Hesabınızla devam edin',
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Kişisel renk referanslarınızı ve kontrol geçmişinizi senkronize tutun.',
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                height: 1.35,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            _AppleSignInButton(
-                              isLoading:
-                                  _loadingProvider == AuthProviderType.apple,
-                              disabled: _isLoading,
-                              onPressed: () => _handleSignIn(
-                                AuthProviderType.apple,
-                                widget.authService.signInWithApple,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _GoogleSignInButton(
-                              isLoading:
-                                  _loadingProvider == AuthProviderType.google,
-                              disabled: _isLoading,
-                              onPressed: () => _handleSignIn(
-                                AuthProviderType.google,
-                                widget.authService.signInWithGoogle,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    color: colorScheme.outlineVariant,
+                              borderRadius: BorderRadius.circular(26),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.primaryTeal.withValues(
+                                    alpha: isDark ? 0.35 : 0.22,
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Text(
-                                    'veya',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Divider(
-                                    color: colorScheme.outlineVariant,
-                                  ),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 10),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            TextButton.icon(
-                              onPressed: _isLoading
-                                  ? null
-                                  : () => _handleSignIn(
-                                        AuthProviderType.guest,
-                                        widget.authService.continueAsGuest,
-                                      ),
-                              icon: _loadingProvider == AuthProviderType.guest
-                                  ? const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.person_outline_rounded),
-                              label: const Text('Misafir Olarak Devam Et'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            MedicalDisclaimer.shortBanner,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              height: 1.35,
-                              fontSize: 11.5,
+                            child: const Icon(
+                              Icons.health_and_safety_rounded,
+                              color: Colors.white,
+                              size: 44,
                             ),
                           ),
                         ),
+                        const SizedBox(height: 22),
+                        Text(
+                          l10n.appTitle,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.6,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.loginTagline,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            height: 1.45,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _FeaturePill(
+                              icon: Icons.tune_rounded,
+                              label: l10n.featureColorCalibration,
+                            ),
+                            _FeaturePill(
+                              icon: Icons.lock_outline_rounded,
+                              label: l10n.featurePrivacyFirst,
+                            ),
+                            _FeaturePill(
+                              icon: Icons.auto_awesome_outlined,
+                              label: l10n.featureOptionalAi,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  l10n.loginCardTitle,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  l10n.loginCardSubtitle,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    height: 1.35,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                _AppleSignInButton(
+                                  label: l10n.continueWithApple,
+                                  isLoading: _loadingProvider ==
+                                      AuthProviderType.apple,
+                                  disabled: _isLoading,
+                                  onPressed: () => _handleSignIn(
+                                    AuthProviderType.apple,
+                                    widget.authService.signInWithApple,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                _GoogleSignInButton(
+                                  label: l10n.continueWithGoogle,
+                                  isLoading: _loadingProvider ==
+                                      AuthProviderType.google,
+                                  disabled: _isLoading,
+                                  onPressed: () => _handleSignIn(
+                                    AuthProviderType.google,
+                                    widget.authService.signInWithGoogle,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Divider(
+                                        color: colorScheme.outlineVariant,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      child: Text(
+                                        l10n.orDivider,
+                                        style:
+                                            theme.textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Divider(
+                                        color: colorScheme.outlineVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                TextButton.icon(
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => _handleSignIn(
+                                            AuthProviderType.guest,
+                                            widget.authService.continueAsGuest,
+                                          ),
+                                  icon:
+                                      _loadingProvider == AuthProviderType.guest
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.person_outline_rounded,
+                                            ),
+                                  label: Text(l10n.continueAsGuest),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.info_outline_rounded,
+                              size: 16,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.disclaimerShort,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  height: 1.35,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              if (widget.localeController != null)
+                PositionedDirectional(
+                  top: 8,
+                  end: 12,
+                  child: ActionChip(
+                    avatar: Icon(
+                      Icons.language_rounded,
+                      size: 16,
+                      color: colorScheme.primary,
+                    ),
+                    label: Text(
+                      activeLangCode.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                    onPressed: () => LanguagePickerSheet.show(
+                      context,
+                      localeController: widget.localeController!,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -309,11 +351,13 @@ class _FeaturePill extends StatelessWidget {
 
 class _AppleSignInButton extends StatelessWidget {
   const _AppleSignInButton({
+    required this.label,
     required this.isLoading,
     required this.disabled,
     required this.onPressed,
   });
 
+  final String label;
   final bool isLoading;
   final bool disabled;
   final VoidCallback onPressed;
@@ -343,14 +387,17 @@ class _AppleSignInButton extends StatelessWidget {
                 color: fg,
               ),
             )
-          : const Row(
+          : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.apple, size: 22),
-                SizedBox(width: 10),
+                const Icon(Icons.apple, size: 22),
+                const SizedBox(width: 10),
                 Text(
-                  'Apple ile Devam Et',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -360,11 +407,13 @@ class _AppleSignInButton extends StatelessWidget {
 
 class _GoogleSignInButton extends StatelessWidget {
   const _GoogleSignInButton({
+    required this.label,
     required this.isLoading,
     required this.disabled,
     required this.onPressed,
   });
 
+  final String label;
   final bool isLoading;
   final bool disabled;
   final VoidCallback onPressed;
@@ -415,9 +464,12 @@ class _GoogleSignInButton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Google ile Devam Et',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),

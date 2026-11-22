@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 
 class DisclaimerDialog extends StatelessWidget {
   const DisclaimerDialog({super.key});
@@ -16,6 +16,7 @@ class DisclaimerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -24,21 +25,21 @@ class DisclaimerDialog extends StatelessWidget {
         size: 36,
         color: colorScheme.primary,
       ),
-      title: const Text(
-        'Önemli Tıbbi Bilgilendirme',
+      title: Text(
+        l10n.disclaimerTitle,
         textAlign: TextAlign.center,
       ),
-      content: const SingleChildScrollView(
+      content: SingleChildScrollView(
         child: Text(
-          MedicalDisclaimer.fullText,
-          style: TextStyle(height: 1.45),
+          l10n.disclaimerFull,
+          style: const TextStyle(height: 1.45),
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Okudum, Anladım'),
+          child: Text(l10n.disclaimerAccept),
         ),
       ],
     );

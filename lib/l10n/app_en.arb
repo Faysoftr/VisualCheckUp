@@ -1,0 +1,113 @@
+{
+  "@@locale": "en",
+  "appTitle": "VisualCheckUp",
+  "disclaimerShort": "This app does not provide a medical diagnosis; it is for informational and visual self-awareness purposes only.",
+  "disclaimerTitle": "Important Medical Notice",
+  "disclaimerFull": "VisualCheckUp provides a visual self-awareness pre-assessment based on color and appearance cues. It is not a medical device and never replaces a doctor's examination, lab testing, or medical diagnosis.\n\n• Ambient lighting, camera sensors, and screen calibration directly affect color perception.\n• Seek medical attention promptly for severe pain, bleeding, high fever, jaundice, black/clay stools, sudden vision changes, or breathing difficulty.\n• Privacy: Captured images are processed on your device by default.",
+  "disclaimerAccept": "I Understand",
+  "loginTagline": "Personal visual wellness tracker and doctor visit preparation assistant for skin, moles, and daily signs.",
+  "featureColorCalibration": "Color Calibration",
+  "featurePrivacyFirst": "Privacy First",
+  "featureOptionalAi": "Optional AI",
+  "loginCardTitle": "Continue with your account",
+  "loginCardSubtitle": "Keep your personal color baselines and checkup history organized.",
+  "continueWithApple": "Continue with Apple",
+  "continueWithGoogle": "Continue with Google",
+  "orDivider": "or",
+  "continueAsGuest": "Continue as Guest",
+  "guestGreeting": "Skin & Visual Wellness Tracking",
+  "userGreeting": "Hello, {name}",
+  "@userGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountTypeLabel": "{provider} Account",
+  "@accountTypeLabel": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "localOnlyLabel": "Stored on this device only",
+  "menuHome": "Home",
+  "menuSectionVisualChecks": "VISUAL CHECKS",
+  "menuSkinGroup": "Skin (Mole, Wart, Bruise, Spot)",
+  "menuSkinGeneral": "General Skin & Rash",
+  "menuSectionTracking": "TRACKING, LABS & VITALS",
+  "menuFollowUpPlan": "Personal Follow-Up Plan",
+  "menuVitalsTracker": "Blood Pressure & Sugar",
+  "menuLabReports": "Lab & Hospital Reports",
+  "menuQuickColorCard": "Camera-Free Color Card",
+  "menuHistory": "Checkup History",
+  "menuReferenceGuide": "Visual Reference Guide",
+  "menuSectionSettings": "SETTINGS & PRIVACY",
+  "menuAiSettings": "AI & Privacy",
+  "menuDisclaimer": "Medical Disclaimer",
+  "menuTheme": "Appearance Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "menuLanguage": "App Language",
+  "languageSystem": "System Default",
+  "signInGoogleOrApple": "Sign in with Google or Apple",
+  "signOut": "Sign Out",
+  "deleteAccount": "Delete Account",
+  "deleteAccountTitle": "Delete Account and Local Data",
+  "deleteAccountBody": "You will be signed out and your checkup history and personal color baselines on this device will be permanently deleted. Continue?",
+  "cancel": "Cancel",
+  "followUpCardTitle": "Personal Follow-Up Plan",
+  "followUpSelectEdit": "Select / Edit",
+  "followUpStart": "Start",
+  "followUpEmptyHint": "Tap to select eye, urine, blood pressure, blood sugar, and other routines.",
+  "followUpSheetSubtitle": "Track eye, tongue, nail, skin, urine, stool, blood pressure, blood sugar, and lab reports in one plan.",
+  "followUpSummaryCounts": "{active} active • {completed} up to date • {due} due",
+  "@followUpSummaryCounts": {
+    "placeholders": {
+      "active": { "type": "int" },
+      "completed": { "type": "int" },
+      "due": { "type": "int" }
+    }
+  },
+  "homeCategoriesTitle": "Checkup Categories",
+  "homeCategoriesSubtitle": "Track visual changes with camera calibration or camera-free color cards.",
+  "homeLabsVitalsTitle": "Labs, Blood Pressure & Sugar",
+  "homeLabsVitalsSubtitle": "Read hospital/blood test reports and track blood pressure & glucose trends.",
+  "homeLabsCardTitle": "Labs & Reports",
+  "homeLabsCardEmpty": "Read & review blood tests",
+  "homeLabsCardCount": "{count} saved reports",
+  "@homeLabsCardCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeVitalsCardTitle": "Blood Pressure & Sugar",
+  "homeVitalsCardEmpty": "Log readings & view trends",
+  "homeVitalsCardCount": "{count} saved readings",
+  "@homeVitalsCardCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeRecentChecks": "Recent Checks",
+  "seeAll": "See All",
+  "catEyeTitle": "Eye (Sclera)",
+  "catEyeSubtitle": "Redness, yellowing, and sclera tone",
+  "catNailTitle": "Nail",
+  "catNailSubtitle": "Pallor, cyanosis, yellowing & shape",
+  "catTongueTitle": "Tongue",
+  "catTongueSubtitle": "Color, white/yellow coating & texture",
+  "catFaceTitle": "Face & Skin",
+  "catFaceSubtitle": "Skin tone, pallor, and redness",
+  "catSkinTitle": "Skin Conditions",
+  "catSkinSubtitle": "Mole, wart, bruise, facial spot & rash",
+  "catUrineTitle": "Urine Color",
+  "catUrineSubtitle": "Hydration and color scale check",
+  "catStoolTitle": "Stool Color",
+  "catStoolSubtitle": "Digestion and color warning check",
+  "tooltipHistory": "History",
+  "tooltipAccountMenu": "Account & Menu"
+}

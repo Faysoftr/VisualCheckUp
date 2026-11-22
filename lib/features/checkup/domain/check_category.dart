@@ -43,7 +43,7 @@ extension CheckCategoryX on CheckCategory {
       case CheckCategory.face:
         return 'Cilt tonu, solgunluk ve kızarıklık';
       case CheckCategory.skinCondition:
-        return 'Döküntü, leke, pullanma ve ben ön kontrolü';
+        return 'Ben, siğil, morluk, yüz lekesi ve döküntü';
       case CheckCategory.urine:
         return 'Hidrasyon ve renk skalası kontrolü';
       case CheckCategory.stool:
