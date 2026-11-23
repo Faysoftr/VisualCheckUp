@@ -11,6 +11,7 @@ class AnalysisOptions {
     this.useWhiteReference = false,
     this.baseline,
     this.allowCloudAi = true,
+    this.languageCode = 'tr',
   });
 
   final bool useWhiteReference;
@@ -19,6 +20,9 @@ class AnalysisOptions {
   /// When `false`, forces 0-token on-device analysis even if a [VisionAiClient]
   /// is configured.
   final bool allowCloudAi;
+
+  /// Active ISO-639-1 language code forwarded to Vision AI prompts.
+  final String languageCode;
 }
 
 /// Abstraction for image-based health screening analyzers.

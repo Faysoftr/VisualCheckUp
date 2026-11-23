@@ -1,22 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
+import 'package:visualcheckup/features/checkup/data/cross_module_correlator.dart';
 import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/doctor_summary_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({
     super.key,
     required this.result,
     this.historyRepository,
+    this.labsVitalsRepository,
   });
 
   final AnalysisResult result;
   final HistoryRepository? historyRepository;
+  final LabsVitalsRepository? labsVitalsRepository;
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -25,6 +31,7 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   CategoryBaseline? _savedBaseline;
   List<AnalysisResult> _allHistory = const [];
+  List<CrossModuleInsight> _crossInsights = const [];
   bool _savingBaseline = false;
 
   @override
@@ -35,13 +42,24 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Future<void> _loadContextData() async {
     final repo = widget.historyRepository;
-    if (repo == null) return;
-    final baseline = await repo.getBaseline(widget.result.category);
-    final history = await repo.loadHistory();
+    final labsRepo = widget.labsVitalsRepository ?? LabsVitalsRepository();
+    final baseline =
+        repo != null ? await repo.getBaseline(widget.result.category) : null;
+    final history = repo != null ? await repo.loadHistory() : const <AnalysisResult>[];
+    final labs = await labsRepo.loadLabReports();
+    final bp = await labsRepo.loadBloodPressureReadings();
+    final sugar = await labsRepo.loadBloodSugarReadings();
+    final cross = CrossModuleHealthCorrelator.correlate(
+      visualResult: widget.result,
+      labReports: labs,
+      bpReadings: bp,
+      sugarReadings: sugar,
+    );
     if (!mounted) return;
     setState(() {
       _savedBaseline = baseline;
       _allHistory = history;
+      _crossInsights = cross;
     });
   }
 
@@ -133,6 +151,99 @@ class _ResultScreenState extends State<ResultScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          // Before / After Visual Photo Comparison Card
+          if (result.imagePath != null &&
+              File(result.imagePath!).existsSync()) ...[
+            _BeforeAfterPhotoCard(
+              currentResult: result,
+              previousWithPhoto: previousInCategory
+                  .where(
+                    (e) =>
+                        e.imagePath != null && File(e.imagePath!).existsSync(),
+                  )
+                  .firstOrNull,
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // Cross-Module Lab + Vitals + Visual Correlation Card
+          if (_crossInsights.isNotEmpty) ...[
+            Card(
+              color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.45),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.hub_outlined,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Tahlil & Ölçümlerle Çapraz Bağlantı',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    for (final insight in _crossInsights) ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              insight.title,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              insight.sourceLabel,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        insight.detail,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          height: 1.4,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      if (insight != _crossInsights.last)
+                        const Divider(height: 16),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // Status Hero Card
           Card(
             child: Padding(
@@ -722,6 +833,117 @@ class _SectionCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BeforeAfterPhotoCard extends StatelessWidget {
+  const _BeforeAfterPhotoCard({
+    required this.currentResult,
+    required this.previousWithPhoto,
+  });
+
+  final AnalysisResult currentResult;
+  final AnalysisResult? previousWithPhoto;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final df = DateFormat('dd.MM.yyyy');
+    final hasBefore = previousWithPhoto != null;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.compare_rounded,
+                  size: 19,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    hasBefore
+                        ? 'Önce / Sonra Görsel Kıyaslama'
+                        : 'Kaydedilen Kontrol Fotoğrafı',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                if (hasBefore) ...[
+                  Expanded(
+                    child: _PhotoTile(
+                      path: previousWithPhoto!.imagePath!,
+                      caption: 'Önce • ${df.format(previousWithPhoto!.createdAt)}',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(
+                  child: _PhotoTile(
+                    path: currentResult.imagePath!,
+                    caption:
+                        '${hasBefore ? 'Sonra • ' : ''}${df.format(currentResult.createdAt)}',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PhotoTile extends StatelessWidget {
+  const _PhotoTile({
+    required this.path,
+    required this.caption,
+  });
+
+  final String path;
+  final String caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: AspectRatio(
+            aspectRatio: 1.15,
+            child: Image.file(
+              File(path),
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Container(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: const Icon(Icons.broken_image_outlined),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          caption,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+      ],
     );
   }
 }

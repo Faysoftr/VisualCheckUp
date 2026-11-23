@@ -1,19 +1,29 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/core/storage/checkup_photo_storage.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 
 class HistoryRepository {
-  static const String _historyKey = 'visualcheckup_history_v1';
+  HistoryRepository({this.profileId = 'self'});
+
+  final String profileId;
+
+  static const String _historyBase = 'visualcheckup_history_v1';
   static const String _disclaimerAcceptedKey = 'visualcheckup_disclaimer_v1';
-  static const String _baselinesKey = 'visualcheckup_baselines_v1';
+  static const String _baselinesBase = 'visualcheckup_baselines_v1';
   static const String _cloudAiEnabledKey = 'visualcheckup_cloud_ai_v1';
   static const String _aiCacheKey = 'visualcheckup_ai_cache_v1';
-  static const String _followUpTracksKey = 'visualcheckup_followup_tracks_v1';
+  static const String _followUpTracksBase = 'visualcheckup_followup_tracks_v1';
   static const int _maxAiCacheEntries = 20;
+
+  String _scoped(String base) => profileId == 'self' ? base : '${base}_$profileId';
+  String get _historyKey => _scoped(_historyBase);
+  String get _baselinesKey => _scoped(_baselinesBase);
+  String get _followUpTracksKey => _scoped(_followUpTracksBase);
 
   Future<List<AnalysisResult>> loadHistory() async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,6 +52,9 @@ class HistoryRepository {
   Future<void> deleteResult(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final current = await loadHistory();
+    for (final item in current.where((e) => e.id == id)) {
+      await CheckupPhotoStorage.deletePhoto(item.imagePath);
+    }
     final updated = current.where((e) => e.id != id).toList();
     final encoded = updated.map((e) => jsonEncode(e.toJson())).toList();
     await prefs.setStringList(_historyKey, encoded);

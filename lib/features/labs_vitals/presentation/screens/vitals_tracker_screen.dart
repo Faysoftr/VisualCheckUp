@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/widgets/trend_sparkline_card.dart';
@@ -114,6 +115,30 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
     );
   }
 
+  Future<void> _exportDoctorPdf() async {
+    if (_bpReadings.isEmpty && _sugarReadings.isEmpty) {
+      await _copyDoctorSummary();
+      return;
+    }
+    try {
+      final labs = await widget.repository.loadLabReports();
+      await LabReportPdfGenerator.saveAndShareHolisticDoctorPdf(
+        profileName: 'VisualCheckUp',
+        labReports: labs,
+        bpReadings: _bpReadings,
+        sugarReadings: _sugarReadings,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('PDF oluşturulamadı: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -123,6 +148,11 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
       appBar: AppBar(
         title: Text(l10n.vitalsScreenTitle),
         actions: [
+          IconButton(
+            onPressed: _exportDoctorPdf,
+            tooltip: 'Doktora Göster • Özet PDF Oluştur',
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+          ),
           IconButton(
             onPressed: _copyDoctorSummary,
             tooltip: l10n.vitalsCopySummaryTooltip,

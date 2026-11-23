@@ -22,6 +22,7 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/category_car
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/growth/presentation/screens/growth_bmi_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
@@ -128,6 +129,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     await _loadDashboardData();
+  }
+
+  Future<void> _openGrowthBmi({int initialTabIndex = 0}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GrowthBmiScreen(initialTabIndex: initialTabIndex),
+      ),
+    );
   }
 
   Future<void> _openSkinSubModule(SkinConcernType concern) async {
@@ -507,6 +516,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenSkinModule: () => _openCategory(CheckCategory.skinCondition),
         onOpenLabReports: _openLabReports,
         onOpenVitalsTracker: _openVitalsTracker,
+        onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
+        onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,
         onOpenHistory: _openHistory,
@@ -767,6 +778,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ? l10n.homeVitalsCardEmpty
                                   : l10n.homeVitalsCardCount(_vitalsCount),
                               onTap: () => _openVitalsTracker(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 13),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.monitor_weight_outlined,
+                              accentColor: const Color(0xFF2B7BBA),
+                              title: 'Boy, Kilo & VKİ',
+                              subtitle: 'Vücut kitle indeksi & ideal kilo',
+                              onTap: () => _openGrowthBmi(initialTabIndex: 0),
+                            ),
+                          ),
+                          const SizedBox(width: 13),
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.child_care_outlined,
+                              accentColor: const Color(0xFF7B5EA7),
+                              title: 'Çocuklarım',
+                              subtitle: '0–18 yaş boy & kilo skalası',
+                              onTap: () => _openGrowthBmi(initialTabIndex: 1),
                             ),
                           ),
                         ],

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 
 /// High-clarity "Doktora Göster" summary sheet presenting observations,
 /// specialty guidance, chronological history, and questions to ask a doctor.
@@ -331,6 +332,31 @@ class _DoctorSummaryBody extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         FilledButton.icon(
+          onPressed: () async {
+            try {
+              await LabReportPdfGenerator.saveAndShareHolisticDoctorPdf(
+                profileName: 'VisualCheckUp',
+                visualChecks: [
+                  report.currentResult,
+                  ...report.previousCategoryResults,
+                ],
+              );
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('PDF oluşturulamadı: $e'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            }
+          },
+          icon: const Icon(Icons.picture_as_pdf_outlined),
+          label: const Text('Doktora Göster • Özet PDF Oluştur'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
           onPressed: () => _copyReport(context),
           icon: const Icon(Icons.copy_rounded),
           label: Text(l10n.copyShareSummaryBtn),

@@ -4,6 +4,7 @@ import 'package:image/image.dart' as img;
 import 'package:visualcheckup/core/ai/ai_vision_contract.dart';
 import 'package:visualcheckup/core/ai/image_preprocessor.dart';
 import 'package:visualcheckup/core/color/color_calibrator.dart';
+import 'package:visualcheckup/core/color/structural_feature_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -93,11 +94,18 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
       baselineNote = comp.note;
     }
 
+    final structural = StructuralFeatureAnalyzer.analyze(
+      image: decoded,
+      category: category,
+    );
+
     final request = AiVisionPromptBuilder.build(
       category: category,
       imageBytes: preprocessed.jpegBytes,
       mimeType: 'image/jpeg',
+      languageCode: options.languageCode,
       calibratedSample: sample,
+      structuralFeatures: structural,
       baseline: options.baseline,
       skinContext: skinContext,
     );

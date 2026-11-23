@@ -5,11 +5,15 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:visualcheckup/core/cloud/cloud_backup_service.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/notifications/reminder_service.dart';
+import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/ai_settings_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
+import 'package:visualcheckup/features/settings/presentation/screens/privacy_policy_screen.dart';
 
 enum _PermUiState {
   checking,
@@ -46,6 +50,10 @@ class _SettingsScreenState extends State<SettingsScreen>
   bool _cloudBackupEnabled = false;
   DateTime? _lastCloudSync;
   bool _syncingCloud = false;
+  ReminderConfig _reminderConfig = const ReminderConfig();
+  final ReminderPreferencesService _reminderService =
+      const ReminderPreferencesService();
+  final FamilyProfileController _profileController = FamilyProfileController();
 
   @override
   void initState() {
@@ -53,6 +61,66 @@ class _SettingsScreenState extends State<SettingsScreen>
     WidgetsBinding.instance.addObserver(this);
     _refreshPermissions();
     _loadCloudState();
+    _loadExtras();
+  }
+
+  Future<void> _loadExtras() async {
+    final rem = await _reminderService.load();
+    await _profileController.load();
+    if (!mounted) return;
+    setState(() => _reminderConfig = rem);
+  }
+
+  Future<void> _toggleReminder(bool enabled) async {
+    final updated = ReminderConfig(
+      enabled: enabled,
+      hour: _reminderConfig.hour,
+      minute: _reminderConfig.minute,
+    );
+    await _reminderService.save(updated);
+    if (!mounted) return;
+    setState(() => _reminderConfig = updated);
+  }
+
+  Future<void> _pickReminderTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _reminderConfig.timeOfDay,
+    );
+    if (picked == null || !mounted) return;
+    final updated = ReminderConfig(
+      enabled: true,
+      hour: picked.hour,
+      minute: picked.minute,
+    );
+    await _reminderService.save(updated);
+    if (!mounted) return;
+    setState(() => _reminderConfig = updated);
+  }
+
+  Future<void> _exportHolisticDoctorFile() async {
+    try {
+      final labsRepo = widget.labsVitalsRepository ?? LabsVitalsRepository();
+      final labs = await labsRepo.loadLabReports();
+      final bp = await labsRepo.loadBloodPressureReadings();
+      final sugar = await labsRepo.loadBloodSugarReadings();
+      final visuals = await widget.historyRepository.loadHistory();
+      await LabReportPdfGenerator.saveAndShareHolisticDoctorPdf(
+        profileName: _profileController.value.name,
+        labReports: labs,
+        bpReadings: bp,
+        sugarReadings: sugar,
+        visualChecks: visuals,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('PDF oluşturulamadı: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Future<void> _loadCloudState() async {
@@ -169,6 +237,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _profileController.dispose();
     super.dispose();
   }
 
@@ -594,7 +663,84 @@ class _SettingsScreenState extends State<SettingsScreen>
 
           const SizedBox(height: 12),
 
-          // 5. Privacy & Medical Notice Card
+          // 5. Family Profiles, Reminders & Holistic Doctor File
+          Card(
+            child: Column(
+              children: [
+                ValueListenableBuilder<FamilyProfile>(
+                  valueListenable: _profileController,
+                  builder: (context, activeProfile, _) {
+                    return ListTile(
+                      leading: Icon(
+                        Icons.family_restroom_outlined,
+                        color: colorScheme.primary,
+                      ),
+                      title: const Text(
+                        'Aile Profilleri',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        'Aktif profil: ${activeProfile.name} (${activeProfile.relation})',
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => FamilyProfileSheet.show(
+                        context,
+                        controller: _profileController,
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  secondary: Icon(
+                    Icons.notifications_active_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: const Text(
+                    'Takip Planı Hatırlatıcısı',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    _reminderConfig.enabled
+                        ? 'Aktif • Günlük saat ${_reminderConfig.formattedTime}'
+                        : 'Kapalı • Kişisel takip planı hatırlatması',
+                  ),
+                  value: _reminderConfig.enabled,
+                  onChanged: _toggleReminder,
+                ),
+                if (_reminderConfig.enabled)
+                  ListTile(
+                    dense: true,
+                    leading: const SizedBox(width: 24),
+                    title: const Text('Hatırlatma Saati'),
+                    trailing: TextButton(
+                      onPressed: _pickReminderTime,
+                      child: Text(_reminderConfig.formattedTime),
+                    ),
+                  ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    Icons.picture_as_pdf_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: const Text(
+                    'Bütüncül Doktor Dosyası PDF',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Son tahlil, tansiyon/şeker ve görsel kontroller tek PDF’te',
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: _exportHolisticDoctorFile,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // 6. Privacy & Medical Notice Card
           Card(
             child: Column(
               children: [
@@ -609,6 +755,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                     context,
                     historyRepository: widget.historyRepository,
                   ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: Icon(
+                    Icons.privacy_tip_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: const Text('Gizlilik Politikası & KVKK'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => PrivacyPolicyScreen.open(context),
                 ),
                 const Divider(height: 1),
                 ListTile(

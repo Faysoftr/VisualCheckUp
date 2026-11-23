@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:visualcheckup/core/color/color_calibrator.dart';
+import 'package:visualcheckup/core/color/structural_feature_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/module_reference_catalog.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
@@ -71,8 +72,10 @@ class AiVisionPromptBuilder {
   /// automatic implicit context caching maximizes input-token savings.
   static const String systemInstruction =
       'VisualCheckUp görsel ön farkındalık asistanısın. Tıbbi teşhis koymazsın. '
-      'Fotoğrafı verilen modülün sağlıklı/sağlıksız referanslarıyla ve kalibrasyon '
-      'telemetrisiyle kıyasla. Yalnızca geçerli, kısa Türkçe JSON döndür: '
+      'Fotoğrafı verilen modülün sağlıklı/sağlıksız referanslarıyla, renk ve ince yapı/doku '
+      'telemetrisiyle (dilde yarık/çatlak ve pas, gözde kılcal kanlanma veya sararma, '
+      'tırnakta beyaz nokta/çizgi, kırık/soyulma, oluk, koyu dikey bant) kıyasla. '
+      'Yalnızca geçerli, kısa Türkçe JSON döndür: '
       '{"image_quality_ok":bool,"matched_finding_ids":[str],'
       '"risk_level":"normal|attention|urgent","summary_title":str,'
       '"summary_detail":str,"observations":[str],"recommendations":[str],'
@@ -105,6 +108,7 @@ class AiVisionPromptBuilder {
     String mimeType = 'image/jpeg',
     String languageCode = 'tr',
     CalibratedSample? calibratedSample,
+    StructuralFeatures? structuralFeatures,
     CategoryBaseline? baseline,
     SkinCheckContext? skinContext,
   }) {
@@ -131,6 +135,12 @@ class AiVisionPromptBuilder {
         'b:${calibratedSample.lab.b.toStringAsFixed(1)}) '
         'wb=${calibratedSample.whiteBalanceApplied ? 1 : 0} '
         'cast=${calibratedSample.lightingCast.name}',
+      );
+    }
+
+    if (structuralFeatures != null) {
+      telemetryParts.add(
+        'struct=(${structuralFeatures.toCompactTelemetry(category)})',
       );
     }
 

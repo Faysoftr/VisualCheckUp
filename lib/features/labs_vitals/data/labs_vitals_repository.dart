@@ -7,9 +7,18 @@ import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 /// Persists dated hospital/blood lab reports, blood pressure measurements,
 /// and blood sugar measurements locally on-device.
 class LabsVitalsRepository {
-  static const String _labReportsKey = 'visualcheckup_lab_reports_v1';
-  static const String _bpReadingsKey = 'visualcheckup_bp_readings_v1';
-  static const String _sugarReadingsKey = 'visualcheckup_sugar_readings_v1';
+  LabsVitalsRepository({this.profileId = 'self'});
+
+  final String profileId;
+
+  static const String _labReportsBase = 'visualcheckup_lab_reports_v1';
+  static const String _bpReadingsBase = 'visualcheckup_bp_readings_v1';
+  static const String _sugarReadingsBase = 'visualcheckup_sugar_readings_v1';
+
+  String _scoped(String base) => profileId == 'self' ? base : '${base}_$profileId';
+  String get _labReportsKey => _scoped(_labReportsBase);
+  String get _bpReadingsKey => _scoped(_bpReadingsBase);
+  String get _sugarReadingsKey => _scoped(_sugarReadingsBase);
 
   Future<List<LabReportRecord>> loadLabReports() async {
     final prefs = await SharedPreferences.getInstance();

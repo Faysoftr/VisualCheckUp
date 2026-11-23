@@ -66,6 +66,7 @@ class AnalysisResult {
     this.lightingNote,
     this.baselineDeltaE,
     this.baselineComparisonNote,
+    this.imagePath,
   });
 
   final String id;
@@ -83,6 +84,7 @@ class AnalysisResult {
   final String? lightingNote;
   final double? baselineDeltaE;
   final String? baselineComparisonNote;
+  final String? imagePath;
 
   Color get dominantColor => Color(dominantColorValue);
 
@@ -98,6 +100,7 @@ class AnalysisResult {
     String? lightingNote,
     double? baselineDeltaE,
     String? baselineComparisonNote,
+    String? imagePath,
   }) {
     return AnalysisResult(
       id: id,
@@ -117,6 +120,7 @@ class AnalysisResult {
       baselineDeltaE: baselineDeltaE ?? this.baselineDeltaE,
       baselineComparisonNote:
           baselineComparisonNote ?? this.baselineComparisonNote,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 
@@ -138,6 +142,7 @@ class AnalysisResult {
       if (baselineDeltaE != null) 'baselineDeltaE': baselineDeltaE,
       if (baselineComparisonNote != null)
         'baselineComparisonNote': baselineComparisonNote,
+      if (imagePath != null) 'imagePath': imagePath,
     };
   }
 
@@ -160,6 +165,7 @@ class AnalysisResult {
       lightingNote: json['lightingNote'] as String?,
       baselineDeltaE: (json['baselineDeltaE'] as num?)?.toDouble(),
       baselineComparisonNote: json['baselineComparisonNote'] as String?,
+      imagePath: json['imagePath'] as String?,
     );
   }
 }

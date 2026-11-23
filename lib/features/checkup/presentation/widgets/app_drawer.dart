@@ -28,6 +28,8 @@ class AppDrawer extends StatelessWidget {
     this.onOpenQuickColorCard,
     this.onOpenLabReports,
     this.onOpenVitalsTracker,
+    this.onOpenGrowthBmi,
+    this.onOpenChildrenGrowth,
   });
 
   final AuthUser currentUser;
@@ -47,6 +49,8 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenQuickColorCard;
   final VoidCallback? onOpenLabReports;
   final VoidCallback? onOpenVitalsTracker;
+  final VoidCallback? onOpenGrowthBmi;
+  final VoidCallback? onOpenChildrenGrowth;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
     Navigator.of(context).pop();
@@ -306,6 +310,19 @@ class AppDrawer extends StatelessWidget {
                       icon: Icons.biotech_outlined,
                       label: l10n.menuLabReports,
                       onTap: () => _closeAndRun(context, onOpenLabReports!),
+                    ),
+                  if (onOpenGrowthBmi != null)
+                    _DrawerTile(
+                      icon: Icons.monitor_weight_outlined,
+                      label: 'Boy, Kilo & VKİ',
+                      onTap: () => _closeAndRun(context, onOpenGrowthBmi!),
+                    ),
+                  if (onOpenChildrenGrowth != null)
+                    _DrawerTile(
+                      icon: Icons.child_care_outlined,
+                      label: 'Çocuklarım (Büyüme Skalası)',
+                      onTap: () =>
+                          _closeAndRun(context, onOpenChildrenGrowth!),
                     ),
                   if (onOpenQuickColorCard != null)
                     _DrawerTile(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
+import 'package:visualcheckup/core/storage/checkup_photo_storage.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
@@ -45,6 +46,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   CategoryBaseline? _baseline;
   CameraPermissionState _permissionState = CameraPermissionState.granted;
   bool _hasCameraError = false;
+  double _minZoom = 1.0;
+  double _maxZoom = 1.0;
+  double _currentZoom = 1.0;
+  Offset? _focusPoint;
 
   @override
   void initState() {
@@ -202,6 +207,12 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
 
     try {
       await controller.initialize();
+      double minZ = 1.0;
+      double maxZ = 1.0;
+      try {
+        minZ = await controller.getMinZoomLevel();
+        maxZ = (await controller.getMaxZoomLevel()).clamp(minZ, 4.0);
+      } catch (_) {}
       if (!mounted) {
         await controller.dispose();
         return;
@@ -209,6 +220,9 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       setState(() {
         _controller = controller;
         _selectedCameraIndex = index;
+        _minZoom = minZ;
+        _maxZoom = maxZ;
+        _currentZoom = minZ;
         _isInitializing = false;
         _hasCameraError = false;
       });
@@ -302,18 +316,63 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     }
   }
 
+  Future<void> _setZoom(double value) async {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    final clamped = value.clamp(_minZoom, _maxZoom);
+    try {
+      await controller.setZoomLevel(clamped);
+      if (mounted) {
+        setState(() => _currentZoom = clamped);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _handleTapToFocus(
+    TapDownDetails details,
+    BoxConstraints constraints,
+  ) async {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+    final dx = (details.localPosition.dx / constraints.maxWidth).clamp(0.0, 1.0);
+    final dy = (details.localPosition.dy / constraints.maxHeight).clamp(0.0, 1.0);
+    final point = Offset(dx, dy);
+
+    setState(() => _focusPoint = details.localPosition);
+    try {
+      await controller.setFocusPoint(point);
+      await controller.setExposurePoint(point);
+    } catch (_) {}
+
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
+      if (mounted && _focusPoint == details.localPosition) {
+        setState(() => _focusPoint = null);
+      }
+    });
+  }
+
   Future<void> _processBytes(Uint8List bytes) async {
     try {
       final allowCloudAi = await widget.historyRepository.isCloudAiEnabled();
-      final result = await widget.analyzer.analyzeImage(
+      final langCode =
+          mounted ? Localizations.localeOf(context).languageCode : 'tr';
+      final analyzed = await widget.analyzer.analyzeImage(
         category: widget.category,
         imageBytes: bytes,
         options: AnalysisOptions(
           useWhiteReference: _useWhiteReference,
           baseline: _baseline,
           allowCloudAi: allowCloudAi,
+          languageCode: langCode,
         ),
       );
+      final savedPhotoPath = await CheckupPhotoStorage.savePhoto(
+        resultId: analyzed.id,
+        imageBytes: bytes,
+      );
+      final result = savedPhotoPath != null
+          ? analyzed.copyWith(imagePath: savedPhotoPath)
+          : analyzed;
       await _openResult(result);
     } catch (e) {
       if (!mounted) return;
@@ -548,51 +607,133 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
             ),
           ),
 
-          // Camera preview + framing reticles
+          // Camera preview + Tap-to-Focus + framing reticles + Zoom slider
           Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _buildPreviewArea(),
-                if (_controller != null && _controller!.value.isInitialized)
-                  IgnorePointer(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final h = constraints.maxHeight;
-                        return Stack(
-                          fit: StackFit.expand,
+            child: LayoutBuilder(
+              builder: (context, constraints) => Stack(
+                fit: StackFit.expand,
+                children: [
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapDown: (d) => _handleTapToFocus(d, constraints),
+                    child: _buildPreviewArea(),
+                  ),
+                  if (_focusPoint != null)
+                    Positioned(
+                      left: (_focusPoint!.dx - 26).clamp(
+                        0.0,
+                        (constraints.maxWidth - 52).clamp(0.0, double.infinity),
+                      ),
+                      top: (_focusPoint!.dy - 26).clamp(
+                        0.0,
+                        (constraints.maxHeight - 52).clamp(0.0, double.infinity),
+                      ),
+                      child: IgnorePointer(
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xFF5CE1D6),
+                              width: 2.2,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (_controller != null &&
+                      _controller!.value.isInitialized &&
+                      _maxZoom > _minZoom + 0.1)
+                    Positioned(
+                      left: 24,
+                      right: 24,
+                      bottom: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Row(
                           children: [
-                            Center(
-                              child: Container(
-                                width: 210,
-                                height: 210,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    width: 2.5,
+                            const Icon(
+                              Icons.zoom_in_rounded,
+                              color: Colors.white70,
+                              size: 18,
+                            ),
+                            Expanded(
+                              child: SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  trackHeight: 2.5,
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 7,
                                   ),
-                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                child: Slider(
+                                  value: _currentZoom.clamp(_minZoom, _maxZoom),
+                                  min: _minZoom,
+                                  max: _maxZoom,
+                                  activeColor: const Color(0xFF5CE1D6),
+                                  inactiveColor: Colors.white24,
+                                  onChanged: _setZoom,
                                 ),
                               ),
                             ),
-                            if (_useWhiteReference)
-                              Positioned(
-                                top: h * 0.74,
-                                left: 0,
-                                right: 0,
-                                child: Center(
-                                  child: Container(
-                                    width: 170,
-                                    height: (h * 0.14).clamp(44.0, 76.0),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.10),
-                                      border: Border.all(
-                                        color: const Color(0xFF5CE1D6),
-                                        width: 1.8,
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
+                            Text(
+                              '${_currentZoom.toStringAsFixed(1)}x',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (_controller != null && _controller!.value.isInitialized)
+                    IgnorePointer(
+                      child: LayoutBuilder(
+                        builder: (context, innerConstraints) {
+                          final h = innerConstraints.maxHeight;
+                          return Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 210,
+                                  height: 210,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.9),
+                                      width: 2.5,
                                     ),
+                                    borderRadius: BorderRadius.circular(28),
+                                  ),
+                                ),
+                              ),
+                              if (_useWhiteReference)
+                                Positioned(
+                                  top: h * 0.72,
+                                  left: 0,
+                                  right: 0,
+                                  child: Center(
+                                    child: Container(
+                                      width: 170,
+                                      height: (h * 0.14).clamp(44.0, 76.0),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.10),
+                                        border: Border.all(
+                                          color: const Color(0xFF5CE1D6),
+                                          width: 1.8,
+                                        ),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
                                     alignment: Alignment.center,
                                     child: Text(
                                       l10n.cameraWhiteRefOn,
@@ -635,6 +776,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                     ),
                   ),
               ],
+            ),
             ),
           ),
 

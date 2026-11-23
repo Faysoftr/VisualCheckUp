@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:visualcheckup/core/color/color_calibrator.dart';
+import 'package:visualcheckup/core/color/structural_feature_analyzer.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -39,6 +40,17 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       g: g,
       b: b,
       baseline: options.baseline,
+    );
+
+    final structural = StructuralFeatureAnalyzer.analyze(
+      image: decoded,
+      category: category,
+    );
+    result = _applyStructuralFindings(
+      result: result,
+      category: category,
+      structural: structural,
+      whiteBalanceApplied: sample.whiteBalanceApplied,
     );
 
     final extraObservations = <String>[];
@@ -921,6 +933,136 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.74,
       createdAt: now,
+    );
+  }
+
+  /// Merges 2D structural/texture findings (tongue fissures, eye capillary
+  /// redness, nail white lines/spots, nail cracks/roughness, dark vertical
+  /// nail bands) into the color-based [AnalysisResult].
+  AnalysisResult _applyStructuralFindings({
+    required AnalysisResult result,
+    required CheckCategory category,
+    required StructuralFeatures structural,
+    bool whiteBalanceApplied = false,
+  }) {
+    final obs = [...result.observations];
+    final recs = [...result.recommendations];
+    final warns = [...result.warningFlags];
+    var risk = result.riskLevel;
+    var title = result.summaryTitle;
+    var detail = result.summaryDetail;
+
+    switch (category) {
+      case CheckCategory.tongue:
+        if (structural.hasTongueFissures) {
+          obs.add(
+            'Dil yüzeyinde çizgisel yarık / çatlak dokusu (fissür oranı %${(structural.fissureGrooveRatio * 100).toStringAsFixed(1)}) saptandı.',
+          );
+          if (risk == RiskLevel.normal) {
+            risk = RiskLevel.attention;
+            title = 'Dilde Yarık / Çatlak Görünümü (Fissürlü Dil İpucu)';
+            detail =
+                'Dil yüzeyinde belirgin oluk/yarık dokusu algılandı. Çoğunlukla zararsız (coğrafi/fissürlü dil) olabilse de ağız kuruluğu, susuzluk veya B vitamini/demir eksiklikleriyle ilişkili olabilir.';
+            recs.add(
+              'Günlük su tüketimini artırın, dil yüzeyini nazikçe fırçalayın ve yanma/ağrı varsa dahiliye veya diş hekimine danışın.',
+            );
+          }
+        }
+        if (structural.hasTongueCoatingPatch && risk == RiskLevel.normal) {
+          obs.add(
+            'Dil üzerinde bölgesel açık renkli pas/tabaka kaplaması (%${(structural.coatingPatchRatio * 100).toStringAsFixed(0)}) gözlendi.',
+          );
+          risk = RiskLevel.attention;
+          title = 'Dilde Bölgesel Beyaz/Sarı Pas Tabakası İpucu';
+          detail =
+              'Dil yüzeyinin bir bölümünde açık renkli tabaka tespit edildi. Susuzluk, ağız kuruluğu veya geçici oral flora değişikliğine bağlı olabilir.';
+        }
+      case CheckCategory.eye:
+        if (structural.hasEyeRedVessels) {
+          obs.add(
+            'Göz akında (sklera) kılcal damar kanlanması / kızarıklık (%${(structural.scleraVesselRatio * 100).toStringAsFixed(1)}) tespit edildi.',
+          );
+          if (risk == RiskLevel.normal) {
+            risk = RiskLevel.attention;
+            title = 'Göz Akında Kılcal Kanlanma / Kızarıklık İpucu';
+            detail =
+                'Beyaz sklera üzerinde belirgin kırmızı damarlanma/kanlanma algılandı. Göz yorgunluğu, kuruluk, alerji, uykusuzluk veya konjonktivit ile ilişkili olabilir.';
+            recs.add(
+              'Ekran molası verin, gözlerinizi ovalamayın; kanlanma 24–48 saat içinde geçmezse göz hekimine başvurun.',
+            );
+            warns.add(
+              'Göz ağrısı, ışığa hassasiyet, görme bulanıklığı veya akıntı eşlik ediyorsa gecikmeden göz doktoruna görünün.',
+            );
+          }
+        }
+        if (structural.hasEyeYellowPatch &&
+            !whiteBalanceApplied &&
+            structural.scleraYellowRatio < 0.85 &&
+            risk == RiskLevel.normal) {
+          obs.add(
+            'Sklera kenarlarında bölgesel sarımsı ton artışı (%${(structural.scleraYellowRatio * 100).toStringAsFixed(1)}) gözlendi.',
+          );
+          risk = RiskLevel.attention;
+          title = 'Göz Akında Bölgesel Sarımsı Ton İpucu';
+          detail =
+              'Göz akının bir kısmında sarımsı renk kayması saptandı. Doğal gün ışığında tekrar kontrol edilmesi ve sürüyorsa hekime danışılması önerilir.';
+        }
+      case CheckCategory.nail:
+        if (structural.hasNailDarkVerticalBand) {
+          obs.add(
+            'Tırnak plağında dar dikey koyu pigment bandı (skor %${(structural.darkVerticalBandScore * 100).toStringAsFixed(0)}) saptandı.',
+          );
+          risk = RiskLevel.urgent;
+          title = 'Tırnakta Dikey Koyu Çizgi (Melanoniki Uyarısı)';
+          detail =
+              'Tırnak boyunca uzanan koyu kahverengi/siyah dikey bant algılandı. Travma veya ilaç kaynaklı olabileceği gibi özellikle tek tırnakta genişliyorsa cilt kanseri (melanom) açısından dermatolojik inceleme gerekir.';
+          recs.add(
+            'Bilinen bir darbe yoksa vakit kaybetmeden bir Dermatoloji (Cildiye) uzmanına muayene olun.',
+          );
+          warns.add(
+            'Koyu çizgi 3 mm’den genişse, düzensiz koyulaşıyorsa veya tırnak dibi etine taşıyorsa acil dermatoloji değerlendirmesi önerilir.',
+          );
+        } else {
+          if (structural.hasNailWhiteLinesOrSpots) {
+            obs.add(
+              'Tırnak plağında beyaz nokta / yatay beyaz çizgi kontrastı (%${(structural.whiteLineSpotRatio * 100).toStringAsFixed(1)}) tespit edildi.',
+            );
+            if (risk == RiskLevel.normal) {
+              risk = RiskLevel.attention;
+              title = 'Tırnakta Beyaz Çizgi / Nokta (Lökoniki İpucu)';
+              detail =
+                  'Pembe tırnak yüzeyi üzerinde belirgin beyaz nokta veya enine beyaz çizgi algılandı. Küçük noktalar çoğunlukla hafif darbelere bağlıdır; yaygın/enine beyaz bantlar çinko, protein veya mineral eksikliği açısından değerlendirilebilir.';
+              recs.add(
+                'Tırnağı darbelerden koruyun; birden fazla tırnakta tekrarlayan beyaz çizgiler varsa kan tahlili (çinko, ferritin, B12, albümin) için hekime danışın.',
+              );
+            }
+          }
+          if (structural.hasNailCracksOrRoughness) {
+            obs.add(
+              'Tırnak yüzeyinde/ucunda kırılma, soyulma veya pürüzlü oluk dokusu (pürüzlülük %${(structural.fractureEdgeRoughness * 100).toStringAsFixed(0)}) saptandı.',
+            );
+            if (risk == RiskLevel.normal) {
+              risk = RiskLevel.attention;
+              title = 'Tırnakta Kırılma / Soyulma / Yüzey Pürüzlülüğü';
+              detail =
+                  'Tırnak plağında veya serbest kenarda kırık, katmanlı soyulma ya da enine oluklanma (Beau çizgisi/pürüzlülük) dokusu algılandı. Sık su/kimyasal teması dışında demir, biyotin, çinko, B12 eksikliği veya tiroid sorunlarıyla ilişkili olabilir.';
+              recs.add(
+                'Temizlikte eldiven kullanın, tırnak ve etlerini düzenli nemlendirin; kırılma yaygın ve kalıcıysa dermatoloji veya dahiliye değerlendirmesi alın.',
+              );
+            }
+          }
+        }
+      default:
+        break;
+    }
+
+    return result.copyWith(
+      riskLevel: risk,
+      summaryTitle: title,
+      summaryDetail: detail,
+      observations: obs.toSet().toList(),
+      recommendations: recs.toSet().toList(),
+      warningFlags: warns.toSet().toList(),
     );
   }
 }
