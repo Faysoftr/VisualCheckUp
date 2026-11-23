@@ -520,48 +520,107 @@ class _HomeScreenState extends State<HomeScreen> {
         onDeleteAccount: widget.onDeleteAccount,
       ),
       appBar: AppBar(
+        backgroundColor: isDark
+            ? AppTheme.darkCanvas
+            : const Color(0xFFEFF7F6),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: Padding(
+          padding: const EdgeInsetsDirectional.only(start: 10),
+          child: Center(
+            child: _FrostedCircleAction(
+              isDark: isDark,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints.tightFor(width: 38, height: 38),
+                icon: const Icon(Icons.menu_rounded, size: 21),
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+            ),
+          ),
+        ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/images/app_logo.jpg',
-                width: 28,
-                height: 28,
-                fit: BoxFit.cover,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryTeal.withValues(alpha: 0.22),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/app_logo.jpg',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            const SizedBox(width: 10),
-            Text(l10n.appTitle),
+            const SizedBox(width: 9),
+            Text(
+              l10n.appTitle,
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: isDark ? Colors.white : const Color(0xFF0E2929),
+              ),
+            ),
           ],
         ),
         actions: [
-          IconButton(
-            onPressed: _openHistory,
-            tooltip: l10n.tooltipHistory,
-            icon: const Icon(Icons.history_rounded),
+          _FrostedCircleAction(
+            isDark: isDark,
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 38, height: 38),
+              onPressed: _openHistory,
+              tooltip: l10n.tooltipHistory,
+              icon: const Icon(Icons.history_rounded, size: 20),
+            ),
           ),
+          const SizedBox(width: 8),
           Padding(
-            padding: const EdgeInsetsDirectional.only(end: 12),
+            padding: const EdgeInsetsDirectional.only(end: 14),
             child: Tooltip(
               message: l10n.tooltipAccountMenu,
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
                 onTap: () => _scaffoldKey.currentState?.openDrawer(),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: isDark
-                      ? colorScheme.primaryContainer
-                      : AppTheme.primaryTeal.withValues(alpha: 0.14),
-                  child: Text(
-                    widget.currentUser.initials,
-                    style: TextStyle(
-                      color: isDark
-                          ? colorScheme.onPrimaryContainer
-                          : AppTheme.primaryTeal,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppTheme.primaryTeal, AppTheme.secondaryMint],
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    backgroundColor: isDark
+                        ? const Color(0xFF122323)
+                        : Colors.white,
+                    child: Text(
+                      widget.currentUser.initials,
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFF6CE5DC)
+                            : AppTheme.primaryTeal,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                      ),
                     ),
                   ),
                 ),
@@ -579,401 +638,937 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           DecoratedBox(
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppTheme.darkCanvas.withValues(alpha: 0.90)
-                  : Colors.white.withValues(alpha: 0.35),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        AppTheme.darkCanvas.withValues(alpha: 0.86),
+                        AppTheme.darkCanvas.withValues(alpha: 0.94),
+                      ]
+                    : [
+                        const Color(0xFFEFF7F6).withValues(alpha: 0.72),
+                        const Color(0xFFF5F9F8).withValues(alpha: 0.78),
+                      ],
+              ),
             ),
           ),
           CustomScrollView(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? colorScheme.primaryContainer.withValues(alpha: 0.25)
-                          : AppTheme.softMintTint,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.14),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Signature Deep-Teal Gradient Hero Card
+                      _HeroWellnessCard(
+                        greeting: _greetingText(context),
+                        providerLabel: widget.currentUser.provider.label,
+                        disclaimer: l10n.disclaimerShort,
+                        checksCount: _allHistory.length,
+                        labsCount: _labReportCount,
+                        vitalsCount: _vitalsCount,
+                        checksLabel: l10n.menuHistory,
+                        labsLabel: l10n.menuLabReports,
+                        vitalsLabel: l10n.menuVitalsTracker,
+                        onTapChecks: _openHistory,
+                        onTapLabs: _openLabReports,
+                        onTapVitals: () => _openVitalsTracker(),
                       ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 12),
+
+                      // 2. Elevated Modern Follow-Up Plan Card
+                      _FollowUpModernCard(
+                        title: l10n.followUpCardTitle,
+                        editLabel: l10n.followUpSelectEdit,
+                        startLabel: l10n.followUpStart,
+                        emptyHint: l10n.followUpEmptyHint,
+                        nextTrack: nextTrack,
+                        trackTitle: nextTrack?.track.localizedTitle(l10n),
+                        statusLabel: nextTrack?.localizedStatusLabel(l10n),
+                        onEdit: _openFollowUpPlan,
+                        onStart: nextTrack == null
+                            ? null
+                            : () => _startTrack(nextTrack.track),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // 3. Editorial Section Header for Categories
+                      _SectionHeader(
+                        title: l10n.homeCategoriesTitle,
+                        subtitle: l10n.homeCategoriesSubtitle,
+                        badgeText: '${CheckCategory.values.length}',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 4. Floating Porcelain 2-Column Category Grid
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final category = CheckCategory.values[index];
+                      return CategoryCard(
+                        category: category,
+                        onTap: () => _openCategory(category),
+                      );
+                    },
+                    childCount: CheckCategory.values.length,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 13,
+                    crossAxisSpacing: 13,
+                    childAspectRatio: 1.04,
+                  ),
+                ),
+              ),
+
+              // 5. Labs & Vitals Bento Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionHeader(
+                        title: l10n.homeLabsVitalsTitle,
+                        subtitle: l10n.homeLabsVitalsSubtitle,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.biotech_outlined,
+                              accentColor: AppTheme.primaryTeal,
+                              title: l10n.homeLabsCardTitle,
+                              subtitle: _labReportCount == 0
+                                  ? l10n.homeLabsCardEmpty
+                                  : l10n.homeLabsCardCount(_labReportCount),
+                              onTap: _openLabReports,
+                            ),
+                          ),
+                          const SizedBox(width: 13),
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.monitor_heart_outlined,
+                              accentColor: const Color(0xFFC8553D),
+                              title: l10n.homeVitalsCardTitle,
+                              subtitle: _vitalsCount == 0
+                                  ? l10n.homeVitalsCardEmpty
+                                  : l10n.homeVitalsCardCount(_vitalsCount),
+                              onTap: () => _openVitalsTracker(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 6. Recent Checks Timeline
+              if (_recent.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+                    child: Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _greetingText(context),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: isDark
-                                      ? colorScheme.onSurface
-                                      : const Color(0xFF0E3434),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surface.withValues(
-                                  alpha: isDark ? 0.2 : 0.85,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.verified_user_outlined,
-                                    size: 13,
-                                    color: colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    widget.currentUser.provider.label,
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        Expanded(
+                          child: _SectionHeader(
+                            title: l10n.homeRecentChecks,
+                          ),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.shield_outlined,
-                              color: colorScheme.primary,
-                              size: 17,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                l10n.disclaimerShort,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isDark
-                                      ? colorScheme.onSurfaceVariant
-                                      : const Color(0xFF1F4D4D),
-                                  height: 1.35,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
+                        TextButton(
+                          onPressed: _openHistory,
+                          child: Text(l10n.seeAll),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.event_repeat_rounded,
-                                size: 18,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  l10n.followUpCardTitle,
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                              TextButton.icon(
-                                onPressed: _openFollowUpPlan,
-                                style: TextButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                ),
-                                icon: const Icon(Icons.tune_rounded, size: 16),
-                                label: Text(l10n.followUpSelectEdit),
-                              ),
-                            ],
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                  sliver: SliverList.separated(
+                    itemCount: _recent.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final item = _recent[index];
+                      final dateText =
+                          DateFormat('dd.MM HH:mm').format(item.createdAt);
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF162323).withValues(alpha: 0.94)
+                              : Colors.white.withValues(alpha: 0.94),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isDark
+                                ? colorScheme.outlineVariant
+                                    .withValues(alpha: 0.3)
+                                : Colors.white,
                           ),
-                          const Divider(height: 14),
-                          if (nextTrack != null)
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: colorScheme.primaryContainer,
-                                  child: Icon(
-                                    nextTrack.track.icon,
-                                    color: colorScheme.primary,
-                                    size: 20,
-                                  ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.2 : 0.04,
+                              ),
+                              blurRadius: 14,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                          child: ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(2.5),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: item.riskLevel.color
+                                      .withValues(alpha: 0.45),
+                                  width: 2,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        nextTrack.track.localizedTitle(l10n),
-                                        style: theme.textTheme.labelLarge
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        nextTrack.localizedStatusLabel(l10n),
-                                        style:
-                                            theme.textTheme.bodySmall?.copyWith(
-                                          color: nextTrack.isDueNow
-                                              ? colorScheme.primary
-                                              : const Color(0xFF1B8A5A),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      if (nextTrack.latestValueSummary !=
-                                          null) ...[
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          nextTrack.latestValueSummary!,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                            fontSize: 11.5,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                FilledButton.tonal(
-                                  onPressed: () =>
-                                      _startTrack(nextTrack.track),
-                                  style: FilledButton.styleFrom(
-                                    visualDensity: VisualDensity.compact,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                  ),
-                                  child: Text(l10n.followUpStart),
-                                ),
-                              ],
-                            )
-                          else
-                            InkWell(
-                              borderRadius: BorderRadius.circular(12),
-                              onTap: _openFollowUpPlan,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.add_task_rounded,
-                                      size: 20,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        l10n.followUpEmptyHint,
-                                        style:
-                                            theme.textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              ),
+                              child: CircleAvatar(
+                                backgroundColor: item.dominantColor,
+                                radius: 16,
                               ),
                             ),
-                        ],
-                      ),
-                    ),
+                            title: Text(
+                              item.summaryTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14.5,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '${item.category.localizedTitle(l10n)} • $dateText',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            trailing: Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: BoxDecoration(
+                                color: item.riskLevel.color
+                                    .withValues(alpha: 0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                item.riskLevel.icon,
+                                size: 18,
+                                color: item.riskLevel.color,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => ResultScreen(
+                                    result: item,
+                                    historyRepository: widget.historyRepository,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.homeCategoriesTitle,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                ),
+              ] else
+                const SliverToBoxAdapter(child: SizedBox(height: 28)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FrostedCircleAction extends StatelessWidget {
+  const _FrostedCircleAction({
+    required this.isDark,
+    required this.child,
+  });
+
+  final bool isDark;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.85),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.10)
+              : AppTheme.primaryTeal.withValues(alpha: 0.10),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _HeroWellnessCard extends StatelessWidget {
+  const _HeroWellnessCard({
+    required this.greeting,
+    required this.providerLabel,
+    required this.disclaimer,
+    required this.checksCount,
+    required this.labsCount,
+    required this.vitalsCount,
+    required this.checksLabel,
+    required this.labsLabel,
+    required this.vitalsLabel,
+    required this.onTapChecks,
+    required this.onTapLabs,
+    required this.onTapVitals,
+  });
+
+  final String greeting;
+  final String providerLabel;
+  final String disclaimer;
+  final int checksCount;
+  final int labsCount;
+  final int vitalsCount;
+  final String checksLabel;
+  final String labsLabel;
+  final String vitalsLabel;
+  final VoidCallback onTapChecks;
+  final VoidCallback onTapLabs;
+  final VoidCallback onTapVitals;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF0D3B3D), Color(0xFF105453), Color(0xFF126B67)]
+              : const [Color(0xFF085457), Color(0xFF0C7473), Color(0xFF169D93)],
+        ),
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryTeal.withValues(alpha: isDark ? 0.25 : 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: Stack(
+          children: [
+            // Soft ambient decorative orbs
+            Positioned(
+              top: -36,
+              right: -24,
+              child: IgnorePointer(
+                child: Container(
+                  width: 132,
+                  height: 132,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.08),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.homeCategoriesSubtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final category = CheckCategory.values[index];
-                  return CategoryCard(
-                    category: category,
-                    onTap: () => _openCategory(category),
-                  );
-                },
-                childCount: CheckCategory.values.length,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.05,
+            Positioned(
+              bottom: -44,
+              left: -26,
+              child: IgnorePointer(
+                child: Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.06),
+                  ),
+                ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 22, 16, 4),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 15, 16, 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.homeLabsVitalsTitle,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.homeLabsVitalsSubtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
-                        child: _DashboardModuleCard(
-                          icon: Icons.biotech_outlined,
-                          accentColor: AppTheme.primaryTeal,
-                          title: l10n.homeLabsCardTitle,
-                          subtitle: _labReportCount == 0
-                              ? l10n.homeLabsCardEmpty
-                              : l10n.homeLabsCardCount(_labReportCount),
-                          onTap: _openLabReports,
+                        child: Text(
+                          greeting,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.45,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _DashboardModuleCard(
-                          icon: Icons.monitor_heart_outlined,
-                          accentColor: const Color(0xFFC8553D),
-                          title: l10n.homeVitalsCardTitle,
-                          subtitle: _vitalsCount == 0
-                              ? l10n.homeVitalsCardEmpty
-                              : l10n.homeVitalsCardCount(_vitalsCount),
-                          onTap: () => _openVitalsTracker(),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.verified_user_outlined,
+                              size: 13,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              providerLabel,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  // Compact interactive frosted stats strip
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _HeroStatChip(
+                          icon: Icons.camera_alt_outlined,
+                          count: checksCount,
+                          label: checksLabel,
+                          onTap: onTapChecks,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _HeroStatChip(
+                          icon: Icons.biotech_outlined,
+                          count: labsCount,
+                          label: labsLabel,
+                          onTap: onTapLabs,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _HeroStatChip(
+                          icon: Icons.monitor_heart_outlined,
+                          count: vitalsCount,
+                          label: vitalsLabel,
+                          onTap: onTapVitals,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.shield_outlined,
+                          color: Colors.white.withValues(alpha: 0.88),
+                          size: 15,
+                        ),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: Text(
+                            disclaimer,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.90),
+                              fontSize: 11.5,
+                              height: 1.32,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-          if (_recent.isNotEmpty) ...[
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroStatChip extends StatelessWidget {
+  const _HeroStatChip({
+    required this.icon,
+    required this.count,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final int count;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(13),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(13),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+          child: Row(
+            children: [
+              Icon(icon, size: 15, color: Colors.white.withValues(alpha: 0.92)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      l10n.homeRecentChecks,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      '$count',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13.5,
+                        height: 1.05,
                       ),
                     ),
-                    TextButton(
-                      onPressed: _openHistory,
-                      child: Text(l10n.seeAll),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.80),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FollowUpModernCard extends StatelessWidget {
+  const _FollowUpModernCard({
+    required this.title,
+    required this.editLabel,
+    required this.startLabel,
+    required this.emptyHint,
+    required this.nextTrack,
+    required this.trackTitle,
+    required this.statusLabel,
+    required this.onEdit,
+    required this.onStart,
+  });
+
+  final String title;
+  final String editLabel;
+  final String startLabel;
+  final String emptyHint;
+  final FollowUpTrackStatus? nextTrack;
+  final String? trackTitle;
+  final String? statusLabel;
+  final VoidCallback onEdit;
+  final VoidCallback? onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF162323).withValues(alpha: 0.94)
+            : Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark
+              ? colorScheme.primary.withValues(alpha: 0.24)
+              : Colors.white,
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryTeal.withValues(alpha: isDark ? 0.14 : 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 11, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryTeal.withValues(
+                      alpha: isDark ? 0.25 : 0.10,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.event_repeat_rounded,
+                        size: 14,
+                        color: isDark
+                            ? const Color(0xFF6CE5DC)
+                            : AppTheme.primaryTeal,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? const Color(0xFF6CE5DC)
+                              : AppTheme.primaryTeal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: onEdit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 14,
+                          color: colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          editLabel,
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              sliver: SliverList.separated(
-                itemCount: _recent.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final item = _recent[index];
-                  final dateText =
-                      DateFormat('dd.MM HH:mm').format(item.createdAt);
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: item.dominantColor,
-                        radius: 18,
+            const SizedBox(height: 10),
+            if (nextTrack != null)
+              Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.primaryTeal.withValues(alpha: 0.16),
+                          AppTheme.secondaryMint.withValues(alpha: 0.24),
+                        ],
                       ),
-                      title: Text(
-                        item.summaryTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: Text('${item.category.title} • $dateText'),
-                      trailing: Icon(
-                        item.riskLevel.icon,
-                        color: item.riskLevel.color,
-                      ),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => ResultScreen(
-                              result: item,
-                              historyRepository: widget.historyRepository,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      nextTrack!.track.icon,
+                      color: isDark
+                          ? const Color(0xFF6CE5DC)
+                          : AppTheme.primaryTeal,
+                      size: 21,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          trackTitle ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: nextTrack!.isDueNow
+                                    ? AppTheme.secondaryMint
+                                    : const Color(0xFF1B8A5A),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                statusLabel ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: nextTrack!.isDueNow
+                                      ? colorScheme.primary
+                                      : const Color(0xFF1B8A5A),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (nextTrack!.latestValueSummary != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            nextTrack!.latestValueSummary!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11.5,
                             ),
                           ),
-                        );
-                      },
+                        ],
+                      ],
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: onStart,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.primaryTeal,
+                      foregroundColor: Colors.white,
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 9,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          startLabel,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_forward_rounded, size: 15),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            else
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: onEdit,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.add_task_rounded,
+                        size: 20,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          emptyHint,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.title,
+    this.subtitle,
+    this.badgeText,
+  });
+
+  final String title;
+  final String? subtitle;
+  final String? badgeText;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 18,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppTheme.primaryTeal, AppTheme.secondaryMint],
+                ),
               ),
             ),
-          ] else
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+              ),
+            ),
+            if (badgeText != null) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryTeal.withValues(
+                    alpha: isDark ? 0.25 : 0.11,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeText!,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? const Color(0xFF6CE5DC)
+                        : AppTheme.primaryTeal,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 3),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 12),
+            child: Text(
+              subtitle!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.32,
+              ),
+            ),
+          ),
         ],
-      ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -996,37 +1591,134 @@ class _DashboardModuleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: accentColor.withValues(alpha: 0.14),
-                child: Icon(icon, color: accentColor, size: 22),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
+    final isDark = theme.brightness == Brightness.dark;
+    final hsl = HSLColor.fromColor(accentColor);
+    final lighterAccent = hsl
+        .withLightness((hsl.lightness + 0.12).clamp(0.0, 0.85))
+        .toColor();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF162323).withValues(alpha: 0.94)
+            : Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark
+              ? accentColor.withValues(alpha: 0.22)
+              : Colors.white,
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withValues(alpha: isDark ? 0.14 : 0.09),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.035),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            splashColor: accentColor.withValues(alpha: 0.12),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -24,
+                  right: -24,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            accentColor.withValues(alpha: isDark ? 0.22 : 0.14),
+                            accentColor.withValues(alpha: 0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [accentColor, lighterAccent],
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: 0.26),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(icon, color: Colors.white, size: 21),
+                          ),
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: accentColor.withValues(
+                                alpha: isDark ? 0.18 : 0.10,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 15,
+                              color: accentColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
