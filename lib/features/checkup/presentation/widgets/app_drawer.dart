@@ -198,7 +198,7 @@ class AppDrawer extends StatelessWidget {
                                 Flexible(
                                   child: Text(
                                     l10n.accountTypeLabel(
-                                      currentUser.provider.label,
+                                      currentUser.provider.localizedLabel(l10n),
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,

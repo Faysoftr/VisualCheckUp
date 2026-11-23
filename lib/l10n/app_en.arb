@@ -194,5 +194,451 @@
   "aiSettingsTitle": "AI & Privacy Settings",
   "vitalsBpTab": "Blood Pressure",
   "vitalsSugarTab": "Blood Sugar",
-  "skinScreenTitle": "Skin Conditions Pre-Check"
+  "skinScreenTitle": "Skin Conditions Pre-Check",
+  "providerGuest": "Guest",
+  "signInFailed": "Sign-in failed: {error}",
+  "@signInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "riskNormal": "Normal Appearance",
+  "riskAttention": "Follow-Up Suggested",
+  "riskUrgent": "Doctor Review Recommended",
+  "recentSummaryFallback": "{category} • {status}",
+  "@recentSummaryFallback": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "latestSummaryPrefix": "Latest: {value}",
+  "@latestSummaryPrefix": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "latestLabValuesSummary": "Latest: {count} values ({abnormal} out of range)",
+  "@latestLabValuesSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "abnormal": {
+        "type": "int"
+      }
+    }
+  },
+  "latestLabAllNormal": "Latest: {count} values (all normal)",
+  "@latestLabAllNormal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labStatusCriticalLow": "Critical Low",
+  "labStatusLow": "Low",
+  "labStatusNormal": "Normal",
+  "labStatusHigh": "High",
+  "labStatusCriticalHigh": "Critical High",
+  "labSourceManual": "Manual Entry",
+  "labSourcePasted": "Parsed from Report Text",
+  "labSourcePhoto": "JPG / Photo Report",
+  "labSourcePdf": "PDF Report",
+  "bpLow": "Low Blood Pressure",
+  "bpNormal": "Normal Range",
+  "bpElevated": "Elevated",
+  "bpStage1": "Stage 1 High",
+  "bpStage2": "Stage 2 High",
+  "bpCrisis": "Hypertensive Crisis",
+  "sugarLow": "Low Blood Sugar",
+  "sugarNormal": "Normal Range",
+  "sugarBorderline": "Borderline High",
+  "sugarHigh": "High Blood Sugar",
+  "sugarVeryHigh": "Very High Blood Sugar",
+  "sugarTypeFasting": "Fasting",
+  "sugarTypePostMeal": "Post-Meal (2h)",
+  "sugarTypeRandom": "Random",
+  "specialtyEye": "Ophthalmology or Internal Medicine",
+  "specialtyNail": "Dermatology or Internal Medicine",
+  "specialtyTongue": "ENT, Oral Health, or Internal Medicine",
+  "specialtySkin": "Dermatology",
+  "specialtyUrine": "Urology or Internal Medicine",
+  "specialtyStool": "Gastroenterology or Internal Medicine",
+  "cloudBackupTitle": "Cloud Backup (Optional • Firebase)",
+  "cloudBackupDesc": "By default, all your lab reports and readings stay on this device only. Enable private backup under your Google/Apple account if you want to keep data when changing phones.",
+  "cloudBackupToggleTitle": "Enable Cloud Backup",
+  "cloudBackupLastSync": "Last backup: {date}",
+  "@cloudBackupLastSync": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cloudBackupEnabledReady": "Enabled • Ready to sync",
+  "cloudBackupDisabledLocal": "Off • On-device storage only",
+  "cloudBackupSignInRequired": "Sign in with Google or Apple to use cloud backup.",
+  "cloudBackupNowBtn": "Back Up Now",
+  "cloudRestoreBtn": "Restore from Cloud",
+  "cloudConsentTitle": "Cloud Backup Consent",
+  "cloudConsentBody": "Your blood tests, vitals, and checkups are stored only on this device by default.\n\nIf you enable cloud backup, this data is stored privately under your Google/Apple Firebase account and permanently deleted when you delete your account.\n\nDo you consent?",
+  "cloudConsentConfirm": "Yes, Enable",
+  "cloudBackupSuccess": "Cloud backup complete: {count} records synced.",
+  "@cloudBackupSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cloudBackupFailed": "Backup failed: {error}",
+  "@cloudBackupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cloudRestoreSuccess": "Restored from cloud: {count} records imported.",
+  "@cloudRestoreSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cloudRestoreFailed": "Restore failed: {error}",
+  "@cloudRestoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cloudBackupDisabledNotice": "Cloud backup turned off. New records stay on this device only.",
+  "aiCloudToggleTitle": "Cloud Vision AI (Gemini) Analysis",
+  "aiCloudOnDesc": "On: Sharp photos are resized and analyzed over a secure connection. Falls back on-device when offline.",
+  "aiCloudOffDesc": "Off (0 Tokens): All analysis runs strictly on your device; no photos are ever uploaded.",
+  "aiBackendOfflineNote": "When a Gemini / Firebase AI key is configured, cloud analysis activates automatically according to this toggle; the on-device engine is currently active.",
+  "aiOptimizationsTitle": "Active Token & Data Saving Controls",
+  "aiOptQualityGate": "0-token blur, darkness, and glare quality gate",
+  "aiOptCompression": "Auto-crop + 512px / 768px JPEG (80%) compression",
+  "aiOptTieredModel": "Smart model routing (Flash-Lite / Flash) & low thinking",
+  "aiOptHashCache": "On-device duplicate hash cache (0 tokens)",
+  "aiClearCacheBtn": "Clear AI Cache",
+  "aiCacheCleared": "AI cache cleared.",
+  "resultScreenTitle": "{category} Result",
+  "@resultScreenTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "tooltipDoctorSummary": "Doctor Visit Summary",
+  "tooltipReferenceGuide": "Reference Guide",
+  "calibratedColorTone": "Calibrated Color Tone",
+  "sampledColorTone": "Sampled Dominant Tone",
+  "confidenceLabel": "Pre-check confidence: {percent}%",
+  "@confidenceLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "whiteBalanceDefaultNote": "Color balanced with white reference.",
+  "recommendedSpecialtyLabel": "Suggested specialty: {specialty}",
+  "@recommendedSpecialtyLabel": {
+    "placeholders": {
+      "specialty": {
+        "type": "String"
+      }
+    }
+  },
+  "timelineComparisonTitle": "Change Over Time",
+  "todayLabel": "Today",
+  "previousRecordSummary": "Previous log: \"{title}\" ({status}). Tracking {count} records.",
+  "@previousRecordSummary": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "personalBaselineComparisonTitle": "Personal Baseline Comparison",
+  "yourBaselineLabel": "Baseline",
+  "warningFlagsTitle": "Warning Signs to Watch",
+  "observationsTitle": "Observations",
+  "recommendationsTitle": "Recommendations",
+  "personalBaselineCardTitle": "Personal Baseline Calibration",
+  "personalBaselineCardDesc": "Save a reading on a healthy day as your personal baseline to reduce camera sensor drift.",
+  "saveBaselineBtn": "Save as My Baseline",
+  "updateBaselineBtn": "Update My Baseline",
+  "clearBaselineBtn": "Remove",
+  "baselineSavedMsg": "Personal baseline saved for {category}.",
+  "@baselineSavedMsg": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "baselineClearedMsg": "Personal baseline removed for {category}.",
+  "@baselineClearedMsg": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorSummaryBtn": "Show to Doctor • Prepare Summary",
+  "returnHomeBtn": "Back to Home",
+  "doctorSheetTitle": "Show to Doctor • Visit Summary",
+  "colorLabel": "Color: {hex} • {status}",
+  "@colorLabel": {
+    "placeholders": {
+      "hex": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "timelineHistoryTitle": "Timeline with Previous Logs",
+  "questionsForDoctorTitle": "Questions to Ask Your Doctor",
+  "copyShareSummaryBtn": "Copy & Share Summary",
+  "doctorSummaryCopied": "Doctor visit summary copied to clipboard.",
+  "referenceSheetTitle": "{category} — Visual References",
+  "@referenceSheetTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "healthyReferenceLabel": "Healthy Reference",
+  "captureChecklistTitle": "Capture Tips",
+  "abnormalFindingsTitle": "Abnormal / Warning Visual Findings",
+  "cameraPermPermanentMsg": "Camera access is disabled in system settings. Enable camera permission for VisualCheckUp or pick a photo from gallery.",
+  "cameraPermRequiredMsg": "Camera permission is needed for visual pre-checks. Images are processed on your device by default.",
+  "cameraGrantPermTitle": "Camera Access Needed",
+  "cameraRequestPermBtn": "Grant Camera Permission",
+  "cameraPickGalleryBtn": "Choose from Gallery",
+  "cameraWhiteRefOn": "White Reference: On",
+  "cameraWhiteRefOff": "White Reference: Off",
+  "cameraBaselineActive": "Baseline Saved",
+  "cameraAnalyzing": "Analyzing...",
+  "cameraCaptureBtn": "Capture & Analyze",
+  "cameraAnalysisFailed": "Analysis failed: {error}",
+  "@cameraAnalysisFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quickCardTitle": "{category} • Color Card",
+  "@quickCardTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "quickCardPrivacyBanner": "No camera needed: pick the closest shade for a private 2-second record.",
+  "quickCardChooseShade": "Select the Closest Color Shade",
+  "quickCardExtraContext": "Extra Context (Optional)",
+  "quickCardSaveViewBtn": "Save & View Assessment",
+  "quickCardUseCameraBtn": "Use Camera Instead",
+  "skinIntroTitle": "Visual Dermatology Pre-Screening",
+  "skinIntroDesc": "Compares moles, warts, bruises, and facial spots against surrounding skin. Not a diagnosis; helps prepare for a dermatologist visit.",
+  "skinStep1Title": "1. Select Skin Pre-Screening Module",
+  "skinOtherConcernsLabel": "Other Skin Presentations",
+  "skinStep2Title": "2. Accompanying Symptoms (Optional)",
+  "skinStep3Title": "3. Body Area (Optional)",
+  "skinStartCameraBtn": "Start Camera Skin Check",
+  "skinConcernRash": "Redness / Rash",
+  "skinConcernMole": "Mole / Dark Spot",
+  "skinConcernScaly": "Scaly / Dry Plaque",
+  "skinConcernBlister": "Blister / Acne",
+  "skinConcernGeneral": "General Skin Check",
+  "bodyAreaFaceNeck": "Face / Neck",
+  "bodyAreaArmHand": "Arm / Hand",
+  "bodyAreaTorso": "Torso",
+  "bodyAreaLegFoot": "Leg / Foot",
+  "bodyAreaScalp": "Scalp",
+  "bodyAreaOther": "Other",
+  "symptomItching": "Itching",
+  "symptomPainWarmth": "Pain / Warmth",
+  "symptomRapidChange": "Rapid growth / shape change",
+  "symptomBleeding": "Bleeding / Oozing",
+  "symptomSpreading": "Spreading rapidly",
+  "symptomFever": "Fever present",
+  "symptomNonHealing": "Non-healing sore (4+ weeks)",
+  "symptomOver6mm": "Over 6 mm or irregular border",
+  "symptomNoTrauma": "Appeared without trauma",
+  "symptomRoughDots": "Rough surface / tiny black dots",
+  "symptomSunHormone": "Sun, hormone, or post-acne spot",
+  "bruiseGuideTitle": "Bruise Color Stages Guide",
+  "wartGuideTitle": "Wart Pre-Check & Safety Guide",
+  "abcdeGuideTitle": "ABCDE Mole Self-Check Guide",
+  "abcdeGuideSubtitle": "5 key signs dermatologists use for mole & skin cancer screening",
+  "labScreenTitle": "Lab & Hospital Reports",
+  "labTabReports": "My Reports",
+  "labTabTrends": "Change Tracking",
+  "labAddBtn": "Add Report / Blood Test",
+  "labEmptyTitle": "No saved blood tests yet",
+  "labEmptyDesc": "Upload a PDF or JPG blood test report; optionally add your hospital diagnosis or complaint for a plain-language summary.",
+  "labAddFirstBtn": "Add First Lab / PDF Report",
+  "labTrendsEmptyDesc": "Save blood tests on different dates to see longitudinal trend charts for Hemoglobin, Ferritin, Glucose, TSH, Vitamin D, and more.",
+  "labParamsCount": "{count} parameters",
+  "@labParamsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labOutOfRangeCount": "{count} out of range",
+  "@labOutOfRangeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labDetailParamsTitle": "Parameter Review ({count})",
+  "@labDetailParamsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labEnteredDiagnosisTitle": "Hospital / Doctor Diagnosis",
+  "labEnteredComplaintTitle": "Your Complaint / Note",
+  "labInterpretationTitle": "Plain-Language Interpretation",
+  "labCopyDoctorSummaryBtn": "Show to Doctor • Copy Summary",
+  "labSummaryCopied": "Lab summary copied to clipboard.",
+  "labExportPdfBtn": "Export Doctor PDF",
+  "labAddSheetTitle": "Add Hospital / Blood Test Report",
+  "labReportTitleField": "Report Title",
+  "labDefaultReportTitle": "Blood Test Result",
+  "labStep1Upload": "1. Upload PDF or JPG Blood Report",
+  "labUploadPdfJpgBtn": "Upload PDF or JPG",
+  "labCameraCaptureBtn": "Take Photo",
+  "labStep2Context": "2. Hospital Diagnosis & Note (Optional)",
+  "labStep2ContextHint": "Enter a doctor's diagnosis you want explained or your symptoms; you may leave both blank.",
+  "labDiagnosisField": "Hospital / Doctor Diagnosis (Optional)",
+  "labComplaintField": "Your Symptoms / Question (Optional)",
+  "labStep3PasteManual": "3. Paste Report Text or Add Values Manually",
+  "labParseTextBtn": "Read & Parse Text",
+  "labParamDropdown": "Lab Parameter",
+  "labValueField": "Value ({unit})",
+  "@labValueField": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "labAddValueBtn": "+ Add",
+  "labParsedValuesTitle": "Parsed Values ({count})",
+  "@labParsedValuesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labSaveEvaluateBtn": "Evaluate & Save Dated Report",
+  "labTrendSummary": "{count} records • Change: {delta} • Latest: {status}",
+  "@labTrendSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "delta": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "vitalsScreenTitle": "Blood Pressure & Sugar",
+  "vitalsCopySummaryTooltip": "Copy Doctor Summary",
+  "vitalsCopyEmptyMsg": "Add a blood pressure or glucose reading first to create a summary.",
+  "vitalsSummaryCopied": "Blood pressure & sugar summary copied.",
+  "vitalsAddBpBtn": "Add Blood Pressure",
+  "vitalsAddSugarBtn": "Add Blood Sugar",
+  "vitalsBpEmptyTitle": "No blood pressure readings yet",
+  "vitalsBpEmptyDesc": "Log systolic/diastolic pressure and pulse with dates to follow your trend chart.",
+  "vitalsBpAddFirstBtn": "Add First BP Reading",
+  "vitalsSugarEmptyTitle": "No blood sugar readings yet",
+  "vitalsSugarEmptyDesc": "Log fasting, post-meal (2h), or random glucose readings to track your trend.",
+  "vitalsSugarAddFirstBtn": "Add First Sugar Reading",
+  "vitalsBpAverage": "Average ({count}): {sys}/{dia} mmHg",
+  "@vitalsBpAverage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "sys": {
+        "type": "int"
+      },
+      "dia": {
+        "type": "int"
+      }
+    }
+  },
+  "vitalsLastPulse": " • Pulse {pulse} bpm",
+  "@vitalsLastPulse": {
+    "placeholders": {
+      "pulse": {
+        "type": "int"
+      }
+    }
+  },
+  "vitalsBpHistoryTitle": "Dated Blood Pressure Logs",
+  "vitalsSugarAverage": "Average ({count}): {avg} mg/dL",
+  "@vitalsSugarAverage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "avg": {
+        "type": "int"
+      }
+    }
+  },
+  "vitalsSugarHistoryTitle": "Dated Blood Sugar Logs",
+  "vitalsNewBpTitle": "New Blood Pressure Reading",
+  "vitalsSystolicField": "Systolic (Top)",
+  "vitalsDiastolicField": "Diastolic (Bottom)",
+  "vitalsPulseField": "Pulse (bpm — Optional)",
+  "vitalsNoteField": "Note (Optional)",
+  "vitalsSaveBpBtn": "Save Blood Pressure",
+  "vitalsNewSugarTitle": "New Blood Sugar Reading",
+  "vitalsSugarValueField": "Blood Sugar (mg/dL)",
+  "vitalsSaveSugarBtn": "Save Blood Sugar",
+  "chartAddReadingHint": "Add readings to view chart"
 }

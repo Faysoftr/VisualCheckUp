@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
@@ -88,10 +89,11 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.category.title} • Renk Kartı'),
+        title: Text(l10n.quickCardTitle(widget.category.localizedTitle(l10n))),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
@@ -113,7 +115,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Kamera gerekmez: Gördüğünüz renge en yakın kartı seçerek 2 saniyede gizli ve hızlı kayıt oluşturun.',
+                    l10n.quickCardPrivacyBanner,
                     style: theme.textTheme.bodySmall?.copyWith(
                       height: 1.38,
                       fontWeight: FontWeight.w500,
@@ -125,7 +127,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
           ),
           const SizedBox(height: 18),
           Text(
-            'En Yakın Renk Tonunu Seçin',
+            l10n.quickCardChooseShade,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -215,16 +217,9 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
           if (_contextOptions.isNotEmpty) ...[
             const SizedBox(height: 20),
             Text(
-              'Ek Bilgi (İsteğe Bağlı)',
+              l10n.quickCardExtraContext,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Gıda, ilaç veya eşlik eden belirti varsa seçin; değerlendirme buna göre uyarlanır.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 10),
@@ -261,13 +256,13 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.check_circle_outline_rounded),
-            label: const Text('Kaydet ve Değerlendirmeyi Gör'),
+            label: Text(l10n.quickCardSaveViewBtn),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _switchToCamera,
             icon: const Icon(Icons.photo_camera_outlined),
-            label: const Text('Bunun Yerine Kamera ile Çek'),
+            label: Text(l10n.quickCardUseCameraBtn),
           ),
         ],
       ),

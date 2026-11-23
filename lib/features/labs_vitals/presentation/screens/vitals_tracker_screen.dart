@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
@@ -88,10 +89,11 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
   }
 
   Future<void> _copyDoctorSummary() async {
+    final l10n = context.l10n;
     if (_bpReadings.isEmpty && _sugarReadings.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Özet oluşturmak için önce tansiyon veya şeker ekleyin.'),
+        SnackBar(
+          content: Text(l10n.vitalsCopyEmptyMsg),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -105,8 +107,8 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Tansiyon & şeker takip özeti panoya kopyalandı.'),
+      SnackBar(
+        content: Text(l10n.vitalsSummaryCopied),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -114,30 +116,37 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final onBpTab = _tabController.index == 0;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tansiyon & Şeker Takibi'),
+        title: Text(l10n.vitalsScreenTitle),
         actions: [
           IconButton(
             onPressed: _copyDoctorSummary,
-            tooltip: 'Doktora Göster Özeti Kopyala',
+            tooltip: l10n.vitalsCopySummaryTooltip,
             icon: const Icon(Icons.assignment_outlined),
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.favorite_outline, size: 18), text: 'Tansiyon'),
-            Tab(icon: Icon(Icons.water_drop_outlined, size: 18), text: 'Kan Şekeri'),
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.favorite_outline, size: 18),
+              text: l10n.vitalsBpTab,
+            ),
+            Tab(
+              icon: const Icon(Icons.water_drop_outlined, size: 18),
+              text: l10n.vitalsSugarTab,
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: onBpTab ? _addBloodPressure : _addBloodSugar,
         icon: const Icon(Icons.add_rounded),
-        label: Text(onBpTab ? 'Tansiyon Ekle' : 'Şeker Ekle'),
+        label: Text(onBpTab ? l10n.vitalsAddBpBtn : l10n.vitalsAddSugarBtn),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -154,6 +163,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
   Widget _buildBpTab(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     if (_bpReadings.isEmpty) {
       return Center(
@@ -173,14 +183,14 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
               ),
               const SizedBox(height: 14),
               Text(
-                'Henüz tansiyon ölçümü yok',
+                l10n.vitalsBpEmptyTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                'Büyük/küçük tansiyon ve nabız değerlerinizi tarihli kaydederek değişim grafiğini izleyin.',
+                l10n.vitalsBpEmptyDesc,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
@@ -190,7 +200,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
               FilledButton.icon(
                 onPressed: _addBloodPressure,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('İlk Tansiyon Ölçümünü Ekle'),
+                label: Text(l10n.vitalsBpAddFirstBtn),
               ),
             ],
           ),
@@ -238,7 +248,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
-                        latest.category.label,
+                        latest.category.localizedLabel(l10n),
                         style: TextStyle(
                           color: latest.category.color,
                           fontWeight: FontWeight.w700,
@@ -250,17 +260,19 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Ortalama (${_bpReadings.length} ölçüm): ${avgSys.round()}/${avgDia.round()} mmHg${latest.pulse != null ? ' • Son nabız: ${latest.pulse} bpm' : ''}',
+                  '${l10n.vitalsBpAverage(_bpReadings.length, avgSys.round(), avgDia.round())}${latest.pulse != null ? l10n.vitalsLastPulse(latest.pulse!) : ''}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  latest.category.guidance,
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.38),
-                ),
+                if (l10n.localeName == 'tr') ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    latest.category.guidance,
+                    style: theme.textTheme.bodySmall?.copyWith(height: 1.38),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 TrendLineChart(
                   points: chronological
@@ -283,7 +295,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
         ),
         const SizedBox(height: 14),
         Text(
-          'Tarihli Tansiyon Kayıtları',
+          l10n.vitalsBpHistoryTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -303,14 +315,14 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                   ),
                 ),
                 title: Text(
-                  '${item.formatted}${item.pulse != null ? ' • Nabız ${item.pulse}' : ''}',
+                  '${item.formatted}${item.pulse != null ? l10n.vitalsLastPulse(item.pulse!) : ''}',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 subtitle: Text(
-                  '${df.format(item.recordedAt)} • ${item.category.label}${item.note != null ? '\n${item.note}' : ''}',
+                  '${df.format(item.recordedAt)} • ${item.category.localizedLabel(l10n)}${item.note != null ? '\n${item.note}' : ''}',
                 ),
                 trailing: IconButton(
-                  tooltip: 'Sil',
+                  tooltip: l10n.clearBaselineBtn,
                   onPressed: () async {
                     await widget.repository.deleteBloodPressure(item.id);
                     await _load();
@@ -327,6 +339,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
   Widget _buildSugarTab(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     if (_sugarReadings.isEmpty) {
       return Center(
@@ -346,14 +359,14 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
               ),
               const SizedBox(height: 14),
               Text(
-                'Henüz kan şekeri ölçümü yok',
+                l10n.vitalsSugarEmptyTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                'Açlık, tokluk (2. saat) veya rastgele şeker ölçümlerinizi tarihli kaydederek eğilimi takip edin.',
+                l10n.vitalsSugarEmptyDesc,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
@@ -363,7 +376,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
               FilledButton.icon(
                 onPressed: _addBloodSugar,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('İlk Şeker Ölçümünü Ekle'),
+                label: Text(l10n.vitalsSugarAddFirstBtn),
               ),
             ],
           ),
@@ -408,7 +421,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
-                        latest.category.label,
+                        latest.category.localizedLabel(l10n),
                         style: TextStyle(
                           color: latest.category.color,
                           fontWeight: FontWeight.w700,
@@ -420,17 +433,19 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${latest.measurementType.label} • Ortalama (${_sugarReadings.length} ölçüm): ${avg.round()} mg/dL',
+                  '${latest.measurementType.localizedLabel(l10n)} • ${l10n.vitalsSugarAverage(_sugarReadings.length, avg.round())}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  latest.category.guidance,
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.38),
-                ),
+                if (l10n.localeName == 'tr') ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    latest.category.guidance,
+                    style: theme.textTheme.bodySmall?.copyWith(height: 1.38),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 TrendLineChart(
                   points: chronological
@@ -453,7 +468,7 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
         ),
         const SizedBox(height: 14),
         Text(
-          'Tarihli Şeker Kayıtları',
+          l10n.vitalsSugarHistoryTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -473,14 +488,14 @@ class _VitalsTrackerScreenState extends State<VitalsTrackerScreen>
                   ),
                 ),
                 title: Text(
-                  '${item.formatted} • ${item.measurementType.label}',
+                  '${item.formatted} • ${item.measurementType.localizedLabel(l10n)}',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 subtitle: Text(
-                  '${df.format(item.recordedAt)} • ${item.category.label}${item.note != null ? '\n${item.note}' : ''}',
+                  '${df.format(item.recordedAt)} • ${item.category.localizedLabel(l10n)}${item.note != null ? '\n${item.note}' : ''}',
                 ),
                 trailing: IconButton(
-                  tooltip: 'Sil',
+                  tooltip: l10n.clearBaselineBtn,
                   onPressed: () async {
                     await widget.repository.deleteBloodSugar(item.id);
                     await _load();
@@ -562,6 +577,7 @@ class _AddBloodPressureSheetState extends State<_AddBloodPressureSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final df = DateFormat('dd.MM.yyyy');
     return SafeArea(
       child: Padding(
@@ -577,7 +593,7 @@ class _AddBloodPressureSheetState extends State<_AddBloodPressureSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Yeni Tansiyon Ölçümü',
+                      l10n.vitalsNewBpTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -597,10 +613,10 @@ class _AddBloodPressureSheetState extends State<_AddBloodPressureSheet> {
                     child: TextField(
                       controller: _sysController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Büyük (Sistolik)',
+                      decoration: InputDecoration(
+                        labelText: l10n.vitalsSystolicField,
                         hintText: '120',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -609,10 +625,10 @@ class _AddBloodPressureSheetState extends State<_AddBloodPressureSheet> {
                     child: TextField(
                       controller: _diaController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Küçük (Diyastolik)',
+                      decoration: InputDecoration(
+                        labelText: l10n.vitalsDiastolicField,
                         hintText: '80',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ),
@@ -622,25 +638,25 @@ class _AddBloodPressureSheetState extends State<_AddBloodPressureSheet> {
               TextField(
                 controller: _pulseController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Nabız (bpm — Opsiyonel)',
+                decoration: InputDecoration(
+                  labelText: l10n.vitalsPulseField,
                   hintText: '72',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _noteController,
-                decoration: const InputDecoration(
-                  labelText: 'Not (Opsiyonel — ör. sabah dinlenmiş)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.vitalsNoteField,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('Tansiyonu Kaydet'),
+                label: Text(l10n.vitalsSaveBpBtn),
               ),
             ],
           ),
@@ -709,6 +725,7 @@ class _AddBloodSugarSheetState extends State<_AddBloodSugarSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final df = DateFormat('dd.MM.yyyy');
     return SafeArea(
       child: Padding(
@@ -724,7 +741,7 @@ class _AddBloodSugarSheetState extends State<_AddBloodSugarSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Yeni Kan Şekeri Ölçümü',
+                      l10n.vitalsNewSugarTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -740,18 +757,18 @@ class _AddBloodSugarSheetState extends State<_AddBloodSugarSheet> {
               const SizedBox(height: 12),
               SegmentedButton<SugarMeasurementType>(
                 showSelectedIcon: false,
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: SugarMeasurementType.fasting,
-                    label: Text('Açlık'),
+                    label: Text(l10n.sugarTypeFasting),
                   ),
                   ButtonSegment(
                     value: SugarMeasurementType.postMeal,
-                    label: Text('Tokluk'),
+                    label: Text(l10n.sugarTypePostMeal),
                   ),
                   ButtonSegment(
                     value: SugarMeasurementType.random,
-                    label: Text('Rastgele'),
+                    label: Text(l10n.sugarTypeRandom),
                   ),
                 ],
                 selected: {_type},
@@ -763,25 +780,25 @@ class _AddBloodSugarSheetState extends State<_AddBloodSugarSheet> {
               TextField(
                 controller: _valueController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Kan Şekeri (mg/dL)',
+                decoration: InputDecoration(
+                  labelText: l10n.vitalsSugarValueField,
                   hintText: '95',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _noteController,
-                decoration: const InputDecoration(
-                  labelText: 'Not (Opsiyonel — ör. kahvaltıdan 2 saat sonra)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.vitalsNoteField,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('Kan Şekerini Kaydet'),
+                label: Text(l10n.vitalsSaveSugarBtn),
               ),
             ],
           ),

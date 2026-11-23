@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
-import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/doctor_summary_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 
@@ -57,6 +56,7 @@ class _ResultScreenState extends State<ResultScreen> {
   Future<void> _saveAsPersonalBaseline() async {
     final repo = widget.historyRepository;
     if (repo == null || _savingBaseline) return;
+    final l10n = context.l10n;
     setState(() => _savingBaseline = true);
 
     final baseline = CategoryBaseline.fromColor(
@@ -74,7 +74,7 @@ class _ResultScreenState extends State<ResultScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${widget.result.category.title} için kişisel normal tonunuz kaydedildi.',
+          l10n.baselineSavedMsg(widget.result.category.localizedTitle(l10n)),
         ),
       ),
     );
@@ -83,6 +83,7 @@ class _ResultScreenState extends State<ResultScreen> {
   Future<void> _clearPersonalBaseline() async {
     final repo = widget.historyRepository;
     if (repo == null || _savingBaseline) return;
+    final l10n = context.l10n;
     setState(() => _savingBaseline = true);
     await repo.deleteBaseline(widget.result.category);
     if (!mounted) return;
@@ -93,7 +94,7 @@ class _ResultScreenState extends State<ResultScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${widget.result.category.title} kişisel normal kaydı kaldırıldı.',
+          l10n.baselineClearedMsg(widget.result.category.localizedTitle(l10n)),
         ),
       ),
     );
@@ -103,6 +104,7 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget build(BuildContext context) {
     final result = widget.result;
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final riskColor = result.riskLevel.color;
     final dateText = DateFormat('dd.MM.yyyy HH:mm').format(result.createdAt);
     final previousInCategory = _allHistory
@@ -112,16 +114,18 @@ class _ResultScreenState extends State<ResultScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${result.category.title} Sonucu'),
+        title: Text(
+          l10n.resultScreenTitle(result.category.localizedTitle(l10n)),
+        ),
         actions: [
           IconButton(
             onPressed: _openDoctorSummary,
-            tooltip: 'Doktora Göster Özeti',
+            tooltip: l10n.tooltipDoctorSummary,
             icon: const Icon(Icons.assignment_outlined),
           ),
           IconButton(
             onPressed: () => ModuleReferenceSheet.show(context, result.category),
-            tooltip: 'Referans Rehberi',
+            tooltip: l10n.tooltipReferenceGuide,
             icon: const Icon(Icons.menu_book_outlined),
           ),
         ],
@@ -157,7 +161,7 @@ class _ResultScreenState extends State<ResultScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              result.riskLevel.label,
+                              result.riskLevel.localizedLabel(l10n),
                               style: TextStyle(
                                 color: riskColor,
                                 fontWeight: FontWeight.w700,
@@ -178,7 +182,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    result.summaryTitle,
+                    result.localizedSummaryTitle(l10n),
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
@@ -213,14 +217,16 @@ class _ResultScreenState extends State<ResultScreen> {
                           children: [
                             Text(
                               result.whiteBalanceCalibrated
-                                  ? 'Kalibre Edilmiş Renk Tonu'
-                                  : 'Örneklenen Baskın Renk Tonu',
+                                  ? l10n.calibratedColorTone
+                                  : l10n.sampledColorTone,
                               style: theme.textTheme.labelMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             Text(
-                              'Ön değerlendirme güveni: %${(result.confidence * 100).round()}',
+                              l10n.confidenceLabel(
+                                (result.confidence * 100).round(),
+                              ),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
@@ -259,7 +265,7 @@ class _ResultScreenState extends State<ResultScreen> {
                           Expanded(
                             child: Text(
                               result.lightingNote ??
-                                  'Beyaz referans ile renk dengelendi.',
+                                  l10n.whiteBalanceDefaultNote,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 height: 1.35,
                                 fontWeight: FontWeight.w500,
@@ -292,7 +298,10 @@ class _ResultScreenState extends State<ResultScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Danışılabilecek bölüm: ${result.category.recommendedSpecialty}',
+                              l10n.recommendedSpecialtyLabel(
+                                result.category
+                                    .localizedRecommendedSpecialty(l10n),
+                              ),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: theme.colorScheme.onPrimaryContainer,
@@ -324,10 +333,12 @@ class _ResultScreenState extends State<ResultScreen> {
                           color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Zaman İçi Değişim Karşılaştırması',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.timelineComparisonTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -346,12 +357,18 @@ class _ResultScreenState extends State<ResultScreen> {
                         ),
                         _SwatchBadge(
                           color: result.dominantColor,
-                          label: 'Bugün',
+                          label: l10n.todayLabel,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Önceki kayıt: "${previousInCategory.first.summaryTitle}" (${previousInCategory.first.riskLevel.label}). Toplam ${previousInCategory.length + 1} kayıt takip ediliyor.',
+                            l10n.previousRecordSummary(
+                              previousInCategory.first
+                                  .localizedSummaryTitle(l10n),
+                              previousInCategory.first.riskLevel
+                                  .localizedLabel(l10n),
+                              previousInCategory.length + 1,
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               height: 1.38,
                               color: theme.colorScheme.onSurfaceVariant,
@@ -382,10 +399,12 @@ class _ResultScreenState extends State<ResultScreen> {
                           color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Kişisel Normal Karşılaştırması',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.personalBaselineComparisonTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -396,7 +415,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         if (_savedBaseline != null) ...[
                           _SwatchBadge(
                             color: _savedBaseline!.color,
-                            label: 'Normaliniz',
+                            label: l10n.yourBaselineLabel,
                           ),
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8),
@@ -405,7 +424,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         ],
                         _SwatchBadge(
                           color: result.dominantColor,
-                          label: 'Bugün',
+                          label: l10n.todayLabel,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -439,18 +458,20 @@ class _ResultScreenState extends State<ResultScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.warning_amber_rounded,
                           color: Color(0xFFC93B3B),
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Dikkat Edilmesi Gereken Belirtiler',
-                          style: TextStyle(
-                            color: Color(0xFFC93B3B),
-                            fontWeight: FontWeight.w700,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.warningFlagsTitle,
+                            style: const TextStyle(
+                              color: Color(0xFFC93B3B),
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -477,7 +498,7 @@ class _ResultScreenState extends State<ResultScreen> {
           if (result.observations.isNotEmpty) ...[
             const SizedBox(height: 12),
             _SectionCard(
-              title: 'Gözlemler',
+              title: l10n.observationsTitle,
               icon: Icons.visibility_outlined,
               items: result.observations,
             ),
@@ -486,7 +507,7 @@ class _ResultScreenState extends State<ResultScreen> {
           if (result.recommendations.isNotEmpty) ...[
             const SizedBox(height: 12),
             _SectionCard(
-              title: 'Öneriler',
+              title: l10n.recommendationsTitle,
               icon: Icons.tips_and_updates_outlined,
               items: result.recommendations,
             ),
@@ -508,17 +529,19 @@ class _ResultScreenState extends State<ResultScreen> {
                           color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Kişisel Normal (Bazal) Kalibrasyon',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.personalBaselineCardTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Kendinizi sağlıklı hissettiğiniz bir günde bu ölçümü kişisel normaliniz olarak kaydedin; telefonunuzun kamera sensörüne özel sapmaları azaltır.',
+                      l10n.personalBaselineCardDesc,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         height: 1.4,
@@ -535,8 +558,8 @@ class _ResultScreenState extends State<ResultScreen> {
                           icon: const Icon(Icons.bookmark_add_outlined),
                           label: Text(
                             _savedBaseline == null
-                                ? 'Kişisel Normalim Olarak Kaydet'
-                                : 'Kişisel Normalimi Güncelle',
+                                ? l10n.saveBaselineBtn
+                                : l10n.updateBaselineBtn,
                           ),
                         ),
                         if (_savedBaseline != null)
@@ -544,7 +567,7 @@ class _ResultScreenState extends State<ResultScreen> {
                             onPressed:
                                 _savingBaseline ? null : _clearPersonalBaseline,
                             icon: const Icon(Icons.delete_outline, size: 18),
-                            label: const Text('Kaydı Sil'),
+                            label: Text(l10n.clearBaselineBtn),
                           ),
                       ],
                     ),
@@ -573,7 +596,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    MedicalDisclaimer.shortBanner,
+                    l10n.disclaimerShort,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       height: 1.35,
@@ -588,13 +611,13 @@ class _ResultScreenState extends State<ResultScreen> {
           OutlinedButton.icon(
             onPressed: _openDoctorSummary,
             icon: const Icon(Icons.assignment_outlined),
-            label: const Text('Doktora Göster • Özet Hazırla'),
+            label: Text(l10n.doctorSummaryBtn),
           ),
           const SizedBox(height: 10),
           FilledButton.icon(
             onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
             icon: const Icon(Icons.home_outlined),
-            label: const Text('Ana Ekrana Dön'),
+            label: Text(l10n.returnHomeBtn),
           ),
         ],
       ),

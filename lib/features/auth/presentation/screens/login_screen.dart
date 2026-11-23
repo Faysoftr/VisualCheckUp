@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Giriş yapılamadı: $error'),
+          content: Text(context.l10n.signInFailed(error.toString())),
           behavior: SnackBarBehavior.floating,
         ),
       );

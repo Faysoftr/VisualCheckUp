@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -24,26 +24,37 @@ class SkinCheckScreen extends StatefulWidget {
   State<SkinCheckScreen> createState() => _SkinCheckScreenState();
 }
 
-class _SkinCheckScreenState extends State<SkinCheckScreen> {
-  static const List<String> _bodyAreas = [
-    'Yüz / Boyun',
-    'Kol / El',
-    'Gövde',
-    'Bacak / Ayak',
-    'Saçlı Deri',
-    'Diğer',
-  ];
+enum _BodyAreaKey { faceNeck, armHand, torso, legFoot, scalp, other }
 
+class _SkinCheckScreenState extends State<SkinCheckScreen> {
   late SkinConcernType _concernType;
   final Set<SkinSymptomFlag> _selectedSymptoms = <SkinSymptomFlag>{};
-  String? _selectedBodyArea;
+  _BodyAreaKey? _selectedBodyArea;
 
   @override
   void initState() {
     super.initState();
     _concernType = widget.initialConcern ?? SkinConcernType.skinCancerRisk;
     if (_concernType == SkinConcernType.facialSpot) {
-      _selectedBodyArea = 'Yüz / Boyun';
+      _selectedBodyArea = _BodyAreaKey.faceNeck;
+    }
+  }
+
+  String _bodyAreaLabel(_BodyAreaKey key, BuildContext context) {
+    final l10n = context.l10n;
+    switch (key) {
+      case _BodyAreaKey.faceNeck:
+        return l10n.bodyAreaFaceNeck;
+      case _BodyAreaKey.armHand:
+        return l10n.bodyAreaArmHand;
+      case _BodyAreaKey.torso:
+        return l10n.bodyAreaTorso;
+      case _BodyAreaKey.legFoot:
+        return l10n.bodyAreaLegFoot;
+      case _BodyAreaKey.scalp:
+        return l10n.bodyAreaScalp;
+      case _BodyAreaKey.other:
+        return l10n.bodyAreaOther;
     }
   }
 
@@ -51,7 +62,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
     setState(() {
       _concernType = type;
       if (type == SkinConcernType.facialSpot && _selectedBodyArea == null) {
-        _selectedBodyArea = 'Yüz / Boyun';
+        _selectedBodyArea = _BodyAreaKey.faceNeck;
       }
     });
   }
@@ -60,7 +71,9 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
     final skinContext = SkinCheckContext(
       concernType: _concernType,
       symptoms: Set<SkinSymptomFlag>.unmodifiable(_selectedSymptoms),
-      bodyArea: _selectedBodyArea,
+      bodyArea: _selectedBodyArea == null
+          ? null
+          : _bodyAreaLabel(_selectedBodyArea!, context),
     );
 
     final analyzer = SkinConditionAnalyzer(skinContext: skinContext);
@@ -81,19 +94,20 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final accent = _concernType.accentColor;
     final relevantSymptoms = SkinSymptomFlagX.orderedFor(_concernType);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cilt Hastalıkları Ön Kontrol'),
+        title: Text(l10n.skinScreenTitle),
         actions: [
           IconButton(
             onPressed: () => ModuleReferenceSheet.show(
               context,
               CheckCategory.skinCondition,
             ),
-            tooltip: 'Cilt Referans Rehberi',
+            tooltip: l10n.tooltipReferenceGuide,
             icon: const Icon(Icons.menu_book_outlined),
           ),
         ],
@@ -119,7 +133,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Görsel Dermatoloji Ön Tarama',
+                        l10n.skinIntroTitle,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colorScheme.onSurface,
@@ -127,7 +141,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Ben/cilt kanseri risk işaretleri, siğil, morluk ve yüz lekeleri için çevre cilt kıyaslı ön değerlendirme sunar. Kesin teşhis koymaz; dermatoloğa hazırlık amaçlıdır.',
+                        l10n.skinIntroDesc,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                           height: 1.4,
@@ -144,7 +158,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
 
           // Step 1: Featured 4 sub-module cards
           Text(
-            '1. Özel Cilt Ön Tarama Modülü Seçin',
+            l10n.skinStep1Title,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -207,24 +221,26 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                       ),
                       const Spacer(),
                       Text(
-                        type.label,
+                        type.localizedLabel(l10n),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        type.shortCardSubtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 11,
-                          height: 1.25,
+                      if (l10n.localeName == 'tr') ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          type.shortCardSubtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 11,
+                            height: 1.25,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -234,7 +250,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
 
           const SizedBox(height: 12),
           Text(
-            'Diğer Cilt Görünümleri',
+            l10n.skinOtherConcernsLabel,
             style: theme.textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
@@ -247,35 +263,30 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
             children: SkinConcernTypeX.generalConcerns.map((type) {
               final selected = _concernType == type;
               return ChoiceChip(
-                label: Text(type.label),
+                label: Text(type.localizedLabel(l10n)),
                 selected: selected,
                 onSelected: (_) => _selectConcern(type),
               );
             }).toList(),
           ),
-          const SizedBox(height: 8),
-          Text(
-            _concernType.helperText,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              height: 1.38,
+          if (l10n.localeName == 'tr') ...[
+            const SizedBox(height: 8),
+            Text(
+              _concernType.helperText,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.38,
+              ),
             ),
-          ),
+          ],
 
           const SizedBox(height: 20),
 
           // Step 2: Contextual symptoms
           Text(
-            '2. Eşlik Eden Belirtiler (Opsiyonel)',
+            l10n.skinStep2Title,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Varsa ilgili belirtileri seçin; risk önceliği buna göre uyarlanır.',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -285,7 +296,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
             children: relevantSymptoms.map((flag) {
               final selected = _selectedSymptoms.contains(flag);
               return FilterChip(
-                label: Text(flag.label),
+                label: Text(flag.localizedLabel(l10n)),
                 selected: selected,
                 onSelected: (value) {
                   setState(() {
@@ -304,7 +315,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
 
           // Step 3: Optional body area
           Text(
-            '3. Vücut Bölgesi (Opsiyonel)',
+            l10n.skinStep3Title,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -313,10 +324,10 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _bodyAreas.map((area) {
+            children: _BodyAreaKey.values.map((area) {
               final selected = _selectedBodyArea == area;
               return ChoiceChip(
-                label: Text(area),
+                label: Text(_bodyAreaLabel(area, context)),
                 selected: selected,
                 onSelected: (value) {
                   setState(() {
@@ -344,10 +355,12 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                           color: SkinConcernType.bruise.accentColor,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Morluk Renk Evreleri Rehberi',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.bruiseGuideTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -413,10 +426,12 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                           color: SkinConcernType.wart.accentColor,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Siğil Ön Kontrol & Güvenlik Rehberi',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: Text(
+                            l10n.wartGuideTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -448,13 +463,13 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                   _concernType == SkinConcernType.molePigment,
               leading: Icon(Icons.menu_book_outlined, color: accent),
               title: Text(
-                'Benler İçin ABCDE Kontrol Rehberi',
+                l10n.abcdeGuideTitle,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               subtitle: Text(
-                'Dermatologların ben ve cilt kanseri ön taramasında kullandığı 5 işaret',
+                l10n.abcdeGuideSubtitle,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -526,7 +541,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    MedicalDisclaimer.shortBanner,
+                    l10n.disclaimerShort,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       height: 1.35,
@@ -542,7 +557,7 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
           FilledButton.icon(
             onPressed: _startCameraScan,
             icon: const Icon(Icons.camera_alt_outlined),
-            label: const Text('Kamera ile Cilt Kontrolünü Başlat'),
+            label: Text(l10n.skinStartCameraBtn),
           ),
         ],
       ),

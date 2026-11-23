@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
-import 'package:intl/intl.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({
@@ -44,13 +45,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final filtered = _selectedFilter == null
         ? _items
         : _items.where((e) => e.category == _selectedFilter).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kontrol Geçmişi'),
+        title: Text(l10n.menuHistory),
       ),
       body: Column(
         children: [
@@ -60,7 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Row(
               children: [
                 FilterChip(
-                  label: const Text('Tümü'),
+                  label: Text(l10n.filterAll),
                   selected: _selectedFilter == null,
                   onSelected: (_) => setState(() => _selectedFilter = null),
                 ),
@@ -69,7 +71,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   (category) => Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
-                      label: Text(category.title),
+                      label: Text(category.localizedTitle(l10n)),
                       selected: _selectedFilter == category,
                       onSelected: (_) =>
                           setState(() => _selectedFilter = category),
@@ -85,7 +87,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 : filtered.isEmpty
                     ? Center(
                         child: Text(
-                          'Henüz kayıtlı bir kontrol yok.',
+                          l10n.historyEmpty,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
@@ -140,13 +142,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                 ),
                                 title: Text(
-                                  item.summaryTitle,
+                                  item.localizedSummaryTitle(l10n),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 subtitle: Text(
-                                  '${item.category.title} • $dateStr',
+                                  '${item.category.localizedTitle(l10n)} • $dateStr',
                                 ),
                                 trailing: Icon(
                                   item.riskLevel.icon,

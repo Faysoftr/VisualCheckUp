@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
@@ -43,7 +44,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   late bool _useWhiteReference;
   CategoryBaseline? _baseline;
   CameraPermissionState _permissionState = CameraPermissionState.granted;
-  String? _cameraError;
+  bool _hasCameraError = false;
 
   @override
   void initState() {
@@ -90,7 +91,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     if (mounted) {
       setState(() {
         _isInitializing = true;
-        _cameraError = null;
+        _hasCameraError = false;
       });
     }
 
@@ -105,10 +106,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       setState(() {
         _permissionState = permission;
         _isInitializing = false;
-        _cameraError = permission == CameraPermissionState.permanentlyDenied ||
-                permission == CameraPermissionState.restricted
-            ? 'Kamera izni cihaz ayarlarından kapatılmış. Ayarlardan VisualCheckUp için kamera iznini açabilir veya galeriden fotoğraf seçebilirsiniz.'
-            : 'Görsel ön kontrol yapabilmek için kamera izni gerekiyor. Görüntüler yalnızca cihazınızda işlenir ve sunucuya gönderilmez.';
+        _hasCameraError = true;
       });
       return;
     }
@@ -122,8 +120,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       if (cameras.isEmpty) {
         setState(() {
           _isInitializing = false;
-          _cameraError =
-              'Bu cihazda kullanılabilir kamera bulunamadı. Galeriden fotoğraf seçebilirsiniz.';
+          _hasCameraError = true;
         });
         return;
       }
@@ -144,8 +141,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       if (!mounted) return;
       setState(() {
         _isInitializing = false;
-        _cameraError =
-            'Kamera başlatılamadı. İzinleri kontrol edin veya galeriden fotoğraf seçin.';
+        _hasCameraError = true;
       });
     }
   }
@@ -157,8 +153,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       setState(() {
         _permissionState = CameraPermissionState.permanentlyDenied;
         _isInitializing = false;
-        _cameraError =
-            'Kamera erişimi cihaz ayarlarından engellenmiş. Ayarları açıp VisualCheckUp için kamera iznini etkinleştirin.';
+        _hasCameraError = true;
       });
       return;
     }
@@ -166,15 +161,13 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       setState(() {
         _permissionState = CameraPermissionState.denied;
         _isInitializing = false;
-        _cameraError =
-            'Kamera izni verilmedi. Devam etmek için kamera izni verebilir veya galeriden fotoğraf seçebilirsiniz.';
+        _hasCameraError = true;
       });
       return;
     }
     setState(() {
       _isInitializing = false;
-      _cameraError =
-          'Kamera erişimi sağlanamadı. Galeriden fotoğraf seçebilirsiniz.';
+      _hasCameraError = true;
     });
   }
 
@@ -188,10 +181,8 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     if (!opened && mounted) {
       _openedSettings = false;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Uygulama ayarları açılamadı. Lütfen cihaz ayarlarından kamera iznini manuel etkinleştirin.',
-          ),
+        SnackBar(
+          content: Text(context.l10n.cameraPermPermanentMsg),
         ),
       );
     }
@@ -219,7 +210,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
         _controller = controller;
         _selectedCameraIndex = index;
         _isInitializing = false;
-        _cameraError = null;
+        _hasCameraError = false;
       });
     } on CameraException catch (e) {
       await controller.dispose();
@@ -230,8 +221,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       if (!mounted) return;
       setState(() {
         _isInitializing = false;
-        _cameraError =
-            'Kamera erişimi sağlanamadı. Galeriden fotoğraf seçebilirsiniz.';
+        _hasCameraError = true;
       });
     }
   }
@@ -260,10 +250,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       if (mounted) {
         setState(() => _torchEnabled = next);
       }
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bu kamerada ışık/flaş açılamadı.')),
+        SnackBar(content: Text(context.l10n.cameraAnalysisFailed(e.toString()))),
       );
     }
   }
@@ -279,10 +269,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       final file = await controller.takePicture();
       final bytes = await file.readAsBytes();
       await _processBytes(bytes);
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fotoğraf çekilirken bir hata oluştu.')),
+        SnackBar(content: Text(context.l10n.cameraAnalysisFailed(e.toString()))),
       );
       setState(() => _isProcessing = false);
     }
@@ -303,10 +293,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
       }
       final bytes = await picked.readAsBytes();
       await _processBytes(bytes);
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fotoğraf seçilemedi.')),
+        SnackBar(content: Text(context.l10n.cameraAnalysisFailed(e.toString()))),
       );
       setState(() => _isProcessing = false);
     }
@@ -325,11 +315,11 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
         ),
       );
       await _openResult(result);
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Görüntü analiz edilemedi. Lütfen tekrar deneyin.'),
+        SnackBar(
+          content: Text(context.l10n.cameraAnalysisFailed(e.toString())),
         ),
       );
       setState(() => _isProcessing = false);
@@ -359,22 +349,22 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text('${widget.category.title} Kontrolü'),
+        title: Text(widget.category.localizedTitle(l10n)),
         actions: [
           IconButton(
             onPressed: () => ModuleReferenceSheet.show(context, widget.category),
-            tooltip: 'Referans Rehberi',
+            tooltip: l10n.tooltipReferenceGuide,
             icon: const Icon(Icons.menu_book_outlined),
           ),
           if (_supportsTorch)
             IconButton(
               onPressed: _toggleTorch,
-              tooltip: _torchEnabled ? 'Işığı Kapat' : 'Işığı Aç',
               icon: Icon(
                 _torchEnabled
                     ? Icons.flash_on_rounded
@@ -384,7 +374,6 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
           if (_cameras.length > 1)
             IconButton(
               onPressed: _switchCamera,
-              tooltip: 'Kamerayı Değiştir',
               icon: const Icon(Icons.cameraswitch_outlined),
             ),
         ],
@@ -409,7 +398,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        widget.category.captureGuide,
+                        widget.category.localizedSubtitle(l10n),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
@@ -460,8 +449,8 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                             const SizedBox(width: 6),
                             Text(
                               _useWhiteReference
-                                  ? 'Beyaz Referans: Açık'
-                                  : 'Beyaz Referans: Kapalı',
+                                  ? l10n.cameraWhiteRefOn
+                                  : l10n.cameraWhiteRefOff,
                               style: TextStyle(
                                 color: _useWhiteReference
                                     ? Colors.white
@@ -497,18 +486,18 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: Colors.white30),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.palette_outlined,
                                 size: 14,
                                 color: Colors.white,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                'Kamerasız Renk Kartı',
-                                style: TextStyle(
+                                l10n.menuQuickColorCard,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -542,9 +531,9 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                               ),
                             ),
                             const SizedBox(width: 6),
-                            const Text(
-                              'Kişisel Normal Aktif',
-                              style: TextStyle(
+                            Text(
+                              l10n.cameraBaselineActive,
+                              style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -605,10 +594,10 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                     alignment: Alignment.center,
-                                    child: const Text(
-                                      'Beyaz Referans\n(Kağıt / Beyaz Zemin)',
+                                    child: Text(
+                                      l10n.cameraWhiteRefOn,
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -631,15 +620,15 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                 if (_isProcessing)
                   Container(
                     color: Colors.black54,
-                    child: const Center(
+                    child: Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircularProgressIndicator(color: Colors.white),
-                          SizedBox(height: 12),
+                          const CircularProgressIndicator(color: Colors.white),
+                          const SizedBox(height: 12),
                           Text(
-                            'Renk kalibrasyonu ve analiz yapılıyor...',
-                            style: TextStyle(color: Colors.white),
+                            l10n.cameraAnalyzing,
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       ),
@@ -660,7 +649,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                 children: [
                   IconButton.filledTonal(
                     onPressed: _isProcessing ? null : _pickFromGallery,
-                    tooltip: 'Galeriden Seç',
+                    tooltip: l10n.cameraPickGalleryBtn,
                     icon: const Icon(Icons.photo_library_outlined),
                   ),
                   GestureDetector(
@@ -696,17 +685,22 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   }
 
   Widget _buildPreviewArea() {
+    final l10n = context.l10n;
     if (_isInitializing) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
     }
 
-    if (_cameraError != null || _controller == null) {
+    if (_hasCameraError || _controller == null) {
       final isPermanentlyDenied =
           _permissionState == CameraPermissionState.permanentlyDenied ||
               _permissionState == CameraPermissionState.restricted;
       final isDenied = _permissionState == CameraPermissionState.denied;
+
+      final errorMessage = isPermanentlyDenied
+          ? l10n.cameraPermPermanentMsg
+          : l10n.cameraPermRequiredMsg;
 
       return Center(
         child: Padding(
@@ -723,7 +717,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                _cameraError ?? 'Kamera kullanılamıyor.',
+                errorMessage,
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white70, height: 1.45),
               ),
@@ -732,13 +726,13 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                 FilledButton.icon(
                   onPressed: _openAppSettings,
                   icon: const Icon(Icons.settings_outlined),
-                  label: const Text('Ayarları Aç'),
+                  label: Text(l10n.permOpenSettingsBtn),
                 )
               else if (isDenied)
                 FilledButton.icon(
                   onPressed: _requestPermissionAgain,
                   icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text('Kamera İzni Ver'),
+                  label: Text(l10n.cameraRequestPermBtn),
                 ),
               if (isPermanentlyDenied || isDenied) const SizedBox(height: 10),
               if (isPermanentlyDenied || isDenied)
@@ -749,13 +743,13 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                   ),
                   onPressed: _pickFromGallery,
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('Galeriden Fotoğraf Seç'),
+                  label: Text(l10n.cameraPickGalleryBtn),
                 )
               else
                 FilledButton.icon(
                   onPressed: _pickFromGallery,
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('Galeriden Fotoğraf Seç'),
+                  label: Text(l10n.cameraPickGalleryBtn),
                 ),
             ],
           ),

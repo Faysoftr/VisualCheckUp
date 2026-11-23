@@ -468,4 +468,732 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get skinScreenTitle => 'Cilt Hastalıkları Ön Kontrol';
+
+  @override
+  String get providerGuest => 'Misafir';
+
+  @override
+  String signInFailed(String error) {
+    return 'Giriş yapılamadı: $error';
+  }
+
+  @override
+  String get riskNormal => 'Olağan Görünüm';
+
+  @override
+  String get riskAttention => 'Takip Önerilir';
+
+  @override
+  String get riskUrgent => 'Doktor Değerlendirmesi Önerilir';
+
+  @override
+  String recentSummaryFallback(String category, String status) {
+    return '$category • $status';
+  }
+
+  @override
+  String latestSummaryPrefix(String value) {
+    return 'Son: $value';
+  }
+
+  @override
+  String latestLabValuesSummary(int count, int abnormal) {
+    return 'Son: $count değer ($abnormal referans dışı)';
+  }
+
+  @override
+  String latestLabAllNormal(int count) {
+    return 'Son: $count değer (tümü normal)';
+  }
+
+  @override
+  String get labStatusCriticalLow => 'Kritik Düşük';
+
+  @override
+  String get labStatusLow => 'Düşük';
+
+  @override
+  String get labStatusNormal => 'Normal';
+
+  @override
+  String get labStatusHigh => 'Yüksek';
+
+  @override
+  String get labStatusCriticalHigh => 'Kritik Yüksek';
+
+  @override
+  String get labSourceManual => 'Manuel Giriş';
+
+  @override
+  String get labSourcePasted => 'Rapor Metninden Okundu';
+
+  @override
+  String get labSourcePhoto => 'JPG / Fotoğraf Raporu';
+
+  @override
+  String get labSourcePdf => 'PDF Raporu';
+
+  @override
+  String get bpLow => 'Düşük Tansiyon';
+
+  @override
+  String get bpNormal => 'Normal Aralık';
+
+  @override
+  String get bpElevated => 'Yüksek-Normal';
+
+  @override
+  String get bpStage1 => 'Evre 1 Yüksek';
+
+  @override
+  String get bpStage2 => 'Belirgin Yüksek';
+
+  @override
+  String get bpCrisis => 'Acil Yüksek Tansiyon';
+
+  @override
+  String get sugarLow => 'Düşük Şeker (Hipoglisemi)';
+
+  @override
+  String get sugarNormal => 'Normal Aralık';
+
+  @override
+  String get sugarBorderline => 'Sınırda Yüksek';
+
+  @override
+  String get sugarHigh => 'Yüksek Kan Şekeri';
+
+  @override
+  String get sugarVeryHigh => 'Çok Yüksek Şeker';
+
+  @override
+  String get sugarTypeFasting => 'Açlık';
+
+  @override
+  String get sugarTypePostMeal => 'Tokluk (2. saat)';
+
+  @override
+  String get sugarTypeRandom => 'Rastgele';
+
+  @override
+  String get specialtyEye => 'Göz Hastalıkları veya Dahiliye';
+
+  @override
+  String get specialtyNail => 'Dermatoloji veya Dahiliye';
+
+  @override
+  String get specialtyTongue => 'KBB, Ağız & Diş Sağlığı veya Dahiliye';
+
+  @override
+  String get specialtySkin => 'Dermatoloji';
+
+  @override
+  String get specialtyUrine => 'Üroloji veya Dahiliye';
+
+  @override
+  String get specialtyStool => 'Gastroenteroloji veya Dahiliye';
+
+  @override
+  String get cloudBackupTitle => 'Bulut Yedekleme (İsteğe Bağlı • Firebase)';
+
+  @override
+  String get cloudBackupDesc =>
+      'Varsayılan olarak tüm kan tahlili ve ölçüm verileriniz yalnızca bu cihazda saklanır. Telefon değiştirirken verilerinizi korumak isterseniz kendi Google/Apple hesabınıza özel yedeklemeyi açabilirsiniz.';
+
+  @override
+  String get cloudBackupToggleTitle => 'Buluta Yedeklemeyi Etkinleştir';
+
+  @override
+  String cloudBackupLastSync(String date) {
+    return 'Son yedekleme: $date';
+  }
+
+  @override
+  String get cloudBackupEnabledReady => 'Etkin • Yedeklemeye hazır';
+
+  @override
+  String get cloudBackupDisabledLocal => 'Kapalı • Yalnızca cihaz içi depolama';
+
+  @override
+  String get cloudBackupSignInRequired =>
+      'Bulut yedekleme için Google veya Apple hesabıyla oturum açmanız gerekir.';
+
+  @override
+  String get cloudBackupNowBtn => 'Şimdi Yedekle';
+
+  @override
+  String get cloudRestoreBtn => 'Buluttan Geri Yükle';
+
+  @override
+  String get cloudConsentTitle => 'Bulut Yedekleme Onayı (KVKK)';
+
+  @override
+  String get cloudConsentBody =>
+      'Kan tahlilleriniz, tansiyon/şeker ölçümleriniz ve kontrol kayıtlarınız varsayılan olarak yalnızca cihazınızda saklanır.\n\nBulut yedeklemeyi açarsanız bu sağlık verileri yalnızca kendi Google/Apple hesabınıza özel Firebase Firestore alanında saklanır; başka hiç kimse erişemez ve hesabınızı sildiğinizde buluttan tamamen silinir.\n\nOnaylıyor musunuz?';
+
+  @override
+  String get cloudConsentConfirm => 'Evet, Etkinleştir';
+
+  @override
+  String cloudBackupSuccess(int count) {
+    return 'Bulut yedekleme tamamlandı: $count kayıt eşitlendi.';
+  }
+
+  @override
+  String cloudBackupFailed(String error) {
+    return 'Yedekleme yapılamadı: $error';
+  }
+
+  @override
+  String cloudRestoreSuccess(int count) {
+    return 'Buluttan geri yüklendi: $count kayıt cihazınıza aktarıldı.';
+  }
+
+  @override
+  String cloudRestoreFailed(String error) {
+    return 'Geri yükleme yapılamadı: $error';
+  }
+
+  @override
+  String get cloudBackupDisabledNotice =>
+      'Bulut yedekleme kapatıldı. Yeni kayıtlar yalnızca cihazda tutulur.';
+
+  @override
+  String get aiCloudToggleTitle => 'Bulut Yapay Zeka (Gemini) Analizi';
+
+  @override
+  String get aiCloudOnDesc =>
+      'Açık: Net ve kaliteli fotoğraflar küçültülerek anlık görsel analiz için güvenli bağlantıdan işlenir. İnternet yoksa cihaz içi analiz çalışır.';
+
+  @override
+  String get aiCloudOffDesc =>
+      'Kapalı (0 Token): Tüm analizler yalnızca cihazınızda yapılır; hiçbir fotoğraf dışarı gönderilmez.';
+
+  @override
+  String get aiBackendOfflineNote =>
+      'Firebase AI Logic / Gemini bağlantısı eklendiğinde bulut analizi bu tercihe göre otomatik devreye girer; şu an cihaz içi motor aktiftir.';
+
+  @override
+  String get aiOptimizationsTitle => 'Aktif Token & Veri Tasarrufu Kontrolleri';
+
+  @override
+  String get aiOptQualityGate =>
+      '0-token bulanıklık, karanlık ve parlama kalite kapısı';
+
+  @override
+  String get aiOptCompression =>
+      'Otomatik kırpma + 512px / 768px JPEG (%80) sıkıştırma';
+
+  @override
+  String get aiOptTieredModel =>
+      'Akıllı model seçimi (Flash-Lite / Flash) & düşük thinking';
+
+  @override
+  String get aiOptHashCache =>
+      'Aynı fotoğraf için cihaz içi hash önbelleği (0 token)';
+
+  @override
+  String get aiClearCacheBtn => 'AI Önbelleğini Temizle';
+
+  @override
+  String get aiCacheCleared => 'Yapay zeka önbelleği temizlendi.';
+
+  @override
+  String resultScreenTitle(String category) {
+    return '$category Sonucu';
+  }
+
+  @override
+  String get tooltipDoctorSummary => 'Doktora Göster Özeti';
+
+  @override
+  String get tooltipReferenceGuide => 'Referans Rehberi';
+
+  @override
+  String get calibratedColorTone => 'Kalibre Edilmiş Renk Tonu';
+
+  @override
+  String get sampledColorTone => 'Örneklenen Baskın Renk Tonu';
+
+  @override
+  String confidenceLabel(int percent) {
+    return 'Ön değerlendirme güveni: %$percent';
+  }
+
+  @override
+  String get whiteBalanceDefaultNote => 'Beyaz referans ile renk dengelendi.';
+
+  @override
+  String recommendedSpecialtyLabel(String specialty) {
+    return 'Danışılabilecek bölüm: $specialty';
+  }
+
+  @override
+  String get timelineComparisonTitle => 'Zaman İçi Değişim Karşılaştırması';
+
+  @override
+  String get todayLabel => 'Bugün';
+
+  @override
+  String previousRecordSummary(String title, String status, int count) {
+    return 'Önceki kayıt: \"$title\" ($status). Toplam $count kayıt takip ediliyor.';
+  }
+
+  @override
+  String get personalBaselineComparisonTitle =>
+      'Kişisel Normal Karşılaştırması';
+
+  @override
+  String get yourBaselineLabel => 'Normaliniz';
+
+  @override
+  String get warningFlagsTitle => 'Dikkat Edilmesi Gereken Belirtiler';
+
+  @override
+  String get observationsTitle => 'Gözlemler';
+
+  @override
+  String get recommendationsTitle => 'Öneriler';
+
+  @override
+  String get personalBaselineCardTitle => 'Kişisel Normal (Bazal) Kalibrasyon';
+
+  @override
+  String get personalBaselineCardDesc =>
+      'Kendinizi sağlıklı hissettiğiniz bir günde bu ölçümü kişisel normaliniz olarak kaydedin; telefonunuzun kamera sensörüne özel sapmaları azaltır.';
+
+  @override
+  String get saveBaselineBtn => 'Kişisel Normalim Olarak Kaydet';
+
+  @override
+  String get updateBaselineBtn => 'Kişisel Normalimi Güncelle';
+
+  @override
+  String get clearBaselineBtn => 'Kaydı Sil';
+
+  @override
+  String baselineSavedMsg(String category) {
+    return '$category için kişisel normal tonunuz kaydedildi.';
+  }
+
+  @override
+  String baselineClearedMsg(String category) {
+    return '$category kişisel normal kaydı kaldırıldı.';
+  }
+
+  @override
+  String get doctorSummaryBtn => 'Doktora Göster • Özet Hazırla';
+
+  @override
+  String get returnHomeBtn => 'Ana Ekrana Dön';
+
+  @override
+  String get doctorSheetTitle => 'Doktora Göster • Randevu Özeti';
+
+  @override
+  String colorLabel(String hex, String status) {
+    return 'Renk: $hex • $status';
+  }
+
+  @override
+  String get timelineHistoryTitle => 'Önceki Kayıtlarla Zaman Çizelgesi';
+
+  @override
+  String get questionsForDoctorTitle => 'Doktorunuza Sorabileceğiniz Sorular';
+
+  @override
+  String get copyShareSummaryBtn => 'Özeti Kopyala ve Paylaş';
+
+  @override
+  String get doctorSummaryCopied =>
+      'Doktor randevu özeti panoya kopyalandı. Notlara veya mesajlara yapıştırabilirsiniz.';
+
+  @override
+  String referenceSheetTitle(String category) {
+    return '$category — Görsel Referanslar';
+  }
+
+  @override
+  String get healthyReferenceLabel => 'Sağlıklı Referans';
+
+  @override
+  String get captureChecklistTitle => 'Doğru Çekim Kontrol Listesi';
+
+  @override
+  String get abnormalFindingsTitle =>
+      'Dikkat Edilmesi Gereken / Sağlıksız Bulgular';
+
+  @override
+  String get cameraPermPermanentMsg =>
+      'Kamera izni cihaz ayarlarından kapatılmış. Ayarlardan VisualCheckUp için kamera iznini açabilir veya galeriden fotoğraf seçebilirsiniz.';
+
+  @override
+  String get cameraPermRequiredMsg =>
+      'Görsel ön kontrol yapabilmek için kamera izni gerekiyor. Görüntüler yalnızca cihazınızda işlenir ve sunucuya gönderilmez.';
+
+  @override
+  String get cameraGrantPermTitle => 'Kamera İzni Gerekli';
+
+  @override
+  String get cameraRequestPermBtn => 'Kamera İzni Ver';
+
+  @override
+  String get cameraPickGalleryBtn => 'Galeriden Fotoğraf Seç';
+
+  @override
+  String get cameraWhiteRefOn => 'Beyaz Referans: Açık';
+
+  @override
+  String get cameraWhiteRefOff => 'Beyaz Referans: Kapalı';
+
+  @override
+  String get cameraBaselineActive => 'Kişisel Normal Kayıtlı';
+
+  @override
+  String get cameraAnalyzing => 'Analiz ediliyor...';
+
+  @override
+  String get cameraCaptureBtn => 'Çek ve Değerlendir';
+
+  @override
+  String cameraAnalysisFailed(String error) {
+    return 'Analiz sırasında hata: $error';
+  }
+
+  @override
+  String quickCardTitle(String category) {
+    return '$category • Renk Kartı';
+  }
+
+  @override
+  String get quickCardPrivacyBanner =>
+      'Kamera gerekmez: Gördüğünüz renge en yakın kartı seçerek 2 saniyede gizli ve hızlı kayıt oluşturun.';
+
+  @override
+  String get quickCardChooseShade => 'En Yakın Renk Tonunu Seçin';
+
+  @override
+  String get quickCardExtraContext => 'Ek Bilgi (İsteğe Bağlı)';
+
+  @override
+  String get quickCardSaveViewBtn => 'Kaydet ve Değerlendirmeyi Gör';
+
+  @override
+  String get quickCardUseCameraBtn => 'Bunun Yerine Kamera ile Çek';
+
+  @override
+  String get skinIntroTitle => 'Görsel Dermatoloji Ön Tarama';
+
+  @override
+  String get skinIntroDesc =>
+      'Ben/cilt kanseri risk işaretleri, siğil, morluk ve yüz lekeleri için çevre cilt kıyaslı ön değerlendirme sunar. Kesin teşhis koymaz; dermatoloğa hazırlık amaçlıdır.';
+
+  @override
+  String get skinStep1Title => '1. Özel Cilt Ön Tarama Modülü Seçin';
+
+  @override
+  String get skinOtherConcernsLabel => 'Diğer Cilt Görünümleri';
+
+  @override
+  String get skinStep2Title => '2. Eşlik Eden Belirtiler (Opsiyonel)';
+
+  @override
+  String get skinStep3Title => '3. Vücut Bölgesi (Opsiyonel)';
+
+  @override
+  String get skinStartCameraBtn => 'Kamera ile Cilt Kontrolünü Başlat';
+
+  @override
+  String get skinConcernRash => 'Kızarıklık / Döküntü';
+
+  @override
+  String get skinConcernMole => 'Ben / Koyu Leke';
+
+  @override
+  String get skinConcernScaly => 'Pullu / Kuru Plak';
+
+  @override
+  String get skinConcernBlister => 'Kabarcık / Sivilce';
+
+  @override
+  String get skinConcernGeneral => 'Genel Cilt Kontrolü';
+
+  @override
+  String get bodyAreaFaceNeck => 'Yüz / Boyun';
+
+  @override
+  String get bodyAreaArmHand => 'Kol / El';
+
+  @override
+  String get bodyAreaTorso => 'Gövde';
+
+  @override
+  String get bodyAreaLegFoot => 'Bacak / Ayak';
+
+  @override
+  String get bodyAreaScalp => 'Saçlı Deri';
+
+  @override
+  String get bodyAreaOther => 'Diğer';
+
+  @override
+  String get symptomItching => 'Kaşıntı';
+
+  @override
+  String get symptomPainWarmth => 'Ağrı / Isı artışı';
+
+  @override
+  String get symptomRapidChange => 'Hızlı büyüme / şekil değişimi';
+
+  @override
+  String get symptomBleeding => 'Kanama / Sızıntı / İltihap';
+
+  @override
+  String get symptomSpreading => 'Hızla yayılıyor';
+
+  @override
+  String get symptomFever => 'Ateş eşlik ediyor';
+
+  @override
+  String get symptomNonHealing => '4+ haftadır iyileşmeyen yara/kabuk';
+
+  @override
+  String get symptomOver6mm => '6 mm üstü veya düzensiz kenar';
+
+  @override
+  String get symptomNoTrauma => 'Darbe olmadan kendiliğinden çıktı';
+
+  @override
+  String get symptomRoughDots => 'Pütürlü yüzey / küçük siyah noktalar';
+
+  @override
+  String get symptomSunHormone => 'Güneş, hormon veya akne sonrası leke';
+
+  @override
+  String get bruiseGuideTitle => 'Morluk Renk Evreleri Rehberi';
+
+  @override
+  String get wartGuideTitle => 'Siğil Ön Kontrol & Güvenlik Rehberi';
+
+  @override
+  String get abcdeGuideTitle => 'Benler İçin ABCDE Kontrol Rehberi';
+
+  @override
+  String get abcdeGuideSubtitle =>
+      'Dermatologların ben ve cilt kanseri ön taramasında kullandığı 5 işaret';
+
+  @override
+  String get labScreenTitle => 'Tahlil & Hastane Raporları';
+
+  @override
+  String get labTabReports => 'Raporlarım';
+
+  @override
+  String get labTabTrends => 'Değişim Takibi';
+
+  @override
+  String get labAddBtn => 'Rapor / Kan Testi Ekle';
+
+  @override
+  String get labEmptyTitle => 'Henüz kayıtlı kan tahlili yok';
+
+  @override
+  String get labEmptyDesc =>
+      'PDF veya JPG kan sonucunuzu yükleyin; isterseniz doktorun yazdığı teşhisi veya kendi şikayetinizi ekleyip sade Türkçe ile yorumlatın.';
+
+  @override
+  String get labAddFirstBtn => 'İlk Tahlil / PDF Raporunu Ekle';
+
+  @override
+  String get labTrendsEmptyDesc =>
+      'Farklı tarihlerde kan testi kaydettiğinizde Hemoglobin, Ferritin, Glukoz, TSH, Vitamin D gibi değerlerin zaman içi değişim grafikleri burada oluşur.';
+
+  @override
+  String labParamsCount(int count) {
+    return '$count parametre';
+  }
+
+  @override
+  String labOutOfRangeCount(int count) {
+    return '$count referans dışı';
+  }
+
+  @override
+  String labDetailParamsTitle(int count) {
+    return 'Parametre Değerlendirmesi ($count)';
+  }
+
+  @override
+  String get labEnteredDiagnosisTitle => 'Girilen Hastane / Doktor Teşhisi';
+
+  @override
+  String get labEnteredComplaintTitle => 'Şikayetiniz / Kendi Notunuz';
+
+  @override
+  String get labInterpretationTitle => 'Anlaşılır Değerlendirme & Yorum';
+
+  @override
+  String get labCopyDoctorSummaryBtn => 'Doktora Göster • Özeti Kopyala';
+
+  @override
+  String get labSummaryCopied => 'Tahlil özeti panoya kopyalandı.';
+
+  @override
+  String get labExportPdfBtn => 'Doktor PDF Raporu İndir / Paylaş';
+
+  @override
+  String get labAddSheetTitle => 'Hastane Raporu / Kan Testi Ekle';
+
+  @override
+  String get labReportTitleField => 'Rapor Başlığı';
+
+  @override
+  String get labDefaultReportTitle => 'Kan Tahlili Sonucu';
+
+  @override
+  String get labStep1Upload => '1. PDF veya JPG Kan Sonucu Yükle';
+
+  @override
+  String get labUploadPdfJpgBtn => 'PDF veya JPG Yükle';
+
+  @override
+  String get labCameraCaptureBtn => 'Kamerayla Çek';
+
+  @override
+  String get labStep2Context =>
+      '2. Hastane Teşhisi & Kendi Notunuz (İsteğe Bağlı)';
+
+  @override
+  String get labStep2ContextHint =>
+      'Doktorun verdiği teşhisi anlamakta zorlandıysanız ya da şikayetinizi eklemek isterseniz yazın; ikisini de boş bırakabilirsiniz.';
+
+  @override
+  String get labDiagnosisField =>
+      'Hastane / Doktor Teşhisi (Boş Bırakılabilir)';
+
+  @override
+  String get labComplaintField =>
+      'Şikayetiniz / Kendi Metniniz (Boş Bırakılabilir)';
+
+  @override
+  String get labStep3PasteManual =>
+      '3. e-Nabız Metni Yapıştır veya Manuel Değer Ekle';
+
+  @override
+  String get labParseTextBtn => 'Metni Oku ve Ayrıştır';
+
+  @override
+  String get labParamDropdown => 'Tahlil Parametresi';
+
+  @override
+  String labValueField(String unit) {
+    return 'Değer ($unit)';
+  }
+
+  @override
+  String get labAddValueBtn => '+ Ekle';
+
+  @override
+  String labParsedValuesTitle(int count) {
+    return 'Okunan Değerler ($count)';
+  }
+
+  @override
+  String get labSaveEvaluateBtn => 'Değerlendir ve Tarihli Kaydet';
+
+  @override
+  String labTrendSummary(int count, String delta, String status) {
+    return '$count kayıt • Değişim: $delta • Son durum: $status';
+  }
+
+  @override
+  String get vitalsScreenTitle => 'Tansiyon & Şeker Takibi';
+
+  @override
+  String get vitalsCopySummaryTooltip => 'Doktora Göster Özeti Kopyala';
+
+  @override
+  String get vitalsCopyEmptyMsg =>
+      'Özet oluşturmak için önce tansiyon veya şeker ekleyin.';
+
+  @override
+  String get vitalsSummaryCopied =>
+      'Tansiyon & şeker takip özeti panoya kopyalandı.';
+
+  @override
+  String get vitalsAddBpBtn => 'Tansiyon Ekle';
+
+  @override
+  String get vitalsAddSugarBtn => 'Şeker Ekle';
+
+  @override
+  String get vitalsBpEmptyTitle => 'Henüz tansiyon ölçümü yok';
+
+  @override
+  String get vitalsBpEmptyDesc =>
+      'Büyük/küçük tansiyon ve nabız değerlerinizi tarihli kaydederek değişim grafiğini izleyin.';
+
+  @override
+  String get vitalsBpAddFirstBtn => 'İlk Tansiyon Ölçümünü Ekle';
+
+  @override
+  String get vitalsSugarEmptyTitle => 'Henüz kan şekeri ölçümü yok';
+
+  @override
+  String get vitalsSugarEmptyDesc =>
+      'Açlık, tokluk (2. saat) veya rastgele şeker ölçümlerinizi tarihli kaydederek eğilimi takip edin.';
+
+  @override
+  String get vitalsSugarAddFirstBtn => 'İlk Şeker Ölçümünü Ekle';
+
+  @override
+  String vitalsBpAverage(int count, int sys, int dia) {
+    return 'Ortalama ($count ölçüm): $sys/$dia mmHg';
+  }
+
+  @override
+  String vitalsLastPulse(int pulse) {
+    return ' • Son nabız: $pulse bpm';
+  }
+
+  @override
+  String get vitalsBpHistoryTitle => 'Tarihli Tansiyon Kayıtları';
+
+  @override
+  String vitalsSugarAverage(int count, int avg) {
+    return 'Ortalama ($count ölçüm): $avg mg/dL';
+  }
+
+  @override
+  String get vitalsSugarHistoryTitle => 'Tarihli Şeker Kayıtları';
+
+  @override
+  String get vitalsNewBpTitle => 'Yeni Tansiyon Ölçümü';
+
+  @override
+  String get vitalsSystolicField => 'Büyük (Sistolik)';
+
+  @override
+  String get vitalsDiastolicField => 'Küçük (Diyastolik)';
+
+  @override
+  String get vitalsPulseField => 'Nabız (bpm — Opsiyonel)';
+
+  @override
+  String get vitalsNoteField => 'Not (Opsiyonel — ör. sabah dinlenmiş)';
+
+  @override
+  String get vitalsSaveBpBtn => 'Tansiyonu Kaydet';
+
+  @override
+  String get vitalsNewSugarTitle => 'Yeni Kan Şekeri Ölçümü';
+
+  @override
+  String get vitalsSugarValueField => 'Kan Şekeri (mg/dL)';
+
+  @override
+  String get vitalsSaveSugarBtn => 'Kan Şekerini Kaydet';
+
+  @override
+  String get chartAddReadingHint => 'Grafik için ölçüm ekleyin';
 }

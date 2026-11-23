@@ -268,7 +268,7 @@ class _FollowUpTrackTile extends StatelessWidget {
             ),
           ],
         ),
-        if (status.latestValueSummary != null) ...[
+        if (status.localizedLatestValueSummary(l10n) != null) ...[
           const SizedBox(height: 6),
           Container(
             width: double.infinity,
@@ -278,7 +278,7 @@ class _FollowUpTrackTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              status.latestValueSummary!,
+              status.localizedLatestValueSummary(l10n)!,
               style: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),

@@ -458,4 +458,721 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get skinScreenTitle => 'فحص مبدئي لحالات الجلد';
+
+  @override
+  String get providerGuest => 'ضيف';
+
+  @override
+  String signInFailed(String error) {
+    return 'فشل تسجيل الدخول: $error';
+  }
+
+  @override
+  String get riskNormal => 'مظهر طبيعي';
+
+  @override
+  String get riskAttention => 'يُنصح بالمتابعة';
+
+  @override
+  String get riskUrgent => 'يُنصح بمراجعة الطبيب';
+
+  @override
+  String recentSummaryFallback(String category, String status) {
+    return '$category • $status';
+  }
+
+  @override
+  String latestSummaryPrefix(String value) {
+    return 'الأحدث: $value';
+  }
+
+  @override
+  String latestLabValuesSummary(int count, int abnormal) {
+    return 'الأحدث: $count قيمة ($abnormal خارج النطاق)';
+  }
+
+  @override
+  String latestLabAllNormal(int count) {
+    return 'الأحدث: $count قيمة (الكل طبيعي)';
+  }
+
+  @override
+  String get labStatusCriticalLow => 'منخفض بشكل حرج';
+
+  @override
+  String get labStatusLow => 'منخفض';
+
+  @override
+  String get labStatusNormal => 'طبيعي';
+
+  @override
+  String get labStatusHigh => 'مرتفع';
+
+  @override
+  String get labStatusCriticalHigh => 'مرتفع بشكل حرج';
+
+  @override
+  String get labSourceManual => 'إدخال يدوي';
+
+  @override
+  String get labSourcePasted => 'مقروء من نص التقرير';
+
+  @override
+  String get labSourcePhoto => 'تقرير صورة / JPG';
+
+  @override
+  String get labSourcePdf => 'تقرير PDF';
+
+  @override
+  String get bpLow => 'انخفاض ضغط الدم';
+
+  @override
+  String get bpNormal => 'نطاق طبيعي';
+
+  @override
+  String get bpElevated => 'مرتفع قليلاً';
+
+  @override
+  String get bpStage1 => 'ارتفاع المرحلة 1';
+
+  @override
+  String get bpStage2 => 'ارتفاع ملحوظ';
+
+  @override
+  String get bpCrisis => 'أزمة ارتفاع ضغط حاد';
+
+  @override
+  String get sugarLow => 'انخفاض سكر الدم';
+
+  @override
+  String get sugarNormal => 'نطاق طبيعي';
+
+  @override
+  String get sugarBorderline => 'مرتفع على الحدود';
+
+  @override
+  String get sugarHigh => 'ارتفاع سكر الدم';
+
+  @override
+  String get sugarVeryHigh => 'ارتفاع حاد في السكر';
+
+  @override
+  String get sugarTypeFasting => 'صائم';
+
+  @override
+  String get sugarTypePostMeal => 'بعد الأكل (ساعتين)';
+
+  @override
+  String get sugarTypeRandom => 'عشوائي';
+
+  @override
+  String get specialtyEye => 'طب العيون أو الباطنية';
+
+  @override
+  String get specialtyNail => 'الجلدية أو الباطنية';
+
+  @override
+  String get specialtyTongue => 'الأنف والأذن أو صحة الفم أو الباطنية';
+
+  @override
+  String get specialtySkin => 'الأمراض الجلدية';
+
+  @override
+  String get specialtyUrine => 'المسالك البولية أو الباطنية';
+
+  @override
+  String get specialtyStool => 'الجهاز الهضمي أو الباطنية';
+
+  @override
+  String get cloudBackupTitle => 'النسخ الاحتياطي السحابي (اختياري • Firebase)';
+
+  @override
+  String get cloudBackupDesc =>
+      'افتراضياً، تبقى جميع تقاريرك وقياساتك على هذا الجهاز فقط. يمكنك تفعيل النسخ الاحتياطي الخاص بحساب Google/Apple لحماية بياناتك عند تغيير الهاتف.';
+
+  @override
+  String get cloudBackupToggleTitle => 'تفعيل النسخ الاحتياطي السحابي';
+
+  @override
+  String cloudBackupLastSync(String date) {
+    return 'آخر نسخة احتياطية: $date';
+  }
+
+  @override
+  String get cloudBackupEnabledReady => 'مفعّل • جاهز للمزامنة';
+
+  @override
+  String get cloudBackupDisabledLocal => 'متوقف • التخزين على الجهاز فقط';
+
+  @override
+  String get cloudBackupSignInRequired =>
+      'يلزم تسجيل الدخول بحساب Google أو Apple لاستخدام النسخ السحابي.';
+
+  @override
+  String get cloudBackupNowBtn => 'نسخ احتياطي الآن';
+
+  @override
+  String get cloudRestoreBtn => 'استعادة من السحابة';
+
+  @override
+  String get cloudConsentTitle => 'موافقة النسخ الاحتياطي السحابي';
+
+  @override
+  String get cloudConsentBody =>
+      'تُحفظ تحاليلك وقياساتك وفحوصاتك افتراضياً على جهازك فقط.\n\nعند تفعيل النسخ السحابي، تُخزن بياناتك بشكل خاص ضمن حساب Google/Apple الخاص بك وتُحذف نهائياً عند حذف حسابك.\n\nهل توافق؟';
+
+  @override
+  String get cloudConsentConfirm => 'نعم، تفعيل';
+
+  @override
+  String cloudBackupSuccess(int count) {
+    return 'اكتمل النسخ السحابي: تمت مزامنة $count سجل.';
+  }
+
+  @override
+  String cloudBackupFailed(String error) {
+    return 'فشل النسخ الاحتياطي: $error';
+  }
+
+  @override
+  String cloudRestoreSuccess(int count) {
+    return 'تمت الاستعادة من السحابة: تم استيراد $count سجل.';
+  }
+
+  @override
+  String cloudRestoreFailed(String error) {
+    return 'فشلت الاستعادة: $error';
+  }
+
+  @override
+  String get cloudBackupDisabledNotice =>
+      'تم إيقاف النسخ السحابي. ستُحفظ السجلات الجديدة على الجهاز فقط.';
+
+  @override
+  String get aiCloudToggleTitle => 'تحليل الذكاء الاصطناعي السحابي (Gemini)';
+
+  @override
+  String get aiCloudOnDesc =>
+      'مفعّل: تُصغّر الصور الواضحة وتُحلّل عبر اتصال آمن، مع التحليل المحلي عند عدم توفر الإنترنت.';
+
+  @override
+  String get aiCloudOffDesc =>
+      'متوقف (0 توكن): يتم كل التحليل محلياً على جهازك فقط؛ لا تُرسل أي صور للخارج.';
+
+  @override
+  String get aiBackendOfflineNote =>
+      'عند ربط مفتاح Gemini / Firebase AI يتفعّل التحليل السحابي تلقائياً وفق هذا الخيار؛ المحرك المحلي نشط حالياً.';
+
+  @override
+  String get aiOptimizationsTitle => 'ضوابط توفير البيانات والتوكن النشطة';
+
+  @override
+  String get aiOptQualityGate =>
+      'فحص تلقائي للضبابية والظلام والوهج بدون تكلفة';
+
+  @override
+  String get aiOptCompression => 'قص تلقائي وضغط JPEG بدقة 512/768 بكسل';
+
+  @override
+  String get aiOptTieredModel =>
+      'اختيار ذكي للنموذج (Flash-Lite / Flash) لتقليل الاستهلاك';
+
+  @override
+  String get aiOptHashCache => 'ذاكرة تخزين محلية للصور المكررة (0 توكن)';
+
+  @override
+  String get aiClearCacheBtn => 'مسح ذاكرة الذكاء الاصطناعي';
+
+  @override
+  String get aiCacheCleared => 'تم مسح ذاكرة الذكاء الاصطناعي.';
+
+  @override
+  String resultScreenTitle(String category) {
+    return 'نتيجة $category';
+  }
+
+  @override
+  String get tooltipDoctorSummary => 'ملخص لزيارة الطبيب';
+
+  @override
+  String get tooltipReferenceGuide => 'دليل المراجع';
+
+  @override
+  String get calibratedColorTone => 'درجة اللون المعايرة';
+
+  @override
+  String get sampledColorTone => 'درجة اللون السائدة';
+
+  @override
+  String confidenceLabel(int percent) {
+    return 'ثقة الفحص المبدئي: $percent%';
+  }
+
+  @override
+  String get whiteBalanceDefaultNote => 'تمت موازنة اللون بالمرجع الأبيض.';
+
+  @override
+  String recommendedSpecialtyLabel(String specialty) {
+    return 'التخصص المقترح: $specialty';
+  }
+
+  @override
+  String get timelineComparisonTitle => 'المقارنة عبر الزمن';
+
+  @override
+  String get todayLabel => 'اليوم';
+
+  @override
+  String previousRecordSummary(String title, String status, int count) {
+    return 'السجل السابق: \"$title\" ($status). تتم متابعة $count سجل.';
+  }
+
+  @override
+  String get personalBaselineComparisonTitle => 'مقارنة مع المعدل الشخصي';
+
+  @override
+  String get yourBaselineLabel => 'المعدل';
+
+  @override
+  String get warningFlagsTitle => 'علامات تحذيرية تستدعي الانتباه';
+
+  @override
+  String get observationsTitle => 'الملاحظات';
+
+  @override
+  String get recommendationsTitle => 'التوصيات';
+
+  @override
+  String get personalBaselineCardTitle => 'معايرة المعدل الشخصي';
+
+  @override
+  String get personalBaselineCardDesc =>
+      'احفظ قياساً في يوم تشعر فيه بصحة جيدة كمرجعك الشخصي لتقليل اختلافات كاميرا الهاتف.';
+
+  @override
+  String get saveBaselineBtn => 'حفظ كمرجعي الشخصي';
+
+  @override
+  String get updateBaselineBtn => 'تحديث مرجعي الشخصي';
+
+  @override
+  String get clearBaselineBtn => 'حذف';
+
+  @override
+  String baselineSavedMsg(String category) {
+    return 'تم حفظ المرجع الشخصي لـ $category.';
+  }
+
+  @override
+  String baselineClearedMsg(String category) {
+    return 'تم حذف المرجع الشخصي لـ $category.';
+  }
+
+  @override
+  String get doctorSummaryBtn => 'عرض على الطبيب • تحضير الملخص';
+
+  @override
+  String get returnHomeBtn => 'العودة للرئيسية';
+
+  @override
+  String get doctorSheetTitle => 'عرض على الطبيب • ملخص الزيارة';
+
+  @override
+  String colorLabel(String hex, String status) {
+    return 'اللون: $hex • $status';
+  }
+
+  @override
+  String get timelineHistoryTitle => 'التسلسل الزمني مع السجلات السابقة';
+
+  @override
+  String get questionsForDoctorTitle => 'أسئلة يمكنك طرحها على طبيبك';
+
+  @override
+  String get copyShareSummaryBtn => 'نسخ ومشاركة الملخص';
+
+  @override
+  String get doctorSummaryCopied => 'تم نسخ ملخص الزيارة إلى الحافظة.';
+
+  @override
+  String referenceSheetTitle(String category) {
+    return '$category — المراجع البصرية';
+  }
+
+  @override
+  String get healthyReferenceLabel => 'المرجع السليم';
+
+  @override
+  String get captureChecklistTitle => 'نصائح التصوير الدقيق';
+
+  @override
+  String get abnormalFindingsTitle => 'العلامات غير الطبيعية / التحذيرية';
+
+  @override
+  String get cameraPermPermanentMsg =>
+      'تم تعطيل إذن الكاميرا في الإعدادات. يمكنك تفعيله أو اختيار صورة من المعرض.';
+
+  @override
+  String get cameraPermRequiredMsg =>
+      'يلزم إذن الكاميرا لإجراء الفحص البصري. تُعالج الصور محلياً على جهازك.';
+
+  @override
+  String get cameraGrantPermTitle => 'يلزم الوصول إلى الكاميرا';
+
+  @override
+  String get cameraRequestPermBtn => 'منح إذن الكاميرا';
+
+  @override
+  String get cameraPickGalleryBtn => 'اختيار من المعرض';
+
+  @override
+  String get cameraWhiteRefOn => 'المرجع الأبيض: مفعّل';
+
+  @override
+  String get cameraWhiteRefOff => 'المرجع الأبيض: متوقف';
+
+  @override
+  String get cameraBaselineActive => 'المرجع الشخصي محفوظ';
+
+  @override
+  String get cameraAnalyzing => 'جارٍ التحليل...';
+
+  @override
+  String get cameraCaptureBtn => 'التقاط وتحليل';
+
+  @override
+  String cameraAnalysisFailed(String error) {
+    return 'فشل التحليل: $error';
+  }
+
+  @override
+  String quickCardTitle(String category) {
+    return '$category • بطاقة الألوان';
+  }
+
+  @override
+  String get quickCardPrivacyBanner =>
+      'لا حاجة للكاميرا: اختر أقرب درجة لون لتسجيل سريع وخاص خلال ثانيتين.';
+
+  @override
+  String get quickCardChooseShade => 'اختر أقرب درجة لون';
+
+  @override
+  String get quickCardExtraContext => 'معلومات إضافية (اختياري)';
+
+  @override
+  String get quickCardSaveViewBtn => 'حفظ وعرض التقييم';
+
+  @override
+  String get quickCardUseCameraBtn => 'استخدام الكاميرا بدلاً من ذلك';
+
+  @override
+  String get skinIntroTitle => 'فحص جلدي بصري مبدئي';
+
+  @override
+  String get skinIntroDesc =>
+      'يقارن الشامات والثآليل والكدمات وبقع الوجه بالجلد المحيط. ليس تشخيصاً طبياً؛ يهدف للتحضير لزيارة طبيب الجلدية.';
+
+  @override
+  String get skinStep1Title => '1. اختر وحدة الفحص الجلدي';
+
+  @override
+  String get skinOtherConcernsLabel => 'حالات جلدية أخرى';
+
+  @override
+  String get skinStep2Title => '2. الأعراض المصاحبة (اختياري)';
+
+  @override
+  String get skinStep3Title => '3. منطقة الجسم (اختياري)';
+
+  @override
+  String get skinStartCameraBtn => 'بدء فحص الجلد بالكاميرا';
+
+  @override
+  String get skinConcernRash => 'احمرار / طفح جلدي';
+
+  @override
+  String get skinConcernMole => 'شامة / بقعة داكنة';
+
+  @override
+  String get skinConcernScaly => 'قشور / جفاف';
+
+  @override
+  String get skinConcernBlister => 'بثور / حب الشباب';
+
+  @override
+  String get skinConcernGeneral => 'فحص جلدي عام';
+
+  @override
+  String get bodyAreaFaceNeck => 'الوجه / الرقبة';
+
+  @override
+  String get bodyAreaArmHand => 'الذراع / اليد';
+
+  @override
+  String get bodyAreaTorso => 'الجذع';
+
+  @override
+  String get bodyAreaLegFoot => 'الساق / القدم';
+
+  @override
+  String get bodyAreaScalp => 'فروة الرأس';
+
+  @override
+  String get bodyAreaOther => 'أخرى';
+
+  @override
+  String get symptomItching => 'حكة';
+
+  @override
+  String get symptomPainWarmth => 'ألم / سخونة';
+
+  @override
+  String get symptomRapidChange => 'نمو سريع / تغير الشكل';
+
+  @override
+  String get symptomBleeding => 'نزيف / إفرازات';
+
+  @override
+  String get symptomSpreading => 'ينتشر بسرعة';
+
+  @override
+  String get symptomFever => 'ترافقه حمى';
+
+  @override
+  String get symptomNonHealing => 'جرح لا يلتئم (+4 أسابيع)';
+
+  @override
+  String get symptomOver6mm => 'أكبر من 6 مم أو حواف غير منتظمة';
+
+  @override
+  String get symptomNoTrauma => 'ظهر تلقائياً دون إصابة';
+
+  @override
+  String get symptomRoughDots => 'سطح خشن / نقاط سوداء صغيرة';
+
+  @override
+  String get symptomSunHormone => 'بقعة شمس أو هرمونات أو بعد حب الشباب';
+
+  @override
+  String get bruiseGuideTitle => 'دليل مراحل ألوان الكدمات';
+
+  @override
+  String get wartGuideTitle => 'دليل فحص وسلامة الثآليل';
+
+  @override
+  String get abcdeGuideTitle => 'دليل ABCDE لفحص الشامات';
+
+  @override
+  String get abcdeGuideSubtitle =>
+      '5 علامات أساسية يستخدمها أطباء الجلدية في فحص الشامات';
+
+  @override
+  String get labScreenTitle => 'التحاليل وتقارير المستشفى';
+
+  @override
+  String get labTabReports => 'تقاريري';
+
+  @override
+  String get labTabTrends => 'تتبع التغيرات';
+
+  @override
+  String get labAddBtn => 'إضافة تقرير / تحليل دم';
+
+  @override
+  String get labEmptyTitle => 'لا توجد تحاليل دم محفوظة بعد';
+
+  @override
+  String get labEmptyDesc =>
+      'ارفع تقرير PDF أو JPG؛ يمكنك اختيارياً إضافة تشخيص المستشفى أو شكواك للحصول على شرح مبسط.';
+
+  @override
+  String get labAddFirstBtn => 'إضافة أول تقرير PDF';
+
+  @override
+  String get labTrendsEmptyDesc =>
+      'احفظ تحاليل بتواريخ مختلفة لعرض رسوم التغير الزمني للهيموغلوبين والفيريتين والغلوكوز وTSH وفيتامين د.';
+
+  @override
+  String labParamsCount(int count) {
+    return '$count مؤشر';
+  }
+
+  @override
+  String labOutOfRangeCount(int count) {
+    return '$count خارج النطاق';
+  }
+
+  @override
+  String labDetailParamsTitle(int count) {
+    return 'تقييم المؤشرات ($count)';
+  }
+
+  @override
+  String get labEnteredDiagnosisTitle => 'تشخيص المستشفى / الطبيب';
+
+  @override
+  String get labEnteredComplaintTitle => 'شكواك / ملاحظتك';
+
+  @override
+  String get labInterpretationTitle => 'تفسير مبسط وواضح';
+
+  @override
+  String get labCopyDoctorSummaryBtn => 'عرض على الطبيب • نسخ الملخص';
+
+  @override
+  String get labSummaryCopied => 'تم نسخ ملخص التحليل.';
+
+  @override
+  String get labExportPdfBtn => 'تصدير تقرير PDF للطبيب';
+
+  @override
+  String get labAddSheetTitle => 'إضافة تقرير مستشفى / تحليل دم';
+
+  @override
+  String get labReportTitleField => 'عنوان التقرير';
+
+  @override
+  String get labDefaultReportTitle => 'نتيجة تحليل الدم';
+
+  @override
+  String get labStep1Upload => '1. رفع تقرير PDF أو JPG';
+
+  @override
+  String get labUploadPdfJpgBtn => 'رفع PDF أو JPG';
+
+  @override
+  String get labCameraCaptureBtn => 'التقاط صورة';
+
+  @override
+  String get labStep2Context => '2. تشخيص المستشفى وملاحظتك (اختياري)';
+
+  @override
+  String get labStep2ContextHint =>
+      'أضف التشخيص الذي ترغب في فهمه أو شكواك؛ يمكنك ترك الحقلين فارغين.';
+
+  @override
+  String get labDiagnosisField => 'تشخيص المستشفى / الطبيب (اختياري)';
+
+  @override
+  String get labComplaintField => 'شكواك / سؤالك (اختياري)';
+
+  @override
+  String get labStep3PasteManual => '3. لصق نص التقرير أو إضافة القيم يدوياً';
+
+  @override
+  String get labParseTextBtn => 'قراءة وتحليل النص';
+
+  @override
+  String get labParamDropdown => 'مؤشر التحليل';
+
+  @override
+  String labValueField(String unit) {
+    return 'القيمة ($unit)';
+  }
+
+  @override
+  String get labAddValueBtn => '+ إضافة';
+
+  @override
+  String labParsedValuesTitle(int count) {
+    return 'القيم المقروءة ($count)';
+  }
+
+  @override
+  String get labSaveEvaluateBtn => 'تقييم وحفظ التقرير';
+
+  @override
+  String labTrendSummary(int count, String delta, String status) {
+    return '$count سجل • التغير: $delta • الأحدث: $status';
+  }
+
+  @override
+  String get vitalsScreenTitle => 'متابعة الضغط والسكر';
+
+  @override
+  String get vitalsCopySummaryTooltip => 'نسخ ملخص الطبيب';
+
+  @override
+  String get vitalsCopyEmptyMsg => 'أضف قياس ضغط أو سكر أولاً لإنشاء ملخص.';
+
+  @override
+  String get vitalsSummaryCopied => 'تم نسخ ملخص الضغط والسكر.';
+
+  @override
+  String get vitalsAddBpBtn => 'إضافة ضغط الدم';
+
+  @override
+  String get vitalsAddSugarBtn => 'إضافة سكر الدم';
+
+  @override
+  String get vitalsBpEmptyTitle => 'لا توجد قياسات ضغط دم بعد';
+
+  @override
+  String get vitalsBpEmptyDesc =>
+      'سجّل الضغط الانقباضي والانبساطي والنبض بالتاريخ لمتابعة الرسم البياني.';
+
+  @override
+  String get vitalsBpAddFirstBtn => 'إضافة أول قياس ضغط';
+
+  @override
+  String get vitalsSugarEmptyTitle => 'لا توجد قياسات سكر دم بعد';
+
+  @override
+  String get vitalsSugarEmptyDesc =>
+      'سجّل قياسات السكر صائماً أو بعد الأكل أو عشوائياً لمتابعة الاتجاه.';
+
+  @override
+  String get vitalsSugarAddFirstBtn => 'إضافة أول قياس سكر';
+
+  @override
+  String vitalsBpAverage(int count, int sys, int dia) {
+    return 'المتوسط ($count): $sys/$dia mmHg';
+  }
+
+  @override
+  String vitalsLastPulse(int pulse) {
+    return ' • النبض $pulse';
+  }
+
+  @override
+  String get vitalsBpHistoryTitle => 'سجل قياسات ضغط الدم';
+
+  @override
+  String vitalsSugarAverage(int count, int avg) {
+    return 'المتوسط ($count): $avg mg/dL';
+  }
+
+  @override
+  String get vitalsSugarHistoryTitle => 'سجل قياسات سكر الدم';
+
+  @override
+  String get vitalsNewBpTitle => 'قياس ضغط دم جديد';
+
+  @override
+  String get vitalsSystolicField => 'الانقباضي (الأعلى)';
+
+  @override
+  String get vitalsDiastolicField => 'الانبساطي (الأدنى)';
+
+  @override
+  String get vitalsPulseField => 'النبض (اختياري)';
+
+  @override
+  String get vitalsNoteField => 'ملاحظة (اختياري)';
+
+  @override
+  String get vitalsSaveBpBtn => 'حفظ ضغط الدم';
+
+  @override
+  String get vitalsNewSugarTitle => 'قياس سكر دم جديد';
+
+  @override
+  String get vitalsSugarValueField => 'سكر الدم (mg/dL)';
+
+  @override
+  String get vitalsSaveSugarBtn => 'حفظ سكر الدم';
+
+  @override
+  String get chartAddReadingHint => 'أضف قياسات لعرض الرسم البياني';
 }

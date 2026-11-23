@@ -226,6 +226,10 @@ class FollowUpTrackStatus {
     required this.isDueNow,
     required this.daysRemaining,
     this.latestValueSummary,
+    this.latestBp,
+    this.latestSugar,
+    this.latestLab,
+    this.latestCheck,
   });
 
   final FollowUpTrack track;
@@ -234,6 +238,10 @@ class FollowUpTrackStatus {
   final bool isDueNow;
   final int daysRemaining;
   final String? latestValueSummary;
+  final BloodPressureReading? latestBp;
+  final BloodSugarReading? latestSugar;
+  final LabReportRecord? latestLab;
+  final AnalysisResult? latestCheck;
 
   String get statusLabel {
     if (lastCheckedAt == null) {
@@ -272,11 +280,16 @@ class FollowUpEvaluator {
     return FollowUpTrack.values.map((track) {
       DateTime? lastAt;
       String? summary;
+      BloodPressureReading? latestBp;
+      BloodSugarReading? latestSugar;
+      LabReportRecord? latestLab;
+      AnalysisResult? latestCheck;
 
       switch (track.dataSource) {
         case FollowUpDataSource.bloodPressure:
           if (sortedBp.isNotEmpty) {
             final latest = sortedBp.first;
+            latestBp = latest;
             lastAt = latest.recordedAt;
             final pulseText =
                 latest.pulse != null ? ' • Nabız ${latest.pulse}' : '';
@@ -287,6 +300,7 @@ class FollowUpEvaluator {
         case FollowUpDataSource.bloodSugar:
           if (sortedSugar.isNotEmpty) {
             final latest = sortedSugar.first;
+            latestSugar = latest;
             lastAt = latest.recordedAt;
             summary =
                 'Son ölçüm: ${latest.formatted} (${latest.category.label})';
@@ -295,6 +309,7 @@ class FollowUpEvaluator {
         case FollowUpDataSource.labReport:
           if (sortedLabs.isNotEmpty) {
             final latest = sortedLabs.first;
+            latestLab = latest;
             lastAt = latest.reportDate;
             final abnormalCount =
                 latest.items.where((i) => i.status.isAbnormal).length;
@@ -310,6 +325,7 @@ class FollowUpEvaluator {
             ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
           if (matching.isNotEmpty) {
             final latest = matching.first;
+            latestCheck = latest;
             lastAt = latest.createdAt;
             summary = 'Son kayıt: ${latest.summaryTitle}';
           }
@@ -341,6 +357,10 @@ class FollowUpEvaluator {
         isDueNow: isDue,
         daysRemaining: remainingDays,
         latestValueSummary: summary,
+        latestBp: latestBp,
+        latestSugar: latestSugar,
+        latestLab: latestLab,
+        latestCheck: latestCheck,
       );
     }).toList();
   }

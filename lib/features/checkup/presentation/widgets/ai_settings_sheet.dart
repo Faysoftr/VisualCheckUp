@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 
 /// Bottom sheet allowing users to opt in/out of cloud Vision AI (Gemini via
@@ -60,10 +61,11 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
   }
 
   Future<void> _clearCache() async {
+    final l10n = context.l10n;
     await widget.historyRepository.clearAiCache();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Yapay zeka önbelleği temizlendi.')),
+      SnackBar(content: Text(l10n.aiCacheCleared)),
     );
   }
 
@@ -71,6 +73,7 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
@@ -82,10 +85,12 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
             children: [
               Icon(Icons.auto_awesome_outlined, color: colorScheme.primary),
               const SizedBox(width: 10),
-              Text(
-                'Yapay Zeka & Gizlilik Ayarları',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  l10n.aiSettingsTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -93,14 +98,12 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
           const SizedBox(height: 12),
           Card(
             child: SwitchListTile(
-              title: const Text(
-                'Bulut Yapay Zeka (Gemini) Analizi',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              title: Text(
+                l10n.aiCloudToggleTitle,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               subtitle: Text(
-                _cloudAiEnabled
-                    ? 'Açık: Net ve kaliteli fotoğraflar küçültülerek anlık görsel analiz için güvenli bağlantıdan işlenir. İnternet yoksa cihaz içi analiz çalışır.'
-                    : 'Kapalı (0 Token): Tüm analizler yalnızca cihazınızda yapılır; hiçbir fotoğraf dışarı gönderilmez.',
+                _cloudAiEnabled ? l10n.aiCloudOnDesc : l10n.aiCloudOffDesc,
               ),
               value: _cloudAiEnabled,
               onChanged: _loading ? null : _toggleCloudAi,
@@ -125,7 +128,7 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Firebase AI Logic / Gemini bağlantısı eklendiğinde bulut analizi bu tercihe göre otomatik devreye girer; şu an cihaz içi motor aktiftir.',
+                      l10n.aiBackendOfflineNote,
                       style: theme.textTheme.bodySmall?.copyWith(height: 1.35),
                     ),
                   ),
@@ -135,27 +138,27 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
           ],
           const SizedBox(height: 14),
           Text(
-            'Aktif Token & Veri Tasarrufu Kontrolleri',
+            l10n.aiOptimizationsTitle,
             style: theme.textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
-          const _OptimizationRow(
+          _OptimizationRow(
             icon: Icons.center_focus_strong_outlined,
-            text: '0-token bulanıklık, karanlık ve parlama kalite kapısı',
+            text: l10n.aiOptQualityGate,
           ),
-          const _OptimizationRow(
+          _OptimizationRow(
             icon: Icons.photo_size_select_large_outlined,
-            text: 'Otomatik kırpma + 512px / 768px JPEG (%80) sıkıştırma',
+            text: l10n.aiOptCompression,
           ),
-          const _OptimizationRow(
+          _OptimizationRow(
             icon: Icons.bolt_outlined,
-            text: 'Akıllı model seçimi (Flash-Lite / Flash) & düşük thinking',
+            text: l10n.aiOptTieredModel,
           ),
-          const _OptimizationRow(
+          _OptimizationRow(
             icon: Icons.cached_rounded,
-            text: 'Aynı fotoğraf için cihaz içi hash önbelleği (0 token)',
+            text: l10n.aiOptHashCache,
           ),
           const SizedBox(height: 14),
           Align(
@@ -163,7 +166,7 @@ class _AiSettingsSheetState extends State<AiSettingsSheet> {
             child: TextButton.icon(
               onPressed: _clearCache,
               icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-              label: const Text('AI Önbelleğini Temizle'),
+              label: Text(l10n.aiClearCacheBtn),
             ),
           ),
         ],

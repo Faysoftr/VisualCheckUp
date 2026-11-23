@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/module_reference_catalog.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -51,6 +52,7 @@ class _ReferenceContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final spec = ModuleReferenceCatalog.forCategory(category);
 
     return ListView(
@@ -63,7 +65,7 @@ class _ReferenceContent extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                '${category.title} — Görsel Referanslar',
+                l10n.referenceSheetTitle(category.localizedTitle(l10n)),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -83,7 +85,7 @@ class _ReferenceContent extends StatelessWidget {
 
         // Healthy Reference section
         Text(
-          'Sağlıklı Referans',
+          l10n.healthyReferenceLabel,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
             color: const Color(0xFF1B8A5A),
@@ -96,7 +98,7 @@ class _ReferenceContent extends StatelessWidget {
 
         // Abnormal / warning findings section
         Text(
-          'Dikkat Edilmesi Gereken / Sağlıksız Bulgular',
+          l10n.abnormalFindingsTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
             color: theme.colorScheme.onSurface,
@@ -122,6 +124,7 @@ class _FindingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final riskColor = finding.riskLevel.color;
 
     return Card(
@@ -167,8 +170,8 @@ class _FindingCard extends StatelessWidget {
                         ),
                         child: Text(
                           finding.isHealthyReference
-                              ? 'Sağlıklı Referans'
-                              : finding.riskLevel.label,
+                              ? l10n.healthyReferenceLabel
+                              : finding.riskLevel.localizedLabel(l10n),
                           style: TextStyle(
                             color: riskColor,
                             fontSize: 11,

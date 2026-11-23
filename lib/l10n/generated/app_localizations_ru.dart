@@ -462,4 +462,720 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get skinScreenTitle => 'Предварительный осмотр кожи';
+
+  @override
+  String get providerGuest => 'Гость';
+
+  @override
+  String signInFailed(String error) {
+    return 'Ошибка входа: $error';
+  }
+
+  @override
+  String get riskNormal => 'Обычный вид';
+
+  @override
+  String get riskAttention => 'Рекомендуется наблюдение';
+
+  @override
+  String get riskUrgent => 'Рекомендуется осмотр врача';
+
+  @override
+  String recentSummaryFallback(String category, String status) {
+    return '$category • $status';
+  }
+
+  @override
+  String latestSummaryPrefix(String value) {
+    return 'Последнее: $value';
+  }
+
+  @override
+  String latestLabValuesSummary(int count, int abnormal) {
+    return 'Последнее: $count показ. ($abnormal вне нормы)';
+  }
+
+  @override
+  String latestLabAllNormal(int count) {
+    return 'Последнее: $count показ. (все в норме)';
+  }
+
+  @override
+  String get labStatusCriticalLow => 'Критически низкий';
+
+  @override
+  String get labStatusLow => 'Низкий';
+
+  @override
+  String get labStatusNormal => 'Норма';
+
+  @override
+  String get labStatusHigh => 'Высокий';
+
+  @override
+  String get labStatusCriticalHigh => 'Критически высокий';
+
+  @override
+  String get labSourceManual => 'Ручной ввод';
+
+  @override
+  String get labSourcePasted => 'Прочитано из текста';
+
+  @override
+  String get labSourcePhoto => 'Фото / JPG отчёт';
+
+  @override
+  String get labSourcePdf => 'PDF отчёт';
+
+  @override
+  String get bpLow => 'Низкое давление';
+
+  @override
+  String get bpNormal => 'В норме';
+
+  @override
+  String get bpElevated => 'Повышенное';
+
+  @override
+  String get bpStage1 => 'Повышенное (ст. 1)';
+
+  @override
+  String get bpStage2 => 'Высокое (ст. 2)';
+
+  @override
+  String get bpCrisis => 'Гипертонический криз';
+
+  @override
+  String get sugarLow => 'Низкий сахар';
+
+  @override
+  String get sugarNormal => 'В норме';
+
+  @override
+  String get sugarBorderline => 'Погранично высокий';
+
+  @override
+  String get sugarHigh => 'Высокий сахар';
+
+  @override
+  String get sugarVeryHigh => 'Очень высокий сахар';
+
+  @override
+  String get sugarTypeFasting => 'Натощак';
+
+  @override
+  String get sugarTypePostMeal => 'После еды (2 ч)';
+
+  @override
+  String get sugarTypeRandom => 'Случайный';
+
+  @override
+  String get specialtyEye => 'Офтальмология или терапия';
+
+  @override
+  String get specialtyNail => 'Дерматология или терапия';
+
+  @override
+  String get specialtyTongue => 'ЛОР, стоматология или терапия';
+
+  @override
+  String get specialtySkin => 'Дерматология';
+
+  @override
+  String get specialtyUrine => 'Урология или терапия';
+
+  @override
+  String get specialtyStool => 'Гастроэнтерология или терапия';
+
+  @override
+  String get cloudBackupTitle => 'Облачное копирование (по желанию • Firebase)';
+
+  @override
+  String get cloudBackupDesc =>
+      'По умолчанию все анализы и измерения хранятся только на этом устройстве. Включите личное резервное копирование в аккаунт Google/Apple, чтобы сохранить данные при смене телефона.';
+
+  @override
+  String get cloudBackupToggleTitle => 'Включить облачное копирование';
+
+  @override
+  String cloudBackupLastSync(String date) {
+    return 'Последнее копирование: $date';
+  }
+
+  @override
+  String get cloudBackupEnabledReady => 'Включено • Готово к синхронизации';
+
+  @override
+  String get cloudBackupDisabledLocal => 'Выключено • Только на устройстве';
+
+  @override
+  String get cloudBackupSignInRequired =>
+      'Войдите через Google или Apple для облачного копирования.';
+
+  @override
+  String get cloudBackupNowBtn => 'Сохранить сейчас';
+
+  @override
+  String get cloudRestoreBtn => 'Восстановить из облака';
+
+  @override
+  String get cloudConsentTitle => 'Согласие на облачное копирование';
+
+  @override
+  String get cloudConsentBody =>
+      'Ваши анализы и измерения по умолчанию хранятся только на этом устройстве.\n\nПри включении облачного копирования данные сохраняются приватно в вашем аккаунте Google/Apple и полностью удаляются при удалении аккаунта.\n\nВы согласны?';
+
+  @override
+  String get cloudConsentConfirm => 'Да, включить';
+
+  @override
+  String cloudBackupSuccess(int count) {
+    return 'Копирование завершено: синхронизировано $count зап.';
+  }
+
+  @override
+  String cloudBackupFailed(String error) {
+    return 'Ошибка копирования: $error';
+  }
+
+  @override
+  String cloudRestoreSuccess(int count) {
+    return 'Восстановлено из облака: $count зап.';
+  }
+
+  @override
+  String cloudRestoreFailed(String error) {
+    return 'Ошибка восстановления: $error';
+  }
+
+  @override
+  String get cloudBackupDisabledNotice =>
+      'Облачное копирование выключено. Новые записи хранятся только локально.';
+
+  @override
+  String get aiCloudToggleTitle => 'Облачный ИИ-анализ (Gemini)';
+
+  @override
+  String get aiCloudOnDesc =>
+      'Вкл.: Чёткие фото сжимаются и анализируются по защищённому каналу. Без сети работает локальный анализ.';
+
+  @override
+  String get aiCloudOffDesc =>
+      'Выкл. (0 токенов): Весь анализ выполняется только на устройстве; фото никуда не отправляются.';
+
+  @override
+  String get aiBackendOfflineNote =>
+      'После подключения ключа Gemini / Firebase AI облачный анализ заработает автоматически; сейчас активен локальный движок.';
+
+  @override
+  String get aiOptimizationsTitle => 'Активная экономия токенов и трафика';
+
+  @override
+  String get aiOptQualityGate =>
+      'Проверка резкости, света и бликов без токенов';
+
+  @override
+  String get aiOptCompression => 'Автообрезка + сжатие JPEG 512/768px (80%)';
+
+  @override
+  String get aiOptTieredModel => 'Умный выбор модели (Flash-Lite / Flash)';
+
+  @override
+  String get aiOptHashCache => 'Локальный кэш повторных фото (0 токенов)';
+
+  @override
+  String get aiClearCacheBtn => 'Очистить кэш ИИ';
+
+  @override
+  String get aiCacheCleared => 'Кэш ИИ очищен.';
+
+  @override
+  String resultScreenTitle(String category) {
+    return 'Результат: $category';
+  }
+
+  @override
+  String get tooltipDoctorSummary => 'Сводка для врача';
+
+  @override
+  String get tooltipReferenceGuide => 'Справочник';
+
+  @override
+  String get calibratedColorTone => 'Калиброванный тон';
+
+  @override
+  String get sampledColorTone => 'Измеренный основной тон';
+
+  @override
+  String confidenceLabel(int percent) {
+    return 'Уверенность оценки: $percent%';
+  }
+
+  @override
+  String get whiteBalanceDefaultNote => 'Цвет откалиброван по белому эталону.';
+
+  @override
+  String recommendedSpecialtyLabel(String specialty) {
+    return 'Рекомендуемый специалист: $specialty';
+  }
+
+  @override
+  String get timelineComparisonTitle => 'Изменения со временем';
+
+  @override
+  String get todayLabel => 'Сегодня';
+
+  @override
+  String previousRecordSummary(String title, String status, int count) {
+    return 'Предыдущая запись: «$title» ($status). Всего записей: $count.';
+  }
+
+  @override
+  String get personalBaselineComparisonTitle => 'Сравнение с вашей нормой';
+
+  @override
+  String get yourBaselineLabel => 'Ваша норма';
+
+  @override
+  String get warningFlagsTitle => 'Тревожные признаки';
+
+  @override
+  String get observationsTitle => 'Наблюдения';
+
+  @override
+  String get recommendationsTitle => 'Рекомендации';
+
+  @override
+  String get personalBaselineCardTitle => 'Личная калибровка нормы';
+
+  @override
+  String get personalBaselineCardDesc =>
+      'Сохраните это измерение в здоровый день как личный эталон для уменьшения погрешности камеры.';
+
+  @override
+  String get saveBaselineBtn => 'Сохранить как мою норму';
+
+  @override
+  String get updateBaselineBtn => 'Обновить мою норму';
+
+  @override
+  String get clearBaselineBtn => 'Удалить';
+
+  @override
+  String baselineSavedMsg(String category) {
+    return 'Личная норма для «$category» сохранена.';
+  }
+
+  @override
+  String baselineClearedMsg(String category) {
+    return 'Личная норма для «$category» удалена.';
+  }
+
+  @override
+  String get doctorSummaryBtn => 'Показать врачу • Сводка';
+
+  @override
+  String get returnHomeBtn => 'На главную';
+
+  @override
+  String get doctorSheetTitle => 'Сводка для визита к врачу';
+
+  @override
+  String colorLabel(String hex, String status) {
+    return 'Цвет: $hex • $status';
+  }
+
+  @override
+  String get timelineHistoryTitle => 'Хронология предыдущих записей';
+
+  @override
+  String get questionsForDoctorTitle => 'Вопросы для врача';
+
+  @override
+  String get copyShareSummaryBtn => 'Скопировать и поделиться';
+
+  @override
+  String get doctorSummaryCopied => 'Сводка для врача скопирована.';
+
+  @override
+  String referenceSheetTitle(String category) {
+    return '$category — Визуальный справочник';
+  }
+
+  @override
+  String get healthyReferenceLabel => 'Здоровый ориентир';
+
+  @override
+  String get captureChecklistTitle => 'Советы по съёмке';
+
+  @override
+  String get abnormalFindingsTitle => 'Признаки, требующие внимания';
+
+  @override
+  String get cameraPermPermanentMsg =>
+      'Доступ к камере отключён в настройках. Включите его или выберите фото из галереи.';
+
+  @override
+  String get cameraPermRequiredMsg =>
+      'Для визуальной проверки нужен доступ к камере. Изображения обрабатываются локально.';
+
+  @override
+  String get cameraGrantPermTitle => 'Нужен доступ к камере';
+
+  @override
+  String get cameraRequestPermBtn => 'Разрешить камеру';
+
+  @override
+  String get cameraPickGalleryBtn => 'Выбрать из галереи';
+
+  @override
+  String get cameraWhiteRefOn => 'Белый эталон: Вкл.';
+
+  @override
+  String get cameraWhiteRefOff => 'Белый эталон: Выкл.';
+
+  @override
+  String get cameraBaselineActive => 'Эталон сохранён';
+
+  @override
+  String get cameraAnalyzing => 'Анализ...';
+
+  @override
+  String get cameraCaptureBtn => 'Снять и оценить';
+
+  @override
+  String cameraAnalysisFailed(String error) {
+    return 'Ошибка анализа: $error';
+  }
+
+  @override
+  String quickCardTitle(String category) {
+    return '$category • Цветовая карта';
+  }
+
+  @override
+  String get quickCardPrivacyBanner =>
+      'Без камеры: выберите ближайший оттенок для быстрой и приватной записи за 2 секунды.';
+
+  @override
+  String get quickCardChooseShade => 'Выберите ближайший оттенок';
+
+  @override
+  String get quickCardExtraContext => 'Доп. сведения (по желанию)';
+
+  @override
+  String get quickCardSaveViewBtn => 'Сохранить и посмотреть';
+
+  @override
+  String get quickCardUseCameraBtn => 'Использовать камеру';
+
+  @override
+  String get skinIntroTitle => 'Визуальный дерматологический скрининг';
+
+  @override
+  String get skinIntroDesc =>
+      'Сравнивает родинки, бородавки, синяки и пятна с окружающей кожей. Не является диагнозом; помогает подготовиться к врачу.';
+
+  @override
+  String get skinStep1Title => '1. Выберите модуль проверки кожи';
+
+  @override
+  String get skinOtherConcernsLabel => 'Другие проявления';
+
+  @override
+  String get skinStep2Title => '2. Сопутствующие симптомы (необязательно)';
+
+  @override
+  String get skinStep3Title => '3. Область тела (необязательно)';
+
+  @override
+  String get skinStartCameraBtn => 'Начать проверку кожи камерой';
+
+  @override
+  String get skinConcernRash => 'Покраснение / Сыпь';
+
+  @override
+  String get skinConcernMole => 'Родинка / Тёмное пятно';
+
+  @override
+  String get skinConcernScaly => 'Шелушение / Сухая бляшка';
+
+  @override
+  String get skinConcernBlister => 'Пузырьки / Акне';
+
+  @override
+  String get skinConcernGeneral => 'Общая проверка кожи';
+
+  @override
+  String get bodyAreaFaceNeck => 'Лицо / Шея';
+
+  @override
+  String get bodyAreaArmHand => 'Рука / Кисть';
+
+  @override
+  String get bodyAreaTorso => 'Туловище';
+
+  @override
+  String get bodyAreaLegFoot => 'Нога / Стопа';
+
+  @override
+  String get bodyAreaScalp => 'Кожа головы';
+
+  @override
+  String get bodyAreaOther => 'Другое';
+
+  @override
+  String get symptomItching => 'Зуд';
+
+  @override
+  String get symptomPainWarmth => 'Боль / Жар';
+
+  @override
+  String get symptomRapidChange => 'Быстрый рост / изменение';
+
+  @override
+  String get symptomBleeding => 'Кровоточивость / Мокнутие';
+
+  @override
+  String get symptomSpreading => 'Быстро распространяется';
+
+  @override
+  String get symptomFever => 'Есть температура';
+
+  @override
+  String get symptomNonHealing => 'Незаживающая рана (4+ нед.)';
+
+  @override
+  String get symptomOver6mm => 'Более 6 мм или неровный край';
+
+  @override
+  String get symptomNoTrauma => 'Появился без удара';
+
+  @override
+  String get symptomRoughDots => 'Шероховатость / чёрные точки';
+
+  @override
+  String get symptomSunHormone => 'Солнечное/гормональное пятно';
+
+  @override
+  String get bruiseGuideTitle => 'Стадии цвета синяка';
+
+  @override
+  String get wartGuideTitle => 'Памятка по бородавкам';
+
+  @override
+  String get abcdeGuideTitle => 'Правило ABCDE для родинок';
+
+  @override
+  String get abcdeGuideSubtitle => '5 ключевых признаков для оценки родинок';
+
+  @override
+  String get labScreenTitle => 'Анализы и отчёты';
+
+  @override
+  String get labTabReports => 'Мои отчёты';
+
+  @override
+  String get labTabTrends => 'Динамика';
+
+  @override
+  String get labAddBtn => 'Добавить анализ';
+
+  @override
+  String get labEmptyTitle => 'Сохранённых анализов пока нет';
+
+  @override
+  String get labEmptyDesc =>
+      'Загрузите PDF или JPG анализа; при желании добавьте диагноз или жалобу для понятного обзора.';
+
+  @override
+  String get labAddFirstBtn => 'Добавить первый отчёт';
+
+  @override
+  String get labTrendsEmptyDesc =>
+      'Сохраняйте анализы за разные даты, чтобы видеть графики динамики гемоглобина, ферритина, глюкозы, ТТГ и др.';
+
+  @override
+  String labParamsCount(int count) {
+    return '$count показ.';
+  }
+
+  @override
+  String labOutOfRangeCount(int count) {
+    return '$count вне нормы';
+  }
+
+  @override
+  String labDetailParamsTitle(int count) {
+    return 'Оценка показателей ($count)';
+  }
+
+  @override
+  String get labEnteredDiagnosisTitle => 'Диагноз врача / больницы';
+
+  @override
+  String get labEnteredComplaintTitle => 'Ваша жалоба / заметка';
+
+  @override
+  String get labInterpretationTitle => 'Понятное пояснение';
+
+  @override
+  String get labCopyDoctorSummaryBtn => 'Показать врачу • Копировать';
+
+  @override
+  String get labSummaryCopied => 'Сводка анализов скопирована.';
+
+  @override
+  String get labExportPdfBtn => 'Экспорт PDF для врача';
+
+  @override
+  String get labAddSheetTitle => 'Добавить анализ / отчёт';
+
+  @override
+  String get labReportTitleField => 'Название отчёта';
+
+  @override
+  String get labDefaultReportTitle => 'Результат анализа крови';
+
+  @override
+  String get labStep1Upload => '1. Загрузить PDF или JPG';
+
+  @override
+  String get labUploadPdfJpgBtn => 'Загрузить PDF / JPG';
+
+  @override
+  String get labCameraCaptureBtn => 'Сфотографировать';
+
+  @override
+  String get labStep2Context => '2. Диагноз и заметка (необязательно)';
+
+  @override
+  String get labStep2ContextHint =>
+      'Укажите диагноз или жалобы, если нужно пояснение; оба поля можно оставить пустыми.';
+
+  @override
+  String get labDiagnosisField => 'Диагноз врача (необязательно)';
+
+  @override
+  String get labComplaintField => 'Жалобы / вопрос (необязательно)';
+
+  @override
+  String get labStep3PasteManual => '3. Вставить текст или добавить значения';
+
+  @override
+  String get labParseTextBtn => 'Распознать текст';
+
+  @override
+  String get labParamDropdown => 'Показатель';
+
+  @override
+  String labValueField(String unit) {
+    return 'Значение ($unit)';
+  }
+
+  @override
+  String get labAddValueBtn => '+ Добавить';
+
+  @override
+  String labParsedValuesTitle(int count) {
+    return 'Распознано ($count)';
+  }
+
+  @override
+  String get labSaveEvaluateBtn => 'Оценить и сохранить';
+
+  @override
+  String labTrendSummary(int count, String delta, String status) {
+    return 'Записей: $count • Изм.: $delta • Посл.: $status';
+  }
+
+  @override
+  String get vitalsScreenTitle => 'Давление и сахар';
+
+  @override
+  String get vitalsCopySummaryTooltip => 'Скопировать сводку для врача';
+
+  @override
+  String get vitalsCopyEmptyMsg =>
+      'Сначала добавьте измерение давления или сахара.';
+
+  @override
+  String get vitalsSummaryCopied => 'Сводка давления и сахара скопирована.';
+
+  @override
+  String get vitalsAddBpBtn => 'Добавить давление';
+
+  @override
+  String get vitalsAddSugarBtn => 'Добавить сахар';
+
+  @override
+  String get vitalsBpEmptyTitle => 'Измерений давления пока нет';
+
+  @override
+  String get vitalsBpEmptyDesc =>
+      'Записывайте давление и пульс с датой, чтобы отслеживать график динамики.';
+
+  @override
+  String get vitalsBpAddFirstBtn => 'Добавить первое измерение';
+
+  @override
+  String get vitalsSugarEmptyTitle => 'Измерений сахара пока нет';
+
+  @override
+  String get vitalsSugarEmptyDesc =>
+      'Записывайте сахар натощак, после еды или случайный для отслеживания динамики.';
+
+  @override
+  String get vitalsSugarAddFirstBtn => 'Добавить первое измерение';
+
+  @override
+  String vitalsBpAverage(int count, int sys, int dia) {
+    return 'Среднее ($count): $sys/$dia mmHg';
+  }
+
+  @override
+  String vitalsLastPulse(int pulse) {
+    return ' • Пульс $pulse';
+  }
+
+  @override
+  String get vitalsBpHistoryTitle => 'История измерений давления';
+
+  @override
+  String vitalsSugarAverage(int count, int avg) {
+    return 'Среднее ($count): $avg mg/dL';
+  }
+
+  @override
+  String get vitalsSugarHistoryTitle => 'История измерений сахара';
+
+  @override
+  String get vitalsNewBpTitle => 'Новое измерение давления';
+
+  @override
+  String get vitalsSystolicField => 'Верхнее (систол.)';
+
+  @override
+  String get vitalsDiastolicField => 'Нижнее (диастол.)';
+
+  @override
+  String get vitalsPulseField => 'Пульс (необязательно)';
+
+  @override
+  String get vitalsNoteField => 'Заметка (необязательно)';
+
+  @override
+  String get vitalsSaveBpBtn => 'Сохранить давление';
+
+  @override
+  String get vitalsNewSugarTitle => 'Новое измерение сахара';
+
+  @override
+  String get vitalsSugarValueField => 'Сахар крови (мг/дл)';
+
+  @override
+  String get vitalsSaveSugarBtn => 'Сохранить сахар';
+
+  @override
+  String get chartAddReadingHint => 'Добавьте измерения для графика';
 }

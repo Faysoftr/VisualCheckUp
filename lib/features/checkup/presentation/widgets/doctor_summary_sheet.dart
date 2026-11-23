@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
-import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 /// High-clarity "Doktora Göster" summary sheet presenting observations,
 /// specialty guidance, chronological history, and questions to ask a doctor.
@@ -54,13 +53,12 @@ class _DoctorSummaryBody extends StatelessWidget {
   final ScrollController? scrollController;
 
   Future<void> _copyReport(BuildContext context) async {
+    final l10n = context.l10n;
     await Clipboard.setData(ClipboardData(text: report.toShareableText()));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Doktor randevu özeti panoya kopyalandı. Notlara veya mesajlara yapıştırabilirsiniz.',
-        ),
+      SnackBar(
+        content: Text(l10n.doctorSummaryCopied),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -70,6 +68,7 @@ class _DoctorSummaryBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final result = report.currentResult;
     final dateFmt = DateFormat('dd.MM.yyyy HH:mm');
 
@@ -92,13 +91,13 @@ class _DoctorSummaryBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Doktora Göster • Randevu Özeti',
+                    l10n.doctorSheetTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   Text(
-                    '${result.category.title} • ${dateFmt.format(result.createdAt)}',
+                    '${result.category.localizedTitle(l10n)} • ${dateFmt.format(result.createdAt)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -132,13 +131,16 @@ class _DoctorSummaryBody extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            result.summaryTitle,
+                            result.localizedSummaryTitle(l10n),
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           Text(
-                            'Renk: ${report.colorHex} • ${result.riskLevel.label}',
+                            l10n.colorLabel(
+                              report.colorHex,
+                              result.riskLevel.localizedLabel(l10n),
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -169,7 +171,9 @@ class _DoctorSummaryBody extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Danışılabilecek Bölüm: ${report.recommendedSpecialty}',
+                          l10n.recommendedSpecialtyLabel(
+                            result.category.localizedRecommendedSpecialty(l10n),
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: colorScheme.onPrimaryContainer,
@@ -187,7 +191,7 @@ class _DoctorSummaryBody extends StatelessWidget {
                 if (result.baselineComparisonNote != null) ...[
                   const SizedBox(height: 10),
                   Text(
-                    'Kişisel Normal Kıyas: ${result.baselineComparisonNote}',
+                    '${l10n.yourBaselineLabel}: ${result.baselineComparisonNote}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -214,10 +218,12 @@ class _DoctorSummaryBody extends StatelessWidget {
                         color: colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        'Önceki Kayıtlarla Zaman Çizelgesi',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                      Expanded(
+                        child: Text(
+                          l10n.timelineHistoryTitle,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
@@ -242,7 +248,7 @@ class _DoctorSummaryBody extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              '${DateFormat('dd.MM.yyyy').format(prev.createdAt)} • ${prev.summaryTitle}',
+                              '${DateFormat('dd.MM.yyyy').format(prev.createdAt)} • ${prev.localizedSummaryTitle(l10n)}',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -276,10 +282,12 @@ class _DoctorSummaryBody extends StatelessWidget {
                       color: colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Doktorunuza Sorabileceğiniz Sorular',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: Text(
+                        l10n.questionsForDoctorTitle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
@@ -315,7 +323,7 @@ class _DoctorSummaryBody extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
-          MedicalDisclaimer.shortBanner,
+          l10n.disclaimerShort,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
             height: 1.35,
@@ -325,7 +333,7 @@ class _DoctorSummaryBody extends StatelessWidget {
         FilledButton.icon(
           onPressed: () => _copyReport(context),
           icon: const Icon(Icons.copy_rounded),
-          label: const Text('Özeti Kopyala ve Paylaş'),
+          label: Text(l10n.copyShareSummaryBtn),
         ),
       ],
     );

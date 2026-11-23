@@ -955,6 +955,1284 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skin Conditions Pre-Check'**
   String get skinScreenTitle;
+
+  /// No description provided for @providerGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get providerGuest;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed: {error}'**
+  String signInFailed(String error);
+
+  /// No description provided for @riskNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Appearance'**
+  String get riskNormal;
+
+  /// No description provided for @riskAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow-Up Suggested'**
+  String get riskAttention;
+
+  /// No description provided for @riskUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Review Recommended'**
+  String get riskUrgent;
+
+  /// No description provided for @recentSummaryFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} • {status}'**
+  String recentSummaryFallback(String category, String status);
+
+  /// No description provided for @latestSummaryPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest: {value}'**
+  String latestSummaryPrefix(String value);
+
+  /// No description provided for @latestLabValuesSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest: {count} values ({abnormal} out of range)'**
+  String latestLabValuesSummary(int count, int abnormal);
+
+  /// No description provided for @latestLabAllNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest: {count} values (all normal)'**
+  String latestLabAllNormal(int count);
+
+  /// No description provided for @labStatusCriticalLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical Low'**
+  String get labStatusCriticalLow;
+
+  /// No description provided for @labStatusLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get labStatusLow;
+
+  /// No description provided for @labStatusNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get labStatusNormal;
+
+  /// No description provided for @labStatusHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get labStatusHigh;
+
+  /// No description provided for @labStatusCriticalHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical High'**
+  String get labStatusCriticalHigh;
+
+  /// No description provided for @labSourceManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Entry'**
+  String get labSourceManual;
+
+  /// No description provided for @labSourcePasted.
+  ///
+  /// In en, this message translates to:
+  /// **'Parsed from Report Text'**
+  String get labSourcePasted;
+
+  /// No description provided for @labSourcePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'JPG / Photo Report'**
+  String get labSourcePhoto;
+
+  /// No description provided for @labSourcePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Report'**
+  String get labSourcePdf;
+
+  /// No description provided for @bpLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Blood Pressure'**
+  String get bpLow;
+
+  /// No description provided for @bpNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Range'**
+  String get bpNormal;
+
+  /// No description provided for @bpElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated'**
+  String get bpElevated;
+
+  /// No description provided for @bpStage1.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage 1 High'**
+  String get bpStage1;
+
+  /// No description provided for @bpStage2.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage 2 High'**
+  String get bpStage2;
+
+  /// No description provided for @bpCrisis.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypertensive Crisis'**
+  String get bpCrisis;
+
+  /// No description provided for @sugarLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Blood Sugar'**
+  String get sugarLow;
+
+  /// No description provided for @sugarNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Range'**
+  String get sugarNormal;
+
+  /// No description provided for @sugarBorderline.
+  ///
+  /// In en, this message translates to:
+  /// **'Borderline High'**
+  String get sugarBorderline;
+
+  /// No description provided for @sugarHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High Blood Sugar'**
+  String get sugarHigh;
+
+  /// No description provided for @sugarVeryHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Very High Blood Sugar'**
+  String get sugarVeryHigh;
+
+  /// No description provided for @sugarTypeFasting.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting'**
+  String get sugarTypeFasting;
+
+  /// No description provided for @sugarTypePostMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Meal (2h)'**
+  String get sugarTypePostMeal;
+
+  /// No description provided for @sugarTypeRandom.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get sugarTypeRandom;
+
+  /// No description provided for @specialtyEye.
+  ///
+  /// In en, this message translates to:
+  /// **'Ophthalmology or Internal Medicine'**
+  String get specialtyEye;
+
+  /// No description provided for @specialtyNail.
+  ///
+  /// In en, this message translates to:
+  /// **'Dermatology or Internal Medicine'**
+  String get specialtyNail;
+
+  /// No description provided for @specialtyTongue.
+  ///
+  /// In en, this message translates to:
+  /// **'ENT, Oral Health, or Internal Medicine'**
+  String get specialtyTongue;
+
+  /// No description provided for @specialtySkin.
+  ///
+  /// In en, this message translates to:
+  /// **'Dermatology'**
+  String get specialtySkin;
+
+  /// No description provided for @specialtyUrine.
+  ///
+  /// In en, this message translates to:
+  /// **'Urology or Internal Medicine'**
+  String get specialtyUrine;
+
+  /// No description provided for @specialtyStool.
+  ///
+  /// In en, this message translates to:
+  /// **'Gastroenterology or Internal Medicine'**
+  String get specialtyStool;
+
+  /// No description provided for @cloudBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Backup (Optional • Firebase)'**
+  String get cloudBackupTitle;
+
+  /// No description provided for @cloudBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'By default, all your lab reports and readings stay on this device only. Enable private backup under your Google/Apple account if you want to keep data when changing phones.'**
+  String get cloudBackupDesc;
+
+  /// No description provided for @cloudBackupToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Cloud Backup'**
+  String get cloudBackupToggleTitle;
+
+  /// No description provided for @cloudBackupLastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup: {date}'**
+  String cloudBackupLastSync(String date);
+
+  /// No description provided for @cloudBackupEnabledReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled • Ready to sync'**
+  String get cloudBackupEnabledReady;
+
+  /// No description provided for @cloudBackupDisabledLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Off • On-device storage only'**
+  String get cloudBackupDisabledLocal;
+
+  /// No description provided for @cloudBackupSignInRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google or Apple to use cloud backup.'**
+  String get cloudBackupSignInRequired;
+
+  /// No description provided for @cloudBackupNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back Up Now'**
+  String get cloudBackupNowBtn;
+
+  /// No description provided for @cloudRestoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Cloud'**
+  String get cloudRestoreBtn;
+
+  /// No description provided for @cloudConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Backup Consent'**
+  String get cloudConsentTitle;
+
+  /// No description provided for @cloudConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your blood tests, vitals, and checkups are stored only on this device by default.\n\nIf you enable cloud backup, this data is stored privately under your Google/Apple Firebase account and permanently deleted when you delete your account.\n\nDo you consent?'**
+  String get cloudConsentBody;
+
+  /// No description provided for @cloudConsentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Enable'**
+  String get cloudConsentConfirm;
+
+  /// No description provided for @cloudBackupSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud backup complete: {count} records synced.'**
+  String cloudBackupSuccess(int count);
+
+  /// No description provided for @cloudBackupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String cloudBackupFailed(String error);
+
+  /// No description provided for @cloudRestoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored from cloud: {count} records imported.'**
+  String cloudRestoreSuccess(int count);
+
+  /// No description provided for @cloudRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: {error}'**
+  String cloudRestoreFailed(String error);
+
+  /// No description provided for @cloudBackupDisabledNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud backup turned off. New records stay on this device only.'**
+  String get cloudBackupDisabledNotice;
+
+  /// No description provided for @aiCloudToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Vision AI (Gemini) Analysis'**
+  String get aiCloudToggleTitle;
+
+  /// No description provided for @aiCloudOnDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'On: Sharp photos are resized and analyzed over a secure connection. Falls back on-device when offline.'**
+  String get aiCloudOnDesc;
+
+  /// No description provided for @aiCloudOffDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Off (0 Tokens): All analysis runs strictly on your device; no photos are ever uploaded.'**
+  String get aiCloudOffDesc;
+
+  /// No description provided for @aiBackendOfflineNote.
+  ///
+  /// In en, this message translates to:
+  /// **'When a Gemini / Firebase AI key is configured, cloud analysis activates automatically according to this toggle; the on-device engine is currently active.'**
+  String get aiBackendOfflineNote;
+
+  /// No description provided for @aiOptimizationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Token & Data Saving Controls'**
+  String get aiOptimizationsTitle;
+
+  /// No description provided for @aiOptQualityGate.
+  ///
+  /// In en, this message translates to:
+  /// **'0-token blur, darkness, and glare quality gate'**
+  String get aiOptQualityGate;
+
+  /// No description provided for @aiOptCompression.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-crop + 512px / 768px JPEG (80%) compression'**
+  String get aiOptCompression;
+
+  /// No description provided for @aiOptTieredModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart model routing (Flash-Lite / Flash) & low thinking'**
+  String get aiOptTieredModel;
+
+  /// No description provided for @aiOptHashCache.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device duplicate hash cache (0 tokens)'**
+  String get aiOptHashCache;
+
+  /// No description provided for @aiClearCacheBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear AI Cache'**
+  String get aiClearCacheBtn;
+
+  /// No description provided for @aiCacheCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'AI cache cleared.'**
+  String get aiCacheCleared;
+
+  /// No description provided for @resultScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} Result'**
+  String resultScreenTitle(String category);
+
+  /// No description provided for @tooltipDoctorSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Visit Summary'**
+  String get tooltipDoctorSummary;
+
+  /// No description provided for @tooltipReferenceGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Guide'**
+  String get tooltipReferenceGuide;
+
+  /// No description provided for @calibratedColorTone.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibrated Color Tone'**
+  String get calibratedColorTone;
+
+  /// No description provided for @sampledColorTone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sampled Dominant Tone'**
+  String get sampledColorTone;
+
+  /// No description provided for @confidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-check confidence: {percent}%'**
+  String confidenceLabel(int percent);
+
+  /// No description provided for @whiteBalanceDefaultNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Color balanced with white reference.'**
+  String get whiteBalanceDefaultNote;
+
+  /// No description provided for @recommendedSpecialtyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested specialty: {specialty}'**
+  String recommendedSpecialtyLabel(String specialty);
+
+  /// No description provided for @timelineComparisonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Over Time'**
+  String get timelineComparisonTitle;
+
+  /// No description provided for @todayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayLabel;
+
+  /// No description provided for @previousRecordSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous log: \"{title}\" ({status}). Tracking {count} records.'**
+  String previousRecordSummary(String title, String status, int count);
+
+  /// No description provided for @personalBaselineComparisonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Baseline Comparison'**
+  String get personalBaselineComparisonTitle;
+
+  /// No description provided for @yourBaselineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline'**
+  String get yourBaselineLabel;
+
+  /// No description provided for @warningFlagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning Signs to Watch'**
+  String get warningFlagsTitle;
+
+  /// No description provided for @observationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Observations'**
+  String get observationsTitle;
+
+  /// No description provided for @recommendationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get recommendationsTitle;
+
+  /// No description provided for @personalBaselineCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Baseline Calibration'**
+  String get personalBaselineCardTitle;
+
+  /// No description provided for @personalBaselineCardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a reading on a healthy day as your personal baseline to reduce camera sensor drift.'**
+  String get personalBaselineCardDesc;
+
+  /// No description provided for @saveBaselineBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as My Baseline'**
+  String get saveBaselineBtn;
+
+  /// No description provided for @updateBaselineBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Update My Baseline'**
+  String get updateBaselineBtn;
+
+  /// No description provided for @clearBaselineBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get clearBaselineBtn;
+
+  /// No description provided for @baselineSavedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal baseline saved for {category}.'**
+  String baselineSavedMsg(String category);
+
+  /// No description provided for @baselineClearedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal baseline removed for {category}.'**
+  String baselineClearedMsg(String category);
+
+  /// No description provided for @doctorSummaryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Show to Doctor • Prepare Summary'**
+  String get doctorSummaryBtn;
+
+  /// No description provided for @returnHomeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get returnHomeBtn;
+
+  /// No description provided for @doctorSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show to Doctor • Visit Summary'**
+  String get doctorSheetTitle;
+
+  /// No description provided for @colorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Color: {hex} • {status}'**
+  String colorLabel(String hex, String status);
+
+  /// No description provided for @timelineHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline with Previous Logs'**
+  String get timelineHistoryTitle;
+
+  /// No description provided for @questionsForDoctorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions to Ask Your Doctor'**
+  String get questionsForDoctorTitle;
+
+  /// No description provided for @copyShareSummaryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy & Share Summary'**
+  String get copyShareSummaryBtn;
+
+  /// No description provided for @doctorSummaryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor visit summary copied to clipboard.'**
+  String get doctorSummaryCopied;
+
+  /// No description provided for @referenceSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} — Visual References'**
+  String referenceSheetTitle(String category);
+
+  /// No description provided for @healthyReferenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy Reference'**
+  String get healthyReferenceLabel;
+
+  /// No description provided for @captureChecklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture Tips'**
+  String get captureChecklistTitle;
+
+  /// No description provided for @abnormalFindingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Abnormal / Warning Visual Findings'**
+  String get abnormalFindingsTitle;
+
+  /// No description provided for @cameraPermPermanentMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is disabled in system settings. Enable camera permission for VisualCheckUp or pick a photo from gallery.'**
+  String get cameraPermPermanentMsg;
+
+  /// No description provided for @cameraPermRequiredMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is needed for visual pre-checks. Images are processed on your device by default.'**
+  String get cameraPermRequiredMsg;
+
+  /// No description provided for @cameraGrantPermTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Access Needed'**
+  String get cameraGrantPermTitle;
+
+  /// No description provided for @cameraRequestPermBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Camera Permission'**
+  String get cameraRequestPermBtn;
+
+  /// No description provided for @cameraPickGalleryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get cameraPickGalleryBtn;
+
+  /// No description provided for @cameraWhiteRefOn.
+  ///
+  /// In en, this message translates to:
+  /// **'White Reference: On'**
+  String get cameraWhiteRefOn;
+
+  /// No description provided for @cameraWhiteRefOff.
+  ///
+  /// In en, this message translates to:
+  /// **'White Reference: Off'**
+  String get cameraWhiteRefOff;
+
+  /// No description provided for @cameraBaselineActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline Saved'**
+  String get cameraBaselineActive;
+
+  /// No description provided for @cameraAnalyzing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing...'**
+  String get cameraAnalyzing;
+
+  /// No description provided for @cameraCaptureBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture & Analyze'**
+  String get cameraCaptureBtn;
+
+  /// No description provided for @cameraAnalysisFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis failed: {error}'**
+  String cameraAnalysisFailed(String error);
+
+  /// No description provided for @quickCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} • Color Card'**
+  String quickCardTitle(String category);
+
+  /// No description provided for @quickCardPrivacyBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera needed: pick the closest shade for a private 2-second record.'**
+  String get quickCardPrivacyBanner;
+
+  /// No description provided for @quickCardChooseShade.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the Closest Color Shade'**
+  String get quickCardChooseShade;
+
+  /// No description provided for @quickCardExtraContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra Context (Optional)'**
+  String get quickCardExtraContext;
+
+  /// No description provided for @quickCardSaveViewBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & View Assessment'**
+  String get quickCardSaveViewBtn;
+
+  /// No description provided for @quickCardUseCameraBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Camera Instead'**
+  String get quickCardUseCameraBtn;
+
+  /// No description provided for @skinIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual Dermatology Pre-Screening'**
+  String get skinIntroTitle;
+
+  /// No description provided for @skinIntroDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Compares moles, warts, bruises, and facial spots against surrounding skin. Not a diagnosis; helps prepare for a dermatologist visit.'**
+  String get skinIntroDesc;
+
+  /// No description provided for @skinStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Select Skin Pre-Screening Module'**
+  String get skinStep1Title;
+
+  /// No description provided for @skinOtherConcernsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Skin Presentations'**
+  String get skinOtherConcernsLabel;
+
+  /// No description provided for @skinStep2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Accompanying Symptoms (Optional)'**
+  String get skinStep2Title;
+
+  /// No description provided for @skinStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Body Area (Optional)'**
+  String get skinStep3Title;
+
+  /// No description provided for @skinStartCameraBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Camera Skin Check'**
+  String get skinStartCameraBtn;
+
+  /// No description provided for @skinConcernRash.
+  ///
+  /// In en, this message translates to:
+  /// **'Redness / Rash'**
+  String get skinConcernRash;
+
+  /// No description provided for @skinConcernMole.
+  ///
+  /// In en, this message translates to:
+  /// **'Mole / Dark Spot'**
+  String get skinConcernMole;
+
+  /// No description provided for @skinConcernScaly.
+  ///
+  /// In en, this message translates to:
+  /// **'Scaly / Dry Plaque'**
+  String get skinConcernScaly;
+
+  /// No description provided for @skinConcernBlister.
+  ///
+  /// In en, this message translates to:
+  /// **'Blister / Acne'**
+  String get skinConcernBlister;
+
+  /// No description provided for @skinConcernGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General Skin Check'**
+  String get skinConcernGeneral;
+
+  /// No description provided for @bodyAreaFaceNeck.
+  ///
+  /// In en, this message translates to:
+  /// **'Face / Neck'**
+  String get bodyAreaFaceNeck;
+
+  /// No description provided for @bodyAreaArmHand.
+  ///
+  /// In en, this message translates to:
+  /// **'Arm / Hand'**
+  String get bodyAreaArmHand;
+
+  /// No description provided for @bodyAreaTorso.
+  ///
+  /// In en, this message translates to:
+  /// **'Torso'**
+  String get bodyAreaTorso;
+
+  /// No description provided for @bodyAreaLegFoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Leg / Foot'**
+  String get bodyAreaLegFoot;
+
+  /// No description provided for @bodyAreaScalp.
+  ///
+  /// In en, this message translates to:
+  /// **'Scalp'**
+  String get bodyAreaScalp;
+
+  /// No description provided for @bodyAreaOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get bodyAreaOther;
+
+  /// No description provided for @symptomItching.
+  ///
+  /// In en, this message translates to:
+  /// **'Itching'**
+  String get symptomItching;
+
+  /// No description provided for @symptomPainWarmth.
+  ///
+  /// In en, this message translates to:
+  /// **'Pain / Warmth'**
+  String get symptomPainWarmth;
+
+  /// No description provided for @symptomRapidChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Rapid growth / shape change'**
+  String get symptomRapidChange;
+
+  /// No description provided for @symptomBleeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleeding / Oozing'**
+  String get symptomBleeding;
+
+  /// No description provided for @symptomSpreading.
+  ///
+  /// In en, this message translates to:
+  /// **'Spreading rapidly'**
+  String get symptomSpreading;
+
+  /// No description provided for @symptomFever.
+  ///
+  /// In en, this message translates to:
+  /// **'Fever present'**
+  String get symptomFever;
+
+  /// No description provided for @symptomNonHealing.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-healing sore (4+ weeks)'**
+  String get symptomNonHealing;
+
+  /// No description provided for @symptomOver6mm.
+  ///
+  /// In en, this message translates to:
+  /// **'Over 6 mm or irregular border'**
+  String get symptomOver6mm;
+
+  /// No description provided for @symptomNoTrauma.
+  ///
+  /// In en, this message translates to:
+  /// **'Appeared without trauma'**
+  String get symptomNoTrauma;
+
+  /// No description provided for @symptomRoughDots.
+  ///
+  /// In en, this message translates to:
+  /// **'Rough surface / tiny black dots'**
+  String get symptomRoughDots;
+
+  /// No description provided for @symptomSunHormone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun, hormone, or post-acne spot'**
+  String get symptomSunHormone;
+
+  /// No description provided for @bruiseGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bruise Color Stages Guide'**
+  String get bruiseGuideTitle;
+
+  /// No description provided for @wartGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wart Pre-Check & Safety Guide'**
+  String get wartGuideTitle;
+
+  /// No description provided for @abcdeGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ABCDE Mole Self-Check Guide'**
+  String get abcdeGuideTitle;
+
+  /// No description provided for @abcdeGuideSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'5 key signs dermatologists use for mole & skin cancer screening'**
+  String get abcdeGuideSubtitle;
+
+  /// No description provided for @labScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab & Hospital Reports'**
+  String get labScreenTitle;
+
+  /// No description provided for @labTabReports.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reports'**
+  String get labTabReports;
+
+  /// No description provided for @labTabTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Tracking'**
+  String get labTabTrends;
+
+  /// No description provided for @labAddBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Report / Blood Test'**
+  String get labAddBtn;
+
+  /// No description provided for @labEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved blood tests yet'**
+  String get labEmptyTitle;
+
+  /// No description provided for @labEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload a PDF or JPG blood test report; optionally add your hospital diagnosis or complaint for a plain-language summary.'**
+  String get labEmptyDesc;
+
+  /// No description provided for @labAddFirstBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Lab / PDF Report'**
+  String get labAddFirstBtn;
+
+  /// No description provided for @labTrendsEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save blood tests on different dates to see longitudinal trend charts for Hemoglobin, Ferritin, Glucose, TSH, Vitamin D, and more.'**
+  String get labTrendsEmptyDesc;
+
+  /// No description provided for @labParamsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} parameters'**
+  String labParamsCount(int count);
+
+  /// No description provided for @labOutOfRangeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} out of range'**
+  String labOutOfRangeCount(int count);
+
+  /// No description provided for @labDetailParamsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter Review ({count})'**
+  String labDetailParamsTitle(int count);
+
+  /// No description provided for @labEnteredDiagnosisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital / Doctor Diagnosis'**
+  String get labEnteredDiagnosisTitle;
+
+  /// No description provided for @labEnteredComplaintTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Complaint / Note'**
+  String get labEnteredComplaintTitle;
+
+  /// No description provided for @labInterpretationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain-Language Interpretation'**
+  String get labInterpretationTitle;
+
+  /// No description provided for @labCopyDoctorSummaryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Show to Doctor • Copy Summary'**
+  String get labCopyDoctorSummaryBtn;
+
+  /// No description provided for @labSummaryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab summary copied to clipboard.'**
+  String get labSummaryCopied;
+
+  /// No description provided for @labExportPdfBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Doctor PDF'**
+  String get labExportPdfBtn;
+
+  /// No description provided for @labAddSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Hospital / Blood Test Report'**
+  String get labAddSheetTitle;
+
+  /// No description provided for @labReportTitleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Title'**
+  String get labReportTitleField;
+
+  /// No description provided for @labDefaultReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Test Result'**
+  String get labDefaultReportTitle;
+
+  /// No description provided for @labStep1Upload.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Upload PDF or JPG Blood Report'**
+  String get labStep1Upload;
+
+  /// No description provided for @labUploadPdfJpgBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload PDF or JPG'**
+  String get labUploadPdfJpgBtn;
+
+  /// No description provided for @labCameraCaptureBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get labCameraCaptureBtn;
+
+  /// No description provided for @labStep2Context.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Hospital Diagnosis & Note (Optional)'**
+  String get labStep2Context;
+
+  /// No description provided for @labStep2ContextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a doctor\'s diagnosis you want explained or your symptoms; you may leave both blank.'**
+  String get labStep2ContextHint;
+
+  /// No description provided for @labDiagnosisField.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital / Doctor Diagnosis (Optional)'**
+  String get labDiagnosisField;
+
+  /// No description provided for @labComplaintField.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Symptoms / Question (Optional)'**
+  String get labComplaintField;
+
+  /// No description provided for @labStep3PasteManual.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Paste Report Text or Add Values Manually'**
+  String get labStep3PasteManual;
+
+  /// No description provided for @labParseTextBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Read & Parse Text'**
+  String get labParseTextBtn;
+
+  /// No description provided for @labParamDropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Lab Parameter'**
+  String get labParamDropdown;
+
+  /// No description provided for @labValueField.
+  ///
+  /// In en, this message translates to:
+  /// **'Value ({unit})'**
+  String labValueField(String unit);
+
+  /// No description provided for @labAddValueBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add'**
+  String get labAddValueBtn;
+
+  /// No description provided for @labParsedValuesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parsed Values ({count})'**
+  String labParsedValuesTitle(int count);
+
+  /// No description provided for @labSaveEvaluateBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate & Save Dated Report'**
+  String get labSaveEvaluateBtn;
+
+  /// No description provided for @labTrendSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records • Change: {delta} • Latest: {status}'**
+  String labTrendSummary(int count, String delta, String status);
+
+  /// No description provided for @vitalsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure & Sugar'**
+  String get vitalsScreenTitle;
+
+  /// No description provided for @vitalsCopySummaryTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Doctor Summary'**
+  String get vitalsCopySummaryTooltip;
+
+  /// No description provided for @vitalsCopyEmptyMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a blood pressure or glucose reading first to create a summary.'**
+  String get vitalsCopyEmptyMsg;
+
+  /// No description provided for @vitalsSummaryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood pressure & sugar summary copied.'**
+  String get vitalsSummaryCopied;
+
+  /// No description provided for @vitalsAddBpBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Blood Pressure'**
+  String get vitalsAddBpBtn;
+
+  /// No description provided for @vitalsAddSugarBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Blood Sugar'**
+  String get vitalsAddSugarBtn;
+
+  /// No description provided for @vitalsBpEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No blood pressure readings yet'**
+  String get vitalsBpEmptyTitle;
+
+  /// No description provided for @vitalsBpEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log systolic/diastolic pressure and pulse with dates to follow your trend chart.'**
+  String get vitalsBpEmptyDesc;
+
+  /// No description provided for @vitalsBpAddFirstBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add First BP Reading'**
+  String get vitalsBpAddFirstBtn;
+
+  /// No description provided for @vitalsSugarEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No blood sugar readings yet'**
+  String get vitalsSugarEmptyTitle;
+
+  /// No description provided for @vitalsSugarEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log fasting, post-meal (2h), or random glucose readings to track your trend.'**
+  String get vitalsSugarEmptyDesc;
+
+  /// No description provided for @vitalsSugarAddFirstBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Sugar Reading'**
+  String get vitalsSugarAddFirstBtn;
+
+  /// No description provided for @vitalsBpAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average ({count}): {sys}/{dia} mmHg'**
+  String vitalsBpAverage(int count, int sys, int dia);
+
+  /// No description provided for @vitalsLastPulse.
+  ///
+  /// In en, this message translates to:
+  /// **' • Pulse {pulse} bpm'**
+  String vitalsLastPulse(int pulse);
+
+  /// No description provided for @vitalsBpHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dated Blood Pressure Logs'**
+  String get vitalsBpHistoryTitle;
+
+  /// No description provided for @vitalsSugarAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average ({count}): {avg} mg/dL'**
+  String vitalsSugarAverage(int count, int avg);
+
+  /// No description provided for @vitalsSugarHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dated Blood Sugar Logs'**
+  String get vitalsSugarHistoryTitle;
+
+  /// No description provided for @vitalsNewBpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Blood Pressure Reading'**
+  String get vitalsNewBpTitle;
+
+  /// No description provided for @vitalsSystolicField.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic (Top)'**
+  String get vitalsSystolicField;
+
+  /// No description provided for @vitalsDiastolicField.
+  ///
+  /// In en, this message translates to:
+  /// **'Diastolic (Bottom)'**
+  String get vitalsDiastolicField;
+
+  /// No description provided for @vitalsPulseField.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse (bpm — Optional)'**
+  String get vitalsPulseField;
+
+  /// No description provided for @vitalsNoteField.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (Optional)'**
+  String get vitalsNoteField;
+
+  /// No description provided for @vitalsSaveBpBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Blood Pressure'**
+  String get vitalsSaveBpBtn;
+
+  /// No description provided for @vitalsNewSugarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Blood Sugar Reading'**
+  String get vitalsNewSugarTitle;
+
+  /// No description provided for @vitalsSugarValueField.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Sugar (mg/dL)'**
+  String get vitalsSugarValueField;
+
+  /// No description provided for @vitalsSaveSugarBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Blood Sugar'**
+  String get vitalsSaveSugarBtn;
+
+  /// No description provided for @chartAddReadingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add readings to view chart'**
+  String get chartAddReadingHint;
 }
 
 class _AppLocalizationsDelegate

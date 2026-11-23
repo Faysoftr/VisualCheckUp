@@ -1,12 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/features/auth/domain/auth_user.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
+import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
+import 'package:visualcheckup/l10n/generated/app_localizations_tr.dart';
 
 extension BuildContextL10n on BuildContext {
-  AppLocalizations get l10n => AppLocalizations.of(this);
+  /// Returns the active [AppLocalizations], falling back to Turkish in
+  /// standalone widget tests that wrap a single screen in a bare [MaterialApp].
+  AppLocalizations get l10n =>
+      Localizations.of<AppLocalizations>(this, AppLocalizations) ??
+      AppLocalizationsTr();
+}
+
+extension AuthProviderTypeL10n on AuthProviderType {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case AuthProviderType.google:
+        return 'Google';
+      case AuthProviderType.apple:
+        return 'Apple';
+      case AuthProviderType.guest:
+        return l10n.providerGuest;
+    }
+  }
+}
+
+extension RiskLevelL10n on RiskLevel {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case RiskLevel.normal:
+        return l10n.riskNormal;
+      case RiskLevel.attention:
+        return l10n.riskAttention;
+      case RiskLevel.urgent:
+        return l10n.riskUrgent;
+    }
+  }
+}
+
+extension AnalysisResultL10n on AnalysisResult {
+  static final RegExp _turkishPattern = RegExp(
+    r'[çğıöşüÇĞİÖŞÜ]|\b(olağan|takip|uyarı|ipucu|görünüm|kızarıklık|sarılık|soluk|morluk|siğil|leke|idrar|dışkı|dil|tırnak|göz|cilt|doktor|değerlendirme|koyu|açık|sarı|kahverengi|kırmızı|beyaz|siyah|hidrasyon|normal\s+aralık)\b',
+    caseSensitive: false,
+  );
+
+  /// Displays a properly localized summary title even for historical checks
+  /// persisted in Turkish by the on-device analyzer.
+  String localizedSummaryTitle(AppLocalizations l10n) {
+    if (l10n.localeName == 'tr') {
+      return summaryTitle;
+    }
+    if (summaryTitle.trim().isEmpty || _turkishPattern.hasMatch(summaryTitle)) {
+      return l10n.recentSummaryFallback(
+        category.localizedTitle(l10n),
+        riskLevel.localizedLabel(l10n),
+      );
+    }
+    return summaryTitle;
+  }
 }
 
 extension CheckCategoryL10n on CheckCategory {
@@ -47,6 +104,24 @@ extension CheckCategoryL10n on CheckCategory {
         return l10n.catStoolSubtitle;
     }
   }
+
+  String localizedRecommendedSpecialty(AppLocalizations l10n) {
+    switch (this) {
+      case CheckCategory.eye:
+        return l10n.specialtyEye;
+      case CheckCategory.nail:
+        return l10n.specialtyNail;
+      case CheckCategory.tongue:
+        return l10n.specialtyTongue;
+      case CheckCategory.face:
+      case CheckCategory.skinCondition:
+        return l10n.specialtySkin;
+      case CheckCategory.urine:
+        return l10n.specialtyUrine;
+      case CheckCategory.stool:
+        return l10n.specialtyStool;
+    }
+  }
 }
 
 extension SkinConcernTypeL10n on SkinConcernType {
@@ -61,11 +136,125 @@ extension SkinConcernTypeL10n on SkinConcernType {
       case SkinConcernType.facialSpot:
         return l10n.skinFacialSpot;
       case SkinConcernType.rashRedness:
+        return l10n.skinConcernRash;
       case SkinConcernType.molePigment:
+        return l10n.skinConcernMole;
       case SkinConcernType.scalyDry:
+        return l10n.skinConcernScaly;
       case SkinConcernType.blisterPustule:
+        return l10n.skinConcernBlister;
       case SkinConcernType.general:
-        return label;
+        return l10n.skinConcernGeneral;
+    }
+  }
+}
+
+extension SkinSymptomFlagL10n on SkinSymptomFlag {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case SkinSymptomFlag.itching:
+        return l10n.symptomItching;
+      case SkinSymptomFlag.painOrWarmth:
+        return l10n.symptomPainWarmth;
+      case SkinSymptomFlag.rapidChange:
+        return l10n.symptomRapidChange;
+      case SkinSymptomFlag.bleedingOrOozing:
+        return l10n.symptomBleeding;
+      case SkinSymptomFlag.spreading:
+        return l10n.symptomSpreading;
+      case SkinSymptomFlag.fever:
+        return l10n.symptomFever;
+      case SkinSymptomFlag.nonHealingSore:
+        return l10n.symptomNonHealing;
+      case SkinSymptomFlag.over6mmOrIrregular:
+        return l10n.symptomOver6mm;
+      case SkinSymptomFlag.spontaneousNoTrauma:
+        return l10n.symptomNoTrauma;
+      case SkinSymptomFlag.roughBlackDots:
+        return l10n.symptomRoughDots;
+      case SkinSymptomFlag.sunOrHormoneHistory:
+        return l10n.symptomSunHormone;
+    }
+  }
+}
+
+extension LabStatusL10n on LabStatus {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case LabStatus.criticalLow:
+        return l10n.labStatusCriticalLow;
+      case LabStatus.low:
+        return l10n.labStatusLow;
+      case LabStatus.normal:
+        return l10n.labStatusNormal;
+      case LabStatus.high:
+        return l10n.labStatusHigh;
+      case LabStatus.criticalHigh:
+        return l10n.labStatusCriticalHigh;
+    }
+  }
+}
+
+extension LabReportSourceL10n on LabReportSource {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case LabReportSource.manual:
+        return l10n.labSourceManual;
+      case LabReportSource.pastedText:
+        return l10n.labSourcePasted;
+      case LabReportSource.photoScan:
+        return l10n.labSourcePhoto;
+      case LabReportSource.pdfUpload:
+        return l10n.labSourcePdf;
+    }
+  }
+}
+
+extension BloodPressureCategoryL10n on BloodPressureCategory {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case BloodPressureCategory.low:
+        return l10n.bpLow;
+      case BloodPressureCategory.normal:
+        return l10n.bpNormal;
+      case BloodPressureCategory.elevated:
+        return l10n.bpElevated;
+      case BloodPressureCategory.highStage1:
+        return l10n.bpStage1;
+      case BloodPressureCategory.highStage2:
+        return l10n.bpStage2;
+      case BloodPressureCategory.crisis:
+        return l10n.bpCrisis;
+    }
+  }
+}
+
+extension BloodSugarCategoryL10n on BloodSugarCategory {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case BloodSugarCategory.hypoglycemia:
+        return l10n.sugarLow;
+      case BloodSugarCategory.normal:
+        return l10n.sugarNormal;
+      case BloodSugarCategory.borderline:
+        return l10n.sugarBorderline;
+      case BloodSugarCategory.high:
+        return l10n.sugarHigh;
+      case BloodSugarCategory.veryHigh:
+        return l10n.sugarVeryHigh;
+    }
+  }
+}
+
+extension SugarMeasurementTypeL10n on SugarMeasurementType {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case SugarMeasurementType.fasting:
+        return l10n.sugarTypeFasting;
+      case SugarMeasurementType.postMeal:
+        return l10n.sugarTypePostMeal;
+      case SugarMeasurementType.random:
+        return l10n.sugarTypeRandom;
     }
   }
 }
@@ -140,6 +329,37 @@ extension FollowUpTrackStatusL10n on FollowUpTrackStatus {
     if (isDueNow) return l10n.statusDueNow;
     if (track.intervalDays == 1) return l10n.statusDoneToday;
     return l10n.statusNextDays(daysRemaining);
+  }
+
+  String? localizedLatestValueSummary(AppLocalizations l10n) {
+    if (latestBp != null) {
+      final bp = latestBp!;
+      final pulseText =
+          bp.pulse != null ? l10n.vitalsLastPulse(bp.pulse!) : '';
+      return l10n.latestSummaryPrefix(
+        '${bp.systolic}/${bp.diastolic} mmHg$pulseText (${bp.category.localizedLabel(l10n)})',
+      );
+    }
+    if (latestSugar != null) {
+      final sugar = latestSugar!;
+      return l10n.latestSummaryPrefix(
+        '${sugar.valueMgDl.round()} mg/dL • ${sugar.measurementType.localizedLabel(l10n)} (${sugar.category.localizedLabel(l10n)})',
+      );
+    }
+    if (latestLab != null) {
+      final lab = latestLab!;
+      final abnormal = lab.items.where((i) => i.status.isAbnormal).length;
+      if (abnormal == 0) {
+        return l10n.latestLabAllNormal(lab.items.length);
+      }
+      return l10n.latestLabValuesSummary(lab.items.length, abnormal);
+    }
+    if (latestCheck != null) {
+      return l10n.latestSummaryPrefix(
+        latestCheck!.localizedSummaryTitle(l10n),
+      );
+    }
+    return latestValueSummary;
   }
 }
 

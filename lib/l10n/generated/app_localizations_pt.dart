@@ -463,4 +463,727 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get skinScreenTitle => 'Pré-avaliação Cutânea';
+
+  @override
+  String get providerGuest => 'Convidado';
+
+  @override
+  String signInFailed(String error) {
+    return 'Falha ao entrar: $error';
+  }
+
+  @override
+  String get riskNormal => 'Aparência normal';
+
+  @override
+  String get riskAttention => 'Acompanhamento sugerido';
+
+  @override
+  String get riskUrgent => 'Avaliação médica recomendada';
+
+  @override
+  String recentSummaryFallback(String category, String status) {
+    return '$category • $status';
+  }
+
+  @override
+  String latestSummaryPrefix(String value) {
+    return 'Último: $value';
+  }
+
+  @override
+  String latestLabValuesSummary(int count, int abnormal) {
+    return 'Último: $count valores ($abnormal fora da faixa)';
+  }
+
+  @override
+  String latestLabAllNormal(int count) {
+    return 'Último: $count valores (todos normais)';
+  }
+
+  @override
+  String get labStatusCriticalLow => 'Crítico baixo';
+
+  @override
+  String get labStatusLow => 'Baixo';
+
+  @override
+  String get labStatusNormal => 'Normal';
+
+  @override
+  String get labStatusHigh => 'Alto';
+
+  @override
+  String get labStatusCriticalHigh => 'Crítico alto';
+
+  @override
+  String get labSourceManual => 'Entrada manual';
+
+  @override
+  String get labSourcePasted => 'Lido do texto';
+
+  @override
+  String get labSourcePhoto => 'Relatório JPG / Foto';
+
+  @override
+  String get labSourcePdf => 'Relatório PDF';
+
+  @override
+  String get bpLow => 'Pressão baixa';
+
+  @override
+  String get bpNormal => 'Faixa normal';
+
+  @override
+  String get bpElevated => 'Elevada';
+
+  @override
+  String get bpStage1 => 'Hipertensão estágio 1';
+
+  @override
+  String get bpStage2 => 'Hipertensão estágio 2';
+
+  @override
+  String get bpCrisis => 'Crise hipertensiva';
+
+  @override
+  String get sugarLow => 'Hipoglicemia';
+
+  @override
+  String get sugarNormal => 'Faixa normal';
+
+  @override
+  String get sugarBorderline => 'Limítrofe';
+
+  @override
+  String get sugarHigh => 'Glicemia alta';
+
+  @override
+  String get sugarVeryHigh => 'Glicemia muito alta';
+
+  @override
+  String get sugarTypeFasting => 'Jejum';
+
+  @override
+  String get sugarTypePostMeal => 'Pós-prandial (2h)';
+
+  @override
+  String get sugarTypeRandom => 'Aleatório';
+
+  @override
+  String get specialtyEye => 'Oftalmologia ou Clínica Médica';
+
+  @override
+  String get specialtyNail => 'Dermatologia ou Clínica Médica';
+
+  @override
+  String get specialtyTongue => 'Otorrino, Saúde Bucal ou Clínica Médica';
+
+  @override
+  String get specialtySkin => 'Dermatologia';
+
+  @override
+  String get specialtyUrine => 'Urologia ou Clínica Médica';
+
+  @override
+  String get specialtyStool => 'Gastroenterologia ou Clínica Médica';
+
+  @override
+  String get cloudBackupTitle => 'Backup na nuvem (Opcional • Firebase)';
+
+  @override
+  String get cloudBackupDesc =>
+      'Por padrão, seus exames e medições ficam apenas neste dispositivo. Ative o backup privado na sua conta Google/Apple se quiser manter os dados ao trocar de celular.';
+
+  @override
+  String get cloudBackupToggleTitle => 'Ativar backup na nuvem';
+
+  @override
+  String cloudBackupLastSync(String date) {
+    return 'Último backup: $date';
+  }
+
+  @override
+  String get cloudBackupEnabledReady => 'Ativo • Pronto para sincronizar';
+
+  @override
+  String get cloudBackupDisabledLocal =>
+      'Desativado • Apenas armazenamento local';
+
+  @override
+  String get cloudBackupSignInRequired =>
+      'Entre com Google ou Apple para usar o backup na nuvem.';
+
+  @override
+  String get cloudBackupNowBtn => 'Fazer backup agora';
+
+  @override
+  String get cloudRestoreBtn => 'Restaurar da nuvem';
+
+  @override
+  String get cloudConsentTitle => 'Consentimento de backup na nuvem';
+
+  @override
+  String get cloudConsentBody =>
+      'Seus exames, medições e registros ficam apenas neste dispositivo por padrão.\n\nAo ativar o backup na nuvem, esses dados serão armazenados de forma privada na sua conta Google/Apple e apagados permanentemente ao excluir a conta.\n\nVocê concorda?';
+
+  @override
+  String get cloudConsentConfirm => 'Sim, ativar';
+
+  @override
+  String cloudBackupSuccess(int count) {
+    return 'Backup concluído: $count registros sincronizados.';
+  }
+
+  @override
+  String cloudBackupFailed(String error) {
+    return 'Falha no backup: $error';
+  }
+
+  @override
+  String cloudRestoreSuccess(int count) {
+    return 'Restaurado da nuvem: $count registros importados.';
+  }
+
+  @override
+  String cloudRestoreFailed(String error) {
+    return 'Falha ao restaurar: $error';
+  }
+
+  @override
+  String get cloudBackupDisabledNotice =>
+      'Backup na nuvem desativado. Novos registros ficam apenas no dispositivo.';
+
+  @override
+  String get aiCloudToggleTitle => 'Análise de IA na nuvem (Gemini)';
+
+  @override
+  String get aiCloudOnDesc =>
+      'Ativado: Fotos nítidas são redimensionadas e analisadas com segurança. Offline usa análise local.';
+
+  @override
+  String get aiCloudOffDesc =>
+      'Desativado (0 tokens): Toda análise ocorre no dispositivo; nenhuma foto é enviada.';
+
+  @override
+  String get aiBackendOfflineNote =>
+      'Quando a chave Gemini / Firebase AI for configurada, a análise em nuvem ativará automaticamente; o motor local está ativo.';
+
+  @override
+  String get aiOptimizationsTitle =>
+      'Controles ativos de economia de tokens e dados';
+
+  @override
+  String get aiOptQualityGate =>
+      'Filtro de qualidade 0-token (desfoque, luz e brilho)';
+
+  @override
+  String get aiOptCompression =>
+      'Corte automático + compressão JPEG 512/768px (80%)';
+
+  @override
+  String get aiOptTieredModel =>
+      'Seleção inteligente de modelo (Flash-Lite / Flash)';
+
+  @override
+  String get aiOptHashCache => 'Cache local de duplicatas (0 tokens)';
+
+  @override
+  String get aiClearCacheBtn => 'Limpar cache de IA';
+
+  @override
+  String get aiCacheCleared => 'Cache de IA limpo.';
+
+  @override
+  String resultScreenTitle(String category) {
+    return 'Resultado: $category';
+  }
+
+  @override
+  String get tooltipDoctorSummary => 'Resumo para o médico';
+
+  @override
+  String get tooltipReferenceGuide => 'Guia de referência';
+
+  @override
+  String get calibratedColorTone => 'Tom de cor calibrado';
+
+  @override
+  String get sampledColorTone => 'Tom dominante amostrado';
+
+  @override
+  String confidenceLabel(int percent) {
+    return 'Confiança preliminar: $percent%';
+  }
+
+  @override
+  String get whiteBalanceDefaultNote =>
+      'Cor equilibrada com referência branca.';
+
+  @override
+  String recommendedSpecialtyLabel(String specialty) {
+    return 'Especialidade sugerida: $specialty';
+  }
+
+  @override
+  String get timelineComparisonTitle => 'Comparação ao longo do tempo';
+
+  @override
+  String get todayLabel => 'Hoje';
+
+  @override
+  String previousRecordSummary(String title, String status, int count) {
+    return 'Registro anterior: \"$title\" ($status). $count registros acompanhados.';
+  }
+
+  @override
+  String get personalBaselineComparisonTitle =>
+      'Comparação com sua base pessoal';
+
+  @override
+  String get yourBaselineLabel => 'Sua base';
+
+  @override
+  String get warningFlagsTitle => 'Sinais de alerta';
+
+  @override
+  String get observationsTitle => 'Observações';
+
+  @override
+  String get recommendationsTitle => 'Recomendações';
+
+  @override
+  String get personalBaselineCardTitle => 'Calibração de base pessoal';
+
+  @override
+  String get personalBaselineCardDesc =>
+      'Salve esta medição em um dia saudável como sua base pessoal para reduzir variações da câmera.';
+
+  @override
+  String get saveBaselineBtn => 'Salvar como minha base';
+
+  @override
+  String get updateBaselineBtn => 'Atualizar minha base';
+
+  @override
+  String get clearBaselineBtn => 'Remover';
+
+  @override
+  String baselineSavedMsg(String category) {
+    return 'Base pessoal salva para $category.';
+  }
+
+  @override
+  String baselineClearedMsg(String category) {
+    return 'Base pessoal removida para $category.';
+  }
+
+  @override
+  String get doctorSummaryBtn => 'Mostrar ao médico • Resumo';
+
+  @override
+  String get returnHomeBtn => 'Voltar ao início';
+
+  @override
+  String get doctorSheetTitle => 'Resumo para consulta médica';
+
+  @override
+  String colorLabel(String hex, String status) {
+    return 'Cor: $hex • $status';
+  }
+
+  @override
+  String get timelineHistoryTitle => 'Linha do tempo anterior';
+
+  @override
+  String get questionsForDoctorTitle => 'Perguntas para o médico';
+
+  @override
+  String get copyShareSummaryBtn => 'Copiar e compartilhar resumo';
+
+  @override
+  String get doctorSummaryCopied => 'Resumo médico copiado.';
+
+  @override
+  String referenceSheetTitle(String category) {
+    return '$category — Referências visuais';
+  }
+
+  @override
+  String get healthyReferenceLabel => 'Referência saudável';
+
+  @override
+  String get captureChecklistTitle => 'Dicas de captura';
+
+  @override
+  String get abnormalFindingsTitle => 'Achados visuais de atenção';
+
+  @override
+  String get cameraPermPermanentMsg =>
+      'A permissão de câmera está desativada nos ajustes. Ative-a ou escolha uma foto da galeria.';
+
+  @override
+  String get cameraPermRequiredMsg =>
+      'É necessária permissão de câmera para o exame visual. Imagens processadas localmente.';
+
+  @override
+  String get cameraGrantPermTitle => 'Acesso à câmera necessário';
+
+  @override
+  String get cameraRequestPermBtn => 'Permitir câmera';
+
+  @override
+  String get cameraPickGalleryBtn => 'Escolher da galeria';
+
+  @override
+  String get cameraWhiteRefOn => 'Referência branca: Ativa';
+
+  @override
+  String get cameraWhiteRefOff => 'Referência branca: Inativa';
+
+  @override
+  String get cameraBaselineActive => 'Base pessoal salva';
+
+  @override
+  String get cameraAnalyzing => 'Analisando...';
+
+  @override
+  String get cameraCaptureBtn => 'Capturar e analisar';
+
+  @override
+  String cameraAnalysisFailed(String error) {
+    return 'Erro na análise: $error';
+  }
+
+  @override
+  String quickCardTitle(String category) {
+    return '$category • Cartela de cores';
+  }
+
+  @override
+  String get quickCardPrivacyBanner =>
+      'Sem câmera: escolha o tom mais próximo para um registro privado em 2 segundos.';
+
+  @override
+  String get quickCardChooseShade => 'Selecione o tom mais próximo';
+
+  @override
+  String get quickCardExtraContext => 'Contexto extra (Opcional)';
+
+  @override
+  String get quickCardSaveViewBtn => 'Salvar e ver avaliação';
+
+  @override
+  String get quickCardUseCameraBtn => 'Usar câmera em vez disso';
+
+  @override
+  String get skinIntroTitle => 'Pré-triagem dermatológica visual';
+
+  @override
+  String get skinIntroDesc =>
+      'Compara pintas, verrugas, hematomas e manchas faciais com a pele ao redor. Não é diagnóstico; auxilia na consulta.';
+
+  @override
+  String get skinStep1Title => '1. Selecione o módulo dermatológico';
+
+  @override
+  String get skinOtherConcernsLabel => 'Outras apresentações';
+
+  @override
+  String get skinStep2Title => '2. Sintomas associados (Opcional)';
+
+  @override
+  String get skinStep3Title => '3. Região do corpo (Opcional)';
+
+  @override
+  String get skinStartCameraBtn => 'Iniciar exame de pele pela câmera';
+
+  @override
+  String get skinConcernRash => 'Vermelhidão / Erupção';
+
+  @override
+  String get skinConcernMole => 'Pinta / Mancha escura';
+
+  @override
+  String get skinConcernScaly => 'Placa seca / descamativa';
+
+  @override
+  String get skinConcernBlister => 'Bolha / Acne';
+
+  @override
+  String get skinConcernGeneral => 'Exame geral da pele';
+
+  @override
+  String get bodyAreaFaceNeck => 'Rosto / Pescoço';
+
+  @override
+  String get bodyAreaArmHand => 'Braço / Mão';
+
+  @override
+  String get bodyAreaTorso => 'Tronco';
+
+  @override
+  String get bodyAreaLegFoot => 'Perna / Pé';
+
+  @override
+  String get bodyAreaScalp => 'Couro cabeludo';
+
+  @override
+  String get bodyAreaOther => 'Outro';
+
+  @override
+  String get symptomItching => 'Coceira';
+
+  @override
+  String get symptomPainWarmth => 'Dor / Calor';
+
+  @override
+  String get symptomRapidChange => 'Crescimento rápido / mudança';
+
+  @override
+  String get symptomBleeding => 'Sangramento / Secreção';
+
+  @override
+  String get symptomSpreading => 'Espalhando rápido';
+
+  @override
+  String get symptomFever => 'Com febre';
+
+  @override
+  String get symptomNonHealing => 'Ferida sem cicatrização (4+ sem.)';
+
+  @override
+  String get symptomOver6mm => 'Maior que 6 mm ou borda irregular';
+
+  @override
+  String get symptomNoTrauma => 'Surgiu sem pancada';
+
+  @override
+  String get symptomRoughDots => 'Superfície áspera / pontos pretos';
+
+  @override
+  String get symptomSunHormone => 'Mancha solar, hormonal ou pós-acne';
+
+  @override
+  String get bruiseGuideTitle => 'Guia de fases do hematoma';
+
+  @override
+  String get wartGuideTitle => 'Guia de segurança para verrugas';
+
+  @override
+  String get abcdeGuideTitle => 'Guia ABCDE para pintas';
+
+  @override
+  String get abcdeGuideSubtitle =>
+      '5 sinais principais usados por dermatologistas';
+
+  @override
+  String get labScreenTitle => 'Exames e laudos';
+
+  @override
+  String get labTabReports => 'Meus exames';
+
+  @override
+  String get labTabTrends => 'Evolução';
+
+  @override
+  String get labAddBtn => 'Adicionar exame';
+
+  @override
+  String get labEmptyTitle => 'Nenhum exame salvo ainda';
+
+  @override
+  String get labEmptyDesc =>
+      'Envie seu exame em PDF ou JPG; se quiser, adicione o diagnóstico ou sintomas para uma explicação simples.';
+
+  @override
+  String get labAddFirstBtn => 'Adicionar primeiro exame';
+
+  @override
+  String get labTrendsEmptyDesc =>
+      'Salve exames em datas diferentes para ver gráficos de evolução de Hemoglobina, Ferritina, Glicose, TSH e mais.';
+
+  @override
+  String labParamsCount(int count) {
+    return '$count parâmetros';
+  }
+
+  @override
+  String labOutOfRangeCount(int count) {
+    return '$count fora da faixa';
+  }
+
+  @override
+  String labDetailParamsTitle(int count) {
+    return 'Avaliação de parâmetros ($count)';
+  }
+
+  @override
+  String get labEnteredDiagnosisTitle => 'Diagnóstico médico';
+
+  @override
+  String get labEnteredComplaintTitle => 'Sua queixa / nota';
+
+  @override
+  String get labInterpretationTitle => 'Interpretação clara';
+
+  @override
+  String get labCopyDoctorSummaryBtn => 'Mostrar ao médico • Copiar';
+
+  @override
+  String get labSummaryCopied => 'Resumo do exame copiado.';
+
+  @override
+  String get labExportPdfBtn => 'Exportar PDF para o médico';
+
+  @override
+  String get labAddSheetTitle => 'Adicionar exame / laudo';
+
+  @override
+  String get labReportTitleField => 'Título do exame';
+
+  @override
+  String get labDefaultReportTitle => 'Resultado de exame';
+
+  @override
+  String get labStep1Upload => '1. Enviar exame PDF ou JPG';
+
+  @override
+  String get labUploadPdfJpgBtn => 'Enviar PDF ou JPG';
+
+  @override
+  String get labCameraCaptureBtn => 'Tirar foto';
+
+  @override
+  String get labStep2Context => '2. Diagnóstico e nota (Opcional)';
+
+  @override
+  String get labStep2ContextHint =>
+      'Digite o diagnóstico que deseja entender ou seus sintomas; pode deixar em branco.';
+
+  @override
+  String get labDiagnosisField => 'Diagnóstico médico (Opcional)';
+
+  @override
+  String get labComplaintField => 'Seus sintomas / dúvida (Opcional)';
+
+  @override
+  String get labStep3PasteManual => '3. Colar texto ou adicionar valores';
+
+  @override
+  String get labParseTextBtn => 'Ler e extrair texto';
+
+  @override
+  String get labParamDropdown => 'Parâmetro';
+
+  @override
+  String labValueField(String unit) {
+    return 'Valor ($unit)';
+  }
+
+  @override
+  String get labAddValueBtn => '+ Adicionar';
+
+  @override
+  String labParsedValuesTitle(int count) {
+    return 'Valores lidos ($count)';
+  }
+
+  @override
+  String get labSaveEvaluateBtn => 'Avaliar e salvar';
+
+  @override
+  String labTrendSummary(int count, String delta, String status) {
+    return '$count registros • Mudança: $delta • Último: $status';
+  }
+
+  @override
+  String get vitalsScreenTitle => 'Pressão e Glicemia';
+
+  @override
+  String get vitalsCopySummaryTooltip => 'Copiar resumo médico';
+
+  @override
+  String get vitalsCopyEmptyMsg =>
+      'Adicione primeiro uma medição de pressão ou glicemia.';
+
+  @override
+  String get vitalsSummaryCopied => 'Resumo de pressão e glicemia copiado.';
+
+  @override
+  String get vitalsAddBpBtn => 'Adicionar pressão';
+
+  @override
+  String get vitalsAddSugarBtn => 'Adicionar glicemia';
+
+  @override
+  String get vitalsBpEmptyTitle => 'Nenhuma medição de pressão ainda';
+
+  @override
+  String get vitalsBpEmptyDesc =>
+      'Registre pressão sistólica, diastólica e pulso para acompanhar o gráfico.';
+
+  @override
+  String get vitalsBpAddFirstBtn => 'Adicionar primeira pressão';
+
+  @override
+  String get vitalsSugarEmptyTitle => 'Nenhuma medição de glicemia ainda';
+
+  @override
+  String get vitalsSugarEmptyDesc =>
+      'Registre glicemia em jejum, pós-prandial ou aleatória para acompanhar a tendência.';
+
+  @override
+  String get vitalsSugarAddFirstBtn => 'Adicionar primeira glicemia';
+
+  @override
+  String vitalsBpAverage(int count, int sys, int dia) {
+    return 'Média ($count): $sys/$dia mmHg';
+  }
+
+  @override
+  String vitalsLastPulse(int pulse) {
+    return ' • Pulso $pulse bpm';
+  }
+
+  @override
+  String get vitalsBpHistoryTitle => 'Histórico de pressão';
+
+  @override
+  String vitalsSugarAverage(int count, int avg) {
+    return 'Média ($count): $avg mg/dL';
+  }
+
+  @override
+  String get vitalsSugarHistoryTitle => 'Histórico de glicemia';
+
+  @override
+  String get vitalsNewBpTitle => 'Nova medição de pressão';
+
+  @override
+  String get vitalsSystolicField => 'Sistólica (Máxima)';
+
+  @override
+  String get vitalsDiastolicField => 'Diastólica (Mínima)';
+
+  @override
+  String get vitalsPulseField => 'Pulso (bpm — Opcional)';
+
+  @override
+  String get vitalsNoteField => 'Nota (Opcional)';
+
+  @override
+  String get vitalsSaveBpBtn => 'Salvar pressão';
+
+  @override
+  String get vitalsNewSugarTitle => 'Nova medição de glicemia';
+
+  @override
+  String get vitalsSugarValueField => 'Glicemia (mg/dL)';
+
+  @override
+  String get vitalsSaveSugarBtn => 'Salvar glicemia';
+
+  @override
+  String get chartAddReadingHint => 'Adicione medições para ver o gráfico';
 }

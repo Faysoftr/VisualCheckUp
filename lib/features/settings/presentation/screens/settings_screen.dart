@@ -66,24 +66,21 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   Future<void> _toggleCloudBackup(bool value) async {
+    final l10n = context.l10n;
     if (value) {
       final consented = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Bulut Yedekleme Onayı (KVKK)'),
-          content: const Text(
-            'Kan tahlilleriniz, tansiyon/şeker ölçümleriniz ve kontrol kayıtlarınız varsayılan olarak yalnızca cihazınızda saklanır.\n\n'
-            'Bulut yedeklemeyi açarsanız bu sağlık verileri yalnızca kendi Google/Apple hesabınıza özel Firebase Firestore alanında saklanır; başka hiç kimse erişemez ve hesabınızı sildiğinizde buluttan tamamen silinir.\n\n'
-            'Onaylıyor musunuz?',
-          ),
+          title: Text(l10n.cloudConsentTitle),
+          content: Text(l10n.cloudConsentBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Vazgeç'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Onayla ve Aç'),
+              child: Text(l10n.cloudConsentConfirm),
             ),
           ],
         ),
@@ -97,11 +94,19 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     if (value && widget.cloudBackupService.canSyncNow) {
       await _runCloudBackup();
+    } else if (!value) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.cloudBackupDisabledNotice),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
   Future<void> _runCloudBackup() async {
     if (_syncingCloud) return;
+    final l10n = context.l10n;
     setState(() => _syncingCloud = true);
     try {
       final summary = await widget.cloudBackupService.backupAll(
@@ -114,9 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       setState(() => _lastCloudSync = last);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Buluta yedeklendi: ${summary.labReportsCount} tahlil, ${summary.bpCount + summary.sugarCount} ölçüm, ${summary.visualChecksCount} görsel kontrol.',
-          ),
+          content: Text(l10n.cloudBackupSuccess(summary.totalCount)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -124,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Yedekleme yapılamadı: $e'),
+          content: Text(l10n.cloudBackupFailed(e.toString())),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -135,6 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Future<void> _runCloudRestore() async {
     if (_syncingCloud) return;
+    final l10n = context.l10n;
     setState(() => _syncingCloud = true);
     try {
       final summary = await widget.cloudBackupService.restoreAll(
@@ -145,9 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Buluttan geri yüklendi: ${summary.totalCount} kayıt cihazınıza aktarıldı.',
-          ),
+          content: Text(l10n.cloudRestoreSuccess(summary.totalCount)),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -155,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Geri yükleme yapılamadı: $e'),
+          content: Text(l10n.cloudRestoreFailed(e.toString())),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -511,7 +513,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Bulut Yedekleme (İsteğe Bağlı • Firebase)',
+                          l10n.cloudBackupTitle,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -521,7 +523,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Varsayılan olarak tüm kan tahlili ve ölçüm verileriniz yalnızca bu cihazda saklanır. Telefon değiştirirken verilerinizi korumak isterseniz kendi Google/Apple hesabınıza özel yedeklemeyi açabilirsiniz.',
+                    l10n.cloudBackupDesc,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       height: 1.35,
@@ -530,16 +532,19 @@ class _SettingsScreenState extends State<SettingsScreen>
                   const SizedBox(height: 8),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text(
-                      'Buluta Yedeklemeyi Etkinleştir',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                    title: Text(
+                      l10n.cloudBackupToggleTitle,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     subtitle: Text(
                       _lastCloudSync != null
-                          ? 'Son yedekleme: ${DateFormat('dd.MM.yyyy HH:mm').format(_lastCloudSync!)}'
+                          ? l10n.cloudBackupLastSync(
+                              DateFormat('dd.MM.yyyy HH:mm')
+                                  .format(_lastCloudSync!),
+                            )
                           : (_cloudBackupEnabled
-                              ? 'Etkin • Yedeklemeye hazır'
-                              : 'Kapalı • Yalnızca cihaz içi depolama'),
+                              ? l10n.cloudBackupEnabledReady
+                              : l10n.cloudBackupDisabledLocal),
                     ),
                     value: _cloudBackupEnabled,
                     onChanged: _syncingCloud ? null : _toggleCloudBackup,
@@ -552,7 +557,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     const SizedBox(height: 8),
                     if (!widget.cloudBackupService.canSyncNow)
                       Text(
-                        'Bulut yedekleme için Google veya Apple hesabıyla oturum açmanız gerekir.',
+                        l10n.cloudBackupSignInRequired,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.error,
                           fontWeight: FontWeight.w600,
@@ -565,13 +570,19 @@ class _SettingsScreenState extends State<SettingsScreen>
                         children: [
                           FilledButton.tonalIcon(
                             onPressed: _syncingCloud ? null : _runCloudBackup,
-                            icon: const Icon(Icons.cloud_upload_outlined, size: 18),
-                            label: const Text('Şimdi Yedekle'),
+                            icon: const Icon(
+                              Icons.cloud_upload_outlined,
+                              size: 18,
+                            ),
+                            label: Text(l10n.cloudBackupNowBtn),
                           ),
                           OutlinedButton.icon(
                             onPressed: _syncingCloud ? null : _runCloudRestore,
-                            icon: const Icon(Icons.cloud_download_outlined, size: 18),
-                            label: const Text('Buluttan Geri Yükle'),
+                            icon: const Icon(
+                              Icons.cloud_download_outlined,
+                              size: 18,
+                            ),
+                            label: Text(l10n.cloudRestoreBtn),
                           ),
                         ],
                       ),

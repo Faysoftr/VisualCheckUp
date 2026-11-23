@@ -461,4 +461,724 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get skinScreenTitle => 'ত্বকের সমস্যার প্রাথমিক পরীক্ষা';
+
+  @override
+  String get providerGuest => 'অতিথি';
+
+  @override
+  String signInFailed(String error) {
+    return 'সাইন-ইন ব্যর্থ হয়েছে: $error';
+  }
+
+  @override
+  String get riskNormal => 'স্বাভাবিক চেহারা';
+
+  @override
+  String get riskAttention => 'ফলো-আপ প্রস্তাবিত';
+
+  @override
+  String get riskUrgent => 'ডাক্তারের পরামর্শ জরুরি';
+
+  @override
+  String recentSummaryFallback(String category, String status) {
+    return '$category • $status';
+  }
+
+  @override
+  String latestSummaryPrefix(String value) {
+    return 'সর্বশেষ: $value';
+  }
+
+  @override
+  String latestLabValuesSummary(int count, int abnormal) {
+    return 'সর্বশেষ: $countটি মান ($abnormalটি সীমার বাইরে)';
+  }
+
+  @override
+  String latestLabAllNormal(int count) {
+    return 'সর্বশেষ: $countটি মান (সব স্বাভাবিক)';
+  }
+
+  @override
+  String get labStatusCriticalLow => 'অত্যন্ত কম';
+
+  @override
+  String get labStatusLow => 'কম';
+
+  @override
+  String get labStatusNormal => 'স্বাভাবিক';
+
+  @override
+  String get labStatusHigh => 'বেশি';
+
+  @override
+  String get labStatusCriticalHigh => 'অত্যন্ত বেশি';
+
+  @override
+  String get labSourceManual => 'ম্যানুয়াল এন্ট্রি';
+
+  @override
+  String get labSourcePasted => 'রিপোর্ট টেক্সট থেকে পঠিত';
+
+  @override
+  String get labSourcePhoto => 'JPG / ছবি রিপোর্ট';
+
+  @override
+  String get labSourcePdf => 'PDF রিপোর্ট';
+
+  @override
+  String get bpLow => 'নিম্ন রক্তচাপ';
+
+  @override
+  String get bpNormal => 'স্বাভাবিক সীমা';
+
+  @override
+  String get bpElevated => 'সামান্য বেশি';
+
+  @override
+  String get bpStage1 => 'ধাপ ১ উচ্চ';
+
+  @override
+  String get bpStage2 => 'উল্লেখযোগ্য উচ্চ';
+
+  @override
+  String get bpCrisis => 'জরুরি উচ্চ রক্তচাপ';
+
+  @override
+  String get sugarLow => 'নিম্ন রক্তের শর্করা';
+
+  @override
+  String get sugarNormal => 'স্বাভাবিক সীমা';
+
+  @override
+  String get sugarBorderline => 'সীমান্তরেখায় বেশি';
+
+  @override
+  String get sugarHigh => 'উচ্চ রক্তের শর্করা';
+
+  @override
+  String get sugarVeryHigh => 'অত্যন্ত উচ্চ শর্করা';
+
+  @override
+  String get sugarTypeFasting => 'খালি পেটে';
+
+  @override
+  String get sugarTypePostMeal => 'খাওয়ার ২ ঘণ্টা পর';
+
+  @override
+  String get sugarTypeRandom => 'যেকোনো সময়';
+
+  @override
+  String get specialtyEye => 'চক্ষু বা মেডিসিন বিভাগ';
+
+  @override
+  String get specialtyNail => 'চর্মরোগ বা মেডিসিন';
+
+  @override
+  String get specialtyTongue => 'ইএনটি, মুখের স্বাস্থ্য বা মেডিসিন';
+
+  @override
+  String get specialtySkin => 'চর্মরোগ বিভাগ';
+
+  @override
+  String get specialtyUrine => 'ইউরোলজি বা মেডিসিন';
+
+  @override
+  String get specialtyStool => 'গ্যাস্ট্রোএন্টারোলজি বা মেডিসিন';
+
+  @override
+  String get cloudBackupTitle => 'ক্লাউড ব্যাকআপ (ঐচ্ছিক • Firebase)';
+
+  @override
+  String get cloudBackupDesc =>
+      'ডিফল্টভাবে আপনার সব রিপোর্ট ও পরিমাপ শুধুমাত্র এই ডিভাইসে থাকে। ফোন বদলানোর সময় ডেটা সুরক্ষিত রাখতে আপনার Google/Apple অ্যাকাউন্টে ব্যাকআপ চালু করতে পারেন।';
+
+  @override
+  String get cloudBackupToggleTitle => 'ক্লাউড ব্যাকআপ চালু করুন';
+
+  @override
+  String cloudBackupLastSync(String date) {
+    return 'শেষ ব্যাকআপ: $date';
+  }
+
+  @override
+  String get cloudBackupEnabledReady => 'চালু • ব্যাকআপের জন্য প্রস্তুত';
+
+  @override
+  String get cloudBackupDisabledLocal => 'বন্ধ • শুধুমাত্র ডিভাইসে সংরক্ষিত';
+
+  @override
+  String get cloudBackupSignInRequired =>
+      'ক্লাউড ব্যাকআপের জন্য Google বা Apple দিয়ে সাইন ইন করুন।';
+
+  @override
+  String get cloudBackupNowBtn => 'এখনই ব্যাকআপ নিন';
+
+  @override
+  String get cloudRestoreBtn => 'ক্লাউড থেকে পুনরুদ্ধার';
+
+  @override
+  String get cloudConsentTitle => 'ক্লাউড ব্যাকআপ সম্মতি';
+
+  @override
+  String get cloudConsentBody =>
+      'আপনার রক্তের পরীক্ষা, পরিমাপ ও চেকআপ ডিফল্টভাবে কেবল এই ডিভাইসে থাকে।\n\nক্লাউড ব্যাকআপ চালু করলে ডেটা আপনার ব্যক্তিগত Google/Apple ফায়ারবেস অ্যাকাউন্টে সংরক্ষিত হবে এবং অ্যাকাউন্ট মুছলে স্থায়ীভাবে মুছে যাবে।\n\nআপনি কি সম্মত?';
+
+  @override
+  String get cloudConsentConfirm => 'হ্যাঁ, চালু করুন';
+
+  @override
+  String cloudBackupSuccess(int count) {
+    return 'ক্লাউড ব্যাকআপ সম্পন্ন: $countটি রেকর্ড সিঙ্ক হয়েছে।';
+  }
+
+  @override
+  String cloudBackupFailed(String error) {
+    return 'ব্যাকআপ ব্যর্থ: $error';
+  }
+
+  @override
+  String cloudRestoreSuccess(int count) {
+    return 'ক্লাউড থেকে পুনরুদ্ধার হয়েছে: $countটি রেকর্ড আমদানি হয়েছে।';
+  }
+
+  @override
+  String cloudRestoreFailed(String error) {
+    return 'পুনরুদ্ধার ব্যর্থ: $error';
+  }
+
+  @override
+  String get cloudBackupDisabledNotice =>
+      'ক্লাউড ব্যাকআপ বন্ধ হয়েছে। নতুন রেকর্ড কেবল এই ডিভাইসে থাকবে।';
+
+  @override
+  String get aiCloudToggleTitle => 'ক্লাউড ভিশন এআই (Gemini) বিশ্লেষণ';
+
+  @override
+  String get aiCloudOnDesc =>
+      'চালু: স্পষ্ট ছবিগুলো ছোট করে নিরাপদ সংযোগে বিশ্লেষণ করা হয়। অফলাইনে ডিভাইস বিশ্লেষণ চলে।';
+
+  @override
+  String get aiCloudOffDesc =>
+      'বন্ধ (০ টোকেন): সমস্ত বিশ্লেষণ কেবল আপনার ডিভাইসে হয়; কোনো ছবি পাঠানো হয় না।';
+
+  @override
+  String get aiBackendOfflineNote =>
+      'Gemini / Firebase AI সংযুক্ত হলে এই অপশন অনুযায়ী ক্লাউড বিশ্লেষণ চালু হবে; বর্তমানে ডিভাইস ইঞ্জিন সক্রিয়।';
+
+  @override
+  String get aiOptimizationsTitle => 'সক্রিয় টোকেন ও ডেটা সাশ্রয় নিয়ন্ত্রণ';
+
+  @override
+  String get aiOptQualityGate => '০-টোকেন ঝাপসা, অন্ধকার ও ঝলক মান যাচাই';
+
+  @override
+  String get aiOptCompression => 'অটো-ক্রপ + 512px/768px JPEG (80%) কম্প্রেশন';
+
+  @override
+  String get aiOptTieredModel => 'স্মার্ট মডেল নির্বাচন (Flash-Lite / Flash)';
+
+  @override
+  String get aiOptHashCache => 'একই ছবির জন্য ডিভাইস ক্যাশে (০ টোকেন)';
+
+  @override
+  String get aiClearCacheBtn => 'এআই ক্যাশে মুছুন';
+
+  @override
+  String get aiCacheCleared => 'এআই ক্যাশে পরিষ্কার করা হয়েছে।';
+
+  @override
+  String resultScreenTitle(String category) {
+    return '$category ফলাফল';
+  }
+
+  @override
+  String get tooltipDoctorSummary => 'ডাক্তারের জন্য সারসংক্ষেপ';
+
+  @override
+  String get tooltipReferenceGuide => 'রেফারেন্স গাইড';
+
+  @override
+  String get calibratedColorTone => 'ক্যালিব্রেটেড রঙের টোন';
+
+  @override
+  String get sampledColorTone => 'প্রধান নমুনা রঙের টোন';
+
+  @override
+  String confidenceLabel(int percent) {
+    return 'প্রাথমিক আস্থা: $percent%';
+  }
+
+  @override
+  String get whiteBalanceDefaultNote =>
+      'সাদা রেফারেন্স দিয়ে রঙ ভারসাম্য করা হয়েছে।';
+
+  @override
+  String recommendedSpecialtyLabel(String specialty) {
+    return 'পরামর্শযোগ্য বিভাগ: $specialty';
+  }
+
+  @override
+  String get timelineComparisonTitle => 'সময়ের সাথে পরিবর্তন';
+
+  @override
+  String get todayLabel => 'আজ';
+
+  @override
+  String previousRecordSummary(String title, String status, int count) {
+    return 'পূর্ববর্তী রেকর্ড: \"$title\" ($status)। মোট $countটি রেকর্ড সংরক্ষিত।';
+  }
+
+  @override
+  String get personalBaselineComparisonTitle =>
+      'ব্যক্তিগত স্বাভাবিক মানের তুলনা';
+
+  @override
+  String get yourBaselineLabel => 'স্বাভাবিক';
+
+  @override
+  String get warningFlagsTitle => 'সতর্কতা লক্ষণ';
+
+  @override
+  String get observationsTitle => 'পর্যবেক্ষণ';
+
+  @override
+  String get recommendationsTitle => 'পরামর্শ';
+
+  @override
+  String get personalBaselineCardTitle => 'ব্যক্তিগত বেসলাইন ক্যালিব্রেশন';
+
+  @override
+  String get personalBaselineCardDesc =>
+      'সুস্থ দিনে এই পরিমাপটিকে আপনার ব্যক্তিগত স্বাভাবিক মান হিসেবে সংরক্ষণ করুন।';
+
+  @override
+  String get saveBaselineBtn => 'ব্যক্তিগত মান হিসেবে সংরক্ষণ';
+
+  @override
+  String get updateBaselineBtn => 'ব্যক্তিগত মান আপডেট করুন';
+
+  @override
+  String get clearBaselineBtn => 'মুছুন';
+
+  @override
+  String baselineSavedMsg(String category) {
+    return '$category-এর জন্য ব্যক্তিগত মান সংরক্ষিত।';
+  }
+
+  @override
+  String baselineClearedMsg(String category) {
+    return '$category-এর ব্যক্তিগত মান মুছে ফেলা হয়েছে।';
+  }
+
+  @override
+  String get doctorSummaryBtn => 'ডাক্তারকে দেখান • সারসংক্ষেপ';
+
+  @override
+  String get returnHomeBtn => 'হোমে ফিরুন';
+
+  @override
+  String get doctorSheetTitle => 'ডাক্তারের সাক্ষাৎ সারসংক্ষেপ';
+
+  @override
+  String colorLabel(String hex, String status) {
+    return 'রঙ: $hex • $status';
+  }
+
+  @override
+  String get timelineHistoryTitle => 'পূর্ববর্তী রেকর্ডের সময়রেখা';
+
+  @override
+  String get questionsForDoctorTitle => 'ডাক্তারকে জিজ্ঞেস করার প্রশ্ন';
+
+  @override
+  String get copyShareSummaryBtn => 'সারসংক্ষেপ কপি ও শেয়ার করুন';
+
+  @override
+  String get doctorSummaryCopied =>
+      'ডাক্তারের সারসংক্ষেপ ক্লিপবোর্ডে কপি হয়েছে।';
+
+  @override
+  String referenceSheetTitle(String category) {
+    return '$category — ভিজ্যুয়াল রেফারেন্স';
+  }
+
+  @override
+  String get healthyReferenceLabel => 'স্বাস্থ্যকর রেফারেন্স';
+
+  @override
+  String get captureChecklistTitle => 'সঠিক ছবির টিপস';
+
+  @override
+  String get abnormalFindingsTitle => 'সতর্কতামূলক ও অস্বাভাবিক লক্ষণ';
+
+  @override
+  String get cameraPermPermanentMsg =>
+      'ডিভাইস সেটিংস থেকে ক্যামেরা অনুমতি বন্ধ। সেটিংস থেকে চালু করুন বা গ্যালারি থেকে ছবি বাছুন।';
+
+  @override
+  String get cameraPermRequiredMsg =>
+      'ভিজ্যুয়াল চেকের জন্য ক্যামেরা অনুমতি প্রয়োজন। ছবিগুলো ডিভাইসেই প্রক্রিয়াকরণ হয়।';
+
+  @override
+  String get cameraGrantPermTitle => 'ক্যামেরা অনুমতি প্রয়োজন';
+
+  @override
+  String get cameraRequestPermBtn => 'ক্যামেরা অনুমতি দিন';
+
+  @override
+  String get cameraPickGalleryBtn => 'গ্যালারি থেকে বাছুন';
+
+  @override
+  String get cameraWhiteRefOn => 'সাদা রেফারেন্স: চালু';
+
+  @override
+  String get cameraWhiteRefOff => 'সাদা রেফারেন্স: বন্ধ';
+
+  @override
+  String get cameraBaselineActive => 'ব্যক্তিগত মান সংরক্ষিত';
+
+  @override
+  String get cameraAnalyzing => 'বিশ্লেষণ চলছে...';
+
+  @override
+  String get cameraCaptureBtn => 'ছবি তুলুন ও বিশ্লেষণ করুন';
+
+  @override
+  String cameraAnalysisFailed(String error) {
+    return 'বিশ্লেষণে ত্রুটি: $error';
+  }
+
+  @override
+  String quickCardTitle(String category) {
+    return '$category • রঙের কার্ড';
+  }
+
+  @override
+  String get quickCardPrivacyBanner =>
+      'ক্যামেরার প্রয়োজন নেই: ২ সেকেন্ডে গোপন ও দ্রুত রেকর্ডের জন্য কাছাকাছি রঙটি বাছুন।';
+
+  @override
+  String get quickCardChooseShade => 'নিকটতম রঙের টোন নির্বাচন করুন';
+
+  @override
+  String get quickCardExtraContext => 'অতিরিক্ত তথ্য (ঐচ্ছিক)';
+
+  @override
+  String get quickCardSaveViewBtn => 'সংরক্ষণ ও মূল্যায়ন দেখুন';
+
+  @override
+  String get quickCardUseCameraBtn => 'এর পরিবর্তে ক্যামেরা ব্যবহার করুন';
+
+  @override
+  String get skinIntroTitle => 'ভিজ্যুয়াল ডার্মাটোলজি প্রাথমিক পরীক্ষা';
+
+  @override
+  String get skinIntroDesc =>
+      'তিল, আঁচিল, কালশিটে ও মুখের দাগ আশেপাশের ত্বকের সাথে তুলনা করে। এটি কোনো রোগ নির্ণয় নয়; চর্মরোগ বিশেষজ্ঞের প্রস্তুতিতে সহায়ক।';
+
+  @override
+  String get skinStep1Title => '১. ত্বকের প্রি-স্ক্রিনিং মডিউল নির্বাচন করুন';
+
+  @override
+  String get skinOtherConcernsLabel => 'অন্যান্য ত্বকের লক্ষণ';
+
+  @override
+  String get skinStep2Title => '২. সহগামী লক্ষণ (ঐচ্ছিক)';
+
+  @override
+  String get skinStep3Title => '৩. শরীরের অংশ (ঐচ্ছিক)';
+
+  @override
+  String get skinStartCameraBtn => 'ক্যামেরা দিয়ে ত্বক পরীক্ষা শুরু করুন';
+
+  @override
+  String get skinConcernRash => 'লালচে ভাব / ফুসকুড়ি';
+
+  @override
+  String get skinConcernMole => 'তিল / কালো দাগ';
+
+  @override
+  String get skinConcernScaly => 'খসখসে / শুষ্ক অংশ';
+
+  @override
+  String get skinConcernBlister => 'ফোস্কা / ব্রণ';
+
+  @override
+  String get skinConcernGeneral => 'সাধারণ ত্বক পরীক্ষা';
+
+  @override
+  String get bodyAreaFaceNeck => 'মুখ / ঘাড়';
+
+  @override
+  String get bodyAreaArmHand => 'হাত / বাহু';
+
+  @override
+  String get bodyAreaTorso => 'শরীরের মধ্যভাগ';
+
+  @override
+  String get bodyAreaLegFoot => 'পা';
+
+  @override
+  String get bodyAreaScalp => 'মাথার ত্বক';
+
+  @override
+  String get bodyAreaOther => 'অন্যান্য';
+
+  @override
+  String get symptomItching => 'চুলকানি';
+
+  @override
+  String get symptomPainWarmth => 'ব্যথা / গরম ভাব';
+
+  @override
+  String get symptomRapidChange => 'দ্রুত বৃদ্ধি / আকার পরিবর্তন';
+
+  @override
+  String get symptomBleeding => 'রক্তপাত / পুঁজ';
+
+  @override
+  String get symptomSpreading => 'দ্রুত ছড়াচ্ছে';
+
+  @override
+  String get symptomFever => 'জ্বর আছে';
+
+  @override
+  String get symptomNonHealing => '৪+ সপ্তাহে না শুকানো ঘা';
+
+  @override
+  String get symptomOver6mm => '৬ মিমি-এর বড় বা অসম কিনারা';
+
+  @override
+  String get symptomNoTrauma => 'আঘাত ছাড়াই নিজে থেকে হয়েছে';
+
+  @override
+  String get symptomRoughDots => 'খসখসে তল / ছোট কালো বিন্দু';
+
+  @override
+  String get symptomSunHormone => 'রোদ, হরমোন বা ব্রণের দাগ';
+
+  @override
+  String get bruiseGuideTitle => 'কালশিটে রঙের ধাপ নির্দেশিকা';
+
+  @override
+  String get wartGuideTitle => 'আঁচিল পূর্ব-পরীক্ষা ও নিরাপত্তা গাইড';
+
+  @override
+  String get abcdeGuideTitle => 'তিলের জন্য ABCDE গাইড';
+
+  @override
+  String get abcdeGuideSubtitle =>
+      'চর্মরোগ বিশেষজ্ঞদের ব্যবহৃত ৫টি প্রধান লক্ষণ';
+
+  @override
+  String get labScreenTitle => 'ল্যাব ও হাসপাতাল রিপোর্ট';
+
+  @override
+  String get labTabReports => 'আমার রিপোর্ট';
+
+  @override
+  String get labTabTrends => 'পরিবর্তন ট্র্যাকিং';
+
+  @override
+  String get labAddBtn => 'রিপোর্ট / রক্তের পরীক্ষা যোগ করুন';
+
+  @override
+  String get labEmptyTitle => 'এখনো কোনো রক্তের পরীক্ষা সংরক্ষিত নেই';
+
+  @override
+  String get labEmptyDesc =>
+      'PDF বা JPG রক্তের রিপোর্ট আপলোড করুন; সহজ ব্যাখ্যার জন্য ঐচ্ছিকভাবে ডাক্তারের নির্ণয় বা আপনার লক্ষণ যোগ করুন।';
+
+  @override
+  String get labAddFirstBtn => 'প্রথম রিপোর্ট যোগ করুন';
+
+  @override
+  String get labTrendsEmptyDesc =>
+      'ভিন্ন তারিখে রক্তের পরীক্ষা সংরক্ষণ করলে হিমোগ্লোবিন, ফেরিটিন, গ্লুকোজ, টিএসএইচ ইত্যাদির গ্রাফ এখানে দেখা যাবে।';
+
+  @override
+  String labParamsCount(int count) {
+    return '$countটি প্যারামিটার';
+  }
+
+  @override
+  String labOutOfRangeCount(int count) {
+    return '$countটি সীমার বাইরে';
+  }
+
+  @override
+  String labDetailParamsTitle(int count) {
+    return 'প্যারামিটার মূল্যায়ন ($count)';
+  }
+
+  @override
+  String get labEnteredDiagnosisTitle => 'হাসপাতাল / ডাক্তারের নির্ণয়';
+
+  @override
+  String get labEnteredComplaintTitle => 'আপনার অভিযোগ / নোট';
+
+  @override
+  String get labInterpretationTitle => 'সহজ ভাষায় ব্যাখ্যা';
+
+  @override
+  String get labCopyDoctorSummaryBtn => 'ডাক্তারকে দেখান • সারসংক্ষেপ কপি';
+
+  @override
+  String get labSummaryCopied => 'রিপোর্ট সারসংক্ষেপ কপি হয়েছে।';
+
+  @override
+  String get labExportPdfBtn => 'ডাক্তার PDF রিপোর্ট তৈরি করুন';
+
+  @override
+  String get labAddSheetTitle => 'হাসপাতাল / রক্তের রিপোর্ট যোগ করুন';
+
+  @override
+  String get labReportTitleField => 'রিপোর্টের শিরোনাম';
+
+  @override
+  String get labDefaultReportTitle => 'রক্তের পরীক্ষার ফলাফল';
+
+  @override
+  String get labStep1Upload => '১. PDF বা JPG রিপোর্ট আপলোড করুন';
+
+  @override
+  String get labUploadPdfJpgBtn => 'PDF বা JPG আপলোড';
+
+  @override
+  String get labCameraCaptureBtn => 'ছবি তুলুন';
+
+  @override
+  String get labStep2Context => '২. হাসপাতালের নির্ণয় ও নোট (ঐচ্ছিক)';
+
+  @override
+  String get labStep2ContextHint =>
+      'ডাক্তারের নির্ণয় বা আপনার লক্ষণ লিখুন; চাইলে দুটিই ফাঁকা রাখতে পারেন।';
+
+  @override
+  String get labDiagnosisField => 'হাসপাতাল / ডাক্তারের নির্ণয় (ঐচ্ছিক)';
+
+  @override
+  String get labComplaintField => 'আপনার লক্ষণ / প্রশ্ন (ঐচ্ছিক)';
+
+  @override
+  String get labStep3PasteManual =>
+      '৩. রিপোর্ট টেক্সট পেস্ট করুন বা মান যোগ করুন';
+
+  @override
+  String get labParseTextBtn => 'টেক্সট পড়ুন ও বিশ্লেষণ করুন';
+
+  @override
+  String get labParamDropdown => 'পরীক্ষার প্যারামিটার';
+
+  @override
+  String labValueField(String unit) {
+    return 'মান ($unit)';
+  }
+
+  @override
+  String get labAddValueBtn => '+ যোগ';
+
+  @override
+  String labParsedValuesTitle(int count) {
+    return 'পঠিত মান ($count)';
+  }
+
+  @override
+  String get labSaveEvaluateBtn => 'মূল্যায়ন ও সংরক্ষণ করুন';
+
+  @override
+  String labTrendSummary(int count, String delta, String status) {
+    return '$countটি রেকর্ড • পরিবর্তন: $delta • সর্বশেষ: $status';
+  }
+
+  @override
+  String get vitalsScreenTitle => 'রক্তচাপ ও শর্করা ট্র্যাকিং';
+
+  @override
+  String get vitalsCopySummaryTooltip => 'ডাক্তারের সারসংক্ষেপ কপি';
+
+  @override
+  String get vitalsCopyEmptyMsg =>
+      'সারসংক্ষেপ তৈরি করতে আগে রক্তচাপ বা শর্করা যোগ করুন।';
+
+  @override
+  String get vitalsSummaryCopied => 'রক্তচাপ ও শর্করার সারসংক্ষেপ কপি হয়েছে।';
+
+  @override
+  String get vitalsAddBpBtn => 'রক্তচাপ যোগ করুন';
+
+  @override
+  String get vitalsAddSugarBtn => 'শর্করা যোগ করুন';
+
+  @override
+  String get vitalsBpEmptyTitle => 'এখনো কোনো রক্তচাপ পরিমাপ নেই';
+
+  @override
+  String get vitalsBpEmptyDesc =>
+      'ট্রেন্ড গ্রাফ দেখতে তারিখসহ রক্তচাপ ও পালস সংরক্ষণ করুন।';
+
+  @override
+  String get vitalsBpAddFirstBtn => 'প্রথম রক্তচাপ যোগ করুন';
+
+  @override
+  String get vitalsSugarEmptyTitle => 'এখনো কোনো রক্তের শর্করা পরিমাপ নেই';
+
+  @override
+  String get vitalsSugarEmptyDesc =>
+      'ট্রেন্ড দেখতে খালি পেটে, খাওয়ার পর বা যেকোনো সময়ের শর্করা সংরক্ষণ করুন।';
+
+  @override
+  String get vitalsSugarAddFirstBtn => 'প্রথম শর্করা যোগ করুন';
+
+  @override
+  String vitalsBpAverage(int count, int sys, int dia) {
+    return 'গড় ($count): $sys/$dia mmHg';
+  }
+
+  @override
+  String vitalsLastPulse(int pulse) {
+    return ' • পালস $pulse';
+  }
+
+  @override
+  String get vitalsBpHistoryTitle => 'তারিখসহ রক্তচাপের রেকর্ড';
+
+  @override
+  String vitalsSugarAverage(int count, int avg) {
+    return 'গড় ($count): $avg mg/dL';
+  }
+
+  @override
+  String get vitalsSugarHistoryTitle => 'তারিখসহ শর্করার রেকর্ড';
+
+  @override
+  String get vitalsNewBpTitle => 'নতুন রক্তচাপ পরিমাপ';
+
+  @override
+  String get vitalsSystolicField => 'সিস্টোলিক (উপরের)';
+
+  @override
+  String get vitalsDiastolicField => 'ডায়াস্টোলিক (নিচের)';
+
+  @override
+  String get vitalsPulseField => 'পালস (ঐচ্ছিক)';
+
+  @override
+  String get vitalsNoteField => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String get vitalsSaveBpBtn => 'রক্তচাপ সংরক্ষণ';
+
+  @override
+  String get vitalsNewSugarTitle => 'নতুন শর্করা পরিমাপ';
+
+  @override
+  String get vitalsSugarValueField => 'রক্তের শর্করা (mg/dL)';
+
+  @override
+  String get vitalsSaveSugarBtn => 'শর্করা সংরক্ষণ';
+
+  @override
+  String get chartAddReadingHint => 'চার্ট দেখতে পরিমাপ যোগ করুন';
 }

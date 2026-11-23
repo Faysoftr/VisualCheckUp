@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/labs_vitals/data/gemini_lab_report_extractor.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_document_picker.dart';
@@ -85,6 +85,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
       builder: (sheetContext) {
         final theme = Theme.of(sheetContext);
         final colorScheme = theme.colorScheme;
+        final l10n = sheetContext.l10n;
         final df = DateFormat('dd.MM.yyyy');
         return DraggableScrollableSheet(
           expand: false,
@@ -116,7 +117,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                           ),
                         ),
                         Text(
-                          '${df.format(report.reportDate)} • ${report.source.label}',
+                          '${df.format(report.reportDate)} • ${report.source.localizedLabel(l10n)}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -170,7 +171,9 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              'Danışılabilecek Bölüm: ${report.suggestedSpecialty}',
+                              l10n.recommendedSpecialtyLabel(
+                                report.suggestedSpecialty,
+                              ),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: colorScheme.primary,
@@ -194,7 +197,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                       children: [
                         if (report.hospitalDiagnosis != null) ...[
                           Text(
-                            'Girilen Hastane / Doktor Teşhisi',
+                            l10n.labEnteredDiagnosisTitle,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.w700,
@@ -213,7 +216,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                           const Divider(height: 18),
                         if (report.userComplaintNote != null) ...[
                           Text(
-                            'Şikayetiniz / Kendi Notunuz',
+                            l10n.labEnteredComplaintTitle,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w700,
@@ -247,10 +250,12 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                               color: colorScheme.primary,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              'Anlaşılır Değerlendirme & Yorum',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
+                            Expanded(
+                              child: Text(
+                                l10n.labInterpretationTitle,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],
@@ -270,7 +275,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               if (report.items.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Text(
-                  'Parametre Tablosu & Değerlendirme (${report.items.length})',
+                  l10n.labDetailParamsTitle(report.items.length),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -311,7 +316,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    item.status.label,
+                                    item.status.localizedLabel(l10n),
                                     style: TextStyle(
                                       color: item.status.color,
                                       fontSize: 11.5,
@@ -372,10 +377,12 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                               color: colorScheme.primary,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              'Doktorunuza Sorabileceğiniz Sorular',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
+                            Expanded(
+                              child: Text(
+                                l10n.questionsForDoctorTitle,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],
@@ -398,7 +405,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               ],
               const SizedBox(height: 10),
               Text(
-                MedicalDisclaimer.shortBanner,
+                l10n.disclaimerShort,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -415,7 +422,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                     if (sheetContext.mounted) {
                       ScaffoldMessenger.of(sheetContext).showSnackBar(
                         SnackBar(
-                          content: Text('PDF oluşturulamadı: $e'),
+                          content: Text(l10n.cameraAnalysisFailed(e.toString())),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
@@ -423,7 +430,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                   }
                 },
                 icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: const Text('Doktora Göster • Özet PDF Oluştur'),
+                label: Text(l10n.labExportPdfBtn),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
@@ -435,15 +442,15 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                   );
                   if (sheetContext.mounted) {
                     ScaffoldMessenger.of(sheetContext).showSnackBar(
-                      const SnackBar(
-                        content: Text('Tahlil özeti metin olarak panoya kopyalandı.'),
+                      SnackBar(
+                        content: Text(l10n.labSummaryCopied),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   }
                 },
                 icon: const Icon(Icons.copy_rounded, size: 18),
-                label: const Text('Metin Olarak Kopyala'),
+                label: Text(l10n.labCopyDoctorSummaryBtn),
               ),
             ],
           ),
@@ -454,22 +461,23 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final trends = LabReportAnalyzer.computeParameterTrends(_reports);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Tahlil & Hastane Raporları'),
-          bottom: const TabBar(
+          title: Text(l10n.labScreenTitle),
+          bottom: TabBar(
             tabs: [
               Tab(
-                icon: Icon(Icons.description_outlined, size: 18),
-                text: 'Raporlarım',
+                icon: const Icon(Icons.description_outlined, size: 18),
+                text: l10n.labTabReports,
               ),
               Tab(
-                icon: Icon(Icons.show_chart_rounded, size: 18),
-                text: 'Değişim Takibi',
+                icon: const Icon(Icons.show_chart_rounded, size: 18),
+                text: l10n.labTabTrends,
               ),
             ],
           ),
@@ -477,7 +485,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _openAddReport,
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Rapor / Kan Testi Ekle'),
+          label: Text(l10n.labAddBtn),
         ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -494,6 +502,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
   Widget _buildReportsTab(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     if (_reports.isEmpty) {
       return Center(
@@ -513,14 +522,14 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Henüz kayıtlı kan tahlili yok',
+                l10n.labEmptyTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                'PDF veya JPG kan sonucunuzu yükleyin; isterseniz doktorun yazdığı teşhisi veya kendi şikayetinizi ekleyip sade Türkçe ile yorumlatın.',
+                l10n.labEmptyDesc,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
@@ -531,7 +540,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               FilledButton.icon(
                 onPressed: _openAddReport,
                 icon: const Icon(Icons.upload_file_outlined),
-                label: const Text('İlk Tahlil / PDF Raporunu Ekle'),
+                label: Text(l10n.labAddFirstBtn),
               ),
             ],
           ),
@@ -576,8 +585,8 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               children: [
                 const SizedBox(height: 2),
                 Text(
-                  '${df.format(report.reportDate)} • ${report.items.isEmpty ? report.source.label : '${report.items.length} parametre'}'
-                  '${report.hospitalDiagnosis != null ? ' • Teşhisli' : ''}',
+                  '${df.format(report.reportDate)} • ${report.items.isEmpty ? report.source.localizedLabel(l10n) : l10n.labParamsCount(report.items.length)}'
+                  '${report.abnormalCount > 0 ? ' • ${l10n.labOutOfRangeCount(report.abnormalCount)}' : ''}',
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -591,7 +600,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
               ],
             ),
             trailing: IconButton(
-              tooltip: 'Raporu Sil',
+              tooltip: l10n.clearBaselineBtn,
               onPressed: () => _deleteReport(report),
               icon: const Icon(Icons.delete_outline_rounded, size: 20),
             ),
@@ -621,13 +630,14 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     if (trends.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(28),
           child: Text(
-            'Kan tahlili raporlarınızı yüklediğinizde tüm parametreler tarih sırasıyla karşılaştırma tablosuna eklenir ve zaman içi değişim grafikleri burada oluşur.',
+            l10n.labTrendsEmptyDesc,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
@@ -651,16 +661,16 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
           children: [
             Expanded(
               child: SegmentedButton<bool>(
-                segments: const [
+                segments: [
                   ButtonSegment<bool>(
                     value: true,
-                    icon: Icon(Icons.table_chart_outlined, size: 17),
-                    label: Text('Kıyas Tablosu'),
+                    icon: const Icon(Icons.table_chart_outlined, size: 17),
+                    label: Text(l10n.labTabReports),
                   ),
                   ButtonSegment<bool>(
                     value: false,
-                    icon: Icon(Icons.show_chart_rounded, size: 17),
-                    label: Text('Grafikler'),
+                    icon: const Icon(Icons.show_chart_rounded, size: 17),
+                    label: Text(l10n.labTabTrends),
                   ),
                 ],
                 selected: {_showComparisonTable},
@@ -677,7 +687,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
             children: [
               Expanded(
                 child: Text(
-                  '${datedReports.length} rapor • ${visibleTrends.length} parametre',
+                  '${l10n.homeLabsCardCount(datedReports.length)} • ${l10n.labParamsCount(visibleTrends.length)}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
@@ -685,7 +695,7 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                 ),
               ),
               FilterChip(
-                label: const Text('Sadece Referans Dışı'),
+                label: Text(l10n.labStatusHigh),
                 selected: _onlyAbnormalInTable,
                 onSelected: (v) => setState(() => _onlyAbnormalInTable = v),
               ),
@@ -737,7 +747,11 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${trend.points.length} kayıt • Değişim: ${trend.deltaSummary} • Son durum: ${trend.latest.status.label}',
+                      l10n.labTrendSummary(
+                        trend.points.length,
+                        trend.deltaSummary,
+                        trend.latest.status.localizedLabel(l10n),
+                      ),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -778,8 +792,7 @@ class _AddLabReportSheet extends StatefulWidget {
 }
 
 class _AddLabReportSheetState extends State<_AddLabReportSheet> {
-  final TextEditingController _titleController =
-      TextEditingController(text: 'Kan Tahlili Sonucu');
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _pasteController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
   final TextEditingController _diagnosisController = TextEditingController();
@@ -793,6 +806,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   String? _parseFeedback;
   bool _pickingFile = false;
   bool _readingDocument = false;
+  bool _initializedDefaultTitle = false;
 
   bool get _canSave =>
       !_readingDocument &&
@@ -806,6 +820,15 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
     super.initState();
     _diagnosisController.addListener(_onOptionalTextChanged);
     _complaintController.addListener(_onOptionalTextChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedDefaultTitle) {
+      _initializedDefaultTitle = true;
+      _titleController.text = context.l10n.labDefaultReportTitle;
+    }
   }
 
   void _onOptionalTextChanged() {
@@ -844,11 +867,10 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       if (doc != null && mounted) {
         await _applyPickedDocument(doc);
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() {
-          _parseFeedback =
-              'Dosya seçici açılamadı; rapor metnini yapıştırabilir veya değerleri manuel girebilirsiniz.';
+          _parseFeedback = context.l10n.cameraAnalysisFailed(e.toString());
         });
       }
     } finally {
@@ -864,11 +886,10 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       if (doc != null && mounted) {
         await _applyPickedDocument(doc);
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() {
-          _parseFeedback =
-              'Kamera açılamadı; PDF/JPG dosyası seçebilir veya metin yapıştırabilirsiniz.';
+          _parseFeedback = context.l10n.cameraAnalysisFailed(e.toString());
         });
       }
     } finally {
@@ -877,17 +898,17 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   }
 
   Future<void> _applyPickedDocument(PickedLabDocument doc) async {
+    final l10n = context.l10n;
+    final defaultTitle = l10n.labDefaultReportTitle;
     setState(() {
       _attachedDocument = doc;
       _source = doc.isPdf ? LabReportSource.pdfUpload : LabReportSource.photoScan;
       _readingDocument = true;
-      _parseFeedback =
-          '${doc.badgeLabel} (${doc.fileName}) okunuyor ve tüm tahlil değerleri çıkarılıyor...';
+      _parseFeedback = l10n.cameraAnalyzing;
     });
 
     var extractedCount = 0;
-    String feedback =
-        '${doc.badgeLabel} yüklendi: ${doc.fileName} (${doc.sizeKb} KB).';
+    String feedback = '${doc.badgeLabel}: ${doc.fileName} (${doc.sizeKb} KB)';
 
     // 1. On-device instant PDF text + geometric row + universal table extraction (0 cost)
     if (doc.isPdf) {
@@ -898,7 +919,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
           _reportDate = parsed.detectedDate!;
         }
         if (parsed.detectedHospital != null &&
-            _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+            _titleController.text.trim() == defaultTitle) {
           _titleController.text = parsed.detectedHospital!;
         }
         for (final item in parsed.items) {
@@ -907,10 +928,11 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
         extractedCount = parsed.items.length;
         if (extractedCount > 0) {
           final dateInfo = parsed.detectedDate != null
-              ? ' • Tarih: ${DateFormat('dd.MM.yyyy').format(parsed.detectedDate!)}'
+              ? ' • ${DateFormat('dd.MM.yyyy').format(parsed.detectedDate!)}'
               : '';
-          feedback =
-              'PDF okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.';
+          feedback = l10n.localeName == 'tr'
+              ? 'PDF okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.'
+              : '${doc.badgeLabel} (${doc.fileName}$dateInfo): ${l10n.labParamsCount(extractedCount)}';
         }
       }
     }
@@ -927,7 +949,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
           _reportDate = aiResult.detectedDate!;
         }
         if (aiResult.hospitalName != null &&
-            _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+            _titleController.text.trim() == defaultTitle) {
           _titleController.text = aiResult.hospitalName!;
         }
         if (aiResult.items.length > extractedCount) {
@@ -936,22 +958,15 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
           }
           extractedCount = _itemsByCode.length;
           final dateInfo = aiResult.detectedDate != null
-              ? ' • Tarih: ${DateFormat('dd.MM.yyyy').format(aiResult.detectedDate!)}'
+              ? ' • ${DateFormat('dd.MM.yyyy').format(aiResult.detectedDate!)}'
               : '';
-          feedback =
-              'Yapay Zeka ile okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.';
+          feedback = l10n.localeName == 'tr'
+              ? 'Yapay Zeka ile okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.'
+              : 'AI (${doc.fileName}$dateInfo): ${l10n.labParamsCount(extractedCount)}';
         }
       } catch (_) {
-        if (extractedCount == 0) {
-          feedback = doc.isPdf
-              ? 'PDF yüklendi (${doc.fileName}). Otomatik okunamadı; metni yapıştırabilir veya değer ekleyebilirsiniz.'
-              : 'Görsel yüklendi (${doc.fileName}). Yapay zeka okuması şu an tamamlanamadı; değerleri aşağıdan ekleyebilirsiniz.';
-        }
+        // Keep base file-loaded feedback so user can enter values or notes.
       }
-    } else if (extractedCount == 0) {
-      feedback = doc.isPdf
-          ? 'PDF yüklendi (${doc.fileName}). Taranmış görsel PDF ise değerleri aşağıdan ekleyebilir veya teşhis/not ile kaydedebilirsiniz.'
-          : 'JPG/Görsel yüklendi (${doc.fileName}). İsterseniz aşağıdan değerleri veya hastane teşhisini ekleyip değerlendirebilirsiniz.';
     }
 
     if (!mounted) return;
@@ -966,9 +981,11 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
     if (doc == null || _readingDocument || !widget.aiExtractor.isAvailable) {
       return;
     }
+    final l10n = context.l10n;
+    final defaultTitle = l10n.labDefaultReportTitle;
     setState(() {
       _readingDocument = true;
-      _parseFeedback = 'Belge Yapay Zeka (Gemini) ile yeniden okunuyor...';
+      _parseFeedback = l10n.cameraAnalyzing;
     });
     try {
       final aiResult = await widget.aiExtractor.extractFromDocument(doc);
@@ -977,7 +994,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
         _reportDate = aiResult.detectedDate!;
       }
       if (aiResult.hospitalName != null &&
-          _titleController.text.trim() == 'Kan Tahlili Sonucu') {
+          _titleController.text.trim() == defaultTitle) {
         _titleController.text = aiResult.hospitalName!;
       }
       for (final item in aiResult.items) {
@@ -986,14 +1003,13 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       setState(() {
         _readingDocument = false;
         _parseFeedback =
-            'Yapay Zeka ile okundu (${doc.fileName}): ${aiResult.items.length} tahlil değeri tabloya aktarıldı.';
+            'AI (${doc.fileName}): ${l10n.labParamsCount(aiResult.items.length)}';
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _readingDocument = false;
-        _parseFeedback =
-            'Yapay Zeka ile okuma tamamlanamadı; mevcut değerleri düzenleyip kaydedebilirsiniz.';
+        _parseFeedback = l10n.cameraAnalysisFailed(e.toString());
       });
     }
   }
@@ -1002,6 +1018,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
     final text = _pasteController.text.trim();
     if (text.isEmpty) return;
 
+    final l10n = context.l10n;
     final parsed = LabReportAnalyzer.parseReportText(text);
     setState(() {
       if (parsed.detectedDate != null) {
@@ -1013,9 +1030,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       if (_attachedDocument == null) {
         _source = LabReportSource.pastedText;
       }
-      _parseFeedback = parsed.items.isEmpty
-          ? 'Tanınan parametre bulunamadı. Örn: "Hemoglobin: 11.4" veya "Glukoz 108" şeklinde girin.'
-          : '${parsed.items.length} tahlil parametresi otomatik okundu ve değerlendirildi.';
+      _parseFeedback = l10n.labParamsCount(parsed.items.length);
     });
   }
 
@@ -1056,6 +1071,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final df = DateFormat('dd.MM.yyyy');
 
     return SafeArea(
@@ -1074,295 +1090,308 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Hastane Raporu / Kan Testi Ekle',
+                      l10n.labAddSheetTitle,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Rapor Başlığı',
-                        border: OutlineInputBorder(),
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  OutlinedButton.icon(
-                    onPressed: _pickDate,
-                    icon: const Icon(Icons.calendar_today_outlined, size: 16),
-                    label: Text(df.format(_reportDate)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Text(
-                '1. PDF veya JPG Kan Sonucu Yükle',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  FilledButton.tonalIcon(
-                    onPressed: _pickingFile ? null : _pickPdfOrJpg,
-                    icon: const Icon(Icons.upload_file_outlined, size: 18),
-                    label: const Text('PDF veya JPG Yükle'),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: _pickingFile ? null : _pickCameraReport,
-                    icon: const Icon(Icons.photo_camera_outlined, size: 18),
-                    label: const Text('Kamerayla Çek'),
-                  ),
-                ],
-              ),
-              if (_attachedDocument != null) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    InputChip(
-                      avatar: Icon(
-                        _attachedDocument!.isPdf
-                            ? Icons.picture_as_pdf_outlined
-                            : Icons.image_outlined,
-                        size: 16,
-                        color: colorScheme.primary,
-                      ),
-                      label: Text(
-                        '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
-                      ),
-                      onDeleted: _readingDocument
-                          ? null
-                          : () => setState(() => _attachedDocument = null),
-                    ),
-                    if (widget.aiExtractor.isAvailable)
-                      ActionChip(
-                        avatar: Icon(
-                          Icons.auto_awesome_outlined,
-                          size: 16,
-                          color: colorScheme.primary,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              labelText: l10n.labReportTitleField,
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
                         ),
-                        label: const Text('Yapay Zeka ile Oku'),
-                        onPressed: _readingDocument ? null : _reReadWithAi,
+                        const SizedBox(width: 10),
+                        OutlinedButton.icon(
+                          onPressed: _pickDate,
+                          icon: const Icon(
+                            Icons.calendar_today_outlined,
+                            size: 16,
+                          ),
+                          label: Text(df.format(_reportDate)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      l10n.labStep1Upload,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-                  ],
-                ),
-              ],
-              if (_readingDocument) ...[
-                const SizedBox(height: 10),
-                const LinearProgressIndicator(),
-              ],
-              if (_parseFeedback != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  _parseFeedback!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 14),
-              Text(
-                '2. Hastane Teşhisi & Kendi Notunuz (İsteğe Bağlı)',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Doktorun verdiği teşhisi anlamakta zorlandıysanız ya da şikayetinizi eklemek isterseniz yazın; ikisini de boş bırakabilirsiniz.',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.35,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _diagnosisController,
-                decoration: const InputDecoration(
-                  labelText: 'Hastane / Doktor Teşhisi (Boş Bırakılabilir)',
-                  hintText:
-                      'Örn: Hipotiroidi, Demir eksikliği anemisi, Grade 2 hepatosteatoz...',
-                  border: OutlineInputBorder(),
-                  isDense: true,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _complaintController,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Şikayetiniz / Kendi Metniniz (Boş Bırakılabilir)',
-                  hintText:
-                      'Örn: Çok halsizim ve saçlarım dökülüyor, bu sonuçlar ne anlama geliyor?',
-                  border: OutlineInputBorder(),
-                  isDense: true,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                '3. e-Nabız Metni Yapıştır veya Manuel Değer Ekle',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _pasteController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText:
-                      'Örn:\nHemoglobin: 11.2 g/dL\nFerritin: 14 ng/mL\nGlukoz: 118 mg/dL\nTSH: 5.1 mIU/L',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton.icon(
-                  onPressed: _parsePastedText,
-                  icon: const Icon(Icons.document_scanner_outlined, size: 18),
-                  label: const Text('Metni Oku ve Ayrıştır'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<LabParameterSpec>(
-                initialValue: _selectedSpec,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Tahlil Parametresi',
-                  border: OutlineInputBorder(),
-                  isDense: true,
-                ),
-                items: LabReportAnalyzer.catalog
-                    .map(
-                      (spec) => DropdownMenuItem(
-                        value: spec,
-                        child: Text('${spec.name} (${spec.unit})'),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        FilledButton.tonalIcon(
+                          onPressed: _pickingFile ? null : _pickPdfOrJpg,
+                          icon: const Icon(
+                            Icons.upload_file_outlined,
+                            size: 18,
+                          ),
+                          label: Text(l10n.labUploadPdfJpgBtn),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _pickingFile ? null : _pickCameraReport,
+                          icon: const Icon(
+                            Icons.photo_camera_outlined,
+                            size: 18,
+                          ),
+                          label: Text(l10n.labCameraCaptureBtn),
+                        ),
+                      ],
+                    ),
+                    if (_attachedDocument != null) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          InputChip(
+                            avatar: Icon(
+                              _attachedDocument!.isPdf
+                                  ? Icons.picture_as_pdf_outlined
+                                  : Icons.image_outlined,
+                              size: 16,
+                              color: colorScheme.primary,
+                            ),
+                            label: Text(
+                              '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
+                            ),
+                            onDeleted: _readingDocument
+                                ? null
+                                : () =>
+                                    setState(() => _attachedDocument = null),
+                          ),
+                          if (widget.aiExtractor.isAvailable)
+                            ActionChip(
+                              avatar: Icon(
+                                Icons.auto_awesome_outlined,
+                                size: 16,
+                                color: colorScheme.primary,
+                              ),
+                              label: Text(l10n.menuAiSettings),
+                              onPressed:
+                                  _readingDocument ? null : _reReadWithAi,
+                            ),
+                        ],
                       ),
-                    )
-                    .toList(),
-                onChanged: (spec) {
-                  if (spec != null) {
-                    setState(() => _selectedSpec = spec);
-                  }
-                },
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _valueController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
+                    ],
+                    if (_readingDocument) ...[
+                      const SizedBox(height: 10),
+                      const LinearProgressIndicator(),
+                    ],
+                    if (_parseFeedback != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _parseFeedback!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
+                    ],
+                    const SizedBox(height: 14),
+                    Text(
+                      l10n.labStep2Context,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.labStep2ContextHint,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _diagnosisController,
                       decoration: InputDecoration(
-                        labelText: 'Değer (${_selectedSpec.unit})',
+                        labelText: l10n.labDiagnosisField,
                         border: const OutlineInputBorder(),
                         isDense: true,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  FilledButton.tonal(
-                    onPressed: _addManualItem,
-                    child: const Text('+ Ekle'),
-                  ),
-                ],
-              ),
-              if (_itemsByCode.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Text(
-                  'Okunan Değerler Tablosu (${_itemsByCode.length})',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingRowHeight: 36,
-                      dataRowMinHeight: 38,
-                      dataRowMaxHeight: 48,
-                      columnSpacing: 14,
-                      horizontalMargin: 12,
-                      columns: const [
-                        DataColumn(label: Text('Parametre')),
-                        DataColumn(label: Text('Sonuç')),
-                        DataColumn(label: Text('Referans')),
-                        DataColumn(label: Text('Durum')),
-                        DataColumn(label: Text('')),
-                      ],
-                      rows: _itemsByCode.values.map((item) {
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              Text(
-                                item.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                item.formattedValue,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12.5,
-                                  color: item.status.color,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                item.referenceRangeText,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            DataCell(
-                              Text(
-                                item.status.label,
-                                style: TextStyle(
-                                  color: item.status.color,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              IconButton(
-                                visualDensity: VisualDensity.compact,
-                                icon: const Icon(Icons.close_rounded, size: 16),
-                                onPressed: () => setState(
-                                  () => _itemsByCode.remove(item.code),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _complaintController,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        labelText: l10n.labComplaintField,
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                    const SizedBox(height: 14),
+                    Text(
+                      l10n.labStep3PasteManual,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _pasteController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText:
+                            'Hemoglobin: 11.2 g/dL\nFerritin: 14 ng/mL\nGlucose: 118 mg/dL\nTSH: 5.1 mIU/L',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: OutlinedButton.icon(
+                        onPressed: _parsePastedText,
+                        icon: const Icon(
+                          Icons.document_scanner_outlined,
+                          size: 18,
+                        ),
+                        label: Text(l10n.labParseTextBtn),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<LabParameterSpec>(
+                      initialValue: _selectedSpec,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.labParamDropdown,
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: LabReportAnalyzer.catalog
+                          .map(
+                            (spec) => DropdownMenuItem(
+                              value: spec,
+                              child: Text('${spec.name} (${spec.unit})'),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (spec) {
+                        if (spec != null) {
+                          setState(() => _selectedSpec = spec);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _valueController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: l10n.labValueField(_selectedSpec.unit),
+                              border: const OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        FilledButton.tonal(
+                          onPressed: _addManualItem,
+                          child: Text(l10n.labAddValueBtn),
+                        ),
+                      ],
+                    ),
+                    if (_itemsByCode.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                        l10n.labParsedValuesTitle(_itemsByCode.length),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            headingRowHeight: 36,
+                            dataRowMinHeight: 38,
+                            dataRowMaxHeight: 48,
+                            columnSpacing: 14,
+                            horizontalMargin: 12,
+                            columns: [
+                              DataColumn(label: Text(l10n.labParamDropdown)),
+                              const DataColumn(label: Text('#')),
+                              const DataColumn(label: Text('Ref')),
+                              const DataColumn(label: Text('•')),
+                              const DataColumn(label: Text('')),
+                            ],
+                            rows: _itemsByCode.values.map((item) {
+                              return DataRow(
+                                cells: [
+                                  DataCell(
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12.5,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      item.formattedValue,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12.5,
+                                        color: item.status.color,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      item.referenceRangeText,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      item.status.localizedLabel(l10n),
+                                      style: TextStyle(
+                                        color: item.status.color,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    IconButton(
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(
+                                        Icons.close_rounded,
+                                        size: 16,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _itemsByCode.remove(item.code),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -1373,7 +1402,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
               child: FilledButton.icon(
                 onPressed: _canSave ? _save : null,
                 icon: const Icon(Icons.save_outlined),
-                label: const Text('Değerlendir ve Tarihli Kaydet'),
+                label: Text(l10n.labSaveEvaluateBtn),
               ),
             ),
           ],
@@ -1394,6 +1423,7 @@ class _ReportComparisonSummaryTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final prevByCode = <String, LabTestItem>{
       if (previousReport != null)
         for (final item in previousReport!.items) item.code: item,
@@ -1411,11 +1441,11 @@ class _ReportComparisonSummaryTable extends StatelessWidget {
           columnSpacing: 16,
           horizontalMargin: 12,
           columns: [
-            const DataColumn(label: Text('Parametre')),
-            const DataColumn(label: Text('Sonuç')),
-            const DataColumn(label: Text('Referans')),
-            const DataColumn(label: Text('Durum')),
-            if (hasPrev) const DataColumn(label: Text('Öncekiyle Kıyas')),
+            DataColumn(label: Text(l10n.labParamDropdown)),
+            const DataColumn(label: Text('#')),
+            const DataColumn(label: Text('Ref')),
+            const DataColumn(label: Text('•')),
+            if (hasPrev) const DataColumn(label: Text('Δ')),
           ],
           rows: report.items.map((item) {
             final prev = prevByCode[item.code];
@@ -1425,7 +1455,7 @@ class _ReportComparisonSummaryTable extends StatelessWidget {
             } else {
               final d = item.value - prev.value;
               if (d.abs() < 0.005) {
-                deltaLabel = '= Sabit';
+                deltaLabel = '=';
               } else {
                 final arrow = d > 0 ? '▲ +' : '▼ ';
                 deltaLabel = '$arrow${_fmtCompact(d)}';
@@ -1466,7 +1496,7 @@ class _ReportComparisonSummaryTable extends StatelessWidget {
                 ),
                 DataCell(
                   Text(
-                    item.status.label,
+                    item.status.localizedLabel(l10n),
                     style: TextStyle(
                       color: item.status.color,
                       fontWeight: FontWeight.w700,
@@ -1505,6 +1535,7 @@ class _MultiReportComparisonTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final df = DateFormat('dd.MM.yy');
 
     if (trends.isEmpty) {
@@ -1512,7 +1543,7 @@ class _MultiReportComparisonTable extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Text(
-            'Seçili filtreye uyan tahlil parametresi yok.',
+            l10n.labEmptyTitle,
             style: theme.textTheme.bodyMedium,
           ),
         ),
@@ -1534,11 +1565,11 @@ class _MultiReportComparisonTable extends StatelessWidget {
           columnSpacing: 16,
           horizontalMargin: 12,
           columns: [
-            const DataColumn(label: Text('Parametre')),
-            const DataColumn(label: Text('Referans')),
+            DataColumn(label: Text(l10n.labParamDropdown)),
+            const DataColumn(label: Text('Ref')),
             for (final report in reports)
               DataColumn(label: Text(df.format(report.reportDate))),
-            const DataColumn(label: Text('Değişim')),
+            const DataColumn(label: Text('Δ')),
           ],
           rows: trends.map((trend) {
             final refText = trend.refMin != null && trend.refMax != null
@@ -1551,7 +1582,7 @@ class _MultiReportComparisonTable extends StatelessWidget {
 
             final d = trend.delta;
             final deltaText = d == null
-                ? 'İlk'
+                ? '—'
                 : d.abs() < 0.005
                     ? '='
                     : '${d > 0 ? '▲ +' : '▼ '}${_fmtCompact(d)}';

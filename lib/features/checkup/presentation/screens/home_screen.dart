@@ -667,7 +667,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 1. Signature Deep-Teal Gradient Hero Card
                       _HeroWellnessCard(
                         greeting: _greetingText(context),
-                        providerLabel: widget.currentUser.provider.label,
+                        providerLabel:
+                            widget.currentUser.provider.localizedLabel(l10n),
                         disclaimer: l10n.disclaimerShort,
                         checksCount: _allHistory.length,
                         labsCount: _labReportCount,
@@ -849,7 +850,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             title: Text(
-                              item.summaryTitle,
+                              item.localizedSummaryTitle(l10n),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 
 class TrendChartPoint {
   const TrendChartPoint({
@@ -45,7 +46,7 @@ class TrendLineChart extends StatelessWidget {
         height: height,
         child: Center(
           child: Text(
-            'Grafik için ölçüm ekleyin',
+            context.l10n.chartAddReadingHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
