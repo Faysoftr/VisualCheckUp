@@ -1196,4 +1196,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get chartAddReadingHint => 'Grafik için ölçüm ekleyin';
+
+  @override
+  String get loginTermsTitle => 'Kullanım Koşulları & Tıbbi Uyarı';
+
+  @override
+  String get loginTermsCheckbox =>
+      'VisualCheckUp’ın kesin tıbbi teşhis koymadığını, yalnızca ön farkındalık amaçlı olduğunu anladım ve Kullanım Koşullarını onaylıyorum.';
+
+  @override
+  String get loginTermsRequiredMsg =>
+      'Giriş yapabilmek için önce Kullanım Koşulları ve Tıbbi Uyarıyı onaylamanız gerekir.';
+
+  @override
+  String get loginTermsReadMore => 'Koşulları Oku';
+
+  @override
+  String get loginTermsModalBody =>
+      '• Kesin Teşhis Koymaz: VisualCheckUp tıbbi bir cihaz değildir; hastalık tanısı koymaz, tedavi önermez ve doktor muayenesinin yerini almaz.\n\n• Yalnızca Ön Farkındalık: Görsel kontroller, kan tahlili özetleri ve boy/kilo/VKİ skalaları yalnızca kişisel takip ve doktor görüşmesine hazırlık amaçlıdır.\n\n• Acil Durum Uyarısı: Şiddetli ağrı, göğüs ağrısı, nefes darlığı, ani görme kaybı veya acil belirtilerde vakit kaybetmeden 112’ye ya da en yakın sağlık kuruluşuna başvurun.\n\n• Gizlilik: Sağlık verileriniz varsayılan olarak yalnızca cihazınızda saklanır ve üçüncü taraflarla paylaşılmaz.';
+
+  @override
+  String get loginTermsAcceptBtn => 'Okudum, Onaylıyorum';
 }

@@ -105,6 +105,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await tester.ensureVisible(find.byKey(const Key('login_terms_checkbox')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('login_terms_checkbox')));
+      await tester.pumpAndSettle();
+
       await tester.ensureVisible(find.text('Apple ile Devam Et'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Apple ile Devam Et'));
@@ -201,6 +206,14 @@ void main() {
           historyRepository: repo,
         ),
       );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Koşulları Oku'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Koşulları Oku'));
+      await tester.pumpAndSettle();
+      expect(find.text('Kullanım Koşulları & Tıbbi Uyarı'), findsOneWidget);
+      await tester.tap(find.text('Okudum, Onaylıyorum'));
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('Google ile Devam Et'));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/cloud/cloud_backup_service.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/data/auth_service.dart';
@@ -45,9 +46,18 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   late final bool _ownsThemeController;
   late final LocaleController _localeController;
   late final bool _ownsLocaleController;
-  late final HistoryRepository _historyRepository;
-  late final LabsVitalsRepository _labsVitalsRepository;
+  late final FamilyProfileController _profileController;
+  late final HistoryRepository? _injectedHistoryRepository;
+  late final LabsVitalsRepository? _injectedLabsVitalsRepository;
   late final ColorHealthAnalyzer _analyzer;
+
+  HistoryRepository get _activeHistoryRepository =>
+      _injectedHistoryRepository ??
+      HistoryRepository(profileId: _profileController.value.id);
+
+  LabsVitalsRepository get _activeLabsVitalsRepository =>
+      _injectedLabsVitalsRepository ??
+      LabsVitalsRepository(profileId: _profileController.value.id);
 
   AuthUser? _currentUser;
   bool _bootstrapping = true;
@@ -61,9 +71,9 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     _themeController = widget.themeController ?? ThemeController();
     _ownsLocaleController = widget.localeController == null;
     _localeController = widget.localeController ?? LocaleController();
-    _historyRepository = widget.historyRepository ?? HistoryRepository();
-    _labsVitalsRepository =
-        widget.labsVitalsRepository ?? LabsVitalsRepository();
+    _profileController = FamilyProfileController();
+    _injectedHistoryRepository = widget.historyRepository;
+    _injectedLabsVitalsRepository = widget.labsVitalsRepository;
     _analyzer = widget.analyzer ?? ColorHealthAnalyzer();
     _currentUser = widget.initialUser;
     _bootstrapping = widget.initialUser == null;
@@ -75,6 +85,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   Future<void> _bootstrap() async {
     await _themeController.load();
     await _localeController.load();
+    await _profileController.load();
     if (widget.initialUser == null) {
       final restoredUser = await _authService.loadCurrentUser();
       if (!mounted) return;
@@ -87,6 +98,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
 
   @override
   void dispose() {
+    _profileController.dispose();
     if (_ownsThemeController) {
       _themeController.dispose();
     }
@@ -112,8 +124,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
 
   Future<void> _handleDeleteAccount() async {
     await const CloudBackupService().deleteAllCloudData();
-    await _historyRepository.clearAllUserData();
-    await _labsVitalsRepository.clearAll();
+    await _activeHistoryRepository.clearAllUserData();
+    await _activeLabsVitalsRepository.clearAll();
     await _authService.deleteAccount();
     if (!mounted) return;
     setState(() {
@@ -150,15 +162,22 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
                 onAuthenticated: _handleAuthenticated,
               );
             } else {
-              home = HomeScreen(
-                analyzer: _analyzer,
-                historyRepository: _historyRepository,
-                labsVitalsRepository: _labsVitalsRepository,
-                currentUser: _currentUser!,
-                themeController: _themeController,
-                localeController: _localeController,
-                onSignOut: _handleSignOut,
-                onDeleteAccount: _handleDeleteAccount,
+              home = ValueListenableBuilder<FamilyProfile>(
+                valueListenable: _profileController,
+                builder: (context, activeProfile, _) {
+                  return HomeScreen(
+                    key: ValueKey<String>('home_${activeProfile.id}'),
+                    analyzer: _analyzer,
+                    historyRepository: _activeHistoryRepository,
+                    labsVitalsRepository: _activeLabsVitalsRepository,
+                    currentUser: _currentUser!,
+                    themeController: _themeController,
+                    localeController: _localeController,
+                    profileController: _profileController,
+                    onSignOut: _handleSignOut,
+                    onDeleteAccount: _handleDeleteAccount,
+                  );
+                },
               );
             }
 

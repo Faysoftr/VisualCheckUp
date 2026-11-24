@@ -11,6 +11,7 @@ import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/ai_settings_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
+import 'package:visualcheckup/features/growth/data/growth_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/privacy_policy_screen.dart';
@@ -30,6 +31,7 @@ class SettingsScreen extends StatefulWidget {
     required this.localeController,
     required this.historyRepository,
     this.labsVitalsRepository,
+    this.profileController,
     this.cloudBackupService = const CloudBackupService(),
   });
 
@@ -37,6 +39,7 @@ class SettingsScreen extends StatefulWidget {
   final LocaleController localeController;
   final HistoryRepository historyRepository;
   final LabsVitalsRepository? labsVitalsRepository;
+  final FamilyProfileController? profileController;
   final CloudBackupService cloudBackupService;
 
   @override
@@ -53,11 +56,14 @@ class _SettingsScreenState extends State<SettingsScreen>
   ReminderConfig _reminderConfig = const ReminderConfig();
   final ReminderPreferencesService _reminderService =
       const ReminderPreferencesService();
-  final FamilyProfileController _profileController = FamilyProfileController();
+  late final FamilyProfileController _profileController;
+  late final bool _ownsProfileController;
 
   @override
   void initState() {
     super.initState();
+    _ownsProfileController = widget.profileController == null;
+    _profileController = widget.profileController ?? FamilyProfileController();
     WidgetsBinding.instance.addObserver(this);
     _refreshPermissions();
     _loadCloudState();
@@ -66,7 +72,9 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Future<void> _loadExtras() async {
     final rem = await _reminderService.load();
-    await _profileController.load();
+    if (_ownsProfileController) {
+      await _profileController.load();
+    }
     if (!mounted) return;
     setState(() => _reminderConfig = rem);
   }
@@ -105,12 +113,14 @@ class _SettingsScreenState extends State<SettingsScreen>
       final bp = await labsRepo.loadBloodPressureReadings();
       final sugar = await labsRepo.loadBloodSugarReadings();
       final visuals = await widget.historyRepository.loadHistory();
+      final adultBody = await GrowthRepository().loadAdultMeasurements();
       await LabReportPdfGenerator.saveAndShareHolisticDoctorPdf(
         profileName: _profileController.value.name,
         labReports: labs,
         bpReadings: bp,
         sugarReadings: sugar,
         visualChecks: visuals,
+        adultBodyLogs: adultBody,
       );
     } catch (e) {
       if (!mounted) return;
@@ -237,7 +247,9 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _profileController.dispose();
+    if (_ownsProfileController) {
+      _profileController.dispose();
+    }
     super.dispose();
   }
 

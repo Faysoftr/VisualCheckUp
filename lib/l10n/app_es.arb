@@ -352,5 +352,11 @@
   "vitalsNewSugarTitle": "Nueva lectura de glucosa",
   "vitalsSugarValueField": "Glucosa (mg/dL)",
   "vitalsSaveSugarBtn": "Guardar glucosa",
-  "chartAddReadingHint": "Añade lecturas para ver el gráfico"
+  "chartAddReadingHint": "Añade lecturas para ver el gráfico",
+  "loginTermsTitle": "Términos de uso y aviso médico",
+  "loginTermsCheckbox": "Entiendo que VisualCheckUp no ofrece un diagnóstico médico definitivo, es solo orientativo y acepto los Términos de uso.",
+  "loginTermsRequiredMsg": "Debes aceptar los Términos de uso y el aviso médico antes de iniciar sesión.",
+  "loginTermsReadMore": "Leer términos",
+  "loginTermsModalBody": "• Sin diagnóstico médico: VisualCheckUp no es un dispositivo médico ni sustituye la evaluación o tratamiento de un profesional de la salud.\n\n• Solo orientación: Los controles visuales, resúmenes de análisis y escalas de IMC/crecimiento sirven únicamente para seguimiento personal y consulta médica.\n\n• Emergencias: Ante dolor intenso, dolor de pecho, falta de aire o síntomas urgentes, acude de inmediato a urgencias.\n\n• Privacidad: Tus datos se guardan de forma predeterminada solo en tu dispositivo.",
+  "loginTermsAcceptBtn": "He leído y acepto"
 }

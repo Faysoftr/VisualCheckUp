@@ -1188,4 +1188,25 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get chartAddReadingHint =>
       'Ajoutez des mesures pour voir le graphique';
+
+  @override
+  String get loginTermsTitle => 'Conditions d’utilisation et avis médical';
+
+  @override
+  String get loginTermsCheckbox =>
+      'Je comprends que VisualCheckUp ne pose pas de diagnostic médical définitif, qu’il est uniquement informatif, et j’accepte les conditions d’utilisation.';
+
+  @override
+  String get loginTermsRequiredMsg =>
+      'Veuillez accepter les conditions d’utilisation et l’avis médical avant de vous connecter.';
+
+  @override
+  String get loginTermsReadMore => 'Lire les conditions';
+
+  @override
+  String get loginTermsModalBody =>
+      '• Aucun diagnostic médical : VisualCheckUp n’est pas un dispositif médical et ne remplace pas la consultation d’un médecin.\n\n• Sensibilisation uniquement : Les contrôles visuels, bilans sanguins et courbes IMC/croissance servent uniquement au suivi personnel et à la préparation médicale.\n\n• Urgence : En cas de douleur thoracique, essoufflement ou symptôme grave, contactez immédiatement les urgences.\n\n• Confidentialité : Vos données restent par défaut uniquement sur votre appareil.';
+
+  @override
+  String get loginTermsAcceptBtn => 'J’ai lu et j’accepte';
 }

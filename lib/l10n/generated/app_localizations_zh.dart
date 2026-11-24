@@ -1143,4 +1143,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chartAddReadingHint => '添加记录以查看趋势图';
+
+  @override
+  String get loginTermsTitle => '使用条款与医疗声明';
+
+  @override
+  String get loginTermsCheckbox =>
+      '我理解 VisualCheckUp 不提供确切医疗诊断，仅用于初步健康参考，并同意使用条款。';
+
+  @override
+  String get loginTermsRequiredMsg => '登录前请先勾选并同意使用条款与医疗声明。';
+
+  @override
+  String get loginTermsReadMore => '查看条款';
+
+  @override
+  String get loginTermsModalBody =>
+      '• 非医疗诊断：VisualCheckUp 不是医疗器械，不能替代专业医生的诊断或治疗。\n\n• 仅供参考：视觉检查、化验单摘要与身高体重/BMI评估仅用于日常健康记录与就医准备。\n\n• 紧急提示：如出现胸痛、呼吸困难、剧烈疼痛或突发症状，请立即前往医院急诊。\n\n• 隐私保护：您的健康数据默认仅保存在本地设备，不会向第三方出售或共享。';
+
+  @override
+  String get loginTermsAcceptBtn => '我已阅读并同意';
 }

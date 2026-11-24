@@ -1175,4 +1175,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get chartAddReadingHint => 'أضف قياسات لعرض الرسم البياني';
+
+  @override
+  String get loginTermsTitle => 'شروط الاستخدام والتنبيه الطبي';
+
+  @override
+  String get loginTermsCheckbox =>
+      'أفهم أن VisualCheckUp لا يقدم تشخيصًا طبيًا نهائيًا وهو للتوعية الأولية فقط، وأوافق على شروط الاستخدام.';
+
+  @override
+  String get loginTermsRequiredMsg =>
+      'يرجى الموافقة على شروط الاستخدام والتنبيه الطبي قبل تسجيل الدخول.';
+
+  @override
+  String get loginTermsReadMore => 'قراءة الشروط';
+
+  @override
+  String get loginTermsModalBody =>
+      '• ليس تشخيصًا طبيًا: تطبيق VisualCheckUp ليس جهازًا طبيًا ولا يغني عن فحص الطبيب أو علاجه.\n\n• للتوعية فقط: الفحوصات البصرية وملخصات التحاليل ومؤشر كتلة الجسم والنمو مخصصة للمتابعة الشخصية والتحضير لزيارة الطبيب.\n\n• تنبيه طارئ: عند وجود ألم شديد في الصدر أو ضيق تنفس أو أعراض طارئة، توجه فورًا إلى الطوارئ.\n\n• الخصوصية: تُحفظ بياناتك الصحية افتراضيًا على جهازك فقط.';
+
+  @override
+  String get loginTermsAcceptBtn => 'قرأت وأوافق';
 }

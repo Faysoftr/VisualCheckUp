@@ -2233,6 +2233,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add readings to view chart'**
   String get chartAddReadingHint;
+
+  /// No description provided for @loginTermsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use & Medical Notice'**
+  String get loginTermsTitle;
+
+  /// No description provided for @loginTermsCheckbox.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand that VisualCheckUp does not provide a medical diagnosis and is for preliminary awareness only, and I accept the Terms of Use.'**
+  String get loginTermsCheckbox;
+
+  /// No description provided for @loginTermsRequiredMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Please accept the Terms of Use & Medical Notice before signing in.'**
+  String get loginTermsRequiredMsg;
+
+  /// No description provided for @loginTermsReadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read Terms'**
+  String get loginTermsReadMore;
+
+  /// No description provided for @loginTermsModalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'• Not a Medical Diagnosis: VisualCheckUp is not a medical device and does not diagnose, treat, or replace a licensed physician.\n\n• Awareness & Preparation Only: Visual checks, lab summaries, and growth/BMI scales are informational tools to help you prepare for doctor visits.\n\n• Emergency Warning: If you experience severe pain, chest pain, shortness of breath, sudden vision loss, or urgent symptoms, seek emergency medical care immediately.\n\n• Privacy: Your health records stay on your device by default and are never sold or shared with third parties.'**
+  String get loginTermsModalBody;
+
+  /// No description provided for @loginTermsAcceptBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'I Have Read & Accept'**
+  String get loginTermsAcceptBtn;
 }
 
 class _AppLocalizationsDelegate

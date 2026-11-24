@@ -8,6 +8,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
 import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/growth/data/growth_calculator.dart';
+import 'package:visualcheckup/features/growth/domain/growth_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 
@@ -288,6 +290,7 @@ class LabReportPdfGenerator {
     List<BloodPressureReading> bpReadings = const [],
     List<BloodSugarReading> sugarReadings = const [],
     List<AnalysisResult> visualChecks = const [],
+    List<AdultBodyMeasurement> adultBodyLogs = const [],
   }) async {
     final document = sf.PdfDocument();
     document.pageSettings.size = sf.PdfPageSize.a4;
@@ -321,6 +324,37 @@ class LabReportPdfGenerator {
       bounds: Rect.fromLTWH(14, y + 34, pageWidth - 28, 18),
     );
     y += 74;
+
+    // 0. Body Metrics & BMI Summary
+    if (adultBodyLogs.isNotEmpty) {
+      final latestBody = adultBodyLogs.first;
+      final bmi = latestBody.bmi;
+      final cat = GrowthCalculator.classifyAdultBmi(bmi);
+      final ideal = GrowthCalculator.idealAdultWeightRange(latestBody.heightCm);
+
+      final h = sf.PdfTextElement(
+        text: 'Boy, Kilo & Vücut Kitle İndeksi (VKİ)',
+        font: fonts.section,
+        brush: sf.PdfSolidBrush(primaryTeal),
+      ).draw(page: page, bounds: Rect.fromLTWH(0, y, pageWidth, 0))!;
+      page = h.page;
+      y = h.bounds.bottom + 6;
+
+      final bodyText =
+          'Son Ölçüm (${df.format(latestBody.recordedAt)}): '
+          '${latestBody.heightCm.toStringAsFixed(0)} cm • '
+          '${latestBody.weightKg.toStringAsFixed(1)} kg • '
+          'VKİ: ${bmi.toStringAsFixed(1)} kg/m² (${cat.label})\n'
+          'İdeal Kilo Aralığı: ${ideal.minKg.toStringAsFixed(1)} – ${ideal.maxKg.toStringAsFixed(1)} kg';
+
+      final res = sf.PdfTextElement(
+        text: bodyText,
+        font: fonts.body,
+        brush: sf.PdfSolidBrush(darkInk),
+      ).draw(page: page, bounds: Rect.fromLTWH(0, y, pageWidth, 0))!;
+      page = res.page;
+      y = res.bounds.bottom + 14;
+    }
 
     // 1. Blood Pressure & Blood Sugar Summary
     if (bpReadings.isNotEmpty || sugarReadings.isNotEmpty) {
@@ -449,6 +483,7 @@ class LabReportPdfGenerator {
     List<BloodPressureReading> bpReadings = const [],
     List<BloodSugarReading> sugarReadings = const [],
     List<AnalysisResult> visualChecks = const [],
+    List<AdultBodyMeasurement> adultBodyLogs = const [],
   }) async {
     final pdfBytes = await generateHolisticDoctorPdf(
       profileName: profileName,
@@ -456,6 +491,7 @@ class LabReportPdfGenerator {
       bpReadings: bpReadings,
       sugarReadings: sugarReadings,
       visualChecks: visualChecks,
+      adultBodyLogs: adultBodyLogs,
     );
     final dir = await getTemporaryDirectory();
     final dateTag = DateFormat('yyyy-MM-dd').format(DateTime.now());

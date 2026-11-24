@@ -352,5 +352,11 @@
   "vitalsNewSugarTitle": "Nouvelle mesure de glycémie",
   "vitalsSugarValueField": "Glycémie (mg/dL)",
   "vitalsSaveSugarBtn": "Enregistrer la glycémie",
-  "chartAddReadingHint": "Ajoutez des mesures pour voir le graphique"
+  "chartAddReadingHint": "Ajoutez des mesures pour voir le graphique",
+  "loginTermsTitle": "Conditions d’utilisation et avis médical",
+  "loginTermsCheckbox": "Je comprends que VisualCheckUp ne pose pas de diagnostic médical définitif, qu’il est uniquement informatif, et j’accepte les conditions d’utilisation.",
+  "loginTermsRequiredMsg": "Veuillez accepter les conditions d’utilisation et l’avis médical avant de vous connecter.",
+  "loginTermsReadMore": "Lire les conditions",
+  "loginTermsModalBody": "• Aucun diagnostic médical : VisualCheckUp n’est pas un dispositif médical et ne remplace pas la consultation d’un médecin.\n\n• Sensibilisation uniquement : Les contrôles visuels, bilans sanguins et courbes IMC/croissance servent uniquement au suivi personnel et à la préparation médicale.\n\n• Urgence : En cas de douleur thoracique, essoufflement ou symptôme grave, contactez immédiatement les urgences.\n\n• Confidentialité : Vos données restent par défaut uniquement sur votre appareil.",
+  "loginTermsAcceptBtn": "J’ai lu et j’accepte"
 }

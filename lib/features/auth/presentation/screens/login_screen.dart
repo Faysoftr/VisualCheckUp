@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
@@ -22,15 +23,102 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static const String _termsAcceptedKey = 'visualcheckup_terms_accepted_v1';
+
   AuthProviderType? _loadingProvider;
+  bool _termsAccepted = false;
+  bool _showTermsError = false;
 
   bool get _isLoading => _loadingProvider != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTermsState();
+  }
+
+  Future<void> _loadTermsState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accepted = prefs.getBool(_termsAcceptedKey) ?? false;
+    if (!mounted) return;
+    if (accepted) {
+      setState(() => _termsAccepted = true);
+    }
+  }
+
+  Future<void> _setTermsAccepted(bool value) async {
+    setState(() {
+      _termsAccepted = value;
+      if (value) _showTermsError = false;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_termsAcceptedKey, value);
+  }
+
+  Future<void> _showTermsDialog() async {
+    final l10n = context.l10n;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(
+              Icons.health_and_safety_outlined,
+              color: Theme.of(dialogContext).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.loginTermsTitle,
+                style: Theme.of(dialogContext).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            l10n.loginTermsModalBody,
+            style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
+                  height: 1.45,
+                ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.loginTermsAcceptBtn),
+          ),
+        ],
+      ),
+    );
+    if (accepted == true && mounted) {
+      await _setTermsAccepted(true);
+    }
+  }
 
   Future<void> _handleSignIn(
     AuthProviderType provider,
     Future<AuthUser> Function() action,
   ) async {
     if (_isLoading) return;
+    if (!_termsAccepted) {
+      setState(() => _showTermsError = true);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.loginTermsRequiredMsg),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
     setState(() => _loadingProvider = provider);
     try {
       final user = await action();
@@ -196,7 +284,94 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 1.35,
                                   ),
                                 ),
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 16),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: _showTermsError
+                                        ? colorScheme.errorContainer
+                                            .withValues(alpha: 0.35)
+                                        : colorScheme.surfaceContainerHighest
+                                            .withValues(alpha: 0.45),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: _showTermsError
+                                          ? colorScheme.error
+                                          : (_termsAccepted
+                                              ? colorScheme.primary
+                                                  .withValues(alpha: 0.5)
+                                              : colorScheme.outlineVariant),
+                                      width: _showTermsError ? 1.5 : 1.0,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      CheckboxListTile(
+                                        key: const Key('login_terms_checkbox'),
+                                        value: _termsAccepted,
+                                        onChanged: _isLoading
+                                            ? null
+                                            : (v) => _setTermsAccepted(
+                                                  v ?? false,
+                                                ),
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        contentPadding:
+                                            const EdgeInsets.fromLTRB(
+                                          8,
+                                          4,
+                                          12,
+                                          0,
+                                        ),
+                                        dense: true,
+                                        title: Text(
+                                          l10n.loginTermsCheckbox,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            height: 1.35,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment:
+                                            AlignmentDirectional.centerEnd,
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .only(
+                                            end: 8,
+                                            bottom: 4,
+                                          ),
+                                          child: TextButton.icon(
+                                            onPressed: _showTermsDialog,
+                                            style: TextButton.styleFrom(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 2,
+                                              ),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.description_outlined,
+                                              size: 15,
+                                            ),
+                                            label: Text(
+                                              l10n.loginTermsReadMore,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
                                 _AppleSignInButton(
                                   label: l10n.continueWithApple,
                                   isLoading: _loadingProvider ==

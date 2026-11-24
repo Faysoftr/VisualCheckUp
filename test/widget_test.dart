@@ -16,10 +16,24 @@ void main() {
       await tester.pumpWidget(const VisualCheckUpApp());
       await tester.pumpAndSettle();
 
-      // Login screen shows Apple, Google, and Guest options.
+      // Login screen shows Apple, Google, Guest options and mandatory terms checkbox.
       expect(find.text('Apple ile Devam Et'), findsOneWidget);
       expect(find.text('Google ile Devam Et'), findsOneWidget);
       expect(find.text('Misafir Olarak Devam Et'), findsOneWidget);
+      expect(find.byKey(const Key('login_terms_checkbox')), findsOneWidget);
+
+      // Attempting sign-in before accepting terms stays on LoginScreen.
+      await tester.ensureVisible(find.text('Misafir Olarak Devam Et'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Misafir Olarak Devam Et'));
+      await tester.pumpAndSettle();
+      expect(find.text('Misafir Olarak Devam Et'), findsOneWidget);
+
+      // Accept mandatory Terms of Use & Medical Notice, then enter as Guest.
+      await tester.ensureVisible(find.byKey(const Key('login_terms_checkbox')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('login_terms_checkbox')));
+      await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('Misafir Olarak Devam Et'));
       await tester.pumpAndSettle();

@@ -4,6 +4,7 @@ import 'package:visualcheckup/core/ai/gemini_vision_ai_client.dart';
 import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
@@ -42,6 +43,7 @@ class HomeScreen extends StatefulWidget {
     required this.onSignOut,
     required this.onDeleteAccount,
     this.localeController,
+    this.profileController,
     this.labsVitalsRepository,
   });
 
@@ -51,6 +53,7 @@ class HomeScreen extends StatefulWidget {
   final AuthUser currentUser;
   final ThemeController themeController;
   final LocaleController? localeController;
+  final FamilyProfileController? profileController;
   final VoidCallback onSignOut;
   final VoidCallback onDeleteAccount;
 
@@ -397,6 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
           localeController: controller,
           historyRepository: widget.historyRepository,
           labsVitalsRepository: _labsVitalsRepository,
+          profileController: widget.profileController,
         ),
       ),
     );

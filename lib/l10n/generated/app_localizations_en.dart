@@ -1189,4 +1189,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chartAddReadingHint => 'Add readings to view chart';
+
+  @override
+  String get loginTermsTitle => 'Terms of Use & Medical Notice';
+
+  @override
+  String get loginTermsCheckbox =>
+      'I understand that VisualCheckUp does not provide a medical diagnosis and is for preliminary awareness only, and I accept the Terms of Use.';
+
+  @override
+  String get loginTermsRequiredMsg =>
+      'Please accept the Terms of Use & Medical Notice before signing in.';
+
+  @override
+  String get loginTermsReadMore => 'Read Terms';
+
+  @override
+  String get loginTermsModalBody =>
+      '• Not a Medical Diagnosis: VisualCheckUp is not a medical device and does not diagnose, treat, or replace a licensed physician.\n\n• Awareness & Preparation Only: Visual checks, lab summaries, and growth/BMI scales are informational tools to help you prepare for doctor visits.\n\n• Emergency Warning: If you experience severe pain, chest pain, shortness of breath, sudden vision loss, or urgent symptoms, seek emergency medical care immediately.\n\n• Privacy: Your health records stay on your device by default and are never sold or shared with third parties.';
+
+  @override
+  String get loginTermsAcceptBtn => 'I Have Read & Accept';
 }

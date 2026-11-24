@@ -1181,4 +1181,25 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get chartAddReadingHint => 'চার্ট দেখতে পরিমাপ যোগ করুন';
+
+  @override
+  String get loginTermsTitle => 'ব্যবহারের শর্তাবলী ও চিকিৎসা সতর্কতা';
+
+  @override
+  String get loginTermsCheckbox =>
+      'আমি বুঝি যে VisualCheckUp কোনো চূড়ান্ত চিকিৎসা নির্ণয় দেয় না, এটি কেবল প্রাথমিক সচেতনতার জন্য, এবং আমি শর্তাবলীতে সম্মত।';
+
+  @override
+  String get loginTermsRequiredMsg =>
+      'সাইন ইন করার আগে অনুগ্রহ করে ব্যবহারের শর্তাবলী ও চিকিৎসা সতর্কতা অনুমোদন করুন।';
+
+  @override
+  String get loginTermsReadMore => 'শর্তাবলী পড়ুন';
+
+  @override
+  String get loginTermsModalBody =>
+      '• চিকিৎসা নির্ণয় নয়: VisualCheckUp কোনো মেডিকেল ডিভাইস নয় এবং চিকিৎসকের পরামর্শ বা চিকিৎসার বিকল্প নয়।\n\n• কেবল প্রাথমিক তথ্য: ভিজ্যুয়াল চেক, ল্যাব রিপোর্ট সারাংশ ও বিএমআই/বৃদ্ধি স্কেল কেবল ব্যক্তিগত পর্যবেক্ষণ ও ডাক্তার দেখানোর প্রস্তুতির জন্য।\n\n• জরুরি সতর্কতা: তীব্র বুকে ব্যথা, শ্বাসকষ্ট বা জরুরি উপসর্গ থাকলে অবিলম্বে জরুরি চিকিৎসা নিন।\n\n• গোপনীয়তা: আপনার স্বাস্থ্য তথ্য ডিফল্টভাবে কেবল আপনার ডিভাইসেই সংরক্ষিত থাকে।';
+
+  @override
+  String get loginTermsAcceptBtn => 'পড়েছি এবং সম্মত';
 }
