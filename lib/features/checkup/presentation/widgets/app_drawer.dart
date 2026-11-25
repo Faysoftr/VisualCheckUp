@@ -29,6 +29,9 @@ class AppDrawer extends StatelessWidget {
     this.onOpenQuickColorCard,
     this.onOpenLabReports,
     this.onOpenVitalsTracker,
+    this.onOpenMedicationReminders,
+    this.onOpenDietMenu,
+    this.onOpenAiCalorieScanner,
     this.onOpenGrowthBmi,
     this.onOpenChildrenGrowth,
   });
@@ -50,6 +53,9 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenQuickColorCard;
   final VoidCallback? onOpenLabReports;
   final VoidCallback? onOpenVitalsTracker;
+  final VoidCallback? onOpenMedicationReminders;
+  final VoidCallback? onOpenDietMenu;
+  final VoidCallback? onOpenAiCalorieScanner;
   final VoidCallback? onOpenGrowthBmi;
   final VoidCallback? onOpenChildrenGrowth;
 
@@ -299,6 +305,29 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 6),
                   const Divider(indent: 12, endIndent: 12),
                   _DrawerSectionLabel(l10n.menuSectionTracking),
+                  if (onOpenMedicationReminders != null)
+                    _DrawerTile(
+                      icon: Icons.alarm_on_rounded,
+                      label: l10n.medMenuTitle,
+                      accentColor: const Color(0xFFC8553D),
+                      onTap: () =>
+                          _closeAndRun(context, onOpenMedicationReminders!),
+                    ),
+                  if (onOpenDietMenu != null)
+                    _DrawerTile(
+                      icon: Icons.restaurant_menu_rounded,
+                      label: l10n.dietMenuTitle,
+                      accentColor: const Color(0xFF16A34A),
+                      onTap: () => _closeAndRun(context, onOpenDietMenu!),
+                    ),
+                  if (onOpenAiCalorieScanner != null)
+                    _DrawerTile(
+                      icon: Icons.camera_enhance_rounded,
+                      label: l10n.dietCalorieQuickTitle,
+                      accentColor: const Color(0xFFD97706),
+                      onTap: () =>
+                          _closeAndRun(context, onOpenAiCalorieScanner!),
+                    ),
                   if (onOpenFollowUpPlan != null)
                     _DrawerTile(
                       icon: Icons.event_repeat_rounded,

@@ -1535,4 +1535,542 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get labAllValuesNormalMsg =>
       'Todos los valores registrados en este informe están dentro del rango normal.';
+
+  @override
+  String get medTitle => 'Recordatorio y Alarmas de Medicación';
+
+  @override
+  String get medSubtitle => 'Controla pastillas, insulina y alarmas con foto';
+
+  @override
+  String get medMenuTitle => 'Alarmas de Medicación';
+
+  @override
+  String get medHomeCardEmpty =>
+      'Sin alarmas aún — añade tu primer recordatorio';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return '$taken/$total tomadas hoy';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return '$count alarmas activas';
+  }
+
+  @override
+  String get medTabToday => 'Hoy';
+
+  @override
+  String get medTabAll => 'Todas las Alarmas';
+
+  @override
+  String get medAddAlarm => 'Nueva Alarma';
+
+  @override
+  String get medEditAlarm => 'Editar Alarma';
+
+  @override
+  String get medCatPill => 'Medicamento / Pastilla';
+
+  @override
+  String get medCatDiabetes => 'Diabetes / Insulina';
+
+  @override
+  String get medCatBloodPressure => 'Presión Arterial';
+
+  @override
+  String get medCatVitamin => 'Vitamina / Suplemento';
+
+  @override
+  String get medCatDropsCream => 'Gotas / Crema';
+
+  @override
+  String get medCatCheckup => 'Medición / Control';
+
+  @override
+  String get medCatOther => 'Otro';
+
+  @override
+  String get medMealAnytime => 'Cualquier momento';
+
+  @override
+  String get medMealBefore => 'Antes de comer';
+
+  @override
+  String get medMealAfter => 'Después de comer';
+
+  @override
+  String get medMealWith => 'Con la comida';
+
+  @override
+  String get medMealBedtime => 'Antes de dormir';
+
+  @override
+  String get medDayMon => 'Lun';
+
+  @override
+  String get medDayTue => 'Mar';
+
+  @override
+  String get medDayWed => 'Mié';
+
+  @override
+  String get medDayThu => 'Jue';
+
+  @override
+  String get medDayFri => 'Vie';
+
+  @override
+  String get medDaySat => 'Sáb';
+
+  @override
+  String get medDaySun => 'Dom';
+
+  @override
+  String get medEveryDay => 'Todos los días';
+
+  @override
+  String get medWeekdays => 'Entre semana';
+
+  @override
+  String get medWeekends => 'Fines de semana';
+
+  @override
+  String get medFieldCategory => 'Categoría';
+
+  @override
+  String get medFieldName => 'Nombre del medicamento / recordatorio';
+
+  @override
+  String get medFieldNameHint =>
+      'Ej.: Metformina 1000 mg, Insulina nocturna...';
+
+  @override
+  String get medFieldNameRequired =>
+      'Por favor escribe el nombre del medicamento.';
+
+  @override
+  String get medFieldDosage => 'Dosis / Cantidad (Opcional)';
+
+  @override
+  String get medFieldDosageHint => 'Ej.: 1 comprimido, 12 unidades, 2 gotas';
+
+  @override
+  String get medFieldDescription =>
+      'Nota del recordatorio (Se ve en la alarma)';
+
+  @override
+  String get medFieldDescriptionHint =>
+      'Ej.: Tomar 30 min antes del desayuno con agua';
+
+  @override
+  String get medFieldMealTiming => 'Horario con comidas';
+
+  @override
+  String get medFieldTime => 'Hora de la alarma';
+
+  @override
+  String get medFieldDays => 'Días de repetición';
+
+  @override
+  String get medFieldPhoto => 'Foto del medicamento (Visible al sonar)';
+
+  @override
+  String get medTakePhoto => 'Tomar Foto';
+
+  @override
+  String get medPickGallery => 'Galería';
+
+  @override
+  String get medRemovePhoto => 'Quitar Foto';
+
+  @override
+  String get medPhotoHint =>
+      'Fotografía la caja o pluma de insulina para verla claramente cuando suene la alarma.';
+
+  @override
+  String get medSoundToggle => 'Sonido de alarma';
+
+  @override
+  String get medVibrateToggle => 'Vibración';
+
+  @override
+  String get medSaveAlarm => 'Guardar Alarma';
+
+  @override
+  String get medAlarmSaved => 'Alarma guardada y programada.';
+
+  @override
+  String get medAlarmDeleted => 'Alarma eliminada.';
+
+  @override
+  String get medDeleteConfirmTitle => 'Eliminar Alarma';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return '¿Eliminar permanentemente la alarma \"$title\"?';
+  }
+
+  @override
+  String get medStatusTaken => 'Tomada';
+
+  @override
+  String get medStatusSnoozed => 'Pospuesta';
+
+  @override
+  String get medStatusSkipped => 'Omitida';
+
+  @override
+  String get medStatusPending => 'Pendiente';
+
+  @override
+  String get medActionTaken => 'Ya la tomé';
+
+  @override
+  String get medActionSnooze => 'Posponer 10 min';
+
+  @override
+  String get medActionSkip => 'Omitir hoy';
+
+  @override
+  String get medActionUndo => 'Deshacer';
+
+  @override
+  String get medActionPreviewAlarm => 'Probar Alarma';
+
+  @override
+  String get medRingHeader => 'HORA DE TU MEDICINA';
+
+  @override
+  String get medRingNoteTitle => 'Nota del recordatorio';
+
+  @override
+  String get medRingNoPhoto => 'Sin foto de medicamento';
+
+  @override
+  String get medRingTapZoom => 'Toca la foto para ampliar';
+
+  @override
+  String get medRingSnoozedToast => 'Pospuesta por 10 minutos.';
+
+  @override
+  String get medRingTakenToast => '¡Excelente! Dosis de hoy registrada.';
+
+  @override
+  String get medTodayProgressTitle => 'Plan de medicación de hoy';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return 'Próxima alarma: $time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms =>
+      'No hay alarmas de medicación programadas para hoy.';
+
+  @override
+  String get medEmptyTitle => 'Aún no hay alarmas';
+
+  @override
+  String get medEmptyBody =>
+      'Añade alarmas con foto para pastillas de diabetes, insulina o presión. Al llegar la hora verás la foto del medicamento y tu nota en grande.';
+
+  @override
+  String get medQuickPresetDiabetes => 'Diabetes / Insulina';
+
+  @override
+  String get medQuickPresetBp => 'Presión arterial';
+
+  @override
+  String get medQuickPresetVitamin => 'Vitamina';
+
+  @override
+  String get dietMenuTitle => 'Dieta y Calorías IA';
+
+  @override
+  String get dietHomeCardTitle => 'Dieta y Menús';
+
+  @override
+  String get dietHomeCardEmpty => 'Dietas listas, seguimiento y peso';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return 'Día $day/$total • $percent% cumplimiento';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'Calcular Calorías del Plato IA';
+
+  @override
+  String get dietCalorieQuickSubtitle =>
+      'Fotografía tu plato para ver calorías y macros';
+
+  @override
+  String get dietTabActive => 'Mi Dieta';
+
+  @override
+  String get dietTabTemplates => 'Plantillas';
+
+  @override
+  String get dietTabWeight => 'Peso';
+
+  @override
+  String get dietTabCalories => 'Calorías IA';
+
+  @override
+  String get dietStartDiet => 'Empezar Dieta';
+
+  @override
+  String get dietRestartOrChange => 'Cambiar Dieta';
+
+  @override
+  String get dietEndDiet => 'Finalizar Dieta';
+
+  @override
+  String get dietEndDietConfirm =>
+      '¿Finalizar tu plan activo? Se conservará el historial de cumplimiento y peso.';
+
+  @override
+  String get dietNoActiveTitle => 'Aún sin dieta activa';
+
+  @override
+  String get dietNoActiveBody =>
+      'Elige entre plantillas listas (Mediterránea, Diabetes, DASH, Pérdida de Peso, Ayuno 16:8, Alta Proteína) y controla fechas, cumplimiento y peso.';
+
+  @override
+  String get dietBrowseTemplates => 'Ver Dietas Listas';
+
+  @override
+  String get dietStartDate => 'Fecha de inicio';
+
+  @override
+  String get dietEndDate => 'Fecha de fin';
+
+  @override
+  String get dietStartWeight => 'Peso inicial (kg)';
+
+  @override
+  String get dietTargetWeight => 'Peso objetivo (kg)';
+
+  @override
+  String get dietDailyCalorieTarget => 'Meta calórica diaria (kcal)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days días';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return 'Día $day de $total';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return 'Faltan $days días';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return 'Cumplimiento: $percent%';
+  }
+
+  @override
+  String get dietFollowed => 'Cumplí';
+
+  @override
+  String get dietNotFollowed => 'No cumplí';
+
+  @override
+  String get dietPending => 'Pendiente';
+
+  @override
+  String get dietSlotBreakfast => 'Desayuno';
+
+  @override
+  String get dietSlotMorningSnack => 'Merienda mañana';
+
+  @override
+  String get dietSlotLunch => 'Almuerzo';
+
+  @override
+  String get dietSlotAfternoonSnack => 'Merienda tarde';
+
+  @override
+  String get dietSlotDinner => 'Cena';
+
+  @override
+  String get dietAlternativesLabel => 'Alternativa';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return 'Meta de agua: $liters L';
+  }
+
+  @override
+  String get dietRulesTitle => 'Guía del plan';
+
+  @override
+  String get dietSampleMenuTitle => 'Menú diario de ejemplo';
+
+  @override
+  String get dietStartedToast => '¡Plan de dieta iniciado!';
+
+  @override
+  String get dietEndedToast => 'Plan de dieta finalizado.';
+
+  @override
+  String get dietWeightLogTitle => 'Control de Peso en Dieta';
+
+  @override
+  String get dietWeightAdd => 'Registrar Peso';
+
+  @override
+  String get dietWeightField => 'Peso actual (kg)';
+
+  @override
+  String get dietWeightNote => 'Nota (Opcional)';
+
+  @override
+  String get dietWeightNoteHint => 'Ej.: Peso en ayunas por la mañana';
+
+  @override
+  String get dietWeightEmpty =>
+      'Aún no hay registros de peso. Añade tu primer pesaje.';
+
+  @override
+  String get dietWeightCurrent => 'Actual';
+
+  @override
+  String get dietWeightTarget => 'Objetivo';
+
+  @override
+  String get dietWeightChange => 'Cambio';
+
+  @override
+  String get dietWeightSaved => 'Registro de peso guardado.';
+
+  @override
+  String get dietCalorieTitle => 'Calculadora de Calorías por Foto IA';
+
+  @override
+  String get dietCalorieSubtitle =>
+      'Funciona con o sin dieta — fotografía tu plato o escribe tu comida.';
+
+  @override
+  String get dietSnapPlateCamera => 'Fotografiar Plato';
+
+  @override
+  String get dietPickPlateGallery => 'Elegir de Galería';
+
+  @override
+  String get dietFoodDescLabel => 'Descripción / Porción (Opcional)';
+
+  @override
+  String get dietFoodDescHint =>
+      'Ej.: Pollo a la plancha, arroz integral, ensalada';
+
+  @override
+  String get dietCalculateFromText => 'Calcular desde Texto';
+
+  @override
+  String get dietAnalyzingPlate => 'Analizando calorías y nutrientes...';
+
+  @override
+  String get dietResultTitle => 'Análisis de Calorías y Macros';
+
+  @override
+  String get dietAiPoweredBadge => 'Gemini AI Visión';
+
+  @override
+  String get dietOnDeviceBadge => 'Estimación Inteligente Local';
+
+  @override
+  String get dietProtein => 'Proteína';
+
+  @override
+  String get dietCarbs => 'Carbohidratos';
+
+  @override
+  String get dietFat => 'Grasa';
+
+  @override
+  String get dietFiber => 'Fibra';
+
+  @override
+  String get dietPortionScale => 'Tamaño de porción';
+
+  @override
+  String get dietSaveMealLog => 'Guardar en Registro de Hoy';
+
+  @override
+  String get dietMealLoggedToast => 'Calorías de la comida guardadas.';
+
+  @override
+  String get dietTodayTotalCalories => 'Total de hoy';
+
+  @override
+  String get dietRecentScans => 'Comidas Analizadas';
+
+  @override
+  String get dietNoScansYet =>
+      'Aún no has analizado platos. Toma una foto de tu comida.';
+
+  @override
+  String dietHealthScore(int score) {
+    return 'Equilibrio: $score/10';
+  }
+
+  @override
+  String get dietTodayLabel => 'Hoy';
+
+  @override
+  String get medCatHerbalTea => 'Infusión / Té Herbal';
+
+  @override
+  String get medCatCustom => 'Otro (Manual)';
+
+  @override
+  String get medFieldCustomCategory => 'Nombre de categoría personalizada';
+
+  @override
+  String get medFieldCustomCategoryHint =>
+      'Ej.: Probiótico, Agua, Fisioterapia...';
+
+  @override
+  String get medQuickPresetHerbalTea => 'Infusión / Té';
+
+  @override
+  String get dietCreateCustom => 'Crear Mi Propia Dieta';
+
+  @override
+  String get dietCreateCustomSubtitle =>
+      'Introduce manualmente la dieta de tu nutricionista o tu menú';
+
+  @override
+  String get dietCustomNameLabel => 'Nombre de la dieta';
+
+  @override
+  String get dietCustomNameHint => 'Ej.: Plan del nutricionista, Mi menú...';
+
+  @override
+  String get dietCustomNameRequired =>
+      'Por favor escribe el nombre de la dieta.';
+
+  @override
+  String get dietCustomMealHint => '¿Qué comerás en esta comida?';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'kcal (opcional)';
+
+  @override
+  String get dietCustomAtLeastOneMeal => 'Introduce al menos una comida.';
+
+  @override
+  String get dietCustomTemplatesTitle => 'Mis Planes Personalizados';
+
+  @override
+  String get dietReadyTemplatesTitle => 'Plantillas de Dieta Listas';
 }

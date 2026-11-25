@@ -5,8 +5,10 @@ import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 import 'package:visualcheckup/features/checkup/domain/quick_color_swatch.dart';
+import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
+import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations_tr.dart';
@@ -548,3 +550,126 @@ String localizedClinicalMetricKey(String rawKey, AppLocalizations l10n) {
       return rawKey;
   }
 }
+
+extension MedicationCategoryL10n on MedicationCategory {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MedicationCategory.pill:
+        return l10n.medCatPill;
+      case MedicationCategory.diabetesInsulin:
+        return l10n.medCatDiabetes;
+      case MedicationCategory.bloodPressure:
+        return l10n.medCatBloodPressure;
+      case MedicationCategory.herbalTea:
+        return l10n.medCatHerbalTea;
+      case MedicationCategory.vitamin:
+        return l10n.medCatVitamin;
+      case MedicationCategory.dropsCream:
+        return l10n.medCatDropsCream;
+      case MedicationCategory.checkup:
+        return l10n.medCatCheckup;
+      case MedicationCategory.other:
+        return l10n.medCatCustom;
+    }
+  }
+}
+
+extension MealTimingL10n on MealTiming {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MealTiming.anytime:
+        return l10n.medMealAnytime;
+      case MealTiming.beforeMeal:
+        return l10n.medMealBefore;
+      case MealTiming.afterMeal:
+        return l10n.medMealAfter;
+      case MealTiming.withMeal:
+        return l10n.medMealWith;
+      case MealTiming.bedtime:
+        return l10n.medMealBedtime;
+    }
+  }
+}
+
+extension MedicationDoseStatusL10n on MedicationDoseStatus {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MedicationDoseStatus.taken:
+        return l10n.medStatusTaken;
+      case MedicationDoseStatus.snoozed:
+        return l10n.medStatusSnoozed;
+      case MedicationDoseStatus.skipped:
+        return l10n.medStatusSkipped;
+    }
+  }
+}
+
+extension MedicationReminderL10n on MedicationReminder {
+  String localizedCategoryLabel(AppLocalizations l10n) {
+    if (customCategoryLabel.trim().isNotEmpty) {
+      return customCategoryLabel.trim();
+    }
+    return category.localizedLabel(l10n);
+  }
+
+  static String localizedWeekdayShort(int isoWeekday, AppLocalizations l10n) {
+    switch (isoWeekday) {
+      case 1:
+        return l10n.medDayMon;
+      case 2:
+        return l10n.medDayTue;
+      case 3:
+        return l10n.medDayWed;
+      case 4:
+        return l10n.medDayThu;
+      case 5:
+        return l10n.medDayFri;
+      case 6:
+        return l10n.medDaySat;
+      case 7:
+        return l10n.medDaySun;
+      default:
+        return l10n.medDayMon;
+    }
+  }
+
+  String localizedDaysSummary(AppLocalizations l10n) {
+    if (isEveryDay) return l10n.medEveryDay;
+    if (isWeekdaysOnly) return l10n.medWeekdays;
+    if (isWeekendsOnly) return l10n.medWeekends;
+    final sorted = weekdays.toList()..sort();
+    return sorted.map((d) => localizedWeekdayShort(d, l10n)).join(', ');
+  }
+}
+
+extension MealSlotL10n on MealSlot {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MealSlot.breakfast:
+        return l10n.dietSlotBreakfast;
+      case MealSlot.morningSnack:
+        return l10n.dietSlotMorningSnack;
+      case MealSlot.lunch:
+        return l10n.dietSlotLunch;
+      case MealSlot.afternoonSnack:
+        return l10n.dietSlotAfternoonSnack;
+      case MealSlot.dinner:
+        return l10n.dietSlotDinner;
+    }
+  }
+}
+
+extension MealComplianceStatusL10n on MealComplianceStatus {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MealComplianceStatus.followed:
+        return l10n.dietFollowed;
+      case MealComplianceStatus.notFollowed:
+        return l10n.dietNotFollowed;
+      case MealComplianceStatus.pending:
+        return l10n.dietPending;
+    }
+  }
+}
+
+

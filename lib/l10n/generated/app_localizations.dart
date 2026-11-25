@@ -2851,6 +2851,1002 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All recorded values in this report are within the reference range.'**
   String get labAllValuesNormalMsg;
+
+  /// No description provided for @medTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication & Alarm Reminder'**
+  String get medTitle;
+
+  /// No description provided for @medSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track pills, insulin & health alarms with photos'**
+  String get medSubtitle;
+
+  /// No description provided for @medMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Alarms'**
+  String get medMenuTitle;
+
+  /// No description provided for @medHomeCardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No alarms yet — add your first reminder'**
+  String get medHomeCardEmpty;
+
+  /// No description provided for @medHomeCardTodaySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{taken}/{total} taken today'**
+  String medHomeCardTodaySummary(int taken, int total);
+
+  /// No description provided for @medHomeCardActiveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active alarms'**
+  String medHomeCardActiveCount(int count);
+
+  /// No description provided for @medTabToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get medTabToday;
+
+  /// No description provided for @medTabAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Alarms'**
+  String get medTabAll;
+
+  /// No description provided for @medAddAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Alarm'**
+  String get medAddAlarm;
+
+  /// No description provided for @medEditAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Alarm'**
+  String get medEditAlarm;
+
+  /// No description provided for @medCatPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine / Pill'**
+  String get medCatPill;
+
+  /// No description provided for @medCatDiabetes.
+  ///
+  /// In en, this message translates to:
+  /// **'Diabetes Pill / Insulin'**
+  String get medCatDiabetes;
+
+  /// No description provided for @medCatBloodPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure Med'**
+  String get medCatBloodPressure;
+
+  /// No description provided for @medCatVitamin.
+  ///
+  /// In en, this message translates to:
+  /// **'Vitamin / Supplement'**
+  String get medCatVitamin;
+
+  /// No description provided for @medCatDropsCream.
+  ///
+  /// In en, this message translates to:
+  /// **'Eye Drops / Cream'**
+  String get medCatDropsCream;
+
+  /// No description provided for @medCatCheckup.
+  ///
+  /// In en, this message translates to:
+  /// **'Vitals / Checkup'**
+  String get medCatCheckup;
+
+  /// No description provided for @medCatOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get medCatOther;
+
+  /// No description provided for @medMealAnytime.
+  ///
+  /// In en, this message translates to:
+  /// **'Anytime'**
+  String get medMealAnytime;
+
+  /// No description provided for @medMealBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Before meal'**
+  String get medMealBefore;
+
+  /// No description provided for @medMealAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'After meal'**
+  String get medMealAfter;
+
+  /// No description provided for @medMealWith.
+  ///
+  /// In en, this message translates to:
+  /// **'With meal'**
+  String get medMealWith;
+
+  /// No description provided for @medMealBedtime.
+  ///
+  /// In en, this message translates to:
+  /// **'At bedtime'**
+  String get medMealBedtime;
+
+  /// No description provided for @medDayMon.
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get medDayMon;
+
+  /// No description provided for @medDayTue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get medDayTue;
+
+  /// No description provided for @medDayWed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get medDayWed;
+
+  /// No description provided for @medDayThu.
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get medDayThu;
+
+  /// No description provided for @medDayFri.
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get medDayFri;
+
+  /// No description provided for @medDaySat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get medDaySat;
+
+  /// No description provided for @medDaySun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get medDaySun;
+
+  /// No description provided for @medEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Day'**
+  String get medEveryDay;
+
+  /// No description provided for @medWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays'**
+  String get medWeekdays;
+
+  /// No description provided for @medWeekends.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekends'**
+  String get medWeekends;
+
+  /// No description provided for @medFieldCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get medFieldCategory;
+
+  /// No description provided for @medFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine / Reminder Name'**
+  String get medFieldName;
+
+  /// No description provided for @medFieldNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Metformin 1000 mg, Evening Insulin...'**
+  String get medFieldNameHint;
+
+  /// No description provided for @medFieldNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a medicine or reminder name.'**
+  String get medFieldNameRequired;
+
+  /// No description provided for @medFieldDosage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage / Amount (Optional)'**
+  String get medFieldDosage;
+
+  /// No description provided for @medFieldDosageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 1 tablet, 12 units, 2 drops'**
+  String get medFieldDosageHint;
+
+  /// No description provided for @medFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Note (Shown on Alarm)'**
+  String get medFieldDescription;
+
+  /// No description provided for @medFieldDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Take 30 min before breakfast with a full glass of water'**
+  String get medFieldDescriptionHint;
+
+  /// No description provided for @medFieldMealTiming.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Timing'**
+  String get medFieldMealTiming;
+
+  /// No description provided for @medFieldTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm Time'**
+  String get medFieldTime;
+
+  /// No description provided for @medFieldDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Days'**
+  String get medFieldDays;
+
+  /// No description provided for @medFieldPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine Photo (Shown When Alarm Rings)'**
+  String get medFieldPhoto;
+
+  /// No description provided for @medTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get medTakePhoto;
+
+  /// No description provided for @medPickGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'From Gallery'**
+  String get medPickGallery;
+
+  /// No description provided for @medRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get medRemovePhoto;
+
+  /// No description provided for @medPhotoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap the medicine box or insulin pen so it displays clearly when the alarm rings.'**
+  String get medPhotoHint;
+
+  /// No description provided for @medSoundToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm Sound'**
+  String get medSoundToggle;
+
+  /// No description provided for @medVibrateToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration'**
+  String get medVibrateToggle;
+
+  /// No description provided for @medSaveAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Alarm'**
+  String get medSaveAlarm;
+
+  /// No description provided for @medAlarmSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm saved and scheduled.'**
+  String get medAlarmSaved;
+
+  /// No description provided for @medAlarmDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm deleted.'**
+  String get medAlarmDeleted;
+
+  /// No description provided for @medDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Alarm'**
+  String get medDeleteConfirmTitle;
+
+  /// No description provided for @medDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete the \"{title}\" alarm?'**
+  String medDeleteConfirmBody(String title);
+
+  /// No description provided for @medStatusTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get medStatusTaken;
+
+  /// No description provided for @medStatusSnoozed.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed'**
+  String get medStatusSnoozed;
+
+  /// No description provided for @medStatusSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get medStatusSkipped;
+
+  /// No description provided for @medStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get medStatusPending;
+
+  /// No description provided for @medActionTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'I Took It'**
+  String get medActionTaken;
+
+  /// No description provided for @medActionSnooze.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 10 min'**
+  String get medActionSnooze;
+
+  /// No description provided for @medActionSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Today'**
+  String get medActionSkip;
+
+  /// No description provided for @medActionUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get medActionUndo;
+
+  /// No description provided for @medActionPreviewAlarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Alarm'**
+  String get medActionPreviewAlarm;
+
+  /// No description provided for @medRingHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'MEDICATION TIME'**
+  String get medRingHeader;
+
+  /// No description provided for @medRingNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Note'**
+  String get medRingNoteTitle;
+
+  /// No description provided for @medRingNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'No medicine photo added'**
+  String get medRingNoPhoto;
+
+  /// No description provided for @medRingTapZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap photo to zoom'**
+  String get medRingTapZoom;
+
+  /// No description provided for @medRingSnoozedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed for 10 minutes.'**
+  String get medRingSnoozedToast;
+
+  /// No description provided for @medRingTakenToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! Today\'s dose marked as taken.'**
+  String get medRingTakenToast;
+
+  /// No description provided for @medTodayProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Medication Plan'**
+  String get medTodayProgressTitle;
+
+  /// No description provided for @medNextAlarmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next alarm: {time} • {title}'**
+  String medNextAlarmLabel(String time, String title);
+
+  /// No description provided for @medNoTodayAlarms.
+  ///
+  /// In en, this message translates to:
+  /// **'No medication alarms scheduled for today.'**
+  String get medNoTodayAlarms;
+
+  /// No description provided for @medEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Medication Alarms Yet'**
+  String get medEmptyTitle;
+
+  /// No description provided for @medEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo-supported alarms for diabetes pills, insulin, blood pressure meds, or daily checks. When it\'s time, the medicine photo and your note appear clearly on screen.'**
+  String get medEmptyBody;
+
+  /// No description provided for @medQuickPresetDiabetes.
+  ///
+  /// In en, this message translates to:
+  /// **'Diabetes / Insulin'**
+  String get medQuickPresetDiabetes;
+
+  /// No description provided for @medQuickPresetBp.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure'**
+  String get medQuickPresetBp;
+
+  /// No description provided for @medQuickPresetVitamin.
+  ///
+  /// In en, this message translates to:
+  /// **'Vitamin'**
+  String get medQuickPresetVitamin;
+
+  /// No description provided for @dietMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet & AI Calorie Tracker'**
+  String get dietMenuTitle;
+
+  /// No description provided for @dietHomeCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet & Meal Plans'**
+  String get dietHomeCardTitle;
+
+  /// No description provided for @dietHomeCardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made diets, compliance & weight tracking'**
+  String get dietHomeCardEmpty;
+
+  /// No description provided for @dietHomeCardActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}/{total} • {percent}% compliance'**
+  String dietHomeCardActive(int day, int total, int percent);
+
+  /// No description provided for @dietCalorieQuickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Plate Calorie Counter'**
+  String get dietCalorieQuickTitle;
+
+  /// No description provided for @dietCalorieQuickSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap your plate photo to calculate calories & macros'**
+  String get dietCalorieQuickSubtitle;
+
+  /// No description provided for @dietTabActive.
+  ///
+  /// In en, this message translates to:
+  /// **'My Diet'**
+  String get dietTabActive;
+
+  /// No description provided for @dietTabTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet Plans'**
+  String get dietTabTemplates;
+
+  /// No description provided for @dietTabWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get dietTabWeight;
+
+  /// No description provided for @dietTabCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Calories'**
+  String get dietTabCalories;
+
+  /// No description provided for @dietStartDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Diet'**
+  String get dietStartDiet;
+
+  /// No description provided for @dietRestartOrChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Diet'**
+  String get dietRestartOrChange;
+
+  /// No description provided for @dietEndDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'End Diet'**
+  String get dietEndDiet;
+
+  /// No description provided for @dietEndDietConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'End your active diet plan? Your compliance and weight records will be kept.'**
+  String get dietEndDietConfirm;
+
+  /// No description provided for @dietNoActiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Active Diet Yet'**
+  String get dietNoActiveTitle;
+
+  /// No description provided for @dietNoActiveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from ready-made clinical diet templates (Mediterranean, Diabetes-Friendly, DASH, Weight Loss, 16:8 Fasting, High Protein) and track daily compliance & weight.'**
+  String get dietNoActiveBody;
+
+  /// No description provided for @dietBrowseTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Ready-Made Diets'**
+  String get dietBrowseTemplates;
+
+  /// No description provided for @dietStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get dietStartDate;
+
+  /// No description provided for @dietEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get dietEndDate;
+
+  /// No description provided for @dietStartWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Weight (kg)'**
+  String get dietStartWeight;
+
+  /// No description provided for @dietTargetWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Weight (kg)'**
+  String get dietTargetWeight;
+
+  /// No description provided for @dietDailyCalorieTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Calorie Target (kcal)'**
+  String get dietDailyCalorieTarget;
+
+  /// No description provided for @dietDurationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String dietDurationDays(int days);
+
+  /// No description provided for @dietDayProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of {total}'**
+  String dietDayProgress(int day, int total);
+
+  /// No description provided for @dietDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String dietDaysLeft(int days);
+
+  /// No description provided for @dietComplianceRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance: {percent}%'**
+  String dietComplianceRate(int percent);
+
+  /// No description provided for @dietFollowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get dietFollowed;
+
+  /// No description provided for @dietNotFollowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get dietNotFollowed;
+
+  /// No description provided for @dietPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get dietPending;
+
+  /// No description provided for @dietSlotBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get dietSlotBreakfast;
+
+  /// No description provided for @dietSlotMorningSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Snack'**
+  String get dietSlotMorningSnack;
+
+  /// No description provided for @dietSlotLunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch'**
+  String get dietSlotLunch;
+
+  /// No description provided for @dietSlotAfternoonSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon Snack'**
+  String get dietSlotAfternoonSnack;
+
+  /// No description provided for @dietSlotDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get dietSlotDinner;
+
+  /// No description provided for @dietAlternativesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternative'**
+  String get dietAlternativesLabel;
+
+  /// No description provided for @dietWaterTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Water target: {liters} L'**
+  String dietWaterTarget(String liters);
+
+  /// No description provided for @dietRulesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Guidelines'**
+  String get dietRulesTitle;
+
+  /// No description provided for @dietSampleMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample Daily Menu'**
+  String get dietSampleMenuTitle;
+
+  /// No description provided for @dietStartedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet plan started! Stay consistent.'**
+  String get dietStartedToast;
+
+  /// No description provided for @dietEndedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Active diet plan ended.'**
+  String get dietEndedToast;
+
+  /// No description provided for @dietWeightLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet Weight Tracking'**
+  String get dietWeightLogTitle;
+
+  /// No description provided for @dietWeightAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Weight'**
+  String get dietWeightAdd;
+
+  /// No description provided for @dietWeightField.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Weight (kg)'**
+  String get dietWeightField;
+
+  /// No description provided for @dietWeightNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (Optional)'**
+  String get dietWeightNote;
+
+  /// No description provided for @dietWeightNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Morning fasting weight'**
+  String get dietWeightNoteHint;
+
+  /// No description provided for @dietWeightEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No weight entries yet. Log your first weight to track your trend.'**
+  String get dietWeightEmpty;
+
+  /// No description provided for @dietWeightCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get dietWeightCurrent;
+
+  /// No description provided for @dietWeightTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get dietWeightTarget;
+
+  /// No description provided for @dietWeightChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get dietWeightChange;
+
+  /// No description provided for @dietWeightSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight entry saved.'**
+  String get dietWeightSaved;
+
+  /// No description provided for @dietCalorieTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Plate Calorie Calculator'**
+  String get dietCalorieTitle;
+
+  /// No description provided for @dietCalorieSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Works with or without a diet — snap a plate photo or describe your meal.'**
+  String get dietCalorieSubtitle;
+
+  /// No description provided for @dietSnapPlateCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap Plate Photo'**
+  String get dietSnapPlateCamera;
+
+  /// No description provided for @dietPickPlateGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from Gallery'**
+  String get dietPickPlateGallery;
+
+  /// No description provided for @dietFoodDescLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Description / Portion (Optional)'**
+  String get dietFoodDescLabel;
+
+  /// No description provided for @dietFoodDescHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Grilled chicken, bulgur pilaf, green salad, ayran'**
+  String get dietFoodDescHint;
+
+  /// No description provided for @dietCalculateFromText.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate from Text'**
+  String get dietCalculateFromText;
+
+  /// No description provided for @dietAnalyzingPlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing plate calories & macros...'**
+  String get dietAnalyzingPlate;
+
+  /// No description provided for @dietResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calorie & Macro Analysis'**
+  String get dietResultTitle;
+
+  /// No description provided for @dietAiPoweredBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini AI Vision'**
+  String get dietAiPoweredBadge;
+
+  /// No description provided for @dietOnDeviceBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart On-Device Estimate'**
+  String get dietOnDeviceBadge;
+
+  /// No description provided for @dietProtein.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get dietProtein;
+
+  /// No description provided for @dietCarbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbs'**
+  String get dietCarbs;
+
+  /// No description provided for @dietFat.
+  ///
+  /// In en, this message translates to:
+  /// **'Fat'**
+  String get dietFat;
+
+  /// No description provided for @dietFiber.
+  ///
+  /// In en, this message translates to:
+  /// **'Fiber'**
+  String get dietFiber;
+
+  /// No description provided for @dietPortionScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Portion Size'**
+  String get dietPortionScale;
+
+  /// No description provided for @dietSaveMealLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Today\'s Log'**
+  String get dietSaveMealLog;
+
+  /// No description provided for @dietMealLoggedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal calories saved to today\'s log.'**
+  String get dietMealLoggedToast;
+
+  /// No description provided for @dietTodayTotalCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Total'**
+  String get dietTodayTotalCalories;
+
+  /// No description provided for @dietRecentScans.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned Meals'**
+  String get dietRecentScans;
+
+  /// No description provided for @dietNoScansYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No meals scanned yet. Take a photo of your plate to estimate calories.'**
+  String get dietNoScansYet;
+
+  /// No description provided for @dietHealthScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance Score: {score}/10'**
+  String dietHealthScore(int score);
+
+  /// No description provided for @dietTodayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get dietTodayLabel;
+
+  /// No description provided for @medCatHerbalTea.
+  ///
+  /// In en, this message translates to:
+  /// **'Herbal Tea'**
+  String get medCatHerbalTea;
+
+  /// No description provided for @medCatCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Other (Custom)'**
+  String get medCatCustom;
+
+  /// No description provided for @medFieldCustomCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Category Name'**
+  String get medFieldCustomCategory;
+
+  /// No description provided for @medFieldCustomCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Probiotic, Herbal Blend, Water, Physio...'**
+  String get medFieldCustomCategoryHint;
+
+  /// No description provided for @medQuickPresetHerbalTea.
+  ///
+  /// In en, this message translates to:
+  /// **'Herbal Tea'**
+  String get medQuickPresetHerbalTea;
+
+  /// No description provided for @dietCreateCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Create My Own Diet'**
+  String get dietCreateCustom;
+
+  /// No description provided for @dietCreateCustomSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your dietitian\'s list or your own meal plan manually'**
+  String get dietCreateCustomSubtitle;
+
+  /// No description provided for @dietCustomNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet Plan Name'**
+  String get dietCustomNameLabel;
+
+  /// No description provided for @dietCustomNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My Dietitian Plan, Custom Healthy Menu...'**
+  String get dietCustomNameHint;
+
+  /// No description provided for @dietCustomNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a diet plan name.'**
+  String get dietCustomNameRequired;
+
+  /// No description provided for @dietCustomMealHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What is planned for this meal?'**
+  String get dietCustomMealHint;
+
+  /// No description provided for @dietCustomMealCaloriesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'kcal (optional)'**
+  String get dietCustomMealCaloriesHint;
+
+  /// No description provided for @dietCustomAtLeastOneMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter at least one meal.'**
+  String get dietCustomAtLeastOneMeal;
+
+  /// No description provided for @dietCustomTemplatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Custom Diet Plans'**
+  String get dietCustomTemplatesTitle;
+
+  /// No description provided for @dietReadyTemplatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-Made Diet Templates'**
+  String get dietReadyTemplatesTitle;
 }
 
 class _AppLocalizationsDelegate

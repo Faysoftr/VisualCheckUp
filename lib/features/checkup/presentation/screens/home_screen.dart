@@ -21,12 +21,19 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/category_car
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/diet/data/diet_repository.dart';
+import 'package:visualcheckup/features/diet/domain/diet_models.dart';
+import 'package:visualcheckup/features/diet/presentation/screens/diet_hub_screen.dart';
 import 'package:visualcheckup/features/growth/presentation/screens/growth_bmi_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/screens/lab_reports_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/screens/vitals_tracker_screen.dart';
+import 'package:visualcheckup/features/medications/data/medication_alarm_scheduler.dart';
+import 'package:visualcheckup/features/medications/data/medication_reminder_repository.dart';
+import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
+import 'package:visualcheckup/features/medications/presentation/screens/medication_reminders_screen.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
@@ -43,11 +50,17 @@ class HomeScreen extends StatefulWidget {
     this.localeController,
     this.profileController,
     this.labsVitalsRepository,
+    this.medicationRepository,
+    this.dietRepository,
+    this.alarmScheduler,
   });
 
   final ColorHealthAnalyzer analyzer;
   final HistoryRepository historyRepository;
   final LabsVitalsRepository? labsVitalsRepository;
+  final MedicationReminderRepository? medicationRepository;
+  final DietRepository? dietRepository;
+  final MedicationAlarmScheduler? alarmScheduler;
   final AuthUser currentUser;
   final ThemeController themeController;
   final LocaleController? localeController;
@@ -62,14 +75,38 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final LabsVitalsRepository _labsVitalsRepository;
+  late final MedicationReminderRepository _medicationRepository;
+  late final DietRepository _dietRepository;
   List<AnalysisResult> _allHistory = const [];
   List<LabReportRecord> _labReports = const [];
   List<BloodPressureReading> _bpReadings = const [];
   List<BloodSugarReading> _sugarReadings = const [];
+  List<MedicationReminder> _medReminders = const [];
+  Map<String, MedicationDoseLog> _todayMedStatuses = const {};
+  ActiveDietPlan? _activeDietPlan;
+  DietComplianceSummary _dietCompliance = const DietComplianceSummary(
+    followedCount: 0,
+    notFollowedCount: 0,
+  );
   Set<FollowUpTrack> _enabledTracks = FollowUpTrackX.defaultEnabled();
 
   int get _labReportCount => _labReports.length;
   int get _vitalsCount => _bpReadings.length + _sugarReadings.length;
+
+  List<MedicationReminder> get _todayMedReminders {
+    final weekday = DateTime.now().weekday;
+    return _medReminders
+        .where((r) => r.enabled && r.isScheduledForWeekday(weekday))
+        .toList();
+  }
+
+  int get _todayMedTakenCount => _todayMedReminders
+      .where(
+        (r) => _todayMedStatuses[r.id]?.status == MedicationDoseStatus.taken,
+      )
+      .length;
+
+  int get _activeMedCount => _medReminders.where((r) => r.enabled).length;
 
   List<AnalysisResult> get _recent => _allHistory.take(3).toList();
 
@@ -78,6 +115,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _labsVitalsRepository =
         widget.labsVitalsRepository ?? LabsVitalsRepository();
+    _medicationRepository =
+        widget.medicationRepository ?? MedicationReminderRepository();
+    _dietRepository = widget.dietRepository ?? DietRepository();
     _bootstrap();
   }
 
@@ -101,6 +141,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final labs = await _labsVitalsRepository.loadLabReports();
     final bp = await _labsVitalsRepository.loadBloodPressureReadings();
     final sugar = await _labsVitalsRepository.loadBloodSugarReadings();
+    final meds = await _medicationRepository.loadReminders();
+    final medStatuses = await _medicationRepository.getTodayStatusMap();
+    final activeDiet = await _dietRepository.loadActivePlan();
+    final dietSummary = activeDiet != null
+        ? await _dietRepository.getComplianceSummary(activeDiet.id)
+        : const DietComplianceSummary(followedCount: 0, notFollowedCount: 0);
     if (!mounted) return;
     setState(() {
       _allHistory = history;
@@ -108,7 +154,35 @@ class _HomeScreenState extends State<HomeScreen> {
       _labReports = labs;
       _bpReadings = bp;
       _sugarReadings = sugar;
+      _medReminders = meds;
+      _todayMedStatuses = medStatuses;
+      _activeDietPlan = activeDiet;
+      _dietCompliance = dietSummary;
     });
+  }
+
+  Future<void> _openDietHub({int initialTabIndex = 0}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DietHubScreen(
+          repository: _dietRepository,
+          initialTabIndex: initialTabIndex,
+        ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openMedicationReminders() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MedicationRemindersScreen(
+          repository: _medicationRepository,
+          scheduler: widget.alarmScheduler,
+        ),
+      ),
+    );
+    await _loadDashboardData();
   }
 
   Future<void> _openLabReports() async {
@@ -401,6 +475,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenSkinModule: () => _openCategory(CheckCategory.skinCondition),
         onOpenLabReports: _openLabReports,
         onOpenVitalsTracker: _openVitalsTracker,
+        onOpenMedicationReminders: _openMedicationReminders,
+        onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
+        onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenQuickColorCard: _openQuickColorCardPicker,
@@ -474,6 +551,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          _FrostedCircleAction(
+            isDark: isDark,
+            child: IconButton(
+              key: const Key('home_med_alarm_appbar_button'),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 38, height: 38),
+              onPressed: _openMedicationReminders,
+              tooltip: l10n.medMenuTitle,
+              icon: const Icon(
+                Icons.alarm_on_rounded,
+                size: 20,
+                color: Color(0xFFC8553D),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           _FrostedCircleAction(
             isDark: isDark,
             child: IconButton(
@@ -592,6 +685,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? null
                             : () => _startTrack(nextTrack.track),
                       ),
+                      const SizedBox(height: 12),
+
+                      // 2b. Prominent Medication & Alarm Reminder Banner Card
+                      _MedicationQuickBanner(
+                        title: l10n.medTitle,
+                        subtitle: _activeMedCount == 0
+                            ? l10n.medHomeCardEmpty
+                            : _todayMedReminders.isNotEmpty
+                                ? l10n.medHomeCardTodaySummary(
+                                    _todayMedTakenCount,
+                                    _todayMedReminders.length,
+                                  )
+                                : l10n.medHomeCardActiveCount(_activeMedCount),
+                        badgeCount: _activeMedCount,
+                        onTap: _openMedicationReminders,
+                      ),
                       const SizedBox(height: 18),
 
                       // 3. Editorial Section Header for Categories
@@ -687,6 +796,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               title: 'Çocuklarım',
                               subtitle: '0–18 yaş boy & kilo skalası',
                               onTap: () => _openGrowthBmi(initialTabIndex: 1),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 13),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.restaurant_menu_rounded,
+                              accentColor: const Color(0xFF16A34A),
+                              title: l10n.dietHomeCardTitle,
+                              subtitle: _activeDietPlan == null
+                                  ? l10n.dietHomeCardEmpty
+                                  : l10n.dietHomeCardActive(
+                                      _activeDietPlan!
+                                          .currentDayNumber(DateTime.now()),
+                                      _activeDietPlan!.totalDays,
+                                      _dietCompliance.compliancePercent,
+                                    ),
+                              onTap: () => _openDietHub(
+                                initialTabIndex:
+                                    _activeDietPlan == null ? 1 : 0,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 13),
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.camera_enhance_rounded,
+                              accentColor: const Color(0xFFD97706),
+                              title: l10n.dietCalorieQuickTitle,
+                              subtitle: l10n.dietCalorieQuickSubtitle,
+                              onTap: () => _openDietHub(initialTabIndex: 3),
                             ),
                           ),
                         ],
@@ -1646,3 +1789,132 @@ class _DashboardModuleCard extends StatelessWidget {
     );
   }
 }
+
+class _MedicationQuickBanner extends StatelessWidget {
+  const _MedicationQuickBanner({
+    required this.title,
+    required this.subtitle,
+    required this.badgeCount,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final int badgeCount;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    const accent = Color(0xFFC8553D);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF1A2424).withValues(alpha: 0.94)
+            : Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: accent.withValues(alpha: isDark ? 0.35 : 0.22),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: isDark ? 0.16 : 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          key: const Key('home_medication_quick_banner'),
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        accent,
+                        accent.withValues(alpha: 0.78),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.alarm_on_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15.5,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (badgeCount > 0) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$badgeCount',
+                      style: const TextStyle(
+                        color: accent,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

@@ -1522,4 +1522,536 @@ class AppLocalizationsUr extends AppLocalizations {
   @override
   String get labAllValuesNormalMsg =>
       'اس رپورٹ میں درج تمام نتائج معمول کی حد میں ہیں۔';
+
+  @override
+  String get medTitle => 'ادویات اور الارم ریمائنڈر';
+
+  @override
+  String get medSubtitle =>
+      'تصویر کے ساتھ گولیوں، انسولین اور چیک اپ الارم کا ریکارڈ رکھیں';
+
+  @override
+  String get medMenuTitle => 'ادویات کے الارم';
+
+  @override
+  String get medHomeCardEmpty =>
+      'ابھی کوئی الارم نہیں — پہلا ریمائنڈر شامل کریں';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return 'آج $taken/$total لی گئیں';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return '$count فعال الارم';
+  }
+
+  @override
+  String get medTabToday => 'آج';
+
+  @override
+  String get medTabAll => 'تمام الارم';
+
+  @override
+  String get medAddAlarm => 'نیا الارم شامل کریں';
+
+  @override
+  String get medEditAlarm => 'الارم میں ترمیم';
+
+  @override
+  String get medCatPill => 'دوا / گولی';
+
+  @override
+  String get medCatDiabetes => 'شوگر کی دوا / انسولین';
+
+  @override
+  String get medCatBloodPressure => 'بلڈ پریشر کی دوا';
+
+  @override
+  String get medCatVitamin => 'وٹامن / سپلیمنٹ';
+
+  @override
+  String get medCatDropsCream => 'آنکھ کے قطرے / کریم';
+
+  @override
+  String get medCatCheckup => 'پیمائش / چیک اپ';
+
+  @override
+  String get medCatOther => 'دیگر';
+
+  @override
+  String get medMealAnytime => 'کسی بھی وقت';
+
+  @override
+  String get medMealBefore => 'کھانے سے پہلے';
+
+  @override
+  String get medMealAfter => 'کھانے کے بعد';
+
+  @override
+  String get medMealWith => 'کھانے کے ساتھ';
+
+  @override
+  String get medMealBedtime => 'سونے سے پہلے';
+
+  @override
+  String get medDayMon => 'پیر';
+
+  @override
+  String get medDayTue => 'منگل';
+
+  @override
+  String get medDayWed => 'بدھ';
+
+  @override
+  String get medDayThu => 'جمعرات';
+
+  @override
+  String get medDayFri => 'جمعہ';
+
+  @override
+  String get medDaySat => 'ہفتہ';
+
+  @override
+  String get medDaySun => 'اتوار';
+
+  @override
+  String get medEveryDay => 'روزانہ';
+
+  @override
+  String get medWeekdays => 'کاروباری دن';
+
+  @override
+  String get medWeekends => 'ہفتہ و اتوار';
+
+  @override
+  String get medFieldCategory => 'زمرہ';
+
+  @override
+  String get medFieldName => 'دوا / ریمائنڈر کا نام';
+
+  @override
+  String get medFieldNameHint => 'مثلاً: میٹفارمن 1000، شام کی انسولین...';
+
+  @override
+  String get medFieldNameRequired => 'براہ کرم دوا یا ریمائنڈر کا نام لکھیں۔';
+
+  @override
+  String get medFieldDosage => 'خوراک / مقدار (اختیاری)';
+
+  @override
+  String get medFieldDosageHint => 'مثلاً: 1 گولی، 12 یونٹ، 2 قطرے';
+
+  @override
+  String get medFieldDescription => 'ریمائنڈر نوٹ (الارم پر نظر آئے گا)';
+
+  @override
+  String get medFieldDescriptionHint =>
+      'مثلاً: ناشتے سے 30 منٹ پہلے پانی کے ساتھ لیں';
+
+  @override
+  String get medFieldMealTiming => 'کھانے کا وقت';
+
+  @override
+  String get medFieldTime => 'الارم کا وقت';
+
+  @override
+  String get medFieldDays => 'تکرار کے دن';
+
+  @override
+  String get medFieldPhoto => 'دوا کی تصویر (الارم بجنے پر نظر آئے گی)';
+
+  @override
+  String get medTakePhoto => 'تصویر کھینچیں';
+
+  @override
+  String get medPickGallery => 'گیلری سے';
+
+  @override
+  String get medRemovePhoto => 'تصویر ہٹائیں';
+
+  @override
+  String get medPhotoHint =>
+      'دوا کے ڈبے یا انسولین پین کی تصویر لیں تاکہ الارم کے وقت اسکرین پر واضح نظر آئے۔';
+
+  @override
+  String get medSoundToggle => 'الارم کی آواز';
+
+  @override
+  String get medVibrateToggle => 'وائبریشن';
+
+  @override
+  String get medSaveAlarm => 'الارم محفوظ کریں';
+
+  @override
+  String get medAlarmSaved => 'الارم محفوظ اور شیڈول ہو گیا۔';
+
+  @override
+  String get medAlarmDeleted => 'الارم حذف کر دیا گیا۔';
+
+  @override
+  String get medDeleteConfirmTitle => 'الارم حذف کریں';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return 'کیا آپ \"$title\" الارم مستقل طور پر حذف کرنا چاہتے ہیں؟';
+  }
+
+  @override
+  String get medStatusTaken => 'لے لی گئی';
+
+  @override
+  String get medStatusSnoozed => 'مؤخر';
+
+  @override
+  String get medStatusSkipped => 'چھوڑ دی گئی';
+
+  @override
+  String get medStatusPending => 'باقی ہے';
+
+  @override
+  String get medActionTaken => 'میں نے دوا لے لی';
+
+  @override
+  String get medActionSnooze => '10 منٹ مؤخر';
+
+  @override
+  String get medActionSkip => 'آج چھوڑ دیں';
+
+  @override
+  String get medActionUndo => 'واپس لیں';
+
+  @override
+  String get medActionPreviewAlarm => 'الارم چیک کریں';
+
+  @override
+  String get medRingHeader => 'دوا کا وقت';
+
+  @override
+  String get medRingNoteTitle => 'ریمائنڈر نوٹ';
+
+  @override
+  String get medRingNoPhoto => 'دوا کی تصویر شامل نہیں کی گئی';
+
+  @override
+  String get medRingTapZoom => 'بڑا دیکھنے کے لیے تصویر پر ٹیپ کریں';
+
+  @override
+  String get medRingSnoozedToast => '10 منٹ کے لیے مؤخر کر دیا گیا۔';
+
+  @override
+  String get medRingTakenToast => 'بہت خوب! آج کی خوراک درج ہو گئی۔';
+
+  @override
+  String get medTodayProgressTitle => 'آج کی ادویات کا شیڈول';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return 'اگلا الارم: $time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms => 'آج کے لیے کوئی دوا کا الارم مقرر نہیں ہے۔';
+
+  @override
+  String get medEmptyTitle => 'ابھی کوئی دوا کا الارم نہیں';
+
+  @override
+  String get medEmptyBody =>
+      'شوگر، انسولین یا بلڈ پریشر کی دوا کے لیے تصویر والے الارم شامل کریں۔ وقت ہونے پر دوا کی تصویر اور آپ کا نوٹ اسکرین پر واضح نظر آئے گا۔';
+
+  @override
+  String get medQuickPresetDiabetes => 'شوگر / انسولین';
+
+  @override
+  String get medQuickPresetBp => 'بلڈ پریشر';
+
+  @override
+  String get medQuickPresetVitamin => 'وٹامن';
+
+  @override
+  String get dietMenuTitle => 'ڈائٹ اور AI کیلوری ٹریکر';
+
+  @override
+  String get dietHomeCardTitle => 'ڈائٹ اور غذائی پلان';
+
+  @override
+  String get dietHomeCardEmpty => 'تیار ڈائٹ پلانز، پابندی اور وزن کا ریکارڈ';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return 'دن $day/$total • $percent% پابندی';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'AI پلیٹ کیلوری حساب';
+
+  @override
+  String get dietCalorieQuickSubtitle =>
+      'پلیٹ کی تصویر کھینچ کر کیلوریز اور غذائیت جانیں';
+
+  @override
+  String get dietTabActive => 'میری ڈائٹ';
+
+  @override
+  String get dietTabTemplates => 'تیار ڈائٹس';
+
+  @override
+  String get dietTabWeight => 'وزن';
+
+  @override
+  String get dietTabCalories => 'AI کیلوریز';
+
+  @override
+  String get dietStartDiet => 'ڈائٹ شروع کریں';
+
+  @override
+  String get dietRestartOrChange => 'ڈائٹ تبدیل کریں';
+
+  @override
+  String get dietEndDiet => 'ڈائٹ ختم کریں';
+
+  @override
+  String get dietEndDietConfirm =>
+      'کیا آپ فعال ڈائٹ ختم کرنا چاہتے ہیں؟ آپ کا وزن اور پابندی کا ریکارڈ محفوظ رہے گا۔';
+
+  @override
+  String get dietNoActiveTitle => 'ابھی کوئی فعال ڈائٹ نہیں';
+
+  @override
+  String get dietNoActiveBody =>
+      'تیار ڈائٹ ٹیمپلیٹس میں سے انتخاب کریں اور روزانہ کی پابندی و وزن کو ٹریک کریں۔';
+
+  @override
+  String get dietBrowseTemplates => 'تیار ڈائٹس دیکھیں';
+
+  @override
+  String get dietStartDate => 'شروع کی تاریخ';
+
+  @override
+  String get dietEndDate => 'اختتام کی تاریخ';
+
+  @override
+  String get dietStartWeight => 'ابتدائی وزن (کلو)';
+
+  @override
+  String get dietTargetWeight => 'ہدف وزن (کلو)';
+
+  @override
+  String get dietDailyCalorieTarget => 'روزانہ کیلوری ہدف (kcal)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days دن';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return 'دن $day از $total';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return '$days دن باقی';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return 'پابندی: $percent%';
+  }
+
+  @override
+  String get dietFollowed => 'عمل کیا';
+
+  @override
+  String get dietNotFollowed => 'عمل نہیں کیا';
+
+  @override
+  String get dietPending => 'باقی ہے';
+
+  @override
+  String get dietSlotBreakfast => 'ناشتہ';
+
+  @override
+  String get dietSlotMorningSnack => 'صبح کا اسنیک';
+
+  @override
+  String get dietSlotLunch => 'دوپہر کا کھانا';
+
+  @override
+  String get dietSlotAfternoonSnack => 'شام کا اسنیک';
+
+  @override
+  String get dietSlotDinner => 'رات کا کھانا';
+
+  @override
+  String get dietAlternativesLabel => 'متبادل';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return 'پانی کا ہدف: $liters لیٹر';
+  }
+
+  @override
+  String get dietRulesTitle => 'ڈائٹ کے اصول';
+
+  @override
+  String get dietSampleMenuTitle => 'روزانہ مینو کا نمونہ';
+
+  @override
+  String get dietStartedToast => 'ڈائٹ پلان شروع ہو گیا!';
+
+  @override
+  String get dietEndedToast => 'فعال ڈائٹ پلان ختم ہو گیا۔';
+
+  @override
+  String get dietWeightLogTitle => 'ڈائٹ وزن ٹریکنگ';
+
+  @override
+  String get dietWeightAdd => 'وزن شامل کریں';
+
+  @override
+  String get dietWeightField => 'موجودہ وزن (کلو)';
+
+  @override
+  String get dietWeightNote => 'نوٹ (اختیاری)';
+
+  @override
+  String get dietWeightNoteHint => 'مثلاً: صبح خالی پیٹ وزن';
+
+  @override
+  String get dietWeightEmpty => 'ابھی کوئی وزن درج نہیں۔ پہلا وزن شامل کریں۔';
+
+  @override
+  String get dietWeightCurrent => 'موجودہ';
+
+  @override
+  String get dietWeightTarget => 'ہدف';
+
+  @override
+  String get dietWeightChange => 'تبدیلی';
+
+  @override
+  String get dietWeightSaved => 'وزن محفوظ ہو گیا۔';
+
+  @override
+  String get dietCalorieTitle => 'AI پلیٹ کیلوری کیلکولیٹر';
+
+  @override
+  String get dietCalorieSubtitle =>
+      'ڈائٹ کے بغیر بھی استعمال کریں — پلیٹ کی تصویر لیں یا کھانا لکھیں۔';
+
+  @override
+  String get dietSnapPlateCamera => 'پلیٹ کی تصویر کھینچیں';
+
+  @override
+  String get dietPickPlateGallery => 'گیلری سے منتخب کریں';
+
+  @override
+  String get dietFoodDescLabel => 'کھانے کی تفصیل / مقدار (اختیاری)';
+
+  @override
+  String get dietFoodDescHint => 'مثلاً: گرلڈ چکن، سلاد، دہی، روٹی';
+
+  @override
+  String get dietCalculateFromText => 'متن سے حساب کریں';
+
+  @override
+  String get dietAnalyzingPlate => 'کیلوریز اور غذائیت کا تجزیہ جاری ہے...';
+
+  @override
+  String get dietResultTitle => 'کیلوری اور غذائیت کا تجزیہ';
+
+  @override
+  String get dietAiPoweredBadge => 'Gemini AI وژن';
+
+  @override
+  String get dietOnDeviceBadge => 'سمارٹ مقامی اندازہ';
+
+  @override
+  String get dietProtein => 'پروٹین';
+
+  @override
+  String get dietCarbs => 'کاربس';
+
+  @override
+  String get dietFat => 'چکنائی';
+
+  @override
+  String get dietFiber => 'فائبر';
+
+  @override
+  String get dietPortionScale => 'مقدار';
+
+  @override
+  String get dietSaveMealLog => 'آج کے ریکارڈ میں محفوظ کریں';
+
+  @override
+  String get dietMealLoggedToast =>
+      'کھانے کی کیلوریز آج کے ریکارڈ میں شامل ہو گئیں۔';
+
+  @override
+  String get dietTodayTotalCalories => 'آج کا کل';
+
+  @override
+  String get dietRecentScans => 'تجزیہ شدہ کھانے';
+
+  @override
+  String get dietNoScansYet => 'ابھی کوئی کھانا اسکین نہیں کیا گیا۔';
+
+  @override
+  String dietHealthScore(int score) {
+    return 'توازن اسکور: $score/10';
+  }
+
+  @override
+  String get dietTodayLabel => 'آج';
+
+  @override
+  String get medCatHerbalTea => 'ہربل چائے / قہوہ';
+
+  @override
+  String get medCatCustom => 'دیگر (خود لکھیں)';
+
+  @override
+  String get medFieldCustomCategory => 'اپنے زمرے کا نام لکھیں';
+
+  @override
+  String get medFieldCustomCategoryHint => 'مثلاً: پروبائیوٹک، پانی، ورزش...';
+
+  @override
+  String get medQuickPresetHerbalTea => 'ہربل چائے';
+
+  @override
+  String get dietCreateCustom => 'اپنی ڈائٹ خود بنائیں';
+
+  @override
+  String get dietCreateCustomSubtitle =>
+      'اپنے ڈائٹیشن کا پلان یا اپنی مرضی کے کھانے خود درج کریں';
+
+  @override
+  String get dietCustomNameLabel => 'ڈائٹ کا نام';
+
+  @override
+  String get dietCustomNameHint => 'مثلاً: میرا ڈائٹ پلان، ذاتی مینو...';
+
+  @override
+  String get dietCustomNameRequired => 'براہ کرم ڈائٹ کا نام لکھیں۔';
+
+  @override
+  String get dietCustomMealHint => 'اس وقت کیا کھائیں گے؟';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'kcal (اختیاری)';
+
+  @override
+  String get dietCustomAtLeastOneMeal =>
+      'براہ کرم کم از کم ایک کھانا درج کریں۔';
+
+  @override
+  String get dietCustomTemplatesTitle => 'میرے ذاتی ڈائٹ پلانز';
+
+  @override
+  String get dietReadyTemplatesTitle => 'تیار ڈائٹ ٹیمپلیٹس';
 }

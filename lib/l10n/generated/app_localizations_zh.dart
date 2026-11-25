@@ -1479,4 +1479,525 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get labAllValuesNormalMsg => '本次报告记录的所有指标均在正常参考范围内。';
+
+  @override
+  String get medTitle => '用药与健康闹钟提醒';
+
+  @override
+  String get medSubtitle => '带药品照片的吃药、胰岛素及测量闹钟';
+
+  @override
+  String get medMenuTitle => '用药闹钟';
+
+  @override
+  String get medHomeCardEmpty => '暂无闹钟 — 添加第一个用药提醒';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return '今日已服 $taken/$total';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return '$count 个启用闹钟';
+  }
+
+  @override
+  String get medTabToday => '今日';
+
+  @override
+  String get medTabAll => '全部闹钟';
+
+  @override
+  String get medAddAlarm => '添加新闹钟';
+
+  @override
+  String get medEditAlarm => '编辑闹钟';
+
+  @override
+  String get medCatPill => '药物 / 药片';
+
+  @override
+  String get medCatDiabetes => '降糖药 / 胰岛素';
+
+  @override
+  String get medCatBloodPressure => '降压药';
+
+  @override
+  String get medCatVitamin => '维生素 / 保健品';
+
+  @override
+  String get medCatDropsCream => '眼药水 / 药膏';
+
+  @override
+  String get medCatCheckup => '测量 / 复查';
+
+  @override
+  String get medCatOther => '其他';
+
+  @override
+  String get medMealAnytime => '不限时间';
+
+  @override
+  String get medMealBefore => '饭前';
+
+  @override
+  String get medMealAfter => '饭后';
+
+  @override
+  String get medMealWith => '随餐';
+
+  @override
+  String get medMealBedtime => '睡前';
+
+  @override
+  String get medDayMon => '周一';
+
+  @override
+  String get medDayTue => '周二';
+
+  @override
+  String get medDayWed => '周三';
+
+  @override
+  String get medDayThu => '周四';
+
+  @override
+  String get medDayFri => '周五';
+
+  @override
+  String get medDaySat => '周六';
+
+  @override
+  String get medDaySun => '周日';
+
+  @override
+  String get medEveryDay => '每天';
+
+  @override
+  String get medWeekdays => '工作日';
+
+  @override
+  String get medWeekends => '周末';
+
+  @override
+  String get medFieldCategory => '分类';
+
+  @override
+  String get medFieldName => '药品 / 提醒名称';
+
+  @override
+  String get medFieldNameHint => '例如：二甲双胍 1000mg、晚间胰岛素...';
+
+  @override
+  String get medFieldNameRequired => '请输入药品或提醒名称。';
+
+  @override
+  String get medFieldDosage => '剂量 / 用量（可选）';
+
+  @override
+  String get medFieldDosageHint => '例如：1片、12单位、2滴';
+
+  @override
+  String get medFieldDescription => '提醒说明（闹钟响时显示）';
+
+  @override
+  String get medFieldDescriptionHint => '例如：早餐前30分钟温水送服';
+
+  @override
+  String get medFieldMealTiming => '服用时机';
+
+  @override
+  String get medFieldTime => '闹钟时间';
+
+  @override
+  String get medFieldDays => '重复日期';
+
+  @override
+  String get medFieldPhoto => '药品照片（闹钟响时大图显示）';
+
+  @override
+  String get medTakePhoto => '拍照';
+
+  @override
+  String get medPickGallery => '从相册选';
+
+  @override
+  String get medRemovePhoto => '移除照片';
+
+  @override
+  String get medPhotoHint => '拍下药盒或胰岛素笔，到点响铃时会在屏幕上清晰显示。';
+
+  @override
+  String get medSoundToggle => '闹钟铃声';
+
+  @override
+  String get medVibrateToggle => '震动提醒';
+
+  @override
+  String get medSaveAlarm => '保存闹钟';
+
+  @override
+  String get medAlarmSaved => '闹钟已保存并设置。';
+
+  @override
+  String get medAlarmDeleted => '闹钟已删除。';
+
+  @override
+  String get medDeleteConfirmTitle => '删除闹钟';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return '确定要永久删除“$title”闹钟吗？';
+  }
+
+  @override
+  String get medStatusTaken => '已服用';
+
+  @override
+  String get medStatusSnoozed => '已推迟';
+
+  @override
+  String get medStatusSkipped => '已跳过';
+
+  @override
+  String get medStatusPending => '待服用';
+
+  @override
+  String get medActionTaken => '已服用';
+
+  @override
+  String get medActionSnooze => '10分钟后再响';
+
+  @override
+  String get medActionSkip => '今日跳过';
+
+  @override
+  String get medActionUndo => '撤销';
+
+  @override
+  String get medActionPreviewAlarm => '测试闹钟';
+
+  @override
+  String get medRingHeader => '用药时间到了';
+
+  @override
+  String get medRingNoteTitle => '提醒说明';
+
+  @override
+  String get medRingNoPhoto => '未添加药品照片';
+
+  @override
+  String get medRingTapZoom => '点击照片查看大图';
+
+  @override
+  String get medRingSnoozedToast => '已推迟10分钟。';
+
+  @override
+  String get medRingTakenToast => '太棒了！今日剂量已标记为已服用。';
+
+  @override
+  String get medTodayProgressTitle => '今日用药计划';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return '下一个闹钟：$time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms => '今天没有安排用药闹钟。';
+
+  @override
+  String get medEmptyTitle => '还没有用药闹钟';
+
+  @override
+  String get medEmptyBody => '为降糖药、胰岛素或降压药添加带照片的闹钟。到点后药品照片和说明会清晰显示在屏幕上。';
+
+  @override
+  String get medQuickPresetDiabetes => '降糖 / 胰岛素';
+
+  @override
+  String get medQuickPresetBp => '降压药';
+
+  @override
+  String get medQuickPresetVitamin => '维生素';
+
+  @override
+  String get dietMenuTitle => '饮食计划与AI热量追踪';
+
+  @override
+  String get dietHomeCardTitle => '饮食与减脂方案';
+
+  @override
+  String get dietHomeCardEmpty => '现成食谱、打卡与体重追踪';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return '第$day/$total天 • 达标率$percent%';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'AI 拍照算热量';
+
+  @override
+  String get dietCalorieQuickSubtitle => '拍下餐盘照片，智能估算热量与三大营养素';
+
+  @override
+  String get dietTabActive => '我的饮食';
+
+  @override
+  String get dietTabTemplates => '现成方案';
+
+  @override
+  String get dietTabWeight => '体重追踪';
+
+  @override
+  String get dietTabCalories => 'AI 算热量';
+
+  @override
+  String get dietStartDiet => '开始饮食计划';
+
+  @override
+  String get dietRestartOrChange => '更换方案';
+
+  @override
+  String get dietEndDiet => '结束计划';
+
+  @override
+  String get dietEndDietConfirm => '确定结束当前饮食计划吗？您的打卡与体重记录将保留。';
+
+  @override
+  String get dietNoActiveTitle => '暂无进行中的饮食计划';
+
+  @override
+  String get dietNoActiveBody =>
+      '从地中海、控糖、DASH降压、均衡减脂、16:8轻断食或高蛋白模板中选择，追踪每日达标与体重变化。';
+
+  @override
+  String get dietBrowseTemplates => '浏览现成方案';
+
+  @override
+  String get dietStartDate => '开始日期';
+
+  @override
+  String get dietEndDate => '结束日期';
+
+  @override
+  String get dietStartWeight => '起始体重 (kg)';
+
+  @override
+  String get dietTargetWeight => '目标体重 (kg)';
+
+  @override
+  String get dietDailyCalorieTarget => '每日热量目标 (kcal)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days 天';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return '第 $day / $total 天';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return '剩余 $days 天';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return '达标率：$percent%';
+  }
+
+  @override
+  String get dietFollowed => '已遵守';
+
+  @override
+  String get dietNotFollowed => '未遵守';
+
+  @override
+  String get dietPending => '待记录';
+
+  @override
+  String get dietSlotBreakfast => '早餐';
+
+  @override
+  String get dietSlotMorningSnack => '上午加餐';
+
+  @override
+  String get dietSlotLunch => '午餐';
+
+  @override
+  String get dietSlotAfternoonSnack => '下午加餐';
+
+  @override
+  String get dietSlotDinner => '晚餐';
+
+  @override
+  String get dietAlternativesLabel => '可替换';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return '饮水目标：$liters 升';
+  }
+
+  @override
+  String get dietRulesTitle => '方案要点';
+
+  @override
+  String get dietSampleMenuTitle => '示例一日食谱';
+
+  @override
+  String get dietStartedToast => '饮食计划已开启！加油！';
+
+  @override
+  String get dietEndedToast => '当前饮食计划已结束。';
+
+  @override
+  String get dietWeightLogTitle => '饮食期体重追踪';
+
+  @override
+  String get dietWeightAdd => '记录体重';
+
+  @override
+  String get dietWeightField => '当前体重 (kg)';
+
+  @override
+  String get dietWeightNote => '备注（可选）';
+
+  @override
+  String get dietWeightNoteHint => '例如：早晨空腹称重';
+
+  @override
+  String get dietWeightEmpty => '暂无体重记录，添加第一条体重数据开始追踪。';
+
+  @override
+  String get dietWeightCurrent => '当前';
+
+  @override
+  String get dietWeightTarget => '目标';
+
+  @override
+  String get dietWeightChange => '变化';
+
+  @override
+  String get dietWeightSaved => '体重已保存。';
+
+  @override
+  String get dietCalorieTitle => 'AI 餐盘热量计算器';
+
+  @override
+  String get dietCalorieSubtitle => '无需开启饮食计划也能单独使用 — 拍下餐盘或输入菜名。';
+
+  @override
+  String get dietSnapPlateCamera => '拍摄餐盘';
+
+  @override
+  String get dietPickPlateGallery => '从相册选择';
+
+  @override
+  String get dietFoodDescLabel => '食物说明 / 分量（可选）';
+
+  @override
+  String get dietFoodDescHint => '例如：烤鸡胸肉、杂粮饭、蔬菜沙拉、酸奶';
+
+  @override
+  String get dietCalculateFromText => '按文字估算';
+
+  @override
+  String get dietAnalyzingPlate => '正在分析餐盘热量与营养成分...';
+
+  @override
+  String get dietResultTitle => '热量与营养分析';
+
+  @override
+  String get dietAiPoweredBadge => 'Gemini AI 视觉识别';
+
+  @override
+  String get dietOnDeviceBadge => '本地智能估算';
+
+  @override
+  String get dietProtein => '蛋白质';
+
+  @override
+  String get dietCarbs => '碳水';
+
+  @override
+  String get dietFat => '脂肪';
+
+  @override
+  String get dietFiber => '膳食纤维';
+
+  @override
+  String get dietPortionScale => '分量比例';
+
+  @override
+  String get dietSaveMealLog => '保存到今日记录';
+
+  @override
+  String get dietMealLoggedToast => '已将本餐热量加入今日记录。';
+
+  @override
+  String get dietTodayTotalCalories => '今日累计';
+
+  @override
+  String get dietRecentScans => '已识别餐食';
+
+  @override
+  String get dietNoScansYet => '还没有餐盘记录，拍一张餐盘照片即可算热量。';
+
+  @override
+  String dietHealthScore(int score) {
+    return '均衡评分：$score/10';
+  }
+
+  @override
+  String get dietTodayLabel => '今天';
+
+  @override
+  String get medCatHerbalTea => '花草茶 / 养生茶';
+
+  @override
+  String get medCatCustom => '其他（手动输入）';
+
+  @override
+  String get medFieldCustomCategory => '自定义分类名称';
+
+  @override
+  String get medFieldCustomCategoryHint => '例如：益生菌、喝水、理疗锻炼...';
+
+  @override
+  String get medQuickPresetHerbalTea => '花草茶';
+
+  @override
+  String get dietCreateCustom => '创建我的专属饮食';
+
+  @override
+  String get dietCreateCustomSubtitle => '手动录入营养师食谱或自定义每日餐单';
+
+  @override
+  String get dietCustomNameLabel => '饮食计划名称';
+
+  @override
+  String get dietCustomNameHint => '例如：营养师食谱、我的减脂餐...';
+
+  @override
+  String get dietCustomNameRequired => '请输入饮食计划名称。';
+
+  @override
+  String get dietCustomMealHint => '这顿计划吃什么？';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'kcal（可选）';
+
+  @override
+  String get dietCustomAtLeastOneMeal => '请至少填写一顿餐食。';
+
+  @override
+  String get dietCustomTemplatesTitle => '我的自定义方案';
+
+  @override
+  String get dietReadyTemplatesTitle => '现成饮食模板';
 }

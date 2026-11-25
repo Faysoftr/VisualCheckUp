@@ -1519,4 +1519,534 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get labAllValuesNormalMsg =>
       'جميع القيم المسجلة في هذا التقرير ضمن النطاق المرجعي.';
+
+  @override
+  String get medTitle => 'منبّه الأدوية والجرعات';
+
+  @override
+  String get medSubtitle => 'تابع الحبوب والإنسولين والمنبهات بالصور';
+
+  @override
+  String get medMenuTitle => 'منبّهات الأدوية';
+
+  @override
+  String get medHomeCardEmpty => 'لا توجد منبهات بعد — أضف أول تذكير';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return 'تم أخذ $taken/$total اليوم';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return '$count منبهات نشطة';
+  }
+
+  @override
+  String get medTabToday => 'اليوم';
+
+  @override
+  String get medTabAll => 'كل المنبهات';
+
+  @override
+  String get medAddAlarm => 'إضافة منبه جديد';
+
+  @override
+  String get medEditAlarm => 'تعديل المنبه';
+
+  @override
+  String get medCatPill => 'دواء / حبة';
+
+  @override
+  String get medCatDiabetes => 'دواء السكري / إنسولين';
+
+  @override
+  String get medCatBloodPressure => 'دواء الضغط';
+
+  @override
+  String get medCatVitamin => 'فيتامين / مكمل';
+
+  @override
+  String get medCatDropsCream => 'قطرة عين / كريم';
+
+  @override
+  String get medCatCheckup => 'قياس / متابعة';
+
+  @override
+  String get medCatOther => 'أخرى';
+
+  @override
+  String get medMealAnytime => 'في أي وقت';
+
+  @override
+  String get medMealBefore => 'قبل الأكل';
+
+  @override
+  String get medMealAfter => 'بعد الأكل';
+
+  @override
+  String get medMealWith => 'مع الأكل';
+
+  @override
+  String get medMealBedtime => 'قبل النوم';
+
+  @override
+  String get medDayMon => 'اثن';
+
+  @override
+  String get medDayTue => 'ثلا';
+
+  @override
+  String get medDayWed => 'أرب';
+
+  @override
+  String get medDayThu => 'خمي';
+
+  @override
+  String get medDayFri => 'جمع';
+
+  @override
+  String get medDaySat => 'سبت';
+
+  @override
+  String get medDaySun => 'أحد';
+
+  @override
+  String get medEveryDay => 'كل يوم';
+
+  @override
+  String get medWeekdays => 'أيام العمل';
+
+  @override
+  String get medWeekends => 'عطلة نهاية الأسبوع';
+
+  @override
+  String get medFieldCategory => 'الفئة';
+
+  @override
+  String get medFieldName => 'اسم الدواء / التذكير';
+
+  @override
+  String get medFieldNameHint => 'مثال: ميتفورمين 1000، إنسولين المساء...';
+
+  @override
+  String get medFieldNameRequired => 'يرجى إدخال اسم الدواء أو التذكير.';
+
+  @override
+  String get medFieldDosage => 'الجرعة / الكمية (اختياري)';
+
+  @override
+  String get medFieldDosageHint => 'مثال: قرص واحد، 12 وحدة، قطرتان';
+
+  @override
+  String get medFieldDescription => 'ملاحظة التذكير (تظهر عند المنبه)';
+
+  @override
+  String get medFieldDescriptionHint =>
+      'مثال: يُؤخذ قبل الإفطار بـ 30 دقيقة مع كوب ماء';
+
+  @override
+  String get medFieldMealTiming => 'وقت التناول';
+
+  @override
+  String get medFieldTime => 'وقت المنبه';
+
+  @override
+  String get medFieldDays => 'أيام التكرار';
+
+  @override
+  String get medFieldPhoto => 'صورة الدواء (تظهر عند رنين المنبه)';
+
+  @override
+  String get medTakePhoto => 'التقاط صورة';
+
+  @override
+  String get medPickGallery => 'من المعرض';
+
+  @override
+  String get medRemovePhoto => 'إزالة الصورة';
+
+  @override
+  String get medPhotoHint =>
+      'صوّر علبة الدواء أو قلم الإنسولين ليظهر بوضوح عند وقت الجرعة.';
+
+  @override
+  String get medSoundToggle => 'صوت المنبه';
+
+  @override
+  String get medVibrateToggle => 'الاهتزاز';
+
+  @override
+  String get medSaveAlarm => 'حفظ المنبه';
+
+  @override
+  String get medAlarmSaved => 'تم حفظ المنبه وجدولته.';
+
+  @override
+  String get medAlarmDeleted => 'تم حذف المنبه.';
+
+  @override
+  String get medDeleteConfirmTitle => 'حذف المنبه';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return 'هل تريد حذف منبه \"$title\" نهائياً؟';
+  }
+
+  @override
+  String get medStatusTaken => 'تم الأخذ';
+
+  @override
+  String get medStatusSnoozed => 'مؤجل';
+
+  @override
+  String get medStatusSkipped => 'تم التخطي';
+
+  @override
+  String get medStatusPending => 'قيد الانتظار';
+
+  @override
+  String get medActionTaken => 'أخذت الجرعة';
+
+  @override
+  String get medActionSnooze => 'تأجيل 10 دقائق';
+
+  @override
+  String get medActionSkip => 'تخطي اليوم';
+
+  @override
+  String get medActionUndo => 'تراجع';
+
+  @override
+  String get medActionPreviewAlarm => 'تجربة المنبه';
+
+  @override
+  String get medRingHeader => 'موعد الدواء';
+
+  @override
+  String get medRingNoteTitle => 'ملاحظة التذكير';
+
+  @override
+  String get medRingNoPhoto => 'لم تتم إضافة صورة للدواء';
+
+  @override
+  String get medRingTapZoom => 'اضغط على الصورة للتكبير';
+
+  @override
+  String get medRingSnoozedToast => 'تم التأجيل لمدة 10 دقائق.';
+
+  @override
+  String get medRingTakenToast => 'رائع! تم تسجيل جرعة اليوم.';
+
+  @override
+  String get medTodayProgressTitle => 'خطة أدوية اليوم';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return 'المنبه القادم: $time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms => 'لا توجد منبهات أدوية مجدولة اليوم.';
+
+  @override
+  String get medEmptyTitle => 'لا توجد منبهات أدوية بعد';
+
+  @override
+  String get medEmptyBody =>
+      'أضف منبهات بالصور لأدوية السكري والإنسولين والضغط. عند الموعد تظهر صورة الدواء وملاحظتك بوضوح على الشاشة.';
+
+  @override
+  String get medQuickPresetDiabetes => 'سكري / إنسولين';
+
+  @override
+  String get medQuickPresetBp => 'دواء الضغط';
+
+  @override
+  String get medQuickPresetVitamin => 'فيتامين';
+
+  @override
+  String get dietMenuTitle => 'الرجيم وحساب السعرات بالذكاء الاصطناعي';
+
+  @override
+  String get dietHomeCardTitle => 'الرجيم والوجبات';
+
+  @override
+  String get dietHomeCardEmpty => 'خطط رجيم جاهزة، التزام وتتبع الوزن';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return 'اليوم $day/$total • التزام $percent%';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'حساب سعرات الطبق بالذكاء الاصطناعي';
+
+  @override
+  String get dietCalorieQuickSubtitle => 'صوّر طبقك لحساب السعرات والمغذيات';
+
+  @override
+  String get dietTabActive => 'رجيمي';
+
+  @override
+  String get dietTabTemplates => 'خطط جاهزة';
+
+  @override
+  String get dietTabWeight => 'الوزن';
+
+  @override
+  String get dietTabCalories => 'السعرات AI';
+
+  @override
+  String get dietStartDiet => 'ابدأ الرجيم';
+
+  @override
+  String get dietRestartOrChange => 'تغيير الرجيم';
+
+  @override
+  String get dietEndDiet => 'إنهاء الرجيم';
+
+  @override
+  String get dietEndDietConfirm =>
+      'هل تريد إنهاء خطة الرجيم الحالية؟ سيتم الاحتفاظ بسجلات الالتزام والوزن.';
+
+  @override
+  String get dietNoActiveTitle => 'لا يوجد رجيم نشط بعد';
+
+  @override
+  String get dietNoActiveBody =>
+      'اختر من قوالب الرجيم الجاهزة (المتوسطي، صديق السكري، داش للضغط، إنقاص الوزن، الصيام 16:8، عالي البروتين) وتابع التزامك ووزنك.';
+
+  @override
+  String get dietBrowseTemplates => 'تصفح خطط الرجيم';
+
+  @override
+  String get dietStartDate => 'تاريخ البدء';
+
+  @override
+  String get dietEndDate => 'تاريخ الانتهاء';
+
+  @override
+  String get dietStartWeight => 'وزن البداية (كجم)';
+
+  @override
+  String get dietTargetWeight => 'الوزن المستهدف (كجم)';
+
+  @override
+  String get dietDailyCalorieTarget => 'هدف السعرات اليومي (سعرة)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days يوماً';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return 'اليوم $day من $total';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return 'متبقي $days أيام';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return 'الالتزام: $percent%';
+  }
+
+  @override
+  String get dietFollowed => 'التزمت';
+
+  @override
+  String get dietNotFollowed => 'لم ألتزم';
+
+  @override
+  String get dietPending => 'قيد الانتظار';
+
+  @override
+  String get dietSlotBreakfast => 'الإفطار';
+
+  @override
+  String get dietSlotMorningSnack => 'وجبة خفيفة صباحية';
+
+  @override
+  String get dietSlotLunch => 'الغداء';
+
+  @override
+  String get dietSlotAfternoonSnack => 'وجبة خفيفة مسائية';
+
+  @override
+  String get dietSlotDinner => 'العشاء';
+
+  @override
+  String get dietAlternativesLabel => 'بديل';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return 'هدف الماء: $liters لتر';
+  }
+
+  @override
+  String get dietRulesTitle => 'إرشادات الخطة';
+
+  @override
+  String get dietSampleMenuTitle => 'نموذج القائمة اليومية';
+
+  @override
+  String get dietStartedToast => 'تم بدء خطة الرجيم بنجاح!';
+
+  @override
+  String get dietEndedToast => 'تم إنهاء خطة الرجيم النشطة.';
+
+  @override
+  String get dietWeightLogTitle => 'تتبع وزن الرجيم';
+
+  @override
+  String get dietWeightAdd => 'تسجيل الوزن';
+
+  @override
+  String get dietWeightField => 'الوزن الحالي (كجم)';
+
+  @override
+  String get dietWeightNote => 'ملاحظة (اختياري)';
+
+  @override
+  String get dietWeightNoteHint => 'مثال: الوزن صباحاً قبل الأكل';
+
+  @override
+  String get dietWeightEmpty =>
+      'لا توجد قياسات وزن بعد. أضف أول قياس لمتابعة التقدم.';
+
+  @override
+  String get dietWeightCurrent => 'الحالي';
+
+  @override
+  String get dietWeightTarget => 'الهدف';
+
+  @override
+  String get dietWeightChange => 'التغيير';
+
+  @override
+  String get dietWeightSaved => 'تم حفظ قياس الوزن.';
+
+  @override
+  String get dietCalorieTitle => 'حاسبة سعرات الطبق بالذكاء الاصطناعي';
+
+  @override
+  String get dietCalorieSubtitle =>
+      'تعمل مع الرجيم أو بدونه — صوّر طبقك أو اكتب وجبتك.';
+
+  @override
+  String get dietSnapPlateCamera => 'تصوير الطبق';
+
+  @override
+  String get dietPickPlateGallery => 'اختيار من المعرض';
+
+  @override
+  String get dietFoodDescLabel => 'وصف الوجبة / الكمية (اختياري)';
+
+  @override
+  String get dietFoodDescHint => 'مثال: دجاج مشوي، برغل، سلطة خضراء، لبن';
+
+  @override
+  String get dietCalculateFromText => 'حساب من النص';
+
+  @override
+  String get dietAnalyzingPlate => 'جارٍ تحليل السعرات والمغذيات...';
+
+  @override
+  String get dietResultTitle => 'تحليل السعرات والمغذيات';
+
+  @override
+  String get dietAiPoweredBadge => 'تحليل Gemini AI البصري';
+
+  @override
+  String get dietOnDeviceBadge => 'تقدير ذكي على الجهاز';
+
+  @override
+  String get dietProtein => 'بروتين';
+
+  @override
+  String get dietCarbs => 'كربوهيدرات';
+
+  @override
+  String get dietFat => 'دهون';
+
+  @override
+  String get dietFiber => 'ألياف';
+
+  @override
+  String get dietPortionScale => 'حجم الحصة';
+
+  @override
+  String get dietSaveMealLog => 'حفظ في سجل اليوم';
+
+  @override
+  String get dietMealLoggedToast => 'تم حفظ سعرات الوجبة في سجل اليوم.';
+
+  @override
+  String get dietTodayTotalCalories => 'إجمالي اليوم';
+
+  @override
+  String get dietRecentScans => 'الوجبات المحسوبة';
+
+  @override
+  String get dietNoScansYet =>
+      'لا توجد وجبات ممسوحة بعد. صوّر طبقك لحساب السعرات.';
+
+  @override
+  String dietHealthScore(int score) {
+    return 'درجة التوازن: $score/10';
+  }
+
+  @override
+  String get dietTodayLabel => 'اليوم';
+
+  @override
+  String get medCatHerbalTea => 'شاي أعشاب';
+
+  @override
+  String get medCatCustom => 'أخرى (إدخال يدوي)';
+
+  @override
+  String get medFieldCustomCategory => 'اسم الفئة المخصصة';
+
+  @override
+  String get medFieldCustomCategoryHint =>
+      'مثال: بروبيوتيك، شرب الماء، علاج طبيعي...';
+
+  @override
+  String get medQuickPresetHerbalTea => 'شاي أعشاب';
+
+  @override
+  String get dietCreateCustom => 'إنشاء رجيمي الخاص';
+
+  @override
+  String get dietCreateCustomSubtitle =>
+      'أدخل قائمة أخصائي التغذية أو وجباتك يدوياً';
+
+  @override
+  String get dietCustomNameLabel => 'اسم خطة الرجيم';
+
+  @override
+  String get dietCustomNameHint => 'مثال: خطة أخصائي التغذية، قائمتي الخاصة...';
+
+  @override
+  String get dietCustomNameRequired => 'يرجى إدخال اسم خطة الرجيم.';
+
+  @override
+  String get dietCustomMealHint => 'ماذا ستتناول في هذه الوجبة؟';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'سعرة (اختياري)';
+
+  @override
+  String get dietCustomAtLeastOneMeal => 'يرجى إدخال وجبة واحدة على الأقل.';
+
+  @override
+  String get dietCustomTemplatesTitle => 'خططي المخصصة';
+
+  @override
+  String get dietReadyTemplatesTitle => 'خطط الرجيم الجاهزة';
 }

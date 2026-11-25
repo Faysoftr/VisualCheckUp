@@ -1542,4 +1542,541 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get labAllValuesNormalMsg =>
       'Bu rapordaki tüm değerleriniz referans aralığında görünüyor.';
+
+  @override
+  String get medTitle => 'İlaç & Alarm Hatırlatıcı';
+
+  @override
+  String get medSubtitle =>
+      'İlaç, insülin ve kontrol alarmlarınızı fotoğrafla takip edin';
+
+  @override
+  String get medMenuTitle => 'İlaç & Alarm Hatırlatıcı';
+
+  @override
+  String get medHomeCardEmpty => 'Henüz alarm yok — ilk ilacınızı ekleyin';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return 'Bugün $taken/$total alındı';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return '$count aktif alarm';
+  }
+
+  @override
+  String get medTabToday => 'Bugün';
+
+  @override
+  String get medTabAll => 'Tüm Alarmlar';
+
+  @override
+  String get medAddAlarm => 'Yeni Alarm Ekle';
+
+  @override
+  String get medEditAlarm => 'Alarmı Düzenle';
+
+  @override
+  String get medCatPill => 'İlaç / Hap';
+
+  @override
+  String get medCatDiabetes => 'Şeker Hapı / İğnesi';
+
+  @override
+  String get medCatBloodPressure => 'Tansiyon İlacı';
+
+  @override
+  String get medCatVitamin => 'Vitamin / Takviye';
+
+  @override
+  String get medCatDropsCream => 'Göz Damlası / Krem';
+
+  @override
+  String get medCatCheckup => 'Ölçüm / Kontrol';
+
+  @override
+  String get medCatOther => 'Diğer';
+
+  @override
+  String get medMealAnytime => 'Fark etmez';
+
+  @override
+  String get medMealBefore => 'Aç karnına';
+
+  @override
+  String get medMealAfter => 'Tok karnına';
+
+  @override
+  String get medMealWith => 'Yemekle birlikte';
+
+  @override
+  String get medMealBedtime => 'Yatmadan önce';
+
+  @override
+  String get medDayMon => 'Pzt';
+
+  @override
+  String get medDayTue => 'Sal';
+
+  @override
+  String get medDayWed => 'Çar';
+
+  @override
+  String get medDayThu => 'Per';
+
+  @override
+  String get medDayFri => 'Cum';
+
+  @override
+  String get medDaySat => 'Cmt';
+
+  @override
+  String get medDaySun => 'Paz';
+
+  @override
+  String get medEveryDay => 'Her Gün';
+
+  @override
+  String get medWeekdays => 'Hafta İçi';
+
+  @override
+  String get medWeekends => 'Hafta Sonu';
+
+  @override
+  String get medFieldCategory => 'Kategori';
+
+  @override
+  String get medFieldName => 'İlaç / Hatırlatıcı Adı';
+
+  @override
+  String get medFieldNameHint => 'Örn: Glifor 1000 mg, Akşam İnsülini...';
+
+  @override
+  String get medFieldNameRequired =>
+      'Lütfen ilaç veya hatırlatıcı adını yazın.';
+
+  @override
+  String get medFieldDosage => 'Doz / Miktar (İsteğe bağlı)';
+
+  @override
+  String get medFieldDosageHint => 'Örn: 1 tablet, 12 ünite, 2 damla';
+
+  @override
+  String get medFieldDescription => 'Hatırlatıcı Açıklaması (Alarmda Görünür)';
+
+  @override
+  String get medFieldDescriptionHint =>
+      'Örn: Kahvaltıdan 30 dk önce bol su ile için';
+
+  @override
+  String get medFieldMealTiming => 'Kullanım Zamanı';
+
+  @override
+  String get medFieldTime => 'Alarm Saati';
+
+  @override
+  String get medFieldDays => 'Tekrar Günleri';
+
+  @override
+  String get medFieldPhoto => 'İlacın Fotoğrafı (Alarm Çalınca Gösterilir)';
+
+  @override
+  String get medTakePhoto => 'Fotoğraf Çek';
+
+  @override
+  String get medPickGallery => 'Galeriden Seç';
+
+  @override
+  String get medRemovePhoto => 'Fotoğrafı Kaldır';
+
+  @override
+  String get medPhotoHint =>
+      'İlaç kutusunun veya insülin kaleminin fotoğrafını çekerseniz vakti gelince ekranda büyükçe görünür.';
+
+  @override
+  String get medSoundToggle => 'Alarm Sesi';
+
+  @override
+  String get medVibrateToggle => 'Titreşim';
+
+  @override
+  String get medSaveAlarm => 'Alarmı Kaydet';
+
+  @override
+  String get medAlarmSaved => 'Alarm kaydedildi ve zamanlandı.';
+
+  @override
+  String get medAlarmDeleted => 'Alarm silindi.';
+
+  @override
+  String get medDeleteConfirmTitle => 'Alarmı Sil';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return '\"$title\" alarmı kalıcı olarak silinsin mi?';
+  }
+
+  @override
+  String get medStatusTaken => 'Alındı';
+
+  @override
+  String get medStatusSnoozed => 'Ertelendi';
+
+  @override
+  String get medStatusSkipped => 'Atlandı';
+
+  @override
+  String get medStatusPending => 'Bekliyor';
+
+  @override
+  String get medActionTaken => 'İçtim / Aldım';
+
+  @override
+  String get medActionSnooze => '10 dk Ertele';
+
+  @override
+  String get medActionSkip => 'Bugün Atla';
+
+  @override
+  String get medActionUndo => 'Geri Al';
+
+  @override
+  String get medActionPreviewAlarm => 'Alarmı Önizle';
+
+  @override
+  String get medRingHeader => 'İLAÇ ZAMANI';
+
+  @override
+  String get medRingNoteTitle => 'Hatırlatma Notu';
+
+  @override
+  String get medRingNoPhoto => 'İlaç fotoğrafı eklenmemiş';
+
+  @override
+  String get medRingTapZoom => 'Büyütmek için fotoğrafa dokunun';
+
+  @override
+  String get medRingSnoozedToast => '10 dakika ertelendi.';
+
+  @override
+  String get medRingTakenToast =>
+      'Harika! Bugünkü doz alındı olarak kaydedildi.';
+
+  @override
+  String get medTodayProgressTitle => 'Bugünkü İlaç Takibi';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return 'Sıradaki alarm: $time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms => 'Bugün için planlanmış ilaç alarmı yok.';
+
+  @override
+  String get medEmptyTitle => 'Henüz İlaç Alarmı Yok';
+
+  @override
+  String get medEmptyBody =>
+      'Şeker hapı, insülin, tansiyon ilacı veya günlük kontrolleriniz için fotoğraf destekli alarmlar ekleyin. Vakti gelince ilacın resmi ve açıklamanız ekranda büyükçe görünür.';
+
+  @override
+  String get medQuickPresetDiabetes => 'Şeker / İnsülin';
+
+  @override
+  String get medQuickPresetBp => 'Tansiyon İlacı';
+
+  @override
+  String get medQuickPresetVitamin => 'Vitamin';
+
+  @override
+  String get dietMenuTitle => 'Diyet & AI Kalori Takibi';
+
+  @override
+  String get dietHomeCardTitle => 'Diyet & Beslenme';
+
+  @override
+  String get dietHomeCardEmpty => 'Hazır diyetler, uyum ve kilo takibi';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return '$day/$total. gün • %$percent uyum';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'AI Tabak Kalori Hesapla';
+
+  @override
+  String get dietCalorieQuickSubtitle =>
+      'Tabağın fotoğrafını çek, kalori ve makroları öğren';
+
+  @override
+  String get dietTabActive => 'Diyetim';
+
+  @override
+  String get dietTabTemplates => 'Hazır Diyetler';
+
+  @override
+  String get dietTabWeight => 'Kilo Takibi';
+
+  @override
+  String get dietTabCalories => 'AI Kalori';
+
+  @override
+  String get dietStartDiet => 'Diyete Başla';
+
+  @override
+  String get dietRestartOrChange => 'Diyeti Değiştir';
+
+  @override
+  String get dietEndDiet => 'Diyeti Bitir';
+
+  @override
+  String get dietEndDietConfirm =>
+      'Aktif diyet planı sonlandırılsın mı? Uyum ve kilo geçmişiniz korunur.';
+
+  @override
+  String get dietNoActiveTitle => 'Henüz Aktif Diyet Yok';
+
+  @override
+  String get dietNoActiveBody =>
+      'Hazır diyet şablonlarından (Akdeniz, Şeker Dostu, Tansiyon DASH, Dengeli Kilo Verme, 16:8 Aralıklı Oruç, Yüksek Protein) birini seçerek tarih, uyum ve kilo takibine başlayın.';
+
+  @override
+  String get dietBrowseTemplates => 'Hazır Diyetleri İncele';
+
+  @override
+  String get dietStartDate => 'Başlangıç Tarihi';
+
+  @override
+  String get dietEndDate => 'Bitiş Tarihi';
+
+  @override
+  String get dietStartWeight => 'Başlangıç Kilosu (kg)';
+
+  @override
+  String get dietTargetWeight => 'Hedef Kilo (kg)';
+
+  @override
+  String get dietDailyCalorieTarget => 'Günlük Kalori Hedefi (kcal)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days gün';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return '$day. Gün / $total';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return '$days gün kaldı';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return 'Uyum: %$percent';
+  }
+
+  @override
+  String get dietFollowed => 'Uydum';
+
+  @override
+  String get dietNotFollowed => 'Uymadım';
+
+  @override
+  String get dietPending => 'Bekliyor';
+
+  @override
+  String get dietSlotBreakfast => 'Kahvaltı';
+
+  @override
+  String get dietSlotMorningSnack => 'Kuşluk Ara Öğün';
+
+  @override
+  String get dietSlotLunch => 'Öğle Yemeği';
+
+  @override
+  String get dietSlotAfternoonSnack => 'İkindi Ara Öğün';
+
+  @override
+  String get dietSlotDinner => 'Akşam Yemeği';
+
+  @override
+  String get dietAlternativesLabel => 'Alternatif';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return 'Su hedefi: $liters L';
+  }
+
+  @override
+  String get dietRulesTitle => 'Diyet Kuralları';
+
+  @override
+  String get dietSampleMenuTitle => 'Örnek Günlük Menü';
+
+  @override
+  String get dietStartedToast =>
+      'Diyet planınız başlatıldı! Başarılar dileriz.';
+
+  @override
+  String get dietEndedToast => 'Aktif diyet planı sonlandırıldı.';
+
+  @override
+  String get dietWeightLogTitle => 'Diyet Kilo Takibi';
+
+  @override
+  String get dietWeightAdd => 'Kilo Ekle';
+
+  @override
+  String get dietWeightField => 'Güncel Kilo (kg)';
+
+  @override
+  String get dietWeightNote => 'Not (İsteğe bağlı)';
+
+  @override
+  String get dietWeightNoteHint => 'Örn: Sabah aç karnına tartım';
+
+  @override
+  String get dietWeightEmpty =>
+      'Henüz kilo kaydı yok. Değişimi görmek için ilk tartımınızı ekleyin.';
+
+  @override
+  String get dietWeightCurrent => 'Güncel';
+
+  @override
+  String get dietWeightTarget => 'Hedef';
+
+  @override
+  String get dietWeightChange => 'Değişim';
+
+  @override
+  String get dietWeightSaved => 'Kilo kaydı eklendi.';
+
+  @override
+  String get dietCalorieTitle => 'Yapay Zeka Tabak Kalori Hesapla';
+
+  @override
+  String get dietCalorieSubtitle =>
+      'Diyetten bağımsız da kullanılabilir — tabağın fotoğrafını çekin veya yemeği yazın.';
+
+  @override
+  String get dietSnapPlateCamera => 'Tabağın Fotoğrafını Çek';
+
+  @override
+  String get dietPickPlateGallery => 'Galeriden Seç';
+
+  @override
+  String get dietFoodDescLabel => 'Yemek Açıklaması / Porsiyon (İsteğe bağlı)';
+
+  @override
+  String get dietFoodDescHint =>
+      'Örn: Izgara tavuk, bulgur pilavı, mevsim salata, ayran';
+
+  @override
+  String get dietCalculateFromText => 'Metinden Hesapla';
+
+  @override
+  String get dietAnalyzingPlate =>
+      'Tabak kalorisi ve besin değerleri hesaplanıyor...';
+
+  @override
+  String get dietResultTitle => 'Kalori & Besin Analizi';
+
+  @override
+  String get dietAiPoweredBadge => 'Gemini AI Görsel Analiz';
+
+  @override
+  String get dietOnDeviceBadge => 'Akıllı Cihaz İçi Tahmin';
+
+  @override
+  String get dietProtein => 'Protein';
+
+  @override
+  String get dietCarbs => 'Karbonhidrat';
+
+  @override
+  String get dietFat => 'Yağ';
+
+  @override
+  String get dietFiber => 'Lif';
+
+  @override
+  String get dietPortionScale => 'Porsiyon Boyutu';
+
+  @override
+  String get dietSaveMealLog => 'Bugünkü Kayda Ekle';
+
+  @override
+  String get dietMealLoggedToast => 'Öğün kalorisi bugünkü günlüğe eklendi.';
+
+  @override
+  String get dietTodayTotalCalories => 'Bugün Alınan';
+
+  @override
+  String get dietRecentScans => 'Hesaplanan Öğünler';
+
+  @override
+  String get dietNoScansYet =>
+      'Henüz tabak taraması yok. Kalorisini öğrenmek için tabağın fotoğrafını çekin.';
+
+  @override
+  String dietHealthScore(int score) {
+    return 'Denge Puanı: $score/10';
+  }
+
+  @override
+  String get dietTodayLabel => 'Bugün';
+
+  @override
+  String get medCatHerbalTea => 'Bitki Çayı';
+
+  @override
+  String get medCatCustom => 'Diğer (Elle Gir)';
+
+  @override
+  String get medFieldCustomCategory => 'Özel Kategori Adı (Elle Girin)';
+
+  @override
+  String get medFieldCustomCategoryHint =>
+      'Örn: Probiyotik, Su İçme, Fizik Tedavi, Kür...';
+
+  @override
+  String get medQuickPresetHerbalTea => 'Bitki Çayı';
+
+  @override
+  String get dietCreateCustom => 'Kendi Diyetimi Oluştur';
+
+  @override
+  String get dietCreateCustomSubtitle =>
+      'Diyetisyeninizin listesini veya kendi öğün planınızı elle girin';
+
+  @override
+  String get dietCustomNameLabel => 'Diyet Adı';
+
+  @override
+  String get dietCustomNameHint => 'Örn: Diyetisyen Listem, Kendi Menüm...';
+
+  @override
+  String get dietCustomNameRequired => 'Lütfen diyet adını yazın.';
+
+  @override
+  String get dietCustomMealHint => 'Bu öğünde ne yiyeceksiniz?';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'kcal (isteğe bağlı)';
+
+  @override
+  String get dietCustomAtLeastOneMeal => 'Lütfen en az bir öğün yazın.';
+
+  @override
+  String get dietCustomTemplatesTitle => 'Kendi Diyet Şablonlarım';
+
+  @override
+  String get dietReadyTemplatesTitle => 'Hazır Diyet Şablonları';
 }

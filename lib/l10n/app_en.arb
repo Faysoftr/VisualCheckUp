@@ -820,5 +820,263 @@
     }
   },
   "labPhotoOfflineHint": "Paper photo attached. Enable Cloud AI in Settings to read paper photos automatically, or enter values manually below.",
-  "labAllValuesNormalMsg": "All recorded values in this report are within the reference range."
+  "labAllValuesNormalMsg": "All recorded values in this report are within the reference range.",
+  "medTitle": "Medication & Alarm Reminder",
+  "medSubtitle": "Track pills, insulin & health alarms with photos",
+  "medMenuTitle": "Medication Alarms",
+  "medHomeCardEmpty": "No alarms yet — add your first reminder",
+  "medHomeCardTodaySummary": "{taken}/{total} taken today",
+  "@medHomeCardTodaySummary": {
+    "placeholders": {
+      "taken": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "medHomeCardActiveCount": "{count} active alarms",
+  "@medHomeCardActiveCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medTabToday": "Today",
+  "medTabAll": "All Alarms",
+  "medAddAlarm": "Add New Alarm",
+  "medEditAlarm": "Edit Alarm",
+  "medCatPill": "Medicine / Pill",
+  "medCatDiabetes": "Diabetes Pill / Insulin",
+  "medCatBloodPressure": "Blood Pressure Med",
+  "medCatVitamin": "Vitamin / Supplement",
+  "medCatDropsCream": "Eye Drops / Cream",
+  "medCatCheckup": "Vitals / Checkup",
+  "medCatOther": "Other",
+  "medMealAnytime": "Anytime",
+  "medMealBefore": "Before meal",
+  "medMealAfter": "After meal",
+  "medMealWith": "With meal",
+  "medMealBedtime": "At bedtime",
+  "medDayMon": "Mon",
+  "medDayTue": "Tue",
+  "medDayWed": "Wed",
+  "medDayThu": "Thu",
+  "medDayFri": "Fri",
+  "medDaySat": "Sat",
+  "medDaySun": "Sun",
+  "medEveryDay": "Every Day",
+  "medWeekdays": "Weekdays",
+  "medWeekends": "Weekends",
+  "medFieldCategory": "Category",
+  "medFieldName": "Medicine / Reminder Name",
+  "medFieldNameHint": "e.g. Metformin 1000 mg, Evening Insulin...",
+  "medFieldNameRequired": "Please enter a medicine or reminder name.",
+  "medFieldDosage": "Dosage / Amount (Optional)",
+  "medFieldDosageHint": "e.g. 1 tablet, 12 units, 2 drops",
+  "medFieldDescription": "Reminder Note (Shown on Alarm)",
+  "medFieldDescriptionHint": "e.g. Take 30 min before breakfast with a full glass of water",
+  "medFieldMealTiming": "Meal Timing",
+  "medFieldTime": "Alarm Time",
+  "medFieldDays": "Repeat Days",
+  "medFieldPhoto": "Medicine Photo (Shown When Alarm Rings)",
+  "medTakePhoto": "Take Photo",
+  "medPickGallery": "From Gallery",
+  "medRemovePhoto": "Remove Photo",
+  "medPhotoHint": "Snap the medicine box or insulin pen so it displays clearly when the alarm rings.",
+  "medSoundToggle": "Alarm Sound",
+  "medVibrateToggle": "Vibration",
+  "medSaveAlarm": "Save Alarm",
+  "medAlarmSaved": "Alarm saved and scheduled.",
+  "medAlarmDeleted": "Alarm deleted.",
+  "medDeleteConfirmTitle": "Delete Alarm",
+  "medDeleteConfirmBody": "Permanently delete the \"{title}\" alarm?",
+  "@medDeleteConfirmBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "medStatusTaken": "Taken",
+  "medStatusSnoozed": "Snoozed",
+  "medStatusSkipped": "Skipped",
+  "medStatusPending": "Pending",
+  "medActionTaken": "I Took It",
+  "medActionSnooze": "Snooze 10 min",
+  "medActionSkip": "Skip Today",
+  "medActionUndo": "Undo",
+  "medActionPreviewAlarm": "Test Alarm",
+  "medRingHeader": "MEDICATION TIME",
+  "medRingNoteTitle": "Reminder Note",
+  "medRingNoPhoto": "No medicine photo added",
+  "medRingTapZoom": "Tap photo to zoom",
+  "medRingSnoozedToast": "Snoozed for 10 minutes.",
+  "medRingTakenToast": "Great! Today's dose marked as taken.",
+  "medTodayProgressTitle": "Today's Medication Plan",
+  "medNextAlarmLabel": "Next alarm: {time} • {title}",
+  "@medNextAlarmLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "medNoTodayAlarms": "No medication alarms scheduled for today.",
+  "medEmptyTitle": "No Medication Alarms Yet",
+  "medEmptyBody": "Add photo-supported alarms for diabetes pills, insulin, blood pressure meds, or daily checks. When it's time, the medicine photo and your note appear clearly on screen.",
+  "medQuickPresetDiabetes": "Diabetes / Insulin",
+  "medQuickPresetBp": "Blood Pressure",
+  "medQuickPresetVitamin": "Vitamin",
+  "dietMenuTitle": "Diet & AI Calorie Tracker",
+  "dietHomeCardTitle": "Diet & Meal Plans",
+  "dietHomeCardEmpty": "Ready-made diets, compliance & weight tracking",
+  "dietHomeCardActive": "Day {day}/{total} • {percent}% compliance",
+  "@dietHomeCardActive": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dietCalorieQuickTitle": "AI Plate Calorie Counter",
+  "dietCalorieQuickSubtitle": "Snap your plate photo to calculate calories & macros",
+  "dietTabActive": "My Diet",
+  "dietTabTemplates": "Diet Plans",
+  "dietTabWeight": "Weight",
+  "dietTabCalories": "AI Calories",
+  "dietStartDiet": "Start Diet",
+  "dietRestartOrChange": "Change Diet",
+  "dietEndDiet": "End Diet",
+  "dietEndDietConfirm": "End your active diet plan? Your compliance and weight records will be kept.",
+  "dietNoActiveTitle": "No Active Diet Yet",
+  "dietNoActiveBody": "Choose from ready-made clinical diet templates (Mediterranean, Diabetes-Friendly, DASH, Weight Loss, 16:8 Fasting, High Protein) and track daily compliance & weight.",
+  "dietBrowseTemplates": "Browse Ready-Made Diets",
+  "dietStartDate": "Start Date",
+  "dietEndDate": "End Date",
+  "dietStartWeight": "Start Weight (kg)",
+  "dietTargetWeight": "Target Weight (kg)",
+  "dietDailyCalorieTarget": "Daily Calorie Target (kcal)",
+  "dietDurationDays": "{days} days",
+  "@dietDurationDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dietDayProgress": "Day {day} of {total}",
+  "@dietDayProgress": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dietDaysLeft": "{days} days left",
+  "@dietDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dietComplianceRate": "Compliance: {percent}%",
+  "@dietComplianceRate": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dietFollowed": "Followed",
+  "dietNotFollowed": "Missed",
+  "dietPending": "Pending",
+  "dietSlotBreakfast": "Breakfast",
+  "dietSlotMorningSnack": "Morning Snack",
+  "dietSlotLunch": "Lunch",
+  "dietSlotAfternoonSnack": "Afternoon Snack",
+  "dietSlotDinner": "Dinner",
+  "dietAlternativesLabel": "Alternative",
+  "dietWaterTarget": "Water target: {liters} L",
+  "@dietWaterTarget": {
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "dietRulesTitle": "Plan Guidelines",
+  "dietSampleMenuTitle": "Sample Daily Menu",
+  "dietStartedToast": "Diet plan started! Stay consistent.",
+  "dietEndedToast": "Active diet plan ended.",
+  "dietWeightLogTitle": "Diet Weight Tracking",
+  "dietWeightAdd": "Log Weight",
+  "dietWeightField": "Current Weight (kg)",
+  "dietWeightNote": "Note (Optional)",
+  "dietWeightNoteHint": "e.g. Morning fasting weight",
+  "dietWeightEmpty": "No weight entries yet. Log your first weight to track your trend.",
+  "dietWeightCurrent": "Current",
+  "dietWeightTarget": "Target",
+  "dietWeightChange": "Change",
+  "dietWeightSaved": "Weight entry saved.",
+  "dietCalorieTitle": "AI Plate Calorie Calculator",
+  "dietCalorieSubtitle": "Works with or without a diet — snap a plate photo or describe your meal.",
+  "dietSnapPlateCamera": "Snap Plate Photo",
+  "dietPickPlateGallery": "Pick from Gallery",
+  "dietFoodDescLabel": "Meal Description / Portion (Optional)",
+  "dietFoodDescHint": "e.g. Grilled chicken, bulgur pilaf, green salad, ayran",
+  "dietCalculateFromText": "Calculate from Text",
+  "dietAnalyzingPlate": "Analyzing plate calories & macros...",
+  "dietResultTitle": "Calorie & Macro Analysis",
+  "dietAiPoweredBadge": "Gemini AI Vision",
+  "dietOnDeviceBadge": "Smart On-Device Estimate",
+  "dietProtein": "Protein",
+  "dietCarbs": "Carbs",
+  "dietFat": "Fat",
+  "dietFiber": "Fiber",
+  "dietPortionScale": "Portion Size",
+  "dietSaveMealLog": "Save to Today's Log",
+  "dietMealLoggedToast": "Meal calories saved to today's log.",
+  "dietTodayTotalCalories": "Today's Total",
+  "dietRecentScans": "Scanned Meals",
+  "dietNoScansYet": "No meals scanned yet. Take a photo of your plate to estimate calories.",
+  "dietHealthScore": "Balance Score: {score}/10",
+  "@dietHealthScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "dietTodayLabel": "Today",
+  "medCatHerbalTea": "Herbal Tea",
+  "medCatCustom": "Other (Custom)",
+  "medFieldCustomCategory": "Custom Category Name",
+  "medFieldCustomCategoryHint": "e.g. Probiotic, Herbal Blend, Water, Physio...",
+  "medQuickPresetHerbalTea": "Herbal Tea",
+  "dietCreateCustom": "Create My Own Diet",
+  "dietCreateCustomSubtitle": "Enter your dietitian's list or your own meal plan manually",
+  "dietCustomNameLabel": "Diet Plan Name",
+  "dietCustomNameHint": "e.g. My Dietitian Plan, Custom Healthy Menu...",
+  "dietCustomNameRequired": "Please enter a diet plan name.",
+  "dietCustomMealHint": "What is planned for this meal?",
+  "dietCustomMealCaloriesHint": "kcal (optional)",
+  "dietCustomAtLeastOneMeal": "Please enter at least one meal.",
+  "dietCustomTemplatesTitle": "My Custom Diet Plans",
+  "dietReadyTemplatesTitle": "Ready-Made Diet Templates"
 }

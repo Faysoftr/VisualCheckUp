@@ -1528,4 +1528,539 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get labAllValuesNormalMsg =>
       'Все записанные показатели в этом отчёте находятся в пределах нормы.';
+
+  @override
+  String get medTitle => 'Напоминания и будильник лекарств';
+
+  @override
+  String get medSubtitle =>
+      'Таблетки, инсулин и замеры с фото на экране будильника';
+
+  @override
+  String get medMenuTitle => 'Будильник лекарств';
+
+  @override
+  String get medHomeCardEmpty =>
+      'Пока нет будильников — добавьте первое напоминание';
+
+  @override
+  String medHomeCardTodaySummary(int taken, int total) {
+    return 'Сегодня принято: $taken/$total';
+  }
+
+  @override
+  String medHomeCardActiveCount(int count) {
+    return 'Активных будильников: $count';
+  }
+
+  @override
+  String get medTabToday => 'Сегодня';
+
+  @override
+  String get medTabAll => 'Все будильники';
+
+  @override
+  String get medAddAlarm => 'Новый будильник';
+
+  @override
+  String get medEditAlarm => 'Изменить будильник';
+
+  @override
+  String get medCatPill => 'Лекарство / Таблетки';
+
+  @override
+  String get medCatDiabetes => 'Диабет / Инсулин';
+
+  @override
+  String get medCatBloodPressure => 'От давления';
+
+  @override
+  String get medCatVitamin => 'Витамины / БАД';
+
+  @override
+  String get medCatDropsCream => 'Капли / Крем';
+
+  @override
+  String get medCatCheckup => 'Замер / Контроль';
+
+  @override
+  String get medCatOther => 'Другое';
+
+  @override
+  String get medMealAnytime => 'В любое время';
+
+  @override
+  String get medMealBefore => 'До еды';
+
+  @override
+  String get medMealAfter => 'После еды';
+
+  @override
+  String get medMealWith => 'Во время еды';
+
+  @override
+  String get medMealBedtime => 'Перед сном';
+
+  @override
+  String get medDayMon => 'Пн';
+
+  @override
+  String get medDayTue => 'Вт';
+
+  @override
+  String get medDayWed => 'Ср';
+
+  @override
+  String get medDayThu => 'Чт';
+
+  @override
+  String get medDayFri => 'Пт';
+
+  @override
+  String get medDaySat => 'Сб';
+
+  @override
+  String get medDaySun => 'Вс';
+
+  @override
+  String get medEveryDay => 'Каждый день';
+
+  @override
+  String get medWeekdays => 'Будни';
+
+  @override
+  String get medWeekends => 'Выходные';
+
+  @override
+  String get medFieldCategory => 'Категория';
+
+  @override
+  String get medFieldName => 'Название лекарства / напоминания';
+
+  @override
+  String get medFieldNameHint =>
+      'Напр.: Метформин 1000 мг, Вечерний инсулин...';
+
+  @override
+  String get medFieldNameRequired =>
+      'Введите название лекарства или напоминания.';
+
+  @override
+  String get medFieldDosage => 'Дозировка (необязательно)';
+
+  @override
+  String get medFieldDosageHint => 'Напр.: 1 таблетка, 12 ЕД, 2 капли';
+
+  @override
+  String get medFieldDescription => 'Пояснение (покажется на будильнике)';
+
+  @override
+  String get medFieldDescriptionHint =>
+      'Напр.: Принять за 30 мин до завтрака, запивая водой';
+
+  @override
+  String get medFieldMealTiming => 'Приём относительно еды';
+
+  @override
+  String get medFieldTime => 'Время будильника';
+
+  @override
+  String get medFieldDays => 'Дни повторения';
+
+  @override
+  String get medFieldPhoto => 'Фото лекарства (покажется при звонке)';
+
+  @override
+  String get medTakePhoto => 'Сделать фото';
+
+  @override
+  String get medPickGallery => 'Из галереи';
+
+  @override
+  String get medRemovePhoto => 'Удалить фото';
+
+  @override
+  String get medPhotoHint =>
+      'Сфотографируйте упаковку или шприц-ручку, чтобы увидеть её крупно при срабатывании.';
+
+  @override
+  String get medSoundToggle => 'Звук будильника';
+
+  @override
+  String get medVibrateToggle => 'Вибрация';
+
+  @override
+  String get medSaveAlarm => 'Сохранить будильник';
+
+  @override
+  String get medAlarmSaved => 'Будильник сохранён и запланирован.';
+
+  @override
+  String get medAlarmDeleted => 'Будильник удалён.';
+
+  @override
+  String get medDeleteConfirmTitle => 'Удалить будильник';
+
+  @override
+  String medDeleteConfirmBody(String title) {
+    return 'Удалить будильник «$title» навсегда?';
+  }
+
+  @override
+  String get medStatusTaken => 'Принято';
+
+  @override
+  String get medStatusSnoozed => 'Отложено';
+
+  @override
+  String get medStatusSkipped => 'Пропущено';
+
+  @override
+  String get medStatusPending => 'Ожидается';
+
+  @override
+  String get medActionTaken => 'Принял(а)';
+
+  @override
+  String get medActionSnooze => 'Отложить 10 мин';
+
+  @override
+  String get medActionSkip => 'Пропустить сегодня';
+
+  @override
+  String get medActionUndo => 'Отменить';
+
+  @override
+  String get medActionPreviewAlarm => 'Проверить будильник';
+
+  @override
+  String get medRingHeader => 'ВРЕМЯ ПРИЁМА ЛЕКАРСТВА';
+
+  @override
+  String get medRingNoteTitle => 'Заметка к напоминанию';
+
+  @override
+  String get medRingNoPhoto => 'Фото лекарства не добавлено';
+
+  @override
+  String get medRingTapZoom => 'Нажмите на фото, чтобы увеличить';
+
+  @override
+  String get medRingSnoozedToast => 'Отложено на 10 минут.';
+
+  @override
+  String get medRingTakenToast => 'Отлично! Сегодняшний приём отмечен.';
+
+  @override
+  String get medTodayProgressTitle => 'Приём лекарств сегодня';
+
+  @override
+  String medNextAlarmLabel(String time, String title) {
+    return 'Следующий будильник: $time • $title';
+  }
+
+  @override
+  String get medNoTodayAlarms =>
+      'На сегодня будильники лекарств не запланированы.';
+
+  @override
+  String get medEmptyTitle => 'Будильников пока нет';
+
+  @override
+  String get medEmptyBody =>
+      'Добавьте будильники с фото для таблеток от сахара, инсулина или давления. В нужное время фото и заметка появятся крупно на экране.';
+
+  @override
+  String get medQuickPresetDiabetes => 'Сахар / Инсулин';
+
+  @override
+  String get medQuickPresetBp => 'От давления';
+
+  @override
+  String get medQuickPresetVitamin => 'Витамины';
+
+  @override
+  String get dietMenuTitle => 'Диета и ИИ-калории';
+
+  @override
+  String get dietHomeCardTitle => 'Диета и Питание';
+
+  @override
+  String get dietHomeCardEmpty => 'Готовые диеты, соблюдение и вес';
+
+  @override
+  String dietHomeCardActive(int day, int total, int percent) {
+    return 'День $day/$total • $percent% соблюдения';
+  }
+
+  @override
+  String get dietCalorieQuickTitle => 'ИИ-подсчёт калорий по фото';
+
+  @override
+  String get dietCalorieQuickSubtitle =>
+      'Сфотографируйте тарелку — узнайте калории и БЖУ';
+
+  @override
+  String get dietTabActive => 'Моя диета';
+
+  @override
+  String get dietTabTemplates => 'Шаблоны';
+
+  @override
+  String get dietTabWeight => 'Вес';
+
+  @override
+  String get dietTabCalories => 'ИИ Калории';
+
+  @override
+  String get dietStartDiet => 'Начать диету';
+
+  @override
+  String get dietRestartOrChange => 'Сменить диету';
+
+  @override
+  String get dietEndDiet => 'Завершить диету';
+
+  @override
+  String get dietEndDietConfirm =>
+      'Завершить активную диету? История соблюдения и веса сохранится.';
+
+  @override
+  String get dietNoActiveTitle => 'Нет активной диеты';
+
+  @override
+  String get dietNoActiveBody =>
+      'Выберите готовый шаблон диеты (Средиземноморская, Диабет, DASH, Похудение, 16:8, Белковая) и отслеживайте рацион и вес.';
+
+  @override
+  String get dietBrowseTemplates => 'Выбрать диету';
+
+  @override
+  String get dietStartDate => 'Дата начала';
+
+  @override
+  String get dietEndDate => 'Дата окончания';
+
+  @override
+  String get dietStartWeight => 'Начальный вес (кг)';
+
+  @override
+  String get dietTargetWeight => 'Целевой вес (кг)';
+
+  @override
+  String get dietDailyCalorieTarget => 'Дневная норма калорий (ккал)';
+
+  @override
+  String dietDurationDays(int days) {
+    return '$days дн.';
+  }
+
+  @override
+  String dietDayProgress(int day, int total) {
+    return 'День $day из $total';
+  }
+
+  @override
+  String dietDaysLeft(int days) {
+    return 'Осталось $days дн.';
+  }
+
+  @override
+  String dietComplianceRate(int percent) {
+    return 'Соблюдение: $percent%';
+  }
+
+  @override
+  String get dietFollowed => 'Соблюдал(а)';
+
+  @override
+  String get dietNotFollowed => 'Нарушил(а)';
+
+  @override
+  String get dietPending => 'Ожидается';
+
+  @override
+  String get dietSlotBreakfast => 'Завтрак';
+
+  @override
+  String get dietSlotMorningSnack => 'Перекус утром';
+
+  @override
+  String get dietSlotLunch => 'Обед';
+
+  @override
+  String get dietSlotAfternoonSnack => 'Полдник';
+
+  @override
+  String get dietSlotDinner => 'Ужин';
+
+  @override
+  String get dietAlternativesLabel => 'Замена';
+
+  @override
+  String dietWaterTarget(String liters) {
+    return 'Норма воды: $liters л';
+  }
+
+  @override
+  String get dietRulesTitle => 'Правила диеты';
+
+  @override
+  String get dietSampleMenuTitle => 'Пример дневного меню';
+
+  @override
+  String get dietStartedToast => 'Диета успешно запущена!';
+
+  @override
+  String get dietEndedToast => 'Активная диета завершена.';
+
+  @override
+  String get dietWeightLogTitle => 'Контроль веса на диете';
+
+  @override
+  String get dietWeightAdd => 'Добавить вес';
+
+  @override
+  String get dietWeightField => 'Текущий вес (кг)';
+
+  @override
+  String get dietWeightNote => 'Заметка (необязательно)';
+
+  @override
+  String get dietWeightNoteHint => 'Напр.: Утром натощак';
+
+  @override
+  String get dietWeightEmpty =>
+      'Записей веса пока нет. Добавьте первое взвешивание.';
+
+  @override
+  String get dietWeightCurrent => 'Текущий';
+
+  @override
+  String get dietWeightTarget => 'Цель';
+
+  @override
+  String get dietWeightChange => 'Изменение';
+
+  @override
+  String get dietWeightSaved => 'Вес сохранён.';
+
+  @override
+  String get dietCalorieTitle => 'ИИ-калькулятор калорий по фото';
+
+  @override
+  String get dietCalorieSubtitle =>
+      'Работает и без диеты — сфотографируйте тарелку или опишите блюдо.';
+
+  @override
+  String get dietSnapPlateCamera => 'Сфотографировать тарелку';
+
+  @override
+  String get dietPickPlateGallery => 'Из галереи';
+
+  @override
+  String get dietFoodDescLabel => 'Описание блюда / порция (необязательно)';
+
+  @override
+  String get dietFoodDescHint => 'Напр.: Курица гриль, булгур, салат, айран';
+
+  @override
+  String get dietCalculateFromText => 'Рассчитать по тексту';
+
+  @override
+  String get dietAnalyzingPlate => 'Анализируем калории и БЖУ...';
+
+  @override
+  String get dietResultTitle => 'Анализ калорий и БЖУ';
+
+  @override
+  String get dietAiPoweredBadge => 'Gemini AI Зрение';
+
+  @override
+  String get dietOnDeviceBadge => 'Умная локальная оценка';
+
+  @override
+  String get dietProtein => 'Белки';
+
+  @override
+  String get dietCarbs => 'Углеводы';
+
+  @override
+  String get dietFat => 'Жиры';
+
+  @override
+  String get dietFiber => 'Клетчатка';
+
+  @override
+  String get dietPortionScale => 'Размер порции';
+
+  @override
+  String get dietSaveMealLog => 'Сохранить в дневник';
+
+  @override
+  String get dietMealLoggedToast => 'Калории блюда добавлены за сегодня.';
+
+  @override
+  String get dietTodayTotalCalories => 'Всего сегодня';
+
+  @override
+  String get dietRecentScans => 'Проанализированные блюда';
+
+  @override
+  String get dietNoScansYet =>
+      'Сканирований пока нет. Сфотографируйте тарелку.';
+
+  @override
+  String dietHealthScore(int score) {
+    return 'Баланс: $score/10';
+  }
+
+  @override
+  String get dietTodayLabel => 'Сегодня';
+
+  @override
+  String get medCatHerbalTea => 'Травяной чай';
+
+  @override
+  String get medCatCustom => 'Другое (Ввести вручную)';
+
+  @override
+  String get medFieldCustomCategory => 'Своя категория';
+
+  @override
+  String get medFieldCustomCategoryHint => 'Напр.: Пробиотик, Вода, Зарядка...';
+
+  @override
+  String get medQuickPresetHerbalTea => 'Травяной чай';
+
+  @override
+  String get dietCreateCustom => 'Создать свою диету';
+
+  @override
+  String get dietCreateCustomSubtitle =>
+      'Введите рацион диетолога или свой собственный план питания';
+
+  @override
+  String get dietCustomNameLabel => 'Название диеты';
+
+  @override
+  String get dietCustomNameHint => 'Напр.: План диетолога, Моё меню...';
+
+  @override
+  String get dietCustomNameRequired => 'Введите название диеты.';
+
+  @override
+  String get dietCustomMealHint => 'Что запланировано на этот приём пищи?';
+
+  @override
+  String get dietCustomMealCaloriesHint => 'ккал (необязательно)';
+
+  @override
+  String get dietCustomAtLeastOneMeal => 'Укажите хотя бы один приём пищи.';
+
+  @override
+  String get dietCustomTemplatesTitle => 'Мои собственные планы';
+
+  @override
+  String get dietReadyTemplatesTitle => 'Готовые шаблоны диет';
 }
