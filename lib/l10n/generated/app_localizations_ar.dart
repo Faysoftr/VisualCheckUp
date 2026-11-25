@@ -2411,4 +2411,186 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'حذف لدى الجميع';
+
+  @override
+  String get commOnlineNow => 'متصل الآن';
+
+  @override
+  String get commFilterOnlineOnly => 'المتصلون الآن';
+
+  @override
+  String get commFilterSameCondition => 'نفس الحالة';
+
+  @override
+  String get commFilterAllConditions => 'جميع الحالات';
+
+  @override
+  String get commSameConditionPrompt =>
+      'أضف حالة مزمنة في ملفي للعثور على أعضاء يشاركونك نفس الحالة.';
+
+  @override
+  String get commFieldChronicConditions => 'الأمراض المزمنة (اختياري)';
+
+  @override
+  String get commFieldCustomCondition => 'حالة مزمنة أخرى (اختياري)';
+
+  @override
+  String get commFieldCustomConditionHint =>
+      'مثال: الفيبروميالغيا، تكيس المبايض...';
+
+  @override
+  String get commToggleShowConditions => 'إظهار الأمراض المزمنة في ملفي';
+
+  @override
+  String get commToggleShowOnline => 'إظهار حالة الاتصال';
+
+  @override
+  String get condType1Diabetes => 'السكري النوع 1';
+
+  @override
+  String get condType2Diabetes => 'السكري النوع 2';
+
+  @override
+  String get condHypertension => 'ارتفاع ضغط الدم';
+
+  @override
+  String get condAsthmaCopd => 'الربو / الانسداد الرئوي';
+
+  @override
+  String get condThyroidHashimoto => 'الغدة الدرقية / هاشيموتو';
+
+  @override
+  String get condMigraine => 'الشقيقة (الصداع النصفي)';
+
+  @override
+  String get condHeartCondition => 'أمراض القلب والأوعية';
+
+  @override
+  String get condCeliacIbs => 'السيلياك / القولون العصبي';
+
+  @override
+  String get condArthritis => 'الروماتيزم / التهاب المفاصل';
+
+  @override
+  String get condAnemia => 'فقر الدم';
+
+  @override
+  String get condKidneyHealth => 'صحة الكلى';
+
+  @override
+  String get condEczemaPsoriasis => 'الأكزيما / الصدفية';
+
+  @override
+  String get adminPanelTitle => 'لوحة تحكم الإدارة';
+
+  @override
+  String get adminTabStats => 'الإحصاءات';
+
+  @override
+  String get adminTabAnnouncements => 'الإعلانات';
+
+  @override
+  String get adminTabPromotions => 'الترويج';
+
+  @override
+  String get adminTabUsers => 'المستخدمون';
+
+  @override
+  String get adminTabReports => 'البلاغات';
+
+  @override
+  String get adminStatOnline => 'متصل الآن';
+
+  @override
+  String get adminStatMembers => 'الأعضاء';
+
+  @override
+  String get adminStatLikes => 'الإعجابات';
+
+  @override
+  String get adminStatChats => 'المحادثات';
+
+  @override
+  String get adminStatPendingReports => 'بلاغات معلقة';
+
+  @override
+  String get adminStatActiveBanners => 'لافتات نشطة';
+
+  @override
+  String get adminConditionBreakdown => 'توزيع الحالات المزمنة';
+
+  @override
+  String get adminNewAnnouncement => 'إعلان جديد';
+
+  @override
+  String get adminNewPromotion => 'بانر / إعلان جديد';
+
+  @override
+  String get adminFieldTitle => 'العنوان';
+
+  @override
+  String get adminFieldMessage => 'النص / الوصف';
+
+  @override
+  String get adminFieldLink => 'رابط URL (اختياري)';
+
+  @override
+  String get adminFieldPlacement => 'موضع العرض';
+
+  @override
+  String get adminPlacementHome => 'أعلى الرئيسية';
+
+  @override
+  String get adminPlacementCommunity => 'أعلى المجتمع';
+
+  @override
+  String get adminPlacementProfile => 'أعلى الملف';
+
+  @override
+  String get adminTypeInfo => 'إعلان عام';
+
+  @override
+  String get adminTypeHealthTip => 'نصيحة صحية';
+
+  @override
+  String get adminTypeWarning => 'تنبيه مهم';
+
+  @override
+  String get adminTypeCampaign => 'حملة';
+
+  @override
+  String get adminSearchUsersHint => 'ابحث بالاسم أو الدولة أو الحالة...';
+
+  @override
+  String get adminActionVerify => 'توثيق';
+
+  @override
+  String get adminActionUnverify => 'إلغاء التوثيق';
+
+  @override
+  String get adminActionSuspend => 'تعليق';
+
+  @override
+  String get adminActionUnsuspend => 'تفعيل';
+
+  @override
+  String get adminStatusSuspended => 'معلق';
+
+  @override
+  String get adminStatusVerified => 'موثق';
+
+  @override
+  String get adminReportResolve => 'تم الحل';
+
+  @override
+  String get adminReportDismiss => 'تجاهل';
+
+  @override
+  String get adminNoReports => 'لا توجد بلاغات حالياً.';
+
+  @override
+  String get adminNoAnnouncements => 'لا توجد إعلانات حالياً.';
+
+  @override
+  String get adminNoPromotions => 'لا توجد إعلانات ترويجية حالياً.';
 }

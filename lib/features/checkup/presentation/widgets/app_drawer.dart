@@ -34,6 +34,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenDietMenu,
     this.onOpenAiCalorieScanner,
     this.onOpenHealthCommunity,
+    this.onOpenAdminPanel,
     this.onOpenDonate,
     this.onOpenGrowthBmi,
     this.onOpenChildrenGrowth,
@@ -60,6 +61,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenDietMenu;
   final VoidCallback? onOpenAiCalorieScanner;
   final VoidCallback? onOpenHealthCommunity;
+  final VoidCallback? onOpenAdminPanel;
   final VoidCallback? onOpenDonate;
   final VoidCallback? onOpenGrowthBmi;
   final VoidCallback? onOpenChildrenGrowth;
@@ -481,6 +483,14 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 8),
                   const Divider(indent: 12, endIndent: 12),
                   _DrawerSectionLabel(l10n.menuSectionSettings),
+                  if (onOpenAdminPanel != null)
+                    _DrawerTile(
+                      key: const Key('drawer_admin_panel_tile'),
+                      icon: Icons.admin_panel_settings_rounded,
+                      label: l10n.adminPanelTitle,
+                      accentColor: const Color(0xFFD97706),
+                      onTap: () => _closeAndRun(context, onOpenAdminPanel!),
+                    ),
                   if (onOpenSettings != null)
                     _DrawerTile(
                       icon: Icons.settings_outlined,
@@ -658,6 +668,7 @@ class _DrawerSectionLabel extends StatelessWidget {
 
 class _DrawerTile extends StatelessWidget {
   const _DrawerTile({
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,

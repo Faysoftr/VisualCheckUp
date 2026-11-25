@@ -113,6 +113,90 @@ class CommunityCountryOption {
   }
 }
 
+/// Optional chronic conditions users can list on their community profile
+/// to find peers navigating the same health journey worldwide.
+enum ChronicCondition {
+  type1Diabetes,
+  type2Diabetes,
+  hypertension,
+  asthmaCopd,
+  thyroidHashimoto,
+  migraine,
+  heartCondition,
+  celiacIbs,
+  arthritisRheumatism,
+  anemia,
+  kidneyHealth,
+  eczemaPsoriasis,
+}
+
+extension ChronicConditionX on ChronicCondition {
+  String get id => name;
+
+  static ChronicCondition? fromId(String? value) {
+    for (final c in ChronicCondition.values) {
+      if (c.name == value) return c;
+    }
+    return null;
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ChronicCondition.type1Diabetes:
+      case ChronicCondition.type2Diabetes:
+        return Icons.bloodtype_rounded;
+      case ChronicCondition.hypertension:
+      case ChronicCondition.heartCondition:
+        return Icons.monitor_heart_rounded;
+      case ChronicCondition.asthmaCopd:
+        return Icons.air_rounded;
+      case ChronicCondition.thyroidHashimoto:
+        return Icons.biotech_rounded;
+      case ChronicCondition.migraine:
+        return Icons.psychology_alt_rounded;
+      case ChronicCondition.celiacIbs:
+        return Icons.restaurant_rounded;
+      case ChronicCondition.arthritisRheumatism:
+        return Icons.accessibility_new_rounded;
+      case ChronicCondition.anemia:
+        return Icons.water_drop_rounded;
+      case ChronicCondition.kidneyHealth:
+        return Icons.medical_services_outlined;
+      case ChronicCondition.eczemaPsoriasis:
+        return Icons.spa_rounded;
+    }
+  }
+
+  Color get accentColor {
+    switch (this) {
+      case ChronicCondition.type1Diabetes:
+        return const Color(0xFFB91C1C);
+      case ChronicCondition.type2Diabetes:
+        return const Color(0xFFC8553D);
+      case ChronicCondition.hypertension:
+        return const Color(0xFFDC2626);
+      case ChronicCondition.asthmaCopd:
+        return const Color(0xFF0284C7);
+      case ChronicCondition.thyroidHashimoto:
+        return const Color(0xFF7C3AED);
+      case ChronicCondition.migraine:
+        return const Color(0xFF6D28D9);
+      case ChronicCondition.heartCondition:
+        return const Color(0xFFBE123C);
+      case ChronicCondition.celiacIbs:
+        return const Color(0xFF15803D);
+      case ChronicCondition.arthritisRheumatism:
+        return const Color(0xFFD97706);
+      case ChronicCondition.anemia:
+        return const Color(0xFF9F1239);
+      case ChronicCondition.kidneyHealth:
+        return const Color(0xFF0F766E);
+      case ChronicCondition.eczemaPsoriasis:
+        return const Color(0xFFEA580C);
+    }
+  }
+}
+
 /// Public opt-in Health Community profile stored separately from private
 /// medical backup collections (`community_profiles/{uid}`).
 class HealthCommunityProfile {
@@ -126,6 +210,9 @@ class HealthCommunityProfile {
     this.city = '',
     this.languageCode = 'tr',
     this.healthGoals = const [HealthGoalTag.healthyLiving],
+    this.chronicConditions = const [],
+    this.customChronicCondition = '',
+    this.showChronicConditions = true,
     this.bio = '',
     this.dailyFocus = '',
     this.hideRealName = false,
@@ -134,6 +221,11 @@ class HealthCommunityProfile {
     this.discoverable = true,
     this.allowMessages = true,
     this.requireMessageApproval = true,
+    this.isOnline = false,
+    this.showOnlineStatus = true,
+    this.lastActiveAt,
+    this.isVerified = false,
+    this.isSuspended = false,
     this.likedBy = const [],
     this.isSampleProfile = false,
     required this.updatedAt,
@@ -148,6 +240,9 @@ class HealthCommunityProfile {
   final String city;
   final String languageCode;
   final List<HealthGoalTag> healthGoals;
+  final List<ChronicCondition> chronicConditions;
+  final String customChronicCondition;
+  final bool showChronicConditions;
   final String bio;
   final String dailyFocus;
   final bool hideRealName;
@@ -156,6 +251,11 @@ class HealthCommunityProfile {
   final bool discoverable;
   final bool allowMessages;
   final bool requireMessageApproval;
+  final bool isOnline;
+  final bool showOnlineStatus;
+  final DateTime? lastActiveAt;
+  final bool isVerified;
+  final bool isSuspended;
   final List<String> likedBy;
   final bool isSampleProfile;
   final DateTime updatedAt;
@@ -163,6 +263,37 @@ class HealthCommunityProfile {
   int get likesCount => likedBy.length;
 
   bool isLikedBy(String userId) => userId.isNotEmpty && likedBy.contains(userId);
+
+  bool get hasAnyChronicCondition =>
+      chronicConditions.isNotEmpty || customChronicCondition.trim().isNotEmpty;
+
+  /// True when the member allows online presence AND is active right now
+  /// (explicit online flag or active within the last 10 minutes).
+  bool isVisibleOnlineAt(DateTime now) {
+    if (!showOnlineStatus) return false;
+    if (isOnline) return true;
+    if (lastActiveAt != null && now.difference(lastActiveAt!).inMinutes <= 10) {
+      return true;
+    }
+    return false;
+  }
+
+  bool get isVisibleOnline => isVisibleOnlineAt(DateTime.now());
+
+  /// Returns true if this profile shares at least one chronic condition
+  /// (selected enum or normalized custom entry) with [other].
+  bool sharesConditionWith(HealthCommunityProfile other) {
+    if (!showChronicConditions || !other.showChronicConditions) return false;
+    for (final c in chronicConditions) {
+      if (other.chronicConditions.contains(c)) return true;
+    }
+    final mine = customChronicCondition.trim().toLowerCase();
+    final theirs = other.customChronicCondition.trim().toLowerCase();
+    if (mine.isNotEmpty && theirs.isNotEmpty) {
+      return mine == theirs || mine.contains(theirs) || theirs.contains(mine);
+    }
+    return false;
+  }
 
   /// Privacy-aware public name (respects [hideRealName]).
   String get visibleName {
@@ -236,6 +367,9 @@ class HealthCommunityProfile {
     String? city,
     String? languageCode,
     List<HealthGoalTag>? healthGoals,
+    List<ChronicCondition>? chronicConditions,
+    String? customChronicCondition,
+    bool? showChronicConditions,
     String? bio,
     String? dailyFocus,
     bool? hideRealName,
@@ -244,6 +378,11 @@ class HealthCommunityProfile {
     bool? discoverable,
     bool? allowMessages,
     bool? requireMessageApproval,
+    bool? isOnline,
+    bool? showOnlineStatus,
+    DateTime? lastActiveAt,
+    bool? isVerified,
+    bool? isSuspended,
     List<String>? likedBy,
     bool? isSampleProfile,
     DateTime? updatedAt,
@@ -258,6 +397,11 @@ class HealthCommunityProfile {
       city: city ?? this.city,
       languageCode: languageCode ?? this.languageCode,
       healthGoals: healthGoals ?? this.healthGoals,
+      chronicConditions: chronicConditions ?? this.chronicConditions,
+      customChronicCondition:
+          customChronicCondition ?? this.customChronicCondition,
+      showChronicConditions:
+          showChronicConditions ?? this.showChronicConditions,
       bio: bio ?? this.bio,
       dailyFocus: dailyFocus ?? this.dailyFocus,
       hideRealName: hideRealName ?? this.hideRealName,
@@ -267,6 +411,11 @@ class HealthCommunityProfile {
       allowMessages: allowMessages ?? this.allowMessages,
       requireMessageApproval:
           requireMessageApproval ?? this.requireMessageApproval,
+      isOnline: isOnline ?? this.isOnline,
+      showOnlineStatus: showOnlineStatus ?? this.showOnlineStatus,
+      lastActiveAt: lastActiveAt ?? this.lastActiveAt,
+      isVerified: isVerified ?? this.isVerified,
+      isSuspended: isSuspended ?? this.isSuspended,
       likedBy: likedBy ?? this.likedBy,
       isSampleProfile: isSampleProfile ?? this.isSampleProfile,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -286,6 +435,10 @@ class HealthCommunityProfile {
       'city': city.trim(),
       'languageCode': languageCode.toLowerCase(),
       'healthGoals': healthGoals.map((g) => g.id).toList(),
+      'chronicConditions': chronicConditions.map((c) => c.id).toList(),
+      if (customChronicCondition.trim().isNotEmpty)
+        'customChronicCondition': customChronicCondition.trim(),
+      'showChronicConditions': showChronicConditions,
       'bio': bio.trim(),
       'dailyFocus': dailyFocus.trim(),
       'hideRealName': hideRealName,
@@ -294,6 +447,11 @@ class HealthCommunityProfile {
       'discoverable': discoverable,
       'allowMessages': allowMessages,
       'requireMessageApproval': requireMessageApproval,
+      'isOnline': isOnline,
+      'showOnlineStatus': showOnlineStatus,
+      if (lastActiveAt != null) 'lastActiveAt': lastActiveAt!.toIso8601String(),
+      'isVerified': isVerified,
+      'isSuspended': isSuspended,
       'likedBy': likedBy,
       'likesCount': likedBy.length,
       'updatedAt': updatedAt.toIso8601String(),
@@ -310,6 +468,12 @@ class HealthCommunityProfile {
             .toList() ??
         const <HealthGoalTag>[];
 
+    final rawConditions = (json['chronicConditions'] as List<dynamic>?)
+            ?.map((e) => ChronicConditionX.fromId(e?.toString()))
+            .whereType<ChronicCondition>()
+            .toList() ??
+        const <ChronicCondition>[];
+
     final rawLikedBy = (json['likedBy'] as List<dynamic>?)
             ?.whereType<String>()
             .toList() ??
@@ -319,6 +483,12 @@ class HealthCommunityProfile {
     final rawUpdated = json['updatedAt'];
     if (rawUpdated is String) {
       parsedUpdated = DateTime.tryParse(rawUpdated) ?? parsedUpdated;
+    }
+
+    DateTime? parsedLastActive;
+    final rawLastActive = json['lastActiveAt'];
+    if (rawLastActive is String) {
+      parsedLastActive = DateTime.tryParse(rawLastActive);
     }
 
     return HealthCommunityProfile(
@@ -332,6 +502,10 @@ class HealthCommunityProfile {
       languageCode: (json['languageCode'] as String?) ?? 'en',
       healthGoals:
           rawGoals.isEmpty ? const [HealthGoalTag.healthyLiving] : rawGoals,
+      chronicConditions: rawConditions,
+      customChronicCondition:
+          (json['customChronicCondition'] as String?) ?? '',
+      showChronicConditions: (json['showChronicConditions'] as bool?) ?? true,
       bio: (json['bio'] as String?) ?? '',
       dailyFocus: (json['dailyFocus'] as String?) ?? '',
       hideRealName: (json['hideRealName'] as bool?) ?? false,
@@ -341,6 +515,11 @@ class HealthCommunityProfile {
       allowMessages: (json['allowMessages'] as bool?) ?? true,
       requireMessageApproval:
           (json['requireMessageApproval'] as bool?) ?? true,
+      isOnline: (json['isOnline'] as bool?) ?? false,
+      showOnlineStatus: (json['showOnlineStatus'] as bool?) ?? true,
+      lastActiveAt: parsedLastActive,
+      isVerified: (json['isVerified'] as bool?) ?? false,
+      isSuspended: (json['isSuspended'] as bool?) ?? false,
       likedBy: rawLikedBy,
       isSampleProfile: (json['isSampleProfile'] as bool?) ?? false,
       updatedAt: parsedUpdated,

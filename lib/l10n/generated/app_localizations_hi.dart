@@ -2422,4 +2422,186 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'सभी के लिए हटाएँ';
+
+  @override
+  String get commOnlineNow => 'ऑनलाइन';
+
+  @override
+  String get commFilterOnlineOnly => 'अभी ऑनलाइन';
+
+  @override
+  String get commFilterSameCondition => 'समान बीमारी';
+
+  @override
+  String get commFilterAllConditions => 'सभी बीमारियाँ';
+
+  @override
+  String get commSameConditionPrompt =>
+      'समान स्वास्थ्य स्थिति वाले लोगों को खोजने के लिए मेरी प्रोफ़ाइल में दीर्घकालिक बीमारी जोड़ें।';
+
+  @override
+  String get commFieldChronicConditions => 'दीर्घकालिक बीमारियाँ (वैकल्पिक)';
+
+  @override
+  String get commFieldCustomCondition => 'अन्य दीर्घकालिक स्थिति (वैकल्पिक)';
+
+  @override
+  String get commFieldCustomConditionHint => 'जैसे: फ़ाइब्रोमायल्जिया, PCOS...';
+
+  @override
+  String get commToggleShowConditions =>
+      'मेरी प्रोफ़ाइल पर दीर्घकालिक बीमारियाँ दिखाएँ';
+
+  @override
+  String get commToggleShowOnline => 'मेरा ऑनलाइन स्टेटस दिखाएँ';
+
+  @override
+  String get condType1Diabetes => 'टाइप 1 डायबिटीज़';
+
+  @override
+  String get condType2Diabetes => 'टाइप 2 डायबिटीज़';
+
+  @override
+  String get condHypertension => 'हाई ब्लड प्रेशर';
+
+  @override
+  String get condAsthmaCopd => 'अस्थमा / COPD';
+
+  @override
+  String get condThyroidHashimoto => 'थायरॉइड / हाशिमोटो';
+
+  @override
+  String get condMigraine => 'माइग्रेन';
+
+  @override
+  String get condHeartCondition => 'हृदय रोग';
+
+  @override
+  String get condCeliacIbs => 'सीलिएक / IBS';
+
+  @override
+  String get condArthritis => 'गठिया / अर्थराइटिस';
+
+  @override
+  String get condAnemia => 'एनीमिया';
+
+  @override
+  String get condKidneyHealth => 'किडनी स्वास्थ्य';
+
+  @override
+  String get condEczemaPsoriasis => 'एक्ज़िमा / सोरायसिस';
+
+  @override
+  String get adminPanelTitle => 'एडमिन कंट्रोल पैनल';
+
+  @override
+  String get adminTabStats => 'आँकड़े';
+
+  @override
+  String get adminTabAnnouncements => 'घोषणाएँ';
+
+  @override
+  String get adminTabPromotions => 'विज्ञापन';
+
+  @override
+  String get adminTabUsers => 'उपयोगकर्ता';
+
+  @override
+  String get adminTabReports => 'रिपोर्ट्स';
+
+  @override
+  String get adminStatOnline => 'ऑनलाइन';
+
+  @override
+  String get adminStatMembers => 'सदस्य';
+
+  @override
+  String get adminStatLikes => 'लाइक';
+
+  @override
+  String get adminStatChats => 'चैट्स';
+
+  @override
+  String get adminStatPendingReports => 'लंबित रिपोर्ट';
+
+  @override
+  String get adminStatActiveBanners => 'सक्रिय बैनर';
+
+  @override
+  String get adminConditionBreakdown => 'दीर्घकालिक बीमारियों का विवरण';
+
+  @override
+  String get adminNewAnnouncement => 'नई घोषणा';
+
+  @override
+  String get adminNewPromotion => 'नया विज्ञापन / बैनर';
+
+  @override
+  String get adminFieldTitle => 'शीर्षक';
+
+  @override
+  String get adminFieldMessage => 'संदेश / विवरण';
+
+  @override
+  String get adminFieldLink => 'लिंक URL (वैकल्पिक)';
+
+  @override
+  String get adminFieldPlacement => 'स्थान';
+
+  @override
+  String get adminPlacementHome => 'होम शीर्ष';
+
+  @override
+  String get adminPlacementCommunity => 'कम्युनिटी शीर्ष';
+
+  @override
+  String get adminPlacementProfile => 'प्रोफ़ाइल शीर्ष';
+
+  @override
+  String get adminTypeInfo => 'घोषणा';
+
+  @override
+  String get adminTypeHealthTip => 'स्वास्थ्य टिप';
+
+  @override
+  String get adminTypeWarning => 'चेतावनी';
+
+  @override
+  String get adminTypeCampaign => 'अभियान';
+
+  @override
+  String get adminSearchUsersHint => 'नाम, देश या बीमारी से खोजें...';
+
+  @override
+  String get adminActionVerify => 'सत्यापित करें';
+
+  @override
+  String get adminActionUnverify => 'सत्यापन हटाएँ';
+
+  @override
+  String get adminActionSuspend => 'निलंबित करें';
+
+  @override
+  String get adminActionUnsuspend => 'बहाल करें';
+
+  @override
+  String get adminStatusSuspended => 'निलंबित';
+
+  @override
+  String get adminStatusVerified => 'सत्यापित';
+
+  @override
+  String get adminReportResolve => 'हल करें';
+
+  @override
+  String get adminReportDismiss => 'खारिज करें';
+
+  @override
+  String get adminNoReports => 'कोई सुरक्षा रिपोर्ट नहीं।';
+
+  @override
+  String get adminNoAnnouncements => 'अभी कोई घोषणा नहीं।';
+
+  @override
+  String get adminNoPromotions => 'अभी कोई विज्ञापन नहीं।';
 }

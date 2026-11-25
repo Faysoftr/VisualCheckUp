@@ -4537,6 +4537,366 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete for everyone'**
   String get commDeleteForEveryone;
+
+  /// No description provided for @commOnlineNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get commOnlineNow;
+
+  /// No description provided for @commFilterOnlineOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Now'**
+  String get commFilterOnlineOnly;
+
+  /// No description provided for @commFilterSameCondition.
+  ///
+  /// In en, this message translates to:
+  /// **'Same Condition'**
+  String get commFilterSameCondition;
+
+  /// No description provided for @commFilterAllConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'All Conditions'**
+  String get commFilterAllConditions;
+
+  /// No description provided for @commSameConditionPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a chronic condition in My Profile to match with peers sharing it.'**
+  String get commSameConditionPrompt;
+
+  /// No description provided for @commFieldChronicConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Chronic Conditions (Optional)'**
+  String get commFieldChronicConditions;
+
+  /// No description provided for @commFieldCustomCondition.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Chronic Condition (optional)'**
+  String get commFieldCustomCondition;
+
+  /// No description provided for @commFieldCustomConditionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Fibromyalgia, PCOS, Vitamin D deficiency'**
+  String get commFieldCustomConditionHint;
+
+  /// No description provided for @commToggleShowConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my chronic conditions on profile'**
+  String get commToggleShowConditions;
+
+  /// No description provided for @commToggleShowOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my online status'**
+  String get commToggleShowOnline;
+
+  /// No description provided for @condType1Diabetes.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 1 Diabetes'**
+  String get condType1Diabetes;
+
+  /// No description provided for @condType2Diabetes.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 2 Diabetes'**
+  String get condType2Diabetes;
+
+  /// No description provided for @condHypertension.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypertension'**
+  String get condHypertension;
+
+  /// No description provided for @condAsthmaCopd.
+  ///
+  /// In en, this message translates to:
+  /// **'Asthma / COPD'**
+  String get condAsthmaCopd;
+
+  /// No description provided for @condThyroidHashimoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Thyroid / Hashimoto'**
+  String get condThyroidHashimoto;
+
+  /// No description provided for @condMigraine.
+  ///
+  /// In en, this message translates to:
+  /// **'Migraine'**
+  String get condMigraine;
+
+  /// No description provided for @condHeartCondition.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart & Vascular'**
+  String get condHeartCondition;
+
+  /// No description provided for @condCeliacIbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Celiac / IBS'**
+  String get condCeliacIbs;
+
+  /// No description provided for @condArthritis.
+  ///
+  /// In en, this message translates to:
+  /// **'Arthritis / Rheumatism'**
+  String get condArthritis;
+
+  /// No description provided for @condAnemia.
+  ///
+  /// In en, this message translates to:
+  /// **'Anemia'**
+  String get condAnemia;
+
+  /// No description provided for @condKidneyHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Kidney Health'**
+  String get condKidneyHealth;
+
+  /// No description provided for @condEczemaPsoriasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Eczema / Psoriasis'**
+  String get condEczemaPsoriasis;
+
+  /// No description provided for @adminPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Control Panel'**
+  String get adminPanelTitle;
+
+  /// No description provided for @adminTabStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get adminTabStats;
+
+  /// No description provided for @adminTabAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get adminTabAnnouncements;
+
+  /// No description provided for @adminTabPromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads & Banners'**
+  String get adminTabPromotions;
+
+  /// No description provided for @adminTabUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get adminTabUsers;
+
+  /// No description provided for @adminTabReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get adminTabReports;
+
+  /// No description provided for @adminStatOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Now'**
+  String get adminStatOnline;
+
+  /// No description provided for @adminStatMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get adminStatMembers;
+
+  /// No description provided for @adminStatLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Likes'**
+  String get adminStatLikes;
+
+  /// No description provided for @adminStatChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Chats'**
+  String get adminStatChats;
+
+  /// No description provided for @adminStatPendingReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Reports'**
+  String get adminStatPendingReports;
+
+  /// No description provided for @adminStatActiveBanners.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Ads/Notices'**
+  String get adminStatActiveBanners;
+
+  /// No description provided for @adminConditionBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Chronic Condition Distribution'**
+  String get adminConditionBreakdown;
+
+  /// No description provided for @adminNewAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'New Announcement'**
+  String get adminNewAnnouncement;
+
+  /// No description provided for @adminNewPromotion.
+  ///
+  /// In en, this message translates to:
+  /// **'New Ad / Banner'**
+  String get adminNewPromotion;
+
+  /// No description provided for @adminFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get adminFieldTitle;
+
+  /// No description provided for @adminFieldMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message / Description'**
+  String get adminFieldMessage;
+
+  /// No description provided for @adminFieldLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Link URL (optional)'**
+  String get adminFieldLink;
+
+  /// No description provided for @adminFieldPlacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Placement'**
+  String get adminFieldPlacement;
+
+  /// No description provided for @adminPlacementHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Top'**
+  String get adminPlacementHome;
+
+  /// No description provided for @adminPlacementCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Community Top'**
+  String get adminPlacementCommunity;
+
+  /// No description provided for @adminPlacementProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Top'**
+  String get adminPlacementProfile;
+
+  /// No description provided for @adminTypeInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement'**
+  String get adminTypeInfo;
+
+  /// No description provided for @adminTypeHealthTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Tip'**
+  String get adminTypeHealthTip;
+
+  /// No description provided for @adminTypeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert'**
+  String get adminTypeWarning;
+
+  /// No description provided for @adminTypeCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign'**
+  String get adminTypeCampaign;
+
+  /// No description provided for @adminSearchUsersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search users by name, country, or condition...'**
+  String get adminSearchUsersHint;
+
+  /// No description provided for @adminActionVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get adminActionVerify;
+
+  /// No description provided for @adminActionUnverify.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Verification'**
+  String get adminActionUnverify;
+
+  /// No description provided for @adminActionSuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get adminActionSuspend;
+
+  /// No description provided for @adminActionUnsuspend.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get adminActionUnsuspend;
+
+  /// No description provided for @adminStatusSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get adminStatusSuspended;
+
+  /// No description provided for @adminStatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get adminStatusVerified;
+
+  /// No description provided for @adminReportResolve.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve'**
+  String get adminReportResolve;
+
+  /// No description provided for @adminReportDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get adminReportDismiss;
+
+  /// No description provided for @adminNoReports.
+  ///
+  /// In en, this message translates to:
+  /// **'No safety reports yet.'**
+  String get adminNoReports;
+
+  /// No description provided for @adminNoAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'No announcements yet.'**
+  String get adminNoAnnouncements;
+
+  /// No description provided for @adminNoPromotions.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads or banners yet.'**
+  String get adminNoPromotions;
 }
 
 class _AppLocalizationsDelegate

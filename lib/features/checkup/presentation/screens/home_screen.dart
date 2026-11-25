@@ -5,6 +5,10 @@ import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
+import 'package:visualcheckup/features/admin/data/admin_repository.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
+import 'package:visualcheckup/features/admin/presentation/screens/admin_panel_screen.dart';
+import 'package:visualcheckup/features/admin/presentation/widgets/global_announcement_and_promo_banners.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
@@ -56,6 +60,7 @@ class HomeScreen extends StatefulWidget {
     this.medicationRepository,
     this.dietRepository,
     this.alarmScheduler,
+    this.adminRepository,
   });
 
   final ColorHealthAnalyzer analyzer;
@@ -64,6 +69,7 @@ class HomeScreen extends StatefulWidget {
   final MedicationReminderRepository? medicationRepository;
   final DietRepository? dietRepository;
   final MedicationAlarmScheduler? alarmScheduler;
+  final AdminRepository? adminRepository;
   final AuthUser currentUser;
   final ThemeController themeController;
   final LocaleController? localeController;
@@ -194,7 +200,18 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => HealthCommunityHubScreen(
           currentUser: widget.currentUser,
           repository: HealthCommunityRepository(),
+          adminRepository: widget.adminRepository,
           initialTabIndex: initialTabIndex,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openAdminPanel() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AdminPanelScreen(
+          repository: widget.adminRepository ?? AdminRepository(),
         ),
       ),
     );
@@ -494,6 +511,12 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
         onOpenHealthCommunity: () => _openHealthCommunity(initialTabIndex: 0),
+        onOpenAdminPanel: AdminUtils.isAdmin(
+          email: widget.currentUser.email,
+          uid: widget.currentUser.id,
+        )
+            ? _openAdminPanel
+            : null,
         onOpenDonate: () => DonationSupportDialog.show(context),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
@@ -698,6 +721,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 0. Admin-managed Global Announcement & Top Health Banner
+                      GlobalAnnouncementBanner(
+                        repository: widget.adminRepository,
+                        margin: const EdgeInsets.only(bottom: 10),
+                      ),
+                      HealthPromotionBanner(
+                        placement: PromotionPlacement.homeTop,
+                        repository: widget.adminRepository,
+                        margin: const EdgeInsets.only(bottom: 10),
+                      ),
+
                       // 1. Signature Deep-Teal Gradient Hero Card
                       _HeroWellnessCard(
                         greeting: _greetingText(context),

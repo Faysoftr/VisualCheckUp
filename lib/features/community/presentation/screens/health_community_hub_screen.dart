@@ -6,6 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/admin/data/admin_repository.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
+import 'package:visualcheckup/features/admin/presentation/widgets/global_announcement_and_promo_banners.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
@@ -17,17 +20,19 @@ import 'package:visualcheckup/features/community/presentation/widgets/community_
 /// Main Global Health Community hub for VisualCheckUp.
 ///
 /// 3 tabs:
-/// 1. Discover — worldwide health buddies filterable by Health Goal, Country,
-///    and search query, with live Profile Like buttons.
+/// 1. Discover — worldwide health buddies filterable by Online Now, Same
+///    Chronic Condition, Specific Condition, Health Goal, Country, and search
+///    query, with live Profile Like buttons.
 /// 2. Messages — 1-on-1 conversations and Message Requests with unread counts,
 ///    mute, and hide controls.
-/// 3. My Profile — opt-in health profile editor with R2 avatar upload, health
-///    goal tags, wellness motto, and full privacy & messaging toggles.
+/// 3. My Profile — opt-in health profile editor with R2 avatar upload, chronic
+///    conditions, health goal tags, wellness motto, and full privacy toggles.
 class HealthCommunityHubScreen extends StatefulWidget {
   const HealthCommunityHubScreen({
     super.key,
     required this.currentUser,
     required this.repository,
+    this.adminRepository,
     this.uploadService,
     this.photoPicker,
     this.initialTabIndex = 0,
@@ -35,6 +40,7 @@ class HealthCommunityHubScreen extends StatefulWidget {
 
   final AuthUser currentUser;
   final HealthCommunityRepository repository;
+  final AdminRepository? adminRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
   final int initialTabIndex;
@@ -55,6 +61,8 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _dailyFocusController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _customConditionController =
+      TextEditingController();
 
   bool _loading = true;
   bool _savingProfile = false;
@@ -65,6 +73,9 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   List<CommunityConversation> _conversations = const [];
 
   HealthGoalTag? _goalFilter;
+  ChronicCondition? _conditionFilter;
+  bool _sameConditionOnly = false;
+  bool _onlineOnly = false;
   String _countryFilter = 'ALL';
 
   // Editable form state for My Profile
@@ -74,6 +85,9 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   String _countryCode = 'TR';
   String _languageCode = 'tr';
   Set<HealthGoalTag> _selectedGoals = {HealthGoalTag.healthyLiving};
+  Set<ChronicCondition> _selectedConditions = {};
+  bool _showChronicConditions = true;
+  bool _showOnlineStatus = true;
   bool _discoverable = true;
   bool _hideRealName = false;
   bool _hidePhoto = false;
@@ -92,11 +106,13 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     );
     _uploadService =
         widget.uploadService ?? R2CommunityImageUploadService.instance;
+    widget.repository.updateOnlinePresence(_myUid, isOnline: true);
     _loadAll();
   }
 
   @override
   void dispose() {
+    widget.repository.updateOnlinePresence(_myUid, isOnline: false);
     _tabController.dispose();
     _searchController.dispose();
     _displayNameController.dispose();
@@ -104,6 +120,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     _cityController.dispose();
     _dailyFocusController.dispose();
     _bioController.dispose();
+    _customConditionController.dispose();
     super.dispose();
   }
 
@@ -116,11 +133,15 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       _cityController.text = '';
       _dailyFocusController.text = '';
       _bioController.text = '';
+      _customConditionController.text = '';
       _photoUrl = null;
       _photoKey = null;
       _countryCode = 'TR';
       _languageCode = 'tr';
       _selectedGoals = {HealthGoalTag.healthyLiving};
+      _selectedConditions = {};
+      _showChronicConditions = true;
+      _showOnlineStatus = true;
       _discoverable = true;
       _hideRealName = false;
       _hidePhoto = false;
@@ -133,11 +154,15 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     _cityController.text = profile.city;
     _dailyFocusController.text = profile.dailyFocus;
     _bioController.text = profile.bio;
+    _customConditionController.text = profile.customChronicCondition;
     _photoUrl = profile.photoUrl;
     _photoKey = profile.photoKey;
     _countryCode = profile.countryCode;
     _languageCode = profile.languageCode;
     _selectedGoals = Set<HealthGoalTag>.from(profile.healthGoals);
+    _selectedConditions = Set<ChronicCondition>.from(profile.chronicConditions);
+    _showChronicConditions = profile.showChronicConditions;
+    _showOnlineStatus = profile.showOnlineStatus;
     _discoverable = profile.discoverable;
     _hideRealName = profile.hideRealName;
     _hidePhoto = profile.hidePhoto;
@@ -150,6 +175,9 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     final discover = await widget.repository.discoverProfiles(
       myUid: _myUid,
       goalFilter: _goalFilter,
+      conditionFilter: _conditionFilter,
+      sameConditionAsMe: _sameConditionOnly,
+      onlineOnly: _onlineOnly,
       countryCodeFilter: _countryFilter,
       searchQuery: _searchController.text,
     );
@@ -171,6 +199,9 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     final discover = await widget.repository.discoverProfiles(
       myUid: _myUid,
       goalFilter: _goalFilter,
+      conditionFilter: _conditionFilter,
+      sameConditionAsMe: _sameConditionOnly,
+      onlineOnly: _onlineOnly,
       countryCodeFilter: _countryFilter,
       searchQuery: _searchController.text,
     );
@@ -283,6 +314,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     if (name.isEmpty) return;
 
     setState(() => _savingProfile = true);
+    final now = DateTime.now();
     final profile = HealthCommunityProfile(
       uid: _myUid,
       displayName: name,
@@ -295,6 +327,14 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       healthGoals: _selectedGoals.isEmpty
           ? const [HealthGoalTag.healthyLiving]
           : _selectedGoals.toList(),
+      chronicConditions: _selectedConditions.toList(),
+      customChronicCondition: _customConditionController.text.trim(),
+      showChronicConditions: _showChronicConditions,
+      isOnline: true,
+      showOnlineStatus: _showOnlineStatus,
+      lastActiveAt: now,
+      isVerified: _myProfile?.isVerified ?? false,
+      isSuspended: _myProfile?.isSuspended ?? false,
       bio: _bioController.text.trim(),
       dailyFocus: _dailyFocusController.text.trim(),
       hideRealName: _hideRealName,
@@ -304,7 +344,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       allowMessages: _allowMessages,
       requireMessageApproval: _requireMessageApproval,
       likedBy: _myProfile?.likedBy ?? const [],
-      updatedAt: DateTime.now(),
+      updatedAt: now,
     );
 
     final saved = await widget.repository.saveMyProfile(profile);
@@ -317,6 +357,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.commProfileSaved)),
     );
+    await _refreshDiscover();
   }
 
   Future<void> _leaveCommunity() async {
@@ -326,6 +367,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     setState(() {
       _myProfile = null;
       _creatingProfile = false;
+      _sameConditionOnly = false;
       _syncFormFromProfile(null);
     });
     ScaffoldMessenger.of(context).showSnackBar(
@@ -471,6 +513,111 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
           ),
         ),
 
+        // Quick Peer Match Filters: Online Now, Same Chronic Condition, Specific Condition
+        SizedBox(
+          height: 44,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  key: const Key('comm_filter_online_only'),
+                  avatar: Icon(
+                    Icons.circle,
+                    size: 11,
+                    color: _onlineOnly ? Colors.white : const Color(0xFF16A34A),
+                  ),
+                  label: Text(l10n.commFilterOnlineOnly),
+                  selected: _onlineOnly,
+                  selectedColor: const Color(0xFF16A34A),
+                  labelStyle: TextStyle(
+                    color: _onlineOnly ? Colors.white : null,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  onSelected: (selected) {
+                    setState(() => _onlineOnly = selected);
+                    _refreshDiscover();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  key: const Key('comm_filter_same_condition'),
+                  avatar: Icon(
+                    Icons.medical_information_outlined,
+                    size: 16,
+                    color: _sameConditionOnly
+                        ? Colors.white
+                        : const Color(0xFFD97706),
+                  ),
+                  label: Text(l10n.commFilterSameCondition),
+                  selected: _sameConditionOnly,
+                  selectedColor: const Color(0xFFD97706),
+                  labelStyle: TextStyle(
+                    color: _sameConditionOnly ? Colors.white : null,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  onSelected: (selected) {
+                    if (selected &&
+                        (_myProfile == null ||
+                            !_myProfile!.hasAnyChronicCondition)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.commSameConditionPrompt)),
+                      );
+                      return;
+                    }
+                    setState(() => _sameConditionOnly = selected);
+                    _refreshDiscover();
+                  },
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: _conditionFilter != null
+                      ? _conditionFilter!.accentColor.withValues(alpha: 0.14)
+                      : colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(14),
+                  border: _conditionFilter != null
+                      ? Border.all(
+                          color: _conditionFilter!.accentColor
+                              .withValues(alpha: 0.5),
+                        )
+                      : null,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<ChronicCondition?>(
+                    key: const Key('comm_condition_filter_dropdown'),
+                    value: _conditionFilter,
+                    isDense: true,
+                    items: [
+                      DropdownMenuItem<ChronicCondition?>(
+                        value: null,
+                        child: Text('🩺 ${l10n.commFilterAllConditions}'),
+                      ),
+                      for (final cond in ChronicCondition.values)
+                        DropdownMenuItem<ChronicCondition?>(
+                          value: cond,
+                          child: Text(cond.localizedLabel(l10n)),
+                        ),
+                    ],
+                    onChanged: (v) {
+                      setState(() => _conditionFilter = v);
+                      _refreshDiscover();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+
         // Horizontal Health Goal Filter Chips
         SizedBox(
           height: 44,
@@ -519,166 +666,307 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
             ],
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
 
-        // Discovered Health Profiles List
+        // Discovered Health Profiles List (with Admin Announcement & Community Promo)
         Expanded(
-          child: _discoverList.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(28),
-                    child: Text(
-                      l10n.commEmptyDiscover,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 24),
+            children: [
+              GlobalAnnouncementBanner(
+                repository: widget.adminRepository,
+                margin: const EdgeInsets.only(bottom: 8),
+              ),
+              HealthPromotionBanner(
+                placement: PromotionPlacement.communityTop,
+                repository: widget.adminRepository,
+                margin: const EdgeInsets.only(bottom: 10),
+              ),
+              if (_discoverList.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 40,
+                  ),
+                  child: Text(
+                    l10n.commEmptyDiscover,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(14, 6, 14, 24),
-                  itemCount: _discoverList.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final profile = _discoverList[index];
-                    final isLiked = profile.isLikedBy(_myUid);
-                    final accent = profile.healthGoals.first.accentColor;
+              else
+                for (final profile in _discoverList) ...[
+                  _buildDiscoverProfileCard(context, profile),
+                  const SizedBox(height: 10),
+                ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
-                    return Card(
-                      child: InkWell(
-                        key: Key('comm_profile_card_${profile.uid}'),
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () => _openProfileDetail(profile),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CommunityAvatar(
-                                    initials: profile.initials,
-                                    photoUrl: profile.visiblePhotoUrl,
-                                    radius: 25,
-                                    accentColor: accent,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          profile.visibleName,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.titleMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${profile.country.flag} ${profile.city.isNotEmpty ? '${profile.city} • ' : ''}${profile.country.label}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Quick Like button
-                                  TextButton.icon(
-                                    key: Key('comm_like_btn_${profile.uid}'),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: isLiked
-                                          ? const Color(0xFFE11D48)
-                                          : colorScheme.onSurfaceVariant,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                    ),
-                                    onPressed: () => _toggleQuickLike(profile),
-                                    icon: Icon(
-                                      isLiked
-                                          ? Icons.favorite_rounded
-                                          : Icons.favorite_border_rounded,
-                                      size: 20,
-                                    ),
-                                    label: Text(
-                                      '${profile.likesCount}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+  Widget _buildDiscoverProfileCard(
+    BuildContext context,
+    HealthCommunityProfile profile,
+  ) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isLiked = profile.isLikedBy(_myUid);
+    final accent = profile.healthGoals.first.accentColor;
+
+    return Card(
+      child: InkWell(
+        key: Key('comm_profile_card_${profile.uid}'),
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => _openProfileDetail(profile),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      CommunityAvatar(
+                        initials: profile.initials,
+                        photoUrl: profile.visiblePhotoUrl,
+                        radius: 25,
+                        accentColor: accent,
+                      ),
+                      if (profile.isVisibleOnline)
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF16A34A),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colorScheme.surface,
+                                width: 2,
                               ),
-                              if (profile.showBio &&
-                                  profile.bio.trim().isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  profile.bio.trim(),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    height: 1.35,
-                                  ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                profile.visibleName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
                                 ),
-                              ],
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: [
-                                  for (final goal in profile.healthGoals)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 9,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: goal.accentColor
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            goal.icon,
-                                            size: 13,
-                                            color: goal.accentColor,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            goal.localizedLabel(l10n),
-                                            style: TextStyle(
-                                              color: goal.accentColor,
-                                              fontSize: 11.5,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
+                              ),
+                            ),
+                            if (profile.isVerified) ...[
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.verified_rounded,
+                                size: 16,
+                                color: Color(0xFF0284C7),
                               ),
                             ],
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '${profile.country.flag} ${profile.city.isNotEmpty ? '${profile.city} • ' : ''}${profile.country.label}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (profile.isVisibleOnline) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF16A34A)
+                                      .withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  l10n.commOnlineNow,
+                                  style: const TextStyle(
+                                    color: Color(0xFF16A34A),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Quick Like button
+                  TextButton.icon(
+                    key: Key('comm_like_btn_${profile.uid}'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: isLiked
+                          ? const Color(0xFFE11D48)
+                          : colorScheme.onSurfaceVariant,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                    ),
+                    onPressed: () => _toggleQuickLike(profile),
+                    icon: Icon(
+                      isLiked
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      size: 20,
+                    ),
+                    label: Text(
+                      '${profile.likesCount}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (profile.showBio && profile.bio.trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  profile.bio.trim(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.35,
+                  ),
+                ),
+              ],
+              if (profile.showChronicConditions &&
+                  profile.hasAnyChronicCondition) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final cond in profile.chronicConditions)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: cond.accentColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: cond.accentColor.withValues(alpha: 0.32),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              cond.icon,
+                              size: 13,
+                              color: cond.accentColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              cond.localizedLabel(l10n),
+                              style: TextStyle(
+                                color: cond.accentColor,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (profile.customChronicCondition.trim().isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer
+                              .withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '🩺 ${profile.customChronicCondition.trim()}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                    );
-                  },
+                  ],
                 ),
+              ],
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final goal in profile.healthGoals)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: goal.accentColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            goal.icon,
+                            size: 13,
+                            color: goal.accentColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            goal.localizedLabel(l10n),
+                            style: TextStyle(
+                              color: goal.accentColor,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 
@@ -1037,6 +1325,50 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
         ),
         const SizedBox(height: 16),
 
+        // Chronic Conditions multi-select (Optional)
+        Text(
+          l10n.commFieldChronicConditions,
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final cond in ChronicCondition.values)
+              FilterChip(
+                key: Key('comm_profile_condition_${cond.name}'),
+                avatar: Icon(cond.icon, size: 16, color: cond.accentColor),
+                label: Text(cond.localizedLabel(l10n)),
+                selected: _selectedConditions.contains(cond),
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      _selectedConditions.add(cond);
+                    } else {
+                      _selectedConditions.remove(cond);
+                    }
+                  });
+                },
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          key: const Key('comm_profile_custom_condition_field'),
+          controller: _customConditionController,
+          maxLength: 80,
+          decoration: InputDecoration(
+            labelText: l10n.commFieldCustomCondition,
+            hintText: l10n.commFieldCustomConditionHint,
+            prefixIcon: const Icon(Icons.medical_information_outlined),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+        const SizedBox(height: 10),
+
         // Health Goals multi-select
         Text(
           l10n.commFieldGoals,
@@ -1112,6 +1444,16 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                 title: Text(l10n.commToggleDiscoverable),
                 value: _discoverable,
                 onChanged: (v) => setState(() => _discoverable = v),
+              ),
+              SwitchListTile(
+                title: Text(l10n.commToggleShowConditions),
+                value: _showChronicConditions,
+                onChanged: (v) => setState(() => _showChronicConditions = v),
+              ),
+              SwitchListTile(
+                title: Text(l10n.commToggleShowOnline),
+                value: _showOnlineStatus,
+                onChanged: (v) => setState(() => _showOnlineStatus = v),
               ),
               SwitchListTile(
                 title: Text(l10n.commToggleHideRealName),

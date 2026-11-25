@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+import 'package:visualcheckup/features/admin/data/admin_repository.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
+import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+
+/// Displays the newest active [GlobalAnnouncement] published from Admin Panel.
+class GlobalAnnouncementBanner extends StatefulWidget {
+  const GlobalAnnouncementBanner({
+    super.key,
+    this.repository,
+    this.margin = const EdgeInsets.fromLTRB(16, 10, 16, 4),
+  });
+
+  final AdminRepository? repository;
+  final EdgeInsetsGeometry margin;
+
+  @override
+  State<GlobalAnnouncementBanner> createState() =>
+      _GlobalAnnouncementBannerState();
+}
+
+class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
+  GlobalAnnouncement? _announcement;
+  bool _dismissed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final repo = widget.repository ?? AdminRepository();
+    final active = await repo.loadAnnouncements(activeOnly: true);
+    if (!mounted) return;
+    setState(() => _announcement = active.isEmpty ? null : active.first);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ann = _announcement;
+    if (ann == null || _dismissed) return const SizedBox.shrink();
+
+    final accent = ann.type.accentColor;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      key: Key('global_announcement_banner_${ann.id}'),
+      margin: widget.margin,
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: isDark ? 0.18 : 0.10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: accent.withValues(alpha: 0.42)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.16),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(ann.type.icon, color: accent, size: 20),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ann.title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: accent,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  ann.message,
+                  style: theme.textTheme.bodySmall?.copyWith(height: 1.35),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            onPressed: () => setState(() => _dismissed = true),
+            icon: const Icon(Icons.close_rounded, size: 18),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Displays active promotional banner/card configured for [placement].
+class HealthPromotionBanner extends StatefulWidget {
+  const HealthPromotionBanner({
+    super.key,
+    required this.placement,
+    this.repository,
+    this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 4),
+  });
+
+  final PromotionPlacement placement;
+  final AdminRepository? repository;
+  final EdgeInsetsGeometry margin;
+
+  @override
+  State<HealthPromotionBanner> createState() => _HealthPromotionBannerState();
+}
+
+class _HealthPromotionBannerState extends State<HealthPromotionBanner> {
+  HealthPromotion? _promo;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final repo = widget.repository ?? AdminRepository();
+    final list = await repo.loadPromotions(
+      activeOnly: true,
+      placement: widget.placement,
+    );
+    if (!mounted) return;
+    setState(() => _promo = list.isEmpty ? null : list.first);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final promo = _promo;
+    if (promo == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      key: Key('health_promo_banner_${promo.id}'),
+      margin: widget.margin,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (promo.imageUrl != null && promo.imageUrl!.trim().isNotEmpty)
+            SizedBox(
+              width: double.infinity,
+              height: 120,
+              child: CommunityImagePreview(
+                imageUrl: promo.imageUrl!,
+                width: double.infinity,
+                height: 120,
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.local_offer_outlined,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        promo.title,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (promo.subtitle.trim().isNotEmpty)
+                        Text(
+                          promo.subtitle.trim(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

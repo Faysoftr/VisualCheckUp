@@ -2448,4 +2448,188 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'Herkesten sil';
+
+  @override
+  String get commOnlineNow => 'Çevrimiçi';
+
+  @override
+  String get commFilterOnlineOnly => 'Çevrimiçi Olanlar';
+
+  @override
+  String get commFilterSameCondition => 'Aynı Hastalık';
+
+  @override
+  String get commFilterAllConditions => 'Tüm Hastalıklar';
+
+  @override
+  String get commSameConditionPrompt =>
+      'Aynı hastalığa sahip kişileri bulmak için Profilim sekmesinden kronik hastalığınızı ekleyin.';
+
+  @override
+  String get commFieldChronicConditions => 'Kronik Hastalıklar (İsteğe Bağlı)';
+
+  @override
+  String get commFieldCustomCondition => 'Diğer Kronik Hastalık (elle girin)';
+
+  @override
+  String get commFieldCustomConditionHint =>
+      'Örn: Fibromiyalji, PCOS, Çölyak...';
+
+  @override
+  String get commToggleShowConditions =>
+      'Kronik hastalıklarım profilimde görünsün';
+
+  @override
+  String get commToggleShowOnline => 'Çevrimiçi durumum görünsün';
+
+  @override
+  String get condType1Diabetes => 'Tip 1 Diyabet';
+
+  @override
+  String get condType2Diabetes => 'Tip 2 Diyabet';
+
+  @override
+  String get condHypertension => 'Hipertansiyon';
+
+  @override
+  String get condAsthmaCopd => 'Astım / KOAH';
+
+  @override
+  String get condThyroidHashimoto => 'Tiroid / Haşimato';
+
+  @override
+  String get condMigraine => 'Migren';
+
+  @override
+  String get condHeartCondition => 'Kalp & Damar';
+
+  @override
+  String get condCeliacIbs => 'Çölyak / İBS';
+
+  @override
+  String get condArthritis => 'Romatizma / Artrit';
+
+  @override
+  String get condAnemia => 'Anemi (Kansızlık)';
+
+  @override
+  String get condKidneyHealth => 'Böbrek Rahatsızlığı';
+
+  @override
+  String get condEczemaPsoriasis => 'Egzama / Sedef';
+
+  @override
+  String get adminPanelTitle => 'Admin Kontrol Paneli';
+
+  @override
+  String get adminTabStats => 'İstatistikler';
+
+  @override
+  String get adminTabAnnouncements => 'Duyurular';
+
+  @override
+  String get adminTabPromotions => 'Reklamlar';
+
+  @override
+  String get adminTabUsers => 'Kullanıcılar';
+
+  @override
+  String get adminTabReports => 'Şikayetler';
+
+  @override
+  String get adminStatOnline => 'Çevrimiçi';
+
+  @override
+  String get adminStatMembers => 'Toplam Üye';
+
+  @override
+  String get adminStatLikes => 'Profil Beğeni';
+
+  @override
+  String get adminStatChats => 'Aktif Sohbet';
+
+  @override
+  String get adminStatPendingReports => 'Bekleyen Şikayet';
+
+  @override
+  String get adminStatActiveBanners => 'Aktif Duyuru/Reklam';
+
+  @override
+  String get adminConditionBreakdown => 'Kronik Hastalık Dağılımı';
+
+  @override
+  String get adminNewAnnouncement => 'Yeni Duyuru';
+
+  @override
+  String get adminNewPromotion => 'Yeni Reklam / Banner';
+
+  @override
+  String get adminFieldTitle => 'Başlık';
+
+  @override
+  String get adminFieldMessage => 'Mesaj / Açıklama';
+
+  @override
+  String get adminFieldLink => 'Bağlantı URL (isteğe bağlı)';
+
+  @override
+  String get adminFieldPlacement => 'Yerleşim Alanı';
+
+  @override
+  String get adminPlacementHome => 'Ana Sayfa Üst';
+
+  @override
+  String get adminPlacementCommunity => 'Topluluk Üst';
+
+  @override
+  String get adminPlacementProfile => 'Profil Üst';
+
+  @override
+  String get adminTypeInfo => 'Genel Duyuru';
+
+  @override
+  String get adminTypeHealthTip => 'Sağlık İpucu';
+
+  @override
+  String get adminTypeWarning => 'Önemli Uyarı';
+
+  @override
+  String get adminTypeCampaign => 'Kampanya';
+
+  @override
+  String get adminSearchUsersHint =>
+      'İsim, ülke veya hastalığa göre üye ara...';
+
+  @override
+  String get adminActionVerify => 'Onayla';
+
+  @override
+  String get adminActionUnverify => 'Onayı Kaldır';
+
+  @override
+  String get adminActionSuspend => 'Askıya Al';
+
+  @override
+  String get adminActionUnsuspend => 'Aktifleştir';
+
+  @override
+  String get adminStatusSuspended => 'Askıda';
+
+  @override
+  String get adminStatusVerified => 'Onaylı';
+
+  @override
+  String get adminReportResolve => 'Çözüldü';
+
+  @override
+  String get adminReportDismiss => 'Reddet';
+
+  @override
+  String get adminNoReports => 'Henüz güvenlik şikayeti yok.';
+
+  @override
+  String get adminNoAnnouncements => 'Henüz duyuru eklenmedi.';
+
+  @override
+  String get adminNoPromotions => 'Henüz reklam veya banner eklenmedi.';
 }

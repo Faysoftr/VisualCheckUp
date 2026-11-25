@@ -2352,4 +2352,184 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => '对所有人删除';
+
+  @override
+  String get commOnlineNow => '在线';
+
+  @override
+  String get commFilterOnlineOnly => '当前在线';
+
+  @override
+  String get commFilterSameCondition => '同病相怜';
+
+  @override
+  String get commFilterAllConditions => '全部慢病';
+
+  @override
+  String get commSameConditionPrompt => '请在“我的主页”添加您的慢性病标签，以便匹配相同经历的伙伴。';
+
+  @override
+  String get commFieldChronicConditions => '慢性病标签（选填）';
+
+  @override
+  String get commFieldCustomCondition => '其他慢性病（选填）';
+
+  @override
+  String get commFieldCustomConditionHint => '例如：纤维肌痛、多囊卵巢...';
+
+  @override
+  String get commToggleShowConditions => '在主页展示我的慢性病标签';
+
+  @override
+  String get commToggleShowOnline => '显示我的在线状态';
+
+  @override
+  String get condType1Diabetes => '1型糖尿病';
+
+  @override
+  String get condType2Diabetes => '2型糖尿病';
+
+  @override
+  String get condHypertension => '高血压';
+
+  @override
+  String get condAsthmaCopd => '哮喘 / 慢阻肺';
+
+  @override
+  String get condThyroidHashimoto => '甲状腺 / 桥本';
+
+  @override
+  String get condMigraine => '偏头痛';
+
+  @override
+  String get condHeartCondition => '心血管健康';
+
+  @override
+  String get condCeliacIbs => '乳糜泻 / 肠易激';
+
+  @override
+  String get condArthritis => '关节炎 / 风湿';
+
+  @override
+  String get condAnemia => '贫血';
+
+  @override
+  String get condKidneyHealth => '肾脏健康';
+
+  @override
+  String get condEczemaPsoriasis => '湿疹 / 银屑病';
+
+  @override
+  String get adminPanelTitle => '管理员控制面板';
+
+  @override
+  String get adminTabStats => '数据统计';
+
+  @override
+  String get adminTabAnnouncements => '全局公告';
+
+  @override
+  String get adminTabPromotions => '广告横幅';
+
+  @override
+  String get adminTabUsers => '用户管理';
+
+  @override
+  String get adminTabReports => '举报审核';
+
+  @override
+  String get adminStatOnline => '当前在线';
+
+  @override
+  String get adminStatMembers => '社区成员';
+
+  @override
+  String get adminStatLikes => '主页点赞';
+
+  @override
+  String get adminStatChats => '活跃对话';
+
+  @override
+  String get adminStatPendingReports => '待处理举报';
+
+  @override
+  String get adminStatActiveBanners => '生效公告/广告';
+
+  @override
+  String get adminConditionBreakdown => '慢性病分布统计';
+
+  @override
+  String get adminNewAnnouncement => '新建公告';
+
+  @override
+  String get adminNewPromotion => '新建广告/横幅';
+
+  @override
+  String get adminFieldTitle => '标题';
+
+  @override
+  String get adminFieldMessage => '内容 / 说明';
+
+  @override
+  String get adminFieldLink => '跳转链接 URL（选填）';
+
+  @override
+  String get adminFieldPlacement => '展示位置';
+
+  @override
+  String get adminPlacementHome => '首页顶部';
+
+  @override
+  String get adminPlacementCommunity => '社区顶部';
+
+  @override
+  String get adminPlacementProfile => '主页顶部';
+
+  @override
+  String get adminTypeInfo => '系统公告';
+
+  @override
+  String get adminTypeHealthTip => '健康提示';
+
+  @override
+  String get adminTypeWarning => '重要提醒';
+
+  @override
+  String get adminTypeCampaign => '活动推广';
+
+  @override
+  String get adminSearchUsersHint => '按姓名、国家或慢病搜索用户...';
+
+  @override
+  String get adminActionVerify => '认证';
+
+  @override
+  String get adminActionUnverify => '取消认证';
+
+  @override
+  String get adminActionSuspend => '停用';
+
+  @override
+  String get adminActionUnsuspend => '恢复';
+
+  @override
+  String get adminStatusSuspended => '已停用';
+
+  @override
+  String get adminStatusVerified => '已认证';
+
+  @override
+  String get adminReportResolve => '已处理';
+
+  @override
+  String get adminReportDismiss => '忽略';
+
+  @override
+  String get adminNoReports => '暂无举报记录。';
+
+  @override
+  String get adminNoAnnouncements => '暂无全局公告。';
+
+  @override
+  String get adminNoPromotions => '暂无广告横幅。';
 }

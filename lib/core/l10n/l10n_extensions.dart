@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -750,6 +751,66 @@ extension CommunityReportReasonL10n on CommunityReportReason {
     }
   }
 }
+
+extension ChronicConditionL10n on ChronicCondition {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case ChronicCondition.type1Diabetes:
+        return l10n.condType1Diabetes;
+      case ChronicCondition.type2Diabetes:
+        return l10n.condType2Diabetes;
+      case ChronicCondition.hypertension:
+        return l10n.condHypertension;
+      case ChronicCondition.asthmaCopd:
+        return l10n.condAsthmaCopd;
+      case ChronicCondition.thyroidHashimoto:
+        return l10n.condThyroidHashimoto;
+      case ChronicCondition.migraine:
+        return l10n.condMigraine;
+      case ChronicCondition.heartCondition:
+        return l10n.condHeartCondition;
+      case ChronicCondition.celiacIbs:
+        return l10n.condCeliacIbs;
+      case ChronicCondition.arthritisRheumatism:
+        return l10n.condArthritis;
+      case ChronicCondition.anemia:
+        return l10n.condAnemia;
+      case ChronicCondition.kidneyHealth:
+        return l10n.condKidneyHealth;
+      case ChronicCondition.eczemaPsoriasis:
+        return l10n.condEczemaPsoriasis;
+    }
+  }
+}
+
+extension AnnouncementTypeL10n on AnnouncementType {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case AnnouncementType.info:
+        return l10n.adminTypeInfo;
+      case AnnouncementType.healthTip:
+        return l10n.adminTypeHealthTip;
+      case AnnouncementType.warning:
+        return l10n.adminTypeWarning;
+      case AnnouncementType.campaign:
+        return l10n.adminTypeCampaign;
+    }
+  }
+}
+
+extension PromotionPlacementL10n on PromotionPlacement {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case PromotionPlacement.homeTop:
+        return l10n.adminPlacementHome;
+      case PromotionPlacement.communityTop:
+        return l10n.adminPlacementCommunity;
+      case PromotionPlacement.profileTop:
+        return l10n.adminPlacementProfile;
+    }
+  }
+}
+
 
 
 

@@ -194,14 +194,29 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   accentColor: Colors.white,
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  _profile.visibleName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _profile.visibleName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    if (_profile.isVerified) ...[
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.verified_rounded,
+                        color: Colors.lightBlueAccent,
+                        size: 20,
+                      ),
+                    ],
+                  ],
                 ),
                 if (!_profile.hideRealName && _profile.nickname.isNotEmpty) ...[
                   const SizedBox(height: 2),
@@ -220,6 +235,8 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   runSpacing: 6,
                   alignment: WrapAlignment.center,
                   children: [
+                    if (_profile.isVisibleOnline)
+                      _HeaderPill(text: '🟢 ${l10n.commOnlineNow}'),
                     _HeaderPill(
                       text:
                           '${_profile.country.flag} ${_profile.city.isNotEmpty ? '${_profile.city}, ' : ''}${_profile.country.label}',
@@ -298,6 +315,86 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
             ),
           ],
           const SizedBox(height: 16),
+
+          // Chronic Conditions Section (when visible & non-empty)
+          if (_profile.showChronicConditions &&
+              _profile.hasAnyChronicCondition) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.medical_information_outlined,
+                          size: 18,
+                          color: Color(0xFFC8553D),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.commFieldChronicConditions,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final cond in _profile.chronicConditions)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 11,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: cond.accentColor.withValues(alpha: 0.13),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: cond.accentColor.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  cond.icon,
+                                  size: 15,
+                                  color: cond.accentColor,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  cond.localizedLabel(l10n),
+                                  style: TextStyle(
+                                    color: cond.accentColor,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (_profile.customChronicCondition.trim().isNotEmpty)
+                          Chip(
+                            avatar: const Icon(
+                              Icons.medical_services_outlined,
+                              size: 15,
+                            ),
+                            label: Text(_profile.customChronicCondition.trim()),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
 
           // Health Goals Section
           Card(

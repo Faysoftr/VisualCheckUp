@@ -2419,4 +2419,185 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'سب کے لیے حذف کریں';
+
+  @override
+  String get commOnlineNow => 'آن لائن';
+
+  @override
+  String get commFilterOnlineOnly => 'آن لائن اراکین';
+
+  @override
+  String get commFilterSameCondition => 'ایک جیسی بیماری';
+
+  @override
+  String get commFilterAllConditions => 'تمام بیماریاں';
+
+  @override
+  String get commSameConditionPrompt =>
+      'ایک جیسی بیماری والے افراد تلاش کرنے کے لیے میرا پروفائل میں دائمی بیماری شامل کریں۔';
+
+  @override
+  String get commFieldChronicConditions => 'دائمی بیماریاں (اختیاری)';
+
+  @override
+  String get commFieldCustomCondition => 'دیگر دائمی بیماری (اختیاری)';
+
+  @override
+  String get commFieldCustomConditionHint => 'مثلاً: فائبرومائالجیا، PCOS...';
+
+  @override
+  String get commToggleShowConditions => 'پروفائل پر دائمی بیماریاں دکھائیں';
+
+  @override
+  String get commToggleShowOnline => 'آن لائن حیثیت دکھائیں';
+
+  @override
+  String get condType1Diabetes => 'ٹائپ 1 ذیابیطس';
+
+  @override
+  String get condType2Diabetes => 'ٹائپ 2 ذیابیطس';
+
+  @override
+  String get condHypertension => 'ہائی بلڈ پریشر';
+
+  @override
+  String get condAsthmaCopd => 'دمہ / COPD';
+
+  @override
+  String get condThyroidHashimoto => 'تھائیرائیڈ / ہاشیموٹو';
+
+  @override
+  String get condMigraine => 'آدھے سر کا درد (مائیگرین)';
+
+  @override
+  String get condHeartCondition => 'دل اور شریانیں';
+
+  @override
+  String get condCeliacIbs => 'سیلیک / IBS';
+
+  @override
+  String get condArthritis => 'گٹھیا / جوڑوں کا درد';
+
+  @override
+  String get condAnemia => 'خون کی کمی';
+
+  @override
+  String get condKidneyHealth => 'گردوں کی صحت';
+
+  @override
+  String get condEczemaPsoriasis => 'ایگزیما / سورائسس';
+
+  @override
+  String get adminPanelTitle => 'ایڈمن کنٹرول پینل';
+
+  @override
+  String get adminTabStats => 'اعدادوشمار';
+
+  @override
+  String get adminTabAnnouncements => 'اعلانات';
+
+  @override
+  String get adminTabPromotions => 'اشتہارات';
+
+  @override
+  String get adminTabUsers => 'صارفین';
+
+  @override
+  String get adminTabReports => 'رپورٹس';
+
+  @override
+  String get adminStatOnline => 'آن لائن';
+
+  @override
+  String get adminStatMembers => 'اراکین';
+
+  @override
+  String get adminStatLikes => 'لائکس';
+
+  @override
+  String get adminStatChats => 'چیٹس';
+
+  @override
+  String get adminStatPendingReports => 'زیر التواء رپورٹس';
+
+  @override
+  String get adminStatActiveBanners => 'فعال بینرز';
+
+  @override
+  String get adminConditionBreakdown => 'دائمی بیماریوں کی تقسیم';
+
+  @override
+  String get adminNewAnnouncement => 'نیا اعلان';
+
+  @override
+  String get adminNewPromotion => 'نیا اشتہار / بینر';
+
+  @override
+  String get adminFieldTitle => 'عنوان';
+
+  @override
+  String get adminFieldMessage => 'پیغام / تفصیل';
+
+  @override
+  String get adminFieldLink => 'لنک URL (اختیاری)';
+
+  @override
+  String get adminFieldPlacement => 'جگہ';
+
+  @override
+  String get adminPlacementHome => 'ہوم اوپر';
+
+  @override
+  String get adminPlacementCommunity => 'کمیونٹی اوپر';
+
+  @override
+  String get adminPlacementProfile => 'پروفائل اوپر';
+
+  @override
+  String get adminTypeInfo => 'اعلان';
+
+  @override
+  String get adminTypeHealthTip => 'صحت کا مشورہ';
+
+  @override
+  String get adminTypeWarning => 'تنبیہ';
+
+  @override
+  String get adminTypeCampaign => 'مہم';
+
+  @override
+  String get adminSearchUsersHint => 'نام، ملک یا بیماری سے تلاش کریں...';
+
+  @override
+  String get adminActionVerify => 'تصدیق کریں';
+
+  @override
+  String get adminActionUnverify => 'تصدیق ہٹائیں';
+
+  @override
+  String get adminActionSuspend => 'معطل کریں';
+
+  @override
+  String get adminActionUnsuspend => 'بحال کریں';
+
+  @override
+  String get adminStatusSuspended => 'معطل';
+
+  @override
+  String get adminStatusVerified => 'تصدیق شدہ';
+
+  @override
+  String get adminReportResolve => 'حل ہو گیا';
+
+  @override
+  String get adminReportDismiss => 'مسترد';
+
+  @override
+  String get adminNoReports => 'ابھی کوئی رپورٹ نہیں۔';
+
+  @override
+  String get adminNoAnnouncements => 'ابھی کوئی اعلان نہیں۔';
+
+  @override
+  String get adminNoPromotions => 'ابھی کوئی اشتہار نہیں۔';
 }

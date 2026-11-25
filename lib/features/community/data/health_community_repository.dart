@@ -68,9 +68,16 @@ class HealthCommunityRepository {
           HealthGoalTag.herbalWellness,
           HealthGoalTag.fitnessWalk,
         ],
+        chronicConditions: const [
+          ChronicCondition.type2Diabetes,
+          ChronicCondition.thyroidHashimoto,
+        ],
         bio:
             'Tip 2 diyabet sürecinde dengeli beslenme ve günlük 8.000 adım hedefiyle ilerliyorum. Motivasyon paylaşmak isterim.',
         dailyFocus: 'Sabah yürüyüşü + şekersiz bitki çayı',
+        isOnline: true,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime,
         likedBy: const ['u_demo_1', 'u_demo_2', 'u_demo_3', 'u_demo_4'],
         isSampleProfile: true,
         updatedAt: baseTime,
@@ -87,9 +94,16 @@ class HealthCommunityRepository {
           HealthGoalTag.weightDiet,
           HealthGoalTag.sleepStress,
         ],
+        chronicConditions: const [
+          ChronicCondition.hypertension,
+          ChronicCondition.heartCondition,
+        ],
         bio:
             'Tracking daily blood pressure and Mediterranean meals. Always happy to exchange low-sodium recipe ideas!',
         dailyFocus: 'DASH diet + evening stretching',
+        isOnline: true,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime,
         likedBy: const ['u_demo_1', 'u_demo_5', 'u_demo_6'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 2)),
@@ -105,9 +119,16 @@ class HealthCommunityRepository {
           HealthGoalTag.bloodPressure,
           HealthGoalTag.healthyLiving,
         ],
+        chronicConditions: const [
+          ChronicCondition.hypertension,
+          ChronicCondition.type2Diabetes,
+        ],
         bio:
             'Tansiyon takibimi düzenli yapıyorum, tuzu azalttım ve her akşam yürüyüşe çıkıyorum.',
         dailyFocus: 'Akşam 45 dk tempolu yürüyüş',
+        isOnline: false,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime.subtract(const Duration(hours: 3)),
         likedBy: const ['u_demo_2', 'u_demo_3'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 4)),
@@ -124,9 +145,16 @@ class HealthCommunityRepository {
           HealthGoalTag.weightDiet,
           HealthGoalTag.healthyLiving,
         ],
+        chronicConditions: const [
+          ChronicCondition.migraine,
+          ChronicCondition.anemia,
+        ],
         bio:
             'Mamá siguiendo el crecimiento saludable de mis hijos y recetas mediterráneas equilibradas.',
         dailyFocus: 'Comida casera y hidratación',
+        isOnline: true,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime,
         likedBy: const ['u_demo_1', 'u_demo_2', 'u_demo_7', 'u_demo_8', 'u_demo_9'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 6)),
@@ -143,9 +171,16 @@ class HealthCommunityRepository {
           HealthGoalTag.skinCare,
           HealthGoalTag.sleepStress,
         ],
+        chronicConditions: const [
+          ChronicCondition.eczemaPsoriasis,
+          ChronicCondition.asthmaCopd,
+        ],
         bio:
             'أشارك عادات النوم الصحي وشاي الأعشاب والروتين اليومي للعناية بالصحة العامة.',
         dailyFocus: 'شرب 2 لتر ماء يومياً',
+        isOnline: false,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime.subtract(const Duration(hours: 5)),
         likedBy: const ['u_demo_4', 'u_demo_5'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 8)),
@@ -162,9 +197,16 @@ class HealthCommunityRepository {
           HealthGoalTag.fitnessWalk,
           HealthGoalTag.diabetes,
         ],
+        chronicConditions: const [
+          ChronicCondition.type1Diabetes,
+          ChronicCondition.celiacIbs,
+        ],
         bio:
             'Focused on steady blood sugar habits, high-protein breakfasts, and daily walking streaks.',
         dailyFocus: '10,000 steps + balanced plate',
+        isOnline: true,
+        showOnlineStatus: true,
+        lastActiveAt: baseTime,
         likedBy: const ['u_demo_1', 'u_demo_3', 'u_demo_8'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 10)),
@@ -347,15 +389,48 @@ class HealthCommunityRepository {
     return local[uid];
   }
 
+  Future<void> updateOnlinePresence(
+    String uid, {
+    required bool isOnline,
+  }) async {
+    if (uid.trim().isEmpty) return;
+    final now = _clock();
+    final local = await _loadLocalProfileMap();
+    final existing = local[uid];
+    if (existing != null && !existing.isSampleProfile) {
+      local[uid] = existing.copyWith(
+        isOnline: isOnline,
+        lastActiveAt: now,
+      );
+      await _saveLocalProfileMap(local);
+    }
+
+    if (_canUseFirestore) {
+      try {
+        await _db.collection('community_profiles').doc(uid).update({
+          'isOnline': isOnline,
+          'lastActiveAt': now.toIso8601String(),
+        });
+      } catch (_) {
+        // Ignore if user has not opted in yet or is offline.
+      }
+    }
+  }
+
   Future<List<HealthCommunityProfile>> discoverProfiles({
     required String myUid,
     HealthGoalTag? goalFilter,
+    ChronicCondition? conditionFilter,
+    bool sameConditionAsMe = false,
+    bool onlineOnly = false,
     String? countryCodeFilter,
     String? languageCodeFilter,
     String searchQuery = '',
   }) async {
     final blocked = await loadBlockedUsers(myUid);
     final merged = await _loadLocalProfileMap();
+    final myProfile = await loadMyProfile(myUid);
+    final now = _clock();
 
     if (_canUseFirestore) {
       try {
@@ -379,8 +454,28 @@ class HealthCommunityRepository {
     final q = searchQuery.trim().toLowerCase();
     final results = merged.values.where((p) {
       if (p.uid == myUid) return false;
-      if (!p.discoverable) return false;
+      if (!p.discoverable || p.isSuspended) return false;
       if (blocked.contains(p.uid)) return false;
+
+      if (onlineOnly && !p.isVisibleOnlineAt(now)) {
+        return false;
+      }
+
+      if (sameConditionAsMe) {
+        if (myProfile == null || !myProfile.hasAnyChronicCondition) {
+          return false;
+        }
+        if (!p.sharesConditionWith(myProfile)) {
+          return false;
+        }
+      }
+
+      if (conditionFilter != null) {
+        if (!p.showChronicConditions ||
+            !p.chronicConditions.contains(conditionFilter)) {
+          return false;
+        }
+      }
 
       if (goalFilter != null && !p.healthGoals.contains(goalFilter)) {
         return false;
@@ -405,6 +500,7 @@ class HealthCommunityRepository {
           p.country.label,
           p.bio,
           p.dailyFocus,
+          if (p.showChronicConditions) p.customChronicCondition,
         ].join(' ').toLowerCase();
         if (!haystack.contains(q)) return false;
       }
@@ -412,12 +508,96 @@ class HealthCommunityRepository {
     }).toList();
 
     results.sort((a, b) {
+      if (onlineOnly) {
+        final aOn = a.isVisibleOnlineAt(now) ? 1 : 0;
+        final bOn = b.isVisibleOnlineAt(now) ? 1 : 0;
+        if (aOn != bOn) return bOn.compareTo(aOn);
+      }
       final likeCmp = b.likesCount.compareTo(a.likesCount);
       if (likeCmp != 0) return likeCmp;
       return b.updatedAt.compareTo(a.updatedAt);
     });
 
     return results;
+  }
+
+  /// Admin helper: returns all community profiles (including hidden/suspended).
+  Future<List<HealthCommunityProfile>> loadAllProfilesForAdmin() async {
+    final merged = await _loadLocalProfileMap();
+    if (_canUseFirestore) {
+      try {
+        final snap =
+            await _db.collection('community_profiles').limit(150).get();
+        for (final doc in snap.docs) {
+          final p = HealthCommunityProfile.fromJson(
+            doc.data(),
+            fallbackUid: doc.id,
+          );
+          merged[p.uid] = p;
+        }
+      } catch (_) {
+        // Fallback to local profiles.
+      }
+    }
+    final list = merged.values.toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return list;
+  }
+
+  Future<void> setProfileSuspended(String uid, bool suspended) async {
+    final local = await _loadLocalProfileMap();
+    final existing = local[uid];
+    if (existing != null) {
+      local[uid] = existing.copyWith(isSuspended: suspended);
+      await _saveLocalProfileMap(local);
+    }
+    if (_canUseFirestore && existing?.isSampleProfile != true) {
+      try {
+        await _db.collection('community_profiles').doc(uid).update({
+          'isSuspended': suspended,
+        });
+      } catch (_) {}
+    }
+  }
+
+  Future<void> setProfileVerified(String uid, bool verified) async {
+    final local = await _loadLocalProfileMap();
+    final existing = local[uid];
+    if (existing != null) {
+      local[uid] = existing.copyWith(isVerified: verified);
+      await _saveLocalProfileMap(local);
+    }
+    if (_canUseFirestore && existing?.isSampleProfile != true) {
+      try {
+        await _db.collection('community_profiles').doc(uid).update({
+          'isVerified': verified,
+        });
+      } catch (_) {}
+    }
+  }
+
+  Future<void> deleteProfileByAdmin(String uid) async {
+    final local = await _loadLocalProfileMap();
+    local.remove(uid);
+    await _saveLocalProfileMap(local);
+    if (_canUseFirestore) {
+      try {
+        await _db.collection('community_profiles').doc(uid).delete();
+      } catch (_) {}
+    }
+  }
+
+  Future<int> loadTotalConversationCountForAdmin() async {
+    final local = await _loadLocalConversations();
+    var count = local.length;
+    if (_canUseFirestore) {
+      try {
+        final snap =
+            await _db.collection('community_conversations').limit(200).get();
+        if (snap.docs.length > count) count = snap.docs.length;
+      } catch (_) {}
+    }
+    return count;
   }
 
   // ---------------------------------------------------------------------------

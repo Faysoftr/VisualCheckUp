@@ -2424,4 +2424,186 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'সবার জন্য মুছুন';
+
+  @override
+  String get commOnlineNow => 'অনলাইন';
+
+  @override
+  String get commFilterOnlineOnly => 'অনলাইন সদস্য';
+
+  @override
+  String get commFilterSameCondition => 'একই রোগ';
+
+  @override
+  String get commFilterAllConditions => 'সব রোগ';
+
+  @override
+  String get commSameConditionPrompt =>
+      'একই রোগের মানুষ খুঁজতে আমার প্রোফাইলে আপনার দীর্ঘমেয়াদী রোগ যোগ করুন।';
+
+  @override
+  String get commFieldChronicConditions => 'দীর্ঘমেয়াদী রোগ (ঐচ্ছিক)';
+
+  @override
+  String get commFieldCustomCondition => 'অন্য দীর্ঘমেয়াদী রোগ (ঐচ্ছিক)';
+
+  @override
+  String get commFieldCustomConditionHint =>
+      'যেমন: ফাইব্রোমায়ালজিয়া, PCOS...';
+
+  @override
+  String get commToggleShowConditions => 'প্রোফাইলে দীর্ঘমেয়াদী রোগ দেখান';
+
+  @override
+  String get commToggleShowOnline => 'অনলাইন অবস্থা দেখান';
+
+  @override
+  String get condType1Diabetes => 'টাইপ ১ ডায়াবেটিস';
+
+  @override
+  String get condType2Diabetes => 'টাইপ ২ ডায়াবেটিস';
+
+  @override
+  String get condHypertension => 'উচ্চ রক্তচাপ';
+
+  @override
+  String get condAsthmaCopd => 'হাঁপানি / COPD';
+
+  @override
+  String get condThyroidHashimoto => 'থাইরয়েড / হাশিমোটো';
+
+  @override
+  String get condMigraine => 'মাইগ্রেন';
+
+  @override
+  String get condHeartCondition => 'হৃদরোগ';
+
+  @override
+  String get condCeliacIbs => 'সেলিয়াক / IBS';
+
+  @override
+  String get condArthritis => 'বাত / আর্থ্রাইটিস';
+
+  @override
+  String get condAnemia => 'রক্তস্বল্পতা';
+
+  @override
+  String get condKidneyHealth => 'কিডনি স্বাস্থ্য';
+
+  @override
+  String get condEczemaPsoriasis => 'একজিমা / সোরিয়াসিস';
+
+  @override
+  String get adminPanelTitle => 'অ্যাডমিন কন্ট্রোল প্যানেল';
+
+  @override
+  String get adminTabStats => 'পরিসংখ্যান';
+
+  @override
+  String get adminTabAnnouncements => 'ঘোষণা';
+
+  @override
+  String get adminTabPromotions => 'বিজ্ঞাপন';
+
+  @override
+  String get adminTabUsers => 'ব্যবহারকারী';
+
+  @override
+  String get adminTabReports => 'রিপোর্ট';
+
+  @override
+  String get adminStatOnline => 'অনলাইন';
+
+  @override
+  String get adminStatMembers => 'সদস্য';
+
+  @override
+  String get adminStatLikes => 'লাইক';
+
+  @override
+  String get adminStatChats => 'চ্যাট';
+
+  @override
+  String get adminStatPendingReports => 'অপেক্ষমান রিপোর্ট';
+
+  @override
+  String get adminStatActiveBanners => 'সক্রিয় ব্যানার';
+
+  @override
+  String get adminConditionBreakdown => 'দীর্ঘমেয়াদী রোগের পরিসংখ্যান';
+
+  @override
+  String get adminNewAnnouncement => 'নতুন ঘোষণা';
+
+  @override
+  String get adminNewPromotion => 'নতুন বিজ্ঞাপন / ব্যানার';
+
+  @override
+  String get adminFieldTitle => 'শিরোনাম';
+
+  @override
+  String get adminFieldMessage => 'বার্তা / বিবরণ';
+
+  @override
+  String get adminFieldLink => 'লিংক URL (ঐচ্ছিক)';
+
+  @override
+  String get adminFieldPlacement => 'অবস্থান';
+
+  @override
+  String get adminPlacementHome => 'হোম শীর্ষ';
+
+  @override
+  String get adminPlacementCommunity => 'কমিউনিটি শীর্ষ';
+
+  @override
+  String get adminPlacementProfile => 'প্রোফাইল শীর্ষ';
+
+  @override
+  String get adminTypeInfo => 'ঘোষণা';
+
+  @override
+  String get adminTypeHealthTip => 'স্বাস্থ্য টিপস';
+
+  @override
+  String get adminTypeWarning => 'সতর্কতা';
+
+  @override
+  String get adminTypeCampaign => 'ক্যাম্পেইন';
+
+  @override
+  String get adminSearchUsersHint => 'নাম, দেশ বা রোগ দিয়ে খুঁজুন...';
+
+  @override
+  String get adminActionVerify => 'যাচাই করুন';
+
+  @override
+  String get adminActionUnverify => 'যাচাই সরান';
+
+  @override
+  String get adminActionSuspend => 'স্থগিত করুন';
+
+  @override
+  String get adminActionUnsuspend => 'পুনরায় চালু';
+
+  @override
+  String get adminStatusSuspended => 'স্থগিত';
+
+  @override
+  String get adminStatusVerified => 'যাচাইকৃত';
+
+  @override
+  String get adminReportResolve => 'সমাধান';
+
+  @override
+  String get adminReportDismiss => 'বাতিল';
+
+  @override
+  String get adminNoReports => 'কোনো রিপোর্ট নেই।';
+
+  @override
+  String get adminNoAnnouncements => 'কোনো ঘোষণা নেই।';
+
+  @override
+  String get adminNoPromotions => 'কোনো বিজ্ঞাপন নেই।';
 }

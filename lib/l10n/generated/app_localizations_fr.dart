@@ -2438,4 +2438,185 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'Supprimer pour tous';
+
+  @override
+  String get commOnlineNow => 'En ligne';
+
+  @override
+  String get commFilterOnlineOnly => 'En ligne';
+
+  @override
+  String get commFilterSameCondition => 'Même maladie';
+
+  @override
+  String get commFilterAllConditions => 'Toutes les maladies';
+
+  @override
+  String get commSameConditionPrompt =>
+      'Ajoutez une maladie chronique dans Mon Profil pour trouver des membres similaires.';
+
+  @override
+  String get commFieldChronicConditions => 'Maladies chroniques (Optionnel)';
+
+  @override
+  String get commFieldCustomCondition => 'Autre maladie chronique (optionnel)';
+
+  @override
+  String get commFieldCustomConditionHint => 'Ex. : Fibromyalgie, SOPK...';
+
+  @override
+  String get commToggleShowConditions => 'Afficher mes maladies chroniques';
+
+  @override
+  String get commToggleShowOnline => 'Afficher mon statut en ligne';
+
+  @override
+  String get condType1Diabetes => 'Diabète Type 1';
+
+  @override
+  String get condType2Diabetes => 'Diabète Type 2';
+
+  @override
+  String get condHypertension => 'Hypertension';
+
+  @override
+  String get condAsthmaCopd => 'Asthme / BPCO';
+
+  @override
+  String get condThyroidHashimoto => 'Thyroïde / Hashimoto';
+
+  @override
+  String get condMigraine => 'Migraine';
+
+  @override
+  String get condHeartCondition => 'Cœur & Vaisseaux';
+
+  @override
+  String get condCeliacIbs => 'Cœliaque / SII';
+
+  @override
+  String get condArthritis => 'Arthrite / Rhumatisme';
+
+  @override
+  String get condAnemia => 'Anémie';
+
+  @override
+  String get condKidneyHealth => 'Santé Rénale';
+
+  @override
+  String get condEczemaPsoriasis => 'Eczéma / Psoriasis';
+
+  @override
+  String get adminPanelTitle => 'Panneau d\'Administration';
+
+  @override
+  String get adminTabStats => 'Statistiques';
+
+  @override
+  String get adminTabAnnouncements => 'Annonces';
+
+  @override
+  String get adminTabPromotions => 'Publicités';
+
+  @override
+  String get adminTabUsers => 'Utilisateurs';
+
+  @override
+  String get adminTabReports => 'Signalements';
+
+  @override
+  String get adminStatOnline => 'En ligne';
+
+  @override
+  String get adminStatMembers => 'Membres';
+
+  @override
+  String get adminStatLikes => 'J\'aime';
+
+  @override
+  String get adminStatChats => 'Discussions';
+
+  @override
+  String get adminStatPendingReports => 'Signalements en attente';
+
+  @override
+  String get adminStatActiveBanners => 'Bannières actives';
+
+  @override
+  String get adminConditionBreakdown => 'Répartition des maladies chroniques';
+
+  @override
+  String get adminNewAnnouncement => 'Nouvelle annonce';
+
+  @override
+  String get adminNewPromotion => 'Nouvelle bannière';
+
+  @override
+  String get adminFieldTitle => 'Titre';
+
+  @override
+  String get adminFieldMessage => 'Message / Description';
+
+  @override
+  String get adminFieldLink => 'Lien URL (optionnel)';
+
+  @override
+  String get adminFieldPlacement => 'Emplacement';
+
+  @override
+  String get adminPlacementHome => 'Haut Accueil';
+
+  @override
+  String get adminPlacementCommunity => 'Haut Communauté';
+
+  @override
+  String get adminPlacementProfile => 'Haut Profil';
+
+  @override
+  String get adminTypeInfo => 'Annonce';
+
+  @override
+  String get adminTypeHealthTip => 'Conseil Santé';
+
+  @override
+  String get adminTypeWarning => 'Alerte';
+
+  @override
+  String get adminTypeCampaign => 'Campagne';
+
+  @override
+  String get adminSearchUsersHint => 'Rechercher par nom, pays ou maladie...';
+
+  @override
+  String get adminActionVerify => 'Vérifier';
+
+  @override
+  String get adminActionUnverify => 'Retirer badge';
+
+  @override
+  String get adminActionSuspend => 'Suspendre';
+
+  @override
+  String get adminActionUnsuspend => 'Réactiver';
+
+  @override
+  String get adminStatusSuspended => 'Suspendu';
+
+  @override
+  String get adminStatusVerified => 'Vérifié';
+
+  @override
+  String get adminReportResolve => 'Résoudre';
+
+  @override
+  String get adminReportDismiss => 'Ignorer';
+
+  @override
+  String get adminNoReports => 'Aucun signalement.';
+
+  @override
+  String get adminNoAnnouncements => 'Aucune annonce.';
+
+  @override
+  String get adminNoPromotions => 'Aucune publicité.';
 }

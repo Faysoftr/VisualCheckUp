@@ -2428,4 +2428,186 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get commDeleteForEveryone => 'Удалить для всех';
+
+  @override
+  String get commOnlineNow => 'В сети';
+
+  @override
+  String get commFilterOnlineOnly => 'Сейчас в сети';
+
+  @override
+  String get commFilterSameCondition => 'Та же болезнь';
+
+  @override
+  String get commFilterAllConditions => 'Все состояния';
+
+  @override
+  String get commSameConditionPrompt =>
+      'Добавьте хроническое состояние в «Мой профиль», чтобы найти единомышленников.';
+
+  @override
+  String get commFieldChronicConditions => 'Хронические состояния (по желанию)';
+
+  @override
+  String get commFieldCustomCondition => 'Другое хроническое состояние';
+
+  @override
+  String get commFieldCustomConditionHint => 'Напр.: фибромиалгия, СПКЯ...';
+
+  @override
+  String get commToggleShowConditions =>
+      'Показывать хронические состояния в профиле';
+
+  @override
+  String get commToggleShowOnline => 'Показывать статус «В сети»';
+
+  @override
+  String get condType1Diabetes => 'Диабет 1 типа';
+
+  @override
+  String get condType2Diabetes => 'Диабет 2 типа';
+
+  @override
+  String get condHypertension => 'Гипертония';
+
+  @override
+  String get condAsthmaCopd => 'Астма / ХОБЛ';
+
+  @override
+  String get condThyroidHashimoto => 'Щитовидная железа / Хашимото';
+
+  @override
+  String get condMigraine => 'Мигрень';
+
+  @override
+  String get condHeartCondition => 'Сердце и сосуды';
+
+  @override
+  String get condCeliacIbs => 'Целиакия / СРК';
+
+  @override
+  String get condArthritis => 'Артрит / Ревматизм';
+
+  @override
+  String get condAnemia => 'Анемия';
+
+  @override
+  String get condKidneyHealth => 'Почки';
+
+  @override
+  String get condEczemaPsoriasis => 'Экзема / Псориаз';
+
+  @override
+  String get adminPanelTitle => 'Панель администратора';
+
+  @override
+  String get adminTabStats => 'Статистика';
+
+  @override
+  String get adminTabAnnouncements => 'Объявления';
+
+  @override
+  String get adminTabPromotions => 'Реклама';
+
+  @override
+  String get adminTabUsers => 'Пользователи';
+
+  @override
+  String get adminTabReports => 'Жалобы';
+
+  @override
+  String get adminStatOnline => 'В сети';
+
+  @override
+  String get adminStatMembers => 'Участники';
+
+  @override
+  String get adminStatLikes => 'Лайки';
+
+  @override
+  String get adminStatChats => 'Чаты';
+
+  @override
+  String get adminStatPendingReports => 'Ожидающие жалобы';
+
+  @override
+  String get adminStatActiveBanners => 'Активные баннеры';
+
+  @override
+  String get adminConditionBreakdown => 'Распределение хронических состояний';
+
+  @override
+  String get adminNewAnnouncement => 'Новое объявление';
+
+  @override
+  String get adminNewPromotion => 'Новый баннер / реклама';
+
+  @override
+  String get adminFieldTitle => 'Заголовок';
+
+  @override
+  String get adminFieldMessage => 'Текст / описание';
+
+  @override
+  String get adminFieldLink => 'Ссылка URL (необязательно)';
+
+  @override
+  String get adminFieldPlacement => 'Размещение';
+
+  @override
+  String get adminPlacementHome => 'Главная (верх)';
+
+  @override
+  String get adminPlacementCommunity => 'Сообщество (верх)';
+
+  @override
+  String get adminPlacementProfile => 'Профиль (верх)';
+
+  @override
+  String get adminTypeInfo => 'Объявление';
+
+  @override
+  String get adminTypeHealthTip => 'Совет здоровья';
+
+  @override
+  String get adminTypeWarning => 'Предупреждение';
+
+  @override
+  String get adminTypeCampaign => 'Акция';
+
+  @override
+  String get adminSearchUsersHint => 'Поиск по имени, стране или диагнозу...';
+
+  @override
+  String get adminActionVerify => 'Подтвердить';
+
+  @override
+  String get adminActionUnverify => 'Снять отметку';
+
+  @override
+  String get adminActionSuspend => 'Заблокировать';
+
+  @override
+  String get adminActionUnsuspend => 'Восстановить';
+
+  @override
+  String get adminStatusSuspended => 'Заблокирован';
+
+  @override
+  String get adminStatusVerified => 'Подтверждён';
+
+  @override
+  String get adminReportResolve => 'Решено';
+
+  @override
+  String get adminReportDismiss => 'Отклонить';
+
+  @override
+  String get adminNoReports => 'Жалоб пока нет.';
+
+  @override
+  String get adminNoAnnouncements => 'Объявлений пока нет.';
+
+  @override
+  String get adminNoPromotions => 'Рекламных баннеров пока нет.';
 }
