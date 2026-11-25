@@ -2146,4 +2146,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'Voluntary one-time support • No subscription';
+
+  @override
+  String get medFieldAlarmSound => 'Alarm Ringtone';
+
+  @override
+  String get medAlarmSoundClassic => 'Classic Alarm';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'Crisp alarm clock ring';
+
+  @override
+  String get medAlarmSoundGentle => 'Gentle Chime';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'Calm rising chime melody';
+
+  @override
+  String get medAlarmSoundRadar => 'Modern Radar';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'Clear rhythmic alarm pulse';
+
+  @override
+  String get medAlarmSoundBell => 'Health Bell';
+
+  @override
+  String get medAlarmSoundBellDesc => 'Bright classic twin-bell ring';
+
+  @override
+  String get medAlarmSoundUrgent => 'Urgent High Alert';
+
+  @override
+  String get medAlarmSoundUrgentDesc =>
+      'Strong insistent tone for critical doses';
+
+  @override
+  String get medAlarmSoundSystem => 'Device Alarm Tone';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'Uses your phone\'s default alarm ringtone';
+
+  @override
+  String get medSoundPreviewPlay => 'Listen';
+
+  @override
+  String get medSoundPreviewStop => 'Stop';
+
+  @override
+  String get medSoundSilent => 'Silent';
+
+  @override
+  String get medPreviewModeBadge => 'PREVIEW';
 }

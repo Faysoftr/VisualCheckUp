@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/photo_zoom_viewer.dart';
+import 'package:visualcheckup/features/medications/data/medication_alarm_audio_player.dart';
 import 'package:visualcheckup/features/medications/data/medication_alarm_scheduler.dart';
 import 'package:visualcheckup/features/medications/data/medication_reminder_repository.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
@@ -20,28 +21,44 @@ enum MedicationAlarmAction {
 /// Full-screen, high-contrast, senior-friendly alarm overlay shown when a
 /// medication reminder fires (or when testing an alarm preview).
 ///
-/// Displays the medicine's real photo prominently alongside the reminder time,
-/// category badge, dosage, meal timing, and full explanation note.
+/// Plays the reminder's selected alarm ringtone in a continuous loop on the
+/// native alarm audio stream and displays the medicine's real photo prominently
+/// alongside the reminder time, category badge, dosage, meal timing, and full
+/// explanation note.
 class MedicationAlarmRingScreen extends StatefulWidget {
   const MedicationAlarmRingScreen({
     super.key,
     required this.reminder,
     required this.repository,
     this.scheduler,
+    this.audioPlayer,
     this.isPreview = false,
+    this.persistActions = true,
+    this.previewPhotoBytes,
   });
 
   final MedicationReminder reminder;
   final MedicationReminderRepository repository;
   final MedicationAlarmScheduler? scheduler;
+  final MedicationAlarmAudioPlayer? audioPlayer;
   final bool isPreview;
+
+  /// When false (e.g. unsaved draft preview inside the Add/Edit sheet),
+  /// tapping Taken/Snooze/Skip closes the preview without mutating saved logs.
+  final bool persistActions;
+
+  /// Optional in-memory photo bytes for unsaved draft previews.
+  final Uint8List? previewPhotoBytes;
 
   static Future<MedicationAlarmAction?> show(
     BuildContext context, {
     required MedicationReminder reminder,
     required MedicationReminderRepository repository,
     MedicationAlarmScheduler? scheduler,
+    MedicationAlarmAudioPlayer? audioPlayer,
     bool isPreview = false,
+    bool persistActions = true,
+    Uint8List? previewPhotoBytes,
   }) {
     return Navigator.of(context).push<MedicationAlarmAction>(
       MaterialPageRoute<MedicationAlarmAction>(
@@ -50,7 +67,10 @@ class MedicationAlarmRingScreen extends StatefulWidget {
           reminder: reminder,
           repository: repository,
           scheduler: scheduler,
+          audioPlayer: audioPlayer,
           isPreview: isPreview,
+          persistActions: persistActions,
+          previewPhotoBytes: previewPhotoBytes,
         ),
       ),
     );
@@ -64,12 +84,15 @@ class MedicationAlarmRingScreen extends StatefulWidget {
 class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseController;
-  Timer? _alertTimer;
+  late final MedicationAlarmAudioPlayer _audioPlayer;
+  Timer? _vibrateTimer;
   bool _busy = false;
 
   @override
   void initState() {
     super.initState();
+    _audioPlayer =
+        widget.audioPlayer ?? PlatformMedicationAlarmAudioPlayer.instance;
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1100),
@@ -78,30 +101,33 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
   }
 
   void _startAlertLoop() {
-    _triggerSingleAlert();
-    _alertTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (_) => _triggerSingleAlert(),
-    );
+    if (widget.reminder.soundEnabled) {
+      unawaited(
+        _audioPlayer.play(widget.reminder.alarmSound, loop: true),
+      );
+    }
+    if (widget.reminder.vibrateEnabled) {
+      _triggerVibrationPulse();
+      _vibrateTimer = Timer.periodic(
+        const Duration(milliseconds: 1800),
+        (_) => _triggerVibrationPulse(),
+      );
+    }
   }
 
-  void _triggerSingleAlert() {
+  void _triggerVibrationPulse() {
     if (!mounted) return;
     try {
-      if (widget.reminder.soundEnabled) {
-        SystemSound.play(SystemSoundType.alert);
-      }
-      if (widget.reminder.vibrateEnabled) {
-        HapticFeedback.heavyImpact();
-      }
+      HapticFeedback.heavyImpact();
     } catch (_) {
-      // Ignore on desktop/test hosts without platform audio/haptic channels.
+      // Ignore on desktop/test hosts without platform haptic channels.
     }
   }
 
   void _stopAlertLoop() {
-    _alertTimer?.cancel();
-    _alertTimer = null;
+    _vibrateTimer?.cancel();
+    _vibrateTimer = null;
+    unawaited(_audioPlayer.stop());
   }
 
   @override
@@ -115,10 +141,12 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
     if (_busy) return;
     setState(() => _busy = true);
     _stopAlertLoop();
-    await widget.repository.logDoseStatus(
-      reminderId: widget.reminder.id,
-      status: MedicationDoseStatus.taken,
-    );
+    if (widget.persistActions) {
+      await widget.repository.logDoseStatus(
+        reminderId: widget.reminder.id,
+        status: MedicationDoseStatus.taken,
+      );
+    }
     if (!mounted) return;
     Navigator.of(context).pop(MedicationAlarmAction.taken);
   }
@@ -127,19 +155,21 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
     if (_busy) return;
     setState(() => _busy = true);
     _stopAlertLoop();
-    final l10n = context.l10n;
-    await widget.repository.logDoseStatus(
-      reminderId: widget.reminder.id,
-      status: MedicationDoseStatus.snoozed,
-    );
-    final scheduler =
-        widget.scheduler ?? LocalMedicationAlarmScheduler.instance;
-    await scheduler.scheduleSnooze(
-      widget.reminder,
-      minutes: 10,
-      categoryLabel: widget.reminder.localizedCategoryLabel(l10n),
-      snoozeBody: l10n.medRingSnoozedToast,
-    );
+    if (widget.persistActions) {
+      final l10n = context.l10n;
+      await widget.repository.logDoseStatus(
+        reminderId: widget.reminder.id,
+        status: MedicationDoseStatus.snoozed,
+      );
+      final scheduler =
+          widget.scheduler ?? LocalMedicationAlarmScheduler.instance;
+      await scheduler.scheduleSnooze(
+        widget.reminder,
+        minutes: 10,
+        categoryLabel: widget.reminder.localizedCategoryLabel(l10n),
+        snoozeBody: l10n.medRingSnoozedToast,
+      );
+    }
     if (!mounted) return;
     Navigator.of(context).pop(MedicationAlarmAction.snoozed);
   }
@@ -148,10 +178,12 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
     if (_busy) return;
     setState(() => _busy = true);
     _stopAlertLoop();
-    await widget.repository.logDoseStatus(
-      reminderId: widget.reminder.id,
-      status: MedicationDoseStatus.skipped,
-    );
+    if (widget.persistActions) {
+      await widget.repository.logDoseStatus(
+        reminderId: widget.reminder.id,
+        status: MedicationDoseStatus.skipped,
+      );
+    }
     if (!mounted) return;
     Navigator.of(context).pop(MedicationAlarmAction.skipped);
   }
@@ -162,9 +194,12 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
     final reminder = widget.reminder;
     final accent = reminder.category.accentColor;
     final photoPath = reminder.photoPath;
-    final hasPhoto = photoPath != null &&
+    final hasFilePhoto = photoPath != null &&
         photoPath.isNotEmpty &&
         File(photoPath).existsSync();
+    final hasMemoryPhoto = widget.previewPhotoBytes != null &&
+        widget.previewPhotoBytes!.isNotEmpty;
+    final hasPhoto = hasMemoryPhoto || hasFilePhoto;
 
     final detailChips = <String>[
       if (reminder.dosage.trim().isNotEmpty) reminder.dosage.trim(),
@@ -174,6 +209,11 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
 
     return PopScope(
       canPop: !_busy,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) {
+          _stopAlertLoop();
+        }
+      },
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -222,14 +262,47 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              l10n.medRingHeader,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.4,
-                              ),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    l10n.medRingHeader,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.4,
+                                    ),
+                                  ),
+                                ),
+                                if (widget.isPreview) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.withValues(alpha: 0.28),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: Colors.amber.shade200
+                                            .withValues(alpha: 0.7),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.medPreviewModeBadge,
+                                      style: TextStyle(
+                                        color: Colors.amber.shade100,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                             Text(
                               reminder.formattedTime,
@@ -268,44 +341,88 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                     child: Column(
                       children: [
-                        // Category Pill Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            color: accent.withValues(alpha: 0.28),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                reminder.category.icon,
-                                color: Colors.white,
-                                size: 18,
+                        // Category & Active Alarm Sound Badges
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 7,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                reminder.localizedCategoryLabel(l10n),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
+                              decoration: BoxDecoration(
+                                color: accent.withValues(alpha: 0.28),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.25),
                                 ),
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    reminder.category.icon,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    reminder.localizedCategoryLabel(l10n),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.22),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    reminder.soundEnabled
+                                        ? reminder.alarmSound.icon
+                                        : Icons.volume_off_rounded,
+                                    color: Colors.white70,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    reminder.soundEnabled
+                                        ? reminder.alarmSound
+                                            .localizedLabel(l10n)
+                                        : l10n.medSoundSilent,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
 
                         // Prominent Medicine Photo Card
                         GestureDetector(
-                          onTap: hasPhoto
+                          onTap: hasFilePhoto
                               ? () => PhotoZoomViewer.show(
                                     context,
                                     imagePath: photoPath,
@@ -336,51 +453,64 @@ class _MedicationAlarmRingScreenState extends State<MedicationAlarmRingScreen>
                                 ? Stack(
                                     fit: StackFit.expand,
                                     children: [
-                                      Image.file(
-                                        File(photoPath),
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, _, _) =>
-                                            _NoPhotoFallback(
-                                          accent: accent,
-                                          icon: reminder.category.icon,
-                                          label: l10n.medRingNoPhoto,
+                                      if (hasMemoryPhoto)
+                                        Image.memory(
+                                          widget.previewPhotoBytes!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, _, _) =>
+                                              _NoPhotoFallback(
+                                            accent: accent,
+                                            icon: reminder.category.icon,
+                                            label: l10n.medRingNoPhoto,
+                                          ),
+                                        )
+                                      else
+                                        Image.file(
+                                          File(photoPath!),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, _, _) =>
+                                              _NoPhotoFallback(
+                                            accent: accent,
+                                            icon: reminder.category.icon,
+                                            label: l10n.medRingNoPhoto,
+                                          ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        right: 12,
-                                        bottom: 12,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.62),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(
-                                                Icons.zoom_in_rounded,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Text(
-                                                l10n.medRingTapZoom,
-                                                style: const TextStyle(
+                                      if (hasFilePhoto)
+                                        Positioned(
+                                          right: 12,
+                                          bottom: 12,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withValues(alpha: 0.62),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.zoom_in_rounded,
                                                   color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
+                                                  size: 16,
                                                 ),
-                                              ),
-                                            ],
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  l10n.medRingTapZoom,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
                                     ],
                                   )
                                 : _NoPhotoFallback(

@@ -643,5 +643,22 @@
   "donateThanksTitle": "আপনার সহায়তার জন্য ধন্যবাদ!",
   "donateThanksBody": "আপনার {tier} ({price}) সহায়তা আমাদের জন্য অনেক মূল্যবান!",
   "donateSupporterBadge": "সহায়তাকারী • ধন্যবাদ!",
-  "donateStoreNotice": "এককালীন স্বেচ্ছামূলক সহায়তা • কোনো সাবস্ক্রিপশন নয়"
+  "donateStoreNotice": "এককালীন স্বেচ্ছামূলক সহায়তা • কোনো সাবস্ক্রিপশন নয়",
+  "medFieldAlarmSound": "অ্যালার্মের সুর",
+  "medAlarmSoundClassic": "ক্লাসিক অ্যালার্ম",
+  "medAlarmSoundClassicDesc": "স্পষ্ট অ্যালার্ম ঘড়ির শব্দ",
+  "medAlarmSoundGentle": "মৃদু সুর",
+  "medAlarmSoundGentleDesc": "শান্ত ও কোমল বেল সুর",
+  "medAlarmSoundRadar": "আধুনিক অ্যালার্ম",
+  "medAlarmSoundRadarDesc": "স্পষ্ট ছন্দময় অ্যালার্ম টোন",
+  "medAlarmSoundBell": "স্বাস্থ্য ঘণ্টা",
+  "medAlarmSoundBellDesc": "উজ্জ্বল ক্লাসিক ডাবল বেল রিং",
+  "medAlarmSoundUrgent": "জরুরি উচ্চ সতর্কতা",
+  "medAlarmSoundUrgentDesc": "গুরুত্বপূর্ণ ডোজের জন্য জোরালো শব্দ",
+  "medAlarmSoundSystem": "ফোনের অ্যালার্ম সুর",
+  "medAlarmSoundSystemDesc": "ফোনের ডিফল্ট অ্যালার্ম রিংটোন ব্যবহার করে",
+  "medSoundPreviewPlay": "শুনুন",
+  "medSoundPreviewStop": "থামান",
+  "medSoundSilent": "নীরব",
+  "medPreviewModeBadge": "প্রিভিউ"
 }

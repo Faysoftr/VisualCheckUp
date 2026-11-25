@@ -3979,6 +3979,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voluntary one-time support • No subscription'**
   String get donateStoreNotice;
+
+  /// No description provided for @medFieldAlarmSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm Ringtone'**
+  String get medFieldAlarmSound;
+
+  /// No description provided for @medAlarmSoundClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic Alarm'**
+  String get medAlarmSoundClassic;
+
+  /// No description provided for @medAlarmSoundClassicDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Crisp alarm clock ring'**
+  String get medAlarmSoundClassicDesc;
+
+  /// No description provided for @medAlarmSoundGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle Chime'**
+  String get medAlarmSoundGentle;
+
+  /// No description provided for @medAlarmSoundGentleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm rising chime melody'**
+  String get medAlarmSoundGentleDesc;
+
+  /// No description provided for @medAlarmSoundRadar.
+  ///
+  /// In en, this message translates to:
+  /// **'Modern Radar'**
+  String get medAlarmSoundRadar;
+
+  /// No description provided for @medAlarmSoundRadarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear rhythmic alarm pulse'**
+  String get medAlarmSoundRadarDesc;
+
+  /// No description provided for @medAlarmSoundBell.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Bell'**
+  String get medAlarmSoundBell;
+
+  /// No description provided for @medAlarmSoundBellDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright classic twin-bell ring'**
+  String get medAlarmSoundBellDesc;
+
+  /// No description provided for @medAlarmSoundUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent High Alert'**
+  String get medAlarmSoundUrgent;
+
+  /// No description provided for @medAlarmSoundUrgentDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong insistent tone for critical doses'**
+  String get medAlarmSoundUrgentDesc;
+
+  /// No description provided for @medAlarmSoundSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Alarm Tone'**
+  String get medAlarmSoundSystem;
+
+  /// No description provided for @medAlarmSoundSystemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses your phone\'s default alarm ringtone'**
+  String get medAlarmSoundSystemDesc;
+
+  /// No description provided for @medSoundPreviewPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get medSoundPreviewPlay;
+
+  /// No description provided for @medSoundPreviewStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get medSoundPreviewStop;
+
+  /// No description provided for @medSoundSilent.
+  ///
+  /// In en, this message translates to:
+  /// **'Silent'**
+  String get medSoundSilent;
+
+  /// No description provided for @medPreviewModeBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PREVIEW'**
+  String get medPreviewModeBadge;
 }
 
 class _AppLocalizationsDelegate

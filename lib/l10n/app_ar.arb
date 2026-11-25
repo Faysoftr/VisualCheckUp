@@ -643,5 +643,22 @@
   "donateThanksTitle": "شكراً جزيلاً لدعمك!",
   "donateThanksBody": "دعمك ({tier} - {price}) يعني لنا الكثير. شكراً لمساهمتك في تطوير VisualCheckUp!",
   "donateSupporterBadge": "داعم • شكراً لك!",
-  "donateStoreNotice": "دعم تطوعي لمرة واحدة • ليس اشتراكاً"
+  "donateStoreNotice": "دعم تطوعي لمرة واحدة • ليس اشتراكاً",
+  "medFieldAlarmSound": "نغمة المنبّه",
+  "medAlarmSoundClassic": "منبّه كلاسيكي",
+  "medAlarmSoundClassicDesc": "رنين ساعة منبّه واضح",
+  "medAlarmSoundGentle": "لحن هادئ",
+  "medAlarmSoundGentleDesc": "نغمة جرس لطيفة ومريحة",
+  "medAlarmSoundRadar": "منبّه عصري",
+  "medAlarmSoundRadarDesc": "نبضات منبّه إيقاعية واضحة",
+  "medAlarmSoundBell": "جرس الصحة",
+  "medAlarmSoundBellDesc": "رنين جرس مزدوج كلاسيكي",
+  "medAlarmSoundUrgent": "تنبيه عاجل قوي",
+  "medAlarmSoundUrgentDesc": "نغمة قوية للجرعات المهمة",
+  "medAlarmSoundSystem": "نغمة منبّه الهاتف",
+  "medAlarmSoundSystemDesc": "يستخدم نغمة المنبّه الافتراضية للهاتف",
+  "medSoundPreviewPlay": "استماع",
+  "medSoundPreviewStop": "إيقاف",
+  "medSoundSilent": "صامت",
+  "medPreviewModeBadge": "معاينة"
 }

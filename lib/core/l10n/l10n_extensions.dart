@@ -604,6 +604,42 @@ extension MedicationDoseStatusL10n on MedicationDoseStatus {
   }
 }
 
+extension MedicationAlarmSoundL10n on MedicationAlarmSound {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case MedicationAlarmSound.classicAlarm:
+        return l10n.medAlarmSoundClassic;
+      case MedicationAlarmSound.gentleChime:
+        return l10n.medAlarmSoundGentle;
+      case MedicationAlarmSound.radarPulse:
+        return l10n.medAlarmSoundRadar;
+      case MedicationAlarmSound.vitalBell:
+        return l10n.medAlarmSoundBell;
+      case MedicationAlarmSound.urgentAlarm:
+        return l10n.medAlarmSoundUrgent;
+      case MedicationAlarmSound.systemAlarm:
+        return l10n.medAlarmSoundSystem;
+    }
+  }
+
+  String localizedDescription(AppLocalizations l10n) {
+    switch (this) {
+      case MedicationAlarmSound.classicAlarm:
+        return l10n.medAlarmSoundClassicDesc;
+      case MedicationAlarmSound.gentleChime:
+        return l10n.medAlarmSoundGentleDesc;
+      case MedicationAlarmSound.radarPulse:
+        return l10n.medAlarmSoundRadarDesc;
+      case MedicationAlarmSound.vitalBell:
+        return l10n.medAlarmSoundBellDesc;
+      case MedicationAlarmSound.urgentAlarm:
+        return l10n.medAlarmSoundUrgentDesc;
+      case MedicationAlarmSound.systemAlarm:
+        return l10n.medAlarmSoundSystemDesc;
+    }
+  }
+}
+
 extension MedicationReminderL10n on MedicationReminder {
   String localizedCategoryLabel(AppLocalizations l10n) {
     if (customCategoryLabel.trim().isNotEmpty) {

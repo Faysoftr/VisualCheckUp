@@ -643,5 +643,22 @@
   "donateThanksTitle": "आपके सहयोग के लिए धन्यवाद!",
   "donateThanksBody": "आपका {tier} ({price}) सहयोग हमारे लिए बहुत मायने रखता है। धन्यवाद!",
   "donateSupporterBadge": "समर्थक • धन्यवाद!",
-  "donateStoreNotice": "एकमुश्त स्वैच्छिक सहयोग • कोई सब्सक्रिप्शन नहीं"
+  "donateStoreNotice": "एकमुश्त स्वैच्छिक सहयोग • कोई सब्सक्रिप्शन नहीं",
+  "medFieldAlarmSound": "अलार्म की ध्वनि",
+  "medAlarmSoundClassic": "क्लासिक अलार्म",
+  "medAlarmSoundClassicDesc": "स्पष्ट अलार्म घड़ी की रिंग",
+  "medAlarmSoundGentle": "सौम्य धुन",
+  "medAlarmSoundGentleDesc": "शांत और मधुर घंटी की धुन",
+  "medAlarmSoundRadar": "आधुनिक अलार्म",
+  "medAlarmSoundRadarDesc": "स्पष्ट लयबद्ध अलार्म टोन",
+  "medAlarmSoundBell": "स्वास्थ्य घंटी",
+  "medAlarmSoundBellDesc": "चमकीली क्लासिक डबल बेल रिंग",
+  "medAlarmSoundUrgent": "तेज़ आपात अलार्म",
+  "medAlarmSoundUrgentDesc": "ज़रूरी दवाओं के लिए तेज़ ध्वनि",
+  "medAlarmSoundSystem": "फ़ोन अलार्म टोन",
+  "medAlarmSoundSystemDesc": "फ़ोन की डिफ़ॉल्ट अलार्म रिंगटोन का उपयोग करता है",
+  "medSoundPreviewPlay": "सुनें",
+  "medSoundPreviewStop": "रोकें",
+  "medSoundSilent": "मौन",
+  "medPreviewModeBadge": "प्रीव्यू"
 }

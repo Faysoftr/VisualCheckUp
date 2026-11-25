@@ -643,5 +643,22 @@
   "donateThanksTitle": "衷心感谢您的支持！",
   "donateThanksBody": "您的「{tier}」（{price}）支持意义非凡，感谢您与我们一起让 VisualCheckUp 变得更好！",
   "donateSupporterBadge": "支持者 • 感谢您！",
-  "donateStoreNotice": "一次性自愿支持 • 非自动续费订阅"
+  "donateStoreNotice": "一次性自愿支持 • 非自动续费订阅",
+  "medFieldAlarmSound": "闹钟铃声",
+  "medAlarmSoundClassic": "经典闹钟",
+  "medAlarmSoundClassicDesc": "清脆的经典闹钟提示音",
+  "medAlarmSoundGentle": "轻柔旋律",
+  "medAlarmSoundGentleDesc": "柔和舒缓的钟声旋律",
+  "medAlarmSoundRadar": "现代雷达",
+  "medAlarmSoundRadarDesc": "清晰有节奏的现代闹钟音",
+  "medAlarmSoundBell": "健康铃声",
+  "medAlarmSoundBellDesc": "清亮的双铃闹钟声",
+  "medAlarmSoundUrgent": "强力紧急警报",
+  "medAlarmSoundUrgentDesc": "重要剂量专用的响亮提示音",
+  "medAlarmSoundSystem": "手机闹钟铃声",
+  "medAlarmSoundSystemDesc": "使用设备默认的闹钟铃声",
+  "medSoundPreviewPlay": "试听",
+  "medSoundPreviewStop": "停止",
+  "medSoundSilent": "静音",
+  "medPreviewModeBadge": "预览"
 }

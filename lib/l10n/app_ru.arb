@@ -643,5 +643,22 @@
   "donateThanksTitle": "Спасибо за поддержку!",
   "donateThanksBody": "Ваша поддержка «{tier}» ({price}) очень важна для нас. Спасибо, что помогаете развивать VisualCheckUp!",
   "donateSupporterBadge": "Поддержал(а) • Спасибо!",
-  "donateStoreNotice": "Разовая добровольная поддержка • Без подписки"
+  "donateStoreNotice": "Разовая добровольная поддержка • Без подписки",
+  "medFieldAlarmSound": "Мелодия будильника",
+  "medAlarmSoundClassic": "Классический будильник",
+  "medAlarmSoundClassicDesc": "Чёткий сигнал будильника",
+  "medAlarmSoundGentle": "Мягкая мелодия",
+  "medAlarmSoundGentleDesc": "Спокойный перезвон",
+  "medAlarmSoundRadar": "Современный сигнал",
+  "medAlarmSoundRadarDesc": "Ритмичный чёткий будильник",
+  "medAlarmSoundBell": "Звонок здоровья",
+  "medAlarmSoundBellDesc": "Яркий двойной звонок",
+  "medAlarmSoundUrgent": "Громкий срочный сигнал",
+  "medAlarmSoundUrgentDesc": "Усиленный тон для важных доз",
+  "medAlarmSoundSystem": "Сигнал телефона",
+  "medAlarmSoundSystemDesc": "Стандартная мелодия будильника устройства",
+  "medSoundPreviewPlay": "Слушать",
+  "medSoundPreviewStop": "Стоп",
+  "medSoundSilent": "Без звука",
+  "medPreviewModeBadge": "ПРЕДПРОСМОТР"
 }

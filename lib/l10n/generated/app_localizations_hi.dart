@@ -2130,4 +2130,56 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'एकमुश्त स्वैच्छिक सहयोग • कोई सब्सक्रिप्शन नहीं';
+
+  @override
+  String get medFieldAlarmSound => 'अलार्म की ध्वनि';
+
+  @override
+  String get medAlarmSoundClassic => 'क्लासिक अलार्म';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'स्पष्ट अलार्म घड़ी की रिंग';
+
+  @override
+  String get medAlarmSoundGentle => 'सौम्य धुन';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'शांत और मधुर घंटी की धुन';
+
+  @override
+  String get medAlarmSoundRadar => 'आधुनिक अलार्म';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'स्पष्ट लयबद्ध अलार्म टोन';
+
+  @override
+  String get medAlarmSoundBell => 'स्वास्थ्य घंटी';
+
+  @override
+  String get medAlarmSoundBellDesc => 'चमकीली क्लासिक डबल बेल रिंग';
+
+  @override
+  String get medAlarmSoundUrgent => 'तेज़ आपात अलार्म';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'ज़रूरी दवाओं के लिए तेज़ ध्वनि';
+
+  @override
+  String get medAlarmSoundSystem => 'फ़ोन अलार्म टोन';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'फ़ोन की डिफ़ॉल्ट अलार्म रिंगटोन का उपयोग करता है';
+
+  @override
+  String get medSoundPreviewPlay => 'सुनें';
+
+  @override
+  String get medSoundPreviewStop => 'रोकें';
+
+  @override
+  String get medSoundSilent => 'मौन';
+
+  @override
+  String get medPreviewModeBadge => 'प्रीव्यू';
 }

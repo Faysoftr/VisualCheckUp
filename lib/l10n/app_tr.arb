@@ -643,5 +643,22 @@
   "donateThanksTitle": "Desteğiniz İçin Teşekkürler!",
   "donateThanksBody": "{tier} ({price}) desteğiniz bizim için çok değerli. VisualCheckUp'ı birlikte büyüttüğünüz için teşekkür ederiz!",
   "donateSupporterBadge": "Destekçimiz • Teşekkürler!",
-  "donateStoreNotice": "Tek seferlik gönüllü destek • Abonelik değildir"
+  "donateStoreNotice": "Tek seferlik gönüllü destek • Abonelik değildir",
+  "medFieldAlarmSound": "Alarm Sesi Seçimi",
+  "medAlarmSoundClassic": "Klasik Alarm",
+  "medAlarmSoundClassicDesc": "Net çalar saat sesi",
+  "medAlarmSoundGentle": "Yumuşak Melodi",
+  "medAlarmSoundGentleDesc": "Sakin ve yumuşak zil melodisi",
+  "medAlarmSoundRadar": "Modern Alarm",
+  "medAlarmSoundRadarDesc": "Ritimli modern alarm tonu",
+  "medAlarmSoundBell": "Sağlık Zili",
+  "medAlarmSoundBellDesc": "Parlak klasik çift zil sesi",
+  "medAlarmSoundUrgent": "Güçlü Acil Alarm",
+  "medAlarmSoundUrgentDesc": "Kritik dozlar için güçlü uyarı tonu",
+  "medAlarmSoundSystem": "Telefon Alarm Sesi",
+  "medAlarmSoundSystemDesc": "Telefonun kendi alarm melodisini kullanır",
+  "medSoundPreviewPlay": "Dinle",
+  "medSoundPreviewStop": "Durdur",
+  "medSoundSilent": "Sessiz",
+  "medPreviewModeBadge": "ÖNİZLEME"
 }

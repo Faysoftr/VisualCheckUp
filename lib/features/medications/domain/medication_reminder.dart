@@ -114,9 +114,88 @@ extension MedicationDoseStatusX on MedicationDoseStatus {
   }
 }
 
+/// Selectable built-in & system alarm ringtones for medication alarms.
+enum MedicationAlarmSound {
+  classicAlarm,
+  gentleChime,
+  radarPulse,
+  vitalBell,
+  urgentAlarm,
+  systemAlarm,
+}
+
+extension MedicationAlarmSoundX on MedicationAlarmSound {
+  String get id => name;
+
+  static MedicationAlarmSound fromId(String? value) {
+    for (final sound in MedicationAlarmSound.values) {
+      if (sound.name == value) return sound;
+    }
+    return MedicationAlarmSound.classicAlarm;
+  }
+
+  /// Resource name in `android/app/src/main/res/raw/` (without extension)
+  /// or `'system_alarm'` for the device's default alarm ringtone.
+  String get rawResourceName {
+    switch (this) {
+      case MedicationAlarmSound.classicAlarm:
+        return 'alarm_classic';
+      case MedicationAlarmSound.gentleChime:
+        return 'alarm_gentle';
+      case MedicationAlarmSound.radarPulse:
+        return 'alarm_radar';
+      case MedicationAlarmSound.vitalBell:
+        return 'alarm_bell';
+      case MedicationAlarmSound.urgentAlarm:
+        return 'alarm_urgent';
+      case MedicationAlarmSound.systemAlarm:
+        return 'system_alarm';
+    }
+  }
+
+  /// Bundled `.wav` filename inside `ios/Runner/` for iOS UNNotificationSound.
+  String get iosSoundFileName {
+    switch (this) {
+      case MedicationAlarmSound.classicAlarm:
+        return 'alarm_classic.wav';
+      case MedicationAlarmSound.gentleChime:
+        return 'alarm_gentle.wav';
+      case MedicationAlarmSound.radarPulse:
+        return 'alarm_radar.wav';
+      case MedicationAlarmSound.vitalBell:
+        return 'alarm_bell.wav';
+      case MedicationAlarmSound.urgentAlarm:
+        return 'alarm_urgent.wav';
+      case MedicationAlarmSound.systemAlarm:
+        return 'alarm_classic.wav';
+    }
+  }
+
+  /// Unique Android notification channel ID per sound (Android caches channel
+  /// sounds permanently per channel ID once created).
+  String get androidChannelId => 'visualcheckup_alarm_${rawResourceName}_v2';
+
+  IconData get icon {
+    switch (this) {
+      case MedicationAlarmSound.classicAlarm:
+        return Icons.alarm_rounded;
+      case MedicationAlarmSound.gentleChime:
+        return Icons.music_note_rounded;
+      case MedicationAlarmSound.radarPulse:
+        return Icons.graphic_eq_rounded;
+      case MedicationAlarmSound.vitalBell:
+        return Icons.notifications_active_rounded;
+      case MedicationAlarmSound.urgentAlarm:
+        return Icons.campaign_rounded;
+      case MedicationAlarmSound.systemAlarm:
+        return Icons.phone_android_rounded;
+    }
+  }
+}
+
 /// A recurring alarm-style medication or health checkup reminder with optional
 /// medicine photo, selected weekdays, dosage, meal timing, custom category,
-/// and explanation note.
+/// selectable alarm sound, and explanation note.
 class MedicationReminder {
   const MedicationReminder({
     required this.id,
@@ -133,6 +212,7 @@ class MedicationReminder {
     this.enabled = true,
     this.soundEnabled = true,
     this.vibrateEnabled = true,
+    this.alarmSound = MedicationAlarmSound.classicAlarm,
     required this.createdAt,
   });
 
@@ -159,6 +239,7 @@ class MedicationReminder {
   final bool enabled;
   final bool soundEnabled;
   final bool vibrateEnabled;
+  final MedicationAlarmSound alarmSound;
   final DateTime createdAt;
 
   String get formattedTime =>
@@ -223,6 +304,7 @@ class MedicationReminder {
     bool? enabled,
     bool? soundEnabled,
     bool? vibrateEnabled,
+    MedicationAlarmSound? alarmSound,
     DateTime? createdAt,
   }) {
     return MedicationReminder(
@@ -240,6 +322,7 @@ class MedicationReminder {
       enabled: enabled ?? this.enabled,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       vibrateEnabled: vibrateEnabled ?? this.vibrateEnabled,
+      alarmSound: alarmSound ?? this.alarmSound,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -262,6 +345,7 @@ class MedicationReminder {
       'enabled': enabled,
       'soundEnabled': soundEnabled,
       'vibrateEnabled': vibrateEnabled,
+      'alarmSound': alarmSound.id,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -288,6 +372,7 @@ class MedicationReminder {
       enabled: (json['enabled'] as bool?) ?? true,
       soundEnabled: (json['soundEnabled'] as bool?) ?? true,
       vibrateEnabled: (json['vibrateEnabled'] as bool?) ?? true,
+      alarmSound: MedicationAlarmSoundX.fromId(json['alarmSound'] as String?),
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
           DateTime.now(),
     );

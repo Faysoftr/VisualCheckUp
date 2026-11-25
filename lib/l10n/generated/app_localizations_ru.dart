@@ -2138,4 +2138,56 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'Разовая добровольная поддержка • Без подписки';
+
+  @override
+  String get medFieldAlarmSound => 'Мелодия будильника';
+
+  @override
+  String get medAlarmSoundClassic => 'Классический будильник';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'Чёткий сигнал будильника';
+
+  @override
+  String get medAlarmSoundGentle => 'Мягкая мелодия';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'Спокойный перезвон';
+
+  @override
+  String get medAlarmSoundRadar => 'Современный сигнал';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'Ритмичный чёткий будильник';
+
+  @override
+  String get medAlarmSoundBell => 'Звонок здоровья';
+
+  @override
+  String get medAlarmSoundBellDesc => 'Яркий двойной звонок';
+
+  @override
+  String get medAlarmSoundUrgent => 'Громкий срочный сигнал';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'Усиленный тон для важных доз';
+
+  @override
+  String get medAlarmSoundSystem => 'Сигнал телефона';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'Стандартная мелодия будильника устройства';
+
+  @override
+  String get medSoundPreviewPlay => 'Слушать';
+
+  @override
+  String get medSoundPreviewStop => 'Стоп';
+
+  @override
+  String get medSoundSilent => 'Без звука';
+
+  @override
+  String get medPreviewModeBadge => 'ПРЕДПРОСМОТР';
 }

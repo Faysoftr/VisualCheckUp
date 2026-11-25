@@ -643,5 +643,22 @@
   "donateThanksTitle": "آپ کے تعاون کا شکریہ!",
   "donateThanksBody": "آپ کا {tier} ({price}) تعاون ہمارے لیے بہت قیمتی ہے۔ VisualCheckUp کو آگے بڑھانے کا شکریہ!",
   "donateSupporterBadge": "حمایت کنندہ • شکریہ!",
-  "donateStoreNotice": "ایک بار کا رضاکارانہ تعاون • کوئی سبسکرپشن نہیں"
+  "donateStoreNotice": "ایک بار کا رضاکارانہ تعاون • کوئی سبسکرپشن نہیں",
+  "medFieldAlarmSound": "الارم کی آواز",
+  "medAlarmSoundClassic": "کلاسک الارم",
+  "medAlarmSoundClassicDesc": "واضح الارم گھڑی کی آواز",
+  "medAlarmSoundGentle": "نرم دھن",
+  "medAlarmSoundGentleDesc": "پرسکون اور ہلکی گھنٹی کی آواز",
+  "medAlarmSoundRadar": "جدید الارم",
+  "medAlarmSoundRadarDesc": "واضح اور متوازن الارم ٹون",
+  "medAlarmSoundBell": "صحت کی گھنٹی",
+  "medAlarmSoundBellDesc": "کلاسک ڈبل بیل کی آواز",
+  "medAlarmSoundUrgent": "تیز ہنگامی الارم",
+  "medAlarmSoundUrgentDesc": "اہم خوراکوں کے لیے تیز آواز",
+  "medAlarmSoundSystem": "فون الارم ٹون",
+  "medAlarmSoundSystemDesc": "فون کی ڈیفالٹ الارم رنگ ٹون استعمال کرتا ہے",
+  "medSoundPreviewPlay": "سنیں",
+  "medSoundPreviewStop": "روکیں",
+  "medSoundSilent": "خاموش",
+  "medPreviewModeBadge": "پیش منظر"
 }

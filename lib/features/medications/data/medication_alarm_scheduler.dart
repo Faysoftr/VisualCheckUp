@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:visualcheckup/features/medications/data/medication_alarm_audio_player.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
 
 /// Abstraction for scheduling native alarm notifications with medicine photos.
@@ -94,26 +95,41 @@ class NoopMedicationAlarmScheduler implements MedicationAlarmScheduler {
 /// Production alarm scheduler backed by [FlutterLocalNotificationsPlugin].
 ///
 /// Schedules high-priority alarm-channel notifications on Android (with
-/// [BigPictureStyleInformation] displaying the captured medicine photo +
-/// `fullScreenIntent: true` to wake the lock screen) and time-sensitive
-/// notifications with [DarwinNotificationAttachment] on iOS/macOS.
+/// dedicated per-sound channels, custom alarm ringtones, `FLAG_INSISTENT`
+/// continuous ringing, [BigPictureStyleInformation] displaying the captured
+/// medicine photo, and `fullScreenIntent: true` to wake the lock screen) and
+/// time-sensitive notifications with custom `.wav` alarm sounds and
+/// [DarwinNotificationAttachment] on iOS/macOS.
 class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
   LocalMedicationAlarmScheduler._();
 
   static final LocalMedicationAlarmScheduler instance =
       LocalMedicationAlarmScheduler._();
 
-  static const String _channelId = 'visualcheckup_med_alarms_v1';
-  static const String _channelName = 'Medication & Health Alarms';
+  static const String _silentChannelId = 'visualcheckup_alarm_silent_v2';
+  static const String _channelNamePrefix = 'Medication Alarms';
   static const String _channelDesc =
       'High-priority medication and health reminder alarms with medicine photo';
   static const String _payloadPrefix = 'med_alarm:';
+
+  /// Android `Notification.FLAG_INSISTENT` (0x00000004) repeats the alarm
+  /// sound continuously until the user opens or dismisses the notification.
+  static const int _androidFlagInsistent = 4;
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
   bool _tzInitialized = false;
+  String? _cachedSystemAlarmUri;
   void Function(String reminderId)? _onTapCallback;
+
+  /// Returns the dedicated Android notification channel ID for [reminder].
+  /// Using a distinct channel per sound avoids Android's immutable channel
+  /// sound cache and replaces the legacy default notification sound channel.
+  static String channelIdFor(MedicationReminder reminder) {
+    if (!reminder.soundEnabled) return _silentChannelId;
+    return reminder.alarmSound.androidChannelId;
+  }
 
   /// Deterministic positive 31-bit base ID for a reminder ID so every weekday
   /// slot (`1..7`) and snooze slot (`9`) has a stable notification ID.
@@ -135,10 +151,10 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
     if (_tzInitialized) return;
     tz_data.initializeTimeZones();
     final now = DateTime.now();
-    final targetOffsetMs = now.timeZoneOffset.inMilliseconds;
+    final targetOffset = now.timeZoneOffset;
     tz.Location? matched;
     for (final loc in tz.timeZoneDatabase.locations.values) {
-      if (loc.currentTimeZone.offset == targetOffsetMs) {
+      if (loc.currentTimeZone.offset == targetOffset) {
         matched = loc;
         // Prefer standard IANA regional zones over Etc/GMT offsets when available.
         if (!loc.name.startsWith('Etc/')) {
@@ -235,12 +251,35 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
     return null;
   }
 
-  NotificationDetails _buildDetails(
+  Future<AndroidNotificationSound?> _resolveAndroidSound(
+    MedicationReminder reminder,
+  ) async {
+    if (!reminder.soundEnabled) return null;
+    if (reminder.alarmSound == MedicationAlarmSound.systemAlarm) {
+      _cachedSystemAlarmUri ??=
+          await PlatformMedicationAlarmAudioPlayer.instance.getSystemAlarmUri();
+      final uri = _cachedSystemAlarmUri;
+      if (uri != null && uri.isNotEmpty) {
+        return UriAndroidNotificationSound(uri);
+      }
+      return const RawResourceAndroidNotificationSound('alarm_classic');
+    }
+    return RawResourceAndroidNotificationSound(
+      reminder.alarmSound.rawResourceName,
+    );
+  }
+
+  String _channelNameFor(MedicationReminder reminder) {
+    if (!reminder.soundEnabled) return '$_channelNamePrefix (Silent)';
+    return '$_channelNamePrefix (${reminder.alarmSound.name})';
+  }
+
+  Future<NotificationDetails> _buildDetails(
     MedicationReminder reminder, {
     required String title,
     required String body,
     required String summaryText,
-  }) {
+  }) async {
     final hasPhoto = !kIsWeb &&
         reminder.photoPath != null &&
         reminder.photoPath!.isNotEmpty &&
@@ -260,17 +299,24 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
             summaryText: summaryText,
           );
 
+    final androidSound = await _resolveAndroidSound(reminder);
+
     final androidDetails = AndroidNotificationDetails(
-      _channelId,
-      _channelName,
+      channelIdFor(reminder),
+      _channelNameFor(reminder),
       channelDescription: _channelDesc,
       importance: Importance.max,
       priority: Priority.max,
       category: AndroidNotificationCategory.alarm,
       audioAttributesUsage: AudioAttributesUsage.alarm,
       fullScreenIntent: true,
+      autoCancel: true,
       visibility: NotificationVisibility.public,
       playSound: reminder.soundEnabled,
+      sound: androidSound,
+      additionalFlags: reminder.soundEnabled
+          ? Int32List.fromList([_androidFlagInsistent])
+          : null,
       enableVibration: reminder.vibrateEnabled,
       vibrationPattern: reminder.vibrateEnabled
           ? Int64List.fromList([0, 600, 300, 600, 300, 600])
@@ -285,6 +331,7 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
       presentAlert: true,
       presentBadge: true,
       presentSound: reminder.soundEnabled,
+      sound: reminder.soundEnabled ? reminder.alarmSound.iosSoundFileName : null,
       interruptionLevel: InterruptionLevel.timeSensitive,
       subtitle: summaryText,
       attachments: hasPhoto
@@ -347,7 +394,7 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
         categoryLabel: categoryLabel,
         mealTimingLabel: mealTimingLabel,
       );
-      final details = _buildDetails(
+      final details = await _buildDetails(
         reminder,
         title: title,
         body: body,
@@ -404,7 +451,7 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
       final body = reminder.description.trim().isNotEmpty
           ? '$snoozeBody — ${reminder.description.trim()}'
           : snoozeBody;
-      final details = _buildDetails(
+      final details = await _buildDetails(
         reminder,
         title: title,
         body: body,
@@ -437,7 +484,7 @@ class LocalMedicationAlarmScheduler implements MedicationAlarmScheduler {
           : (reminder.dosage.trim().isNotEmpty
               ? reminder.dosage.trim()
               : categoryLabel);
-      final details = _buildDetails(
+      final details = await _buildDetails(
         reminder,
         title: title,
         body: body,

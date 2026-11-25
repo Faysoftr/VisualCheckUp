@@ -2144,4 +2144,57 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'Soutien ponctuel volontaire • Sans abonnement';
+
+  @override
+  String get medFieldAlarmSound => 'Sonnerie d\'alarme';
+
+  @override
+  String get medAlarmSoundClassic => 'Alarme classique';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'Sonnerie nette de réveil';
+
+  @override
+  String get medAlarmSoundGentle => 'Mélodie douce';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'Carillon calme et progressif';
+
+  @override
+  String get medAlarmSoundRadar => 'Alarme moderne';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'Impulsion rythmée bien audible';
+
+  @override
+  String get medAlarmSoundBell => 'Cloche santé';
+
+  @override
+  String get medAlarmSoundBellDesc => 'Double sonnette classique lumineuse';
+
+  @override
+  String get medAlarmSoundUrgent => 'Alerte urgente forte';
+
+  @override
+  String get medAlarmSoundUrgentDesc =>
+      'Tonalité puissante pour doses essentielles';
+
+  @override
+  String get medAlarmSoundSystem => 'Alarme du téléphone';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'Utilise la sonnerie d\'alarme par défaut';
+
+  @override
+  String get medSoundPreviewPlay => 'Écouter';
+
+  @override
+  String get medSoundPreviewStop => 'Arrêter';
+
+  @override
+  String get medSoundSilent => 'Silencieux';
+
+  @override
+  String get medPreviewModeBadge => 'APERÇU';
 }

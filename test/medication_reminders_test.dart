@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/features/medications/data/medication_alarm_audio_player.dart';
 import 'package:visualcheckup/features/medications/data/medication_alarm_scheduler.dart';
 import 'package:visualcheckup/features/medications/data/medication_alarm_watcher.dart';
 import 'package:visualcheckup/features/medications/data/medication_reminder_repository.dart';
@@ -43,6 +44,27 @@ class _SpyAlarmScheduler extends NoopMedicationAlarmScheduler {
   }
 }
 
+class _SpyAudioPlayer implements MedicationAlarmAudioPlayer {
+  final List<({MedicationAlarmSound sound, bool loop})> played = [];
+  int stopCount = 0;
+
+  @override
+  Future<void> play(
+    MedicationAlarmSound sound, {
+    bool loop = false,
+  }) async {
+    played.add((sound: sound, loop: loop));
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCount++;
+  }
+
+  @override
+  Future<String?> getSystemAlarmUri() async => null;
+}
+
 Uint8List _createSampleJpegBytes() {
   final image = img.Image(width: 64, height: 64);
   img.fill(image, color: img.ColorRgb8(200, 85, 61));
@@ -79,6 +101,7 @@ void main() {
         enabled: true,
         soundEnabled: true,
         vibrateEnabled: false,
+        alarmSound: MedicationAlarmSound.urgentAlarm,
         createdAt: DateTime(2026, 11, 25, 7, 0),
       );
 
@@ -93,6 +116,13 @@ void main() {
       expect(roundTrip.mealTiming, MealTiming.beforeMeal);
       expect(roundTrip.photoPath, '/tmp/glifor.jpg');
       expect(roundTrip.vibrateEnabled, isFalse);
+      expect(roundTrip.alarmSound, MedicationAlarmSound.urgentAlarm);
+
+      // Legacy JSON without alarmSound defaults to classicAlarm
+      final legacyJson = Map<String, dynamic>.from(original.toJson())
+        ..remove('alarmSound');
+      final migrated = MedicationReminder.fromJson(legacyJson);
+      expect(migrated.alarmSound, MedicationAlarmSound.classicAlarm);
     });
 
     test('calculates nextTriggerTime across weekdays accurately', () {
@@ -461,5 +491,116 @@ void main() {
         expect(saved.customCategoryLabel, 'Probiyotik Kür');
       },
     );
+
+    test('uses dedicated per-sound notification channels and silent channel', () {
+      final base = MedicationReminder(
+        id: 'ch_1',
+        title: 'Tansiyon Hapı',
+        category: MedicationCategory.bloodPressure,
+        hour: 9,
+        minute: 0,
+        weekdays: MedicationReminder.allWeekdays,
+        createdAt: DateTime(2026, 11, 25, 8, 0),
+      );
+
+      final classicChannel = LocalMedicationAlarmScheduler.channelIdFor(base);
+      final urgentChannel = LocalMedicationAlarmScheduler.channelIdFor(
+        base.copyWith(alarmSound: MedicationAlarmSound.urgentAlarm),
+      );
+      final silentChannel = LocalMedicationAlarmScheduler.channelIdFor(
+        base.copyWith(soundEnabled: false),
+      );
+
+      expect(classicChannel, isNot(equals(urgentChannel)));
+      expect(classicChannel, isNot(equals(silentChannel)));
+      expect(classicChannel, contains('alarm_classic'));
+      expect(urgentChannel, contains('alarm_urgent'));
+      expect(silentChannel, contains('silent'));
+    });
+
+    testWidgets(
+      'selects alarm sound, previews audio, and previews full-screen draft alarm before saving',
+      (tester) async {
+        final repo = MedicationReminderRepository(profileId: 'sound_test');
+        final spyScheduler = _SpyAlarmScheduler();
+        final spyAudio = _SpyAudioPlayer();
+
+        await tester.pumpWidget(
+          _wrapWithApp(
+            MedicationRemindersScreen(
+              repository: repo,
+              scheduler: spyScheduler,
+              audioPlayer: spyAudio,
+              photoPicker: (_) async => _createSampleJpegBytes(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Open Add Alarm sheet
+        await tester.tap(find.byKey(const Key('med_add_alarm_fab')));
+        await tester.pumpAndSettle();
+
+        // Enter medicine name
+        final nameField = find.byKey(const Key('med_name_field'));
+        await tester.ensureVisible(nameField);
+        await tester.enterText(nameField, 'Sabah Tansiyon İlacı');
+        await tester.pumpAndSettle();
+
+        // Scroll to Alarm Sound picker & preview "Sağlık Zili" (vitalBell)
+        final bellPreviewBtn =
+            find.byKey(const Key('med_sound_preview_vitalBell'));
+        await tester.ensureVisible(bellPreviewBtn);
+        await tester.pumpAndSettle();
+
+        await tester.tap(bellPreviewBtn);
+        await tester.pump();
+        expect(
+          spyAudio.played.last,
+          (sound: MedicationAlarmSound.vitalBell, loop: false),
+        );
+
+        // Tap Stop on same sound preview
+        await tester.tap(bellPreviewBtn);
+        await tester.pump();
+        expect(spyAudio.stopCount, greaterThanOrEqualTo(1));
+
+        // Open full-screen Draft Alarm Preview before saving
+        await tester.tap(
+          find.byKey(const Key('med_form_preview_alarm_button')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+
+        expect(find.byType(MedicationAlarmRingScreen), findsOneWidget);
+        expect(find.text('ÖNİZLEME'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(MedicationAlarmRingScreen),
+            matching: find.text('Sağlık Zili'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          spyAudio.played.last,
+          (sound: MedicationAlarmSound.vitalBell, loop: true),
+        );
+
+        // Tapping Taken on unsaved draft preview closes cleanly without saving dose log
+        final stopsBeforeClose = spyAudio.stopCount;
+        await tester.tap(find.byKey(const Key('alarm_ring_taken_button')));
+        await tester.pumpAndSettle();
+        expect(spyAudio.stopCount, greaterThan(stopsBeforeClose));
+        expect(await repo.getTodayStatusMap(), isEmpty);
+
+        // Save alarm and verify selected alarmSound persisted
+        await tester.tap(find.byKey(const Key('med_save_alarm_button')));
+        await tester.pumpAndSettle();
+
+        final saved = (await repo.loadReminders()).single;
+        expect(saved.alarmSound, MedicationAlarmSound.vitalBell);
+      },
+    );
   });
 }
+

@@ -2155,4 +2155,56 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'Tek seferlik gönüllü destek • Abonelik değildir';
+
+  @override
+  String get medFieldAlarmSound => 'Alarm Sesi Seçimi';
+
+  @override
+  String get medAlarmSoundClassic => 'Klasik Alarm';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'Net çalar saat sesi';
+
+  @override
+  String get medAlarmSoundGentle => 'Yumuşak Melodi';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'Sakin ve yumuşak zil melodisi';
+
+  @override
+  String get medAlarmSoundRadar => 'Modern Alarm';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'Ritimli modern alarm tonu';
+
+  @override
+  String get medAlarmSoundBell => 'Sağlık Zili';
+
+  @override
+  String get medAlarmSoundBellDesc => 'Parlak klasik çift zil sesi';
+
+  @override
+  String get medAlarmSoundUrgent => 'Güçlü Acil Alarm';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'Kritik dozlar için güçlü uyarı tonu';
+
+  @override
+  String get medAlarmSoundSystem => 'Telefon Alarm Sesi';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'Telefonun kendi alarm melodisini kullanır';
+
+  @override
+  String get medSoundPreviewPlay => 'Dinle';
+
+  @override
+  String get medSoundPreviewStop => 'Durdur';
+
+  @override
+  String get medSoundSilent => 'Sessiz';
+
+  @override
+  String get medPreviewModeBadge => 'ÖNİZLEME';
 }

@@ -2122,4 +2122,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get donateStoreNotice => 'دعم تطوعي لمرة واحدة • ليس اشتراكاً';
+
+  @override
+  String get medFieldAlarmSound => 'نغمة المنبّه';
+
+  @override
+  String get medAlarmSoundClassic => 'منبّه كلاسيكي';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'رنين ساعة منبّه واضح';
+
+  @override
+  String get medAlarmSoundGentle => 'لحن هادئ';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'نغمة جرس لطيفة ومريحة';
+
+  @override
+  String get medAlarmSoundRadar => 'منبّه عصري';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'نبضات منبّه إيقاعية واضحة';
+
+  @override
+  String get medAlarmSoundBell => 'جرس الصحة';
+
+  @override
+  String get medAlarmSoundBellDesc => 'رنين جرس مزدوج كلاسيكي';
+
+  @override
+  String get medAlarmSoundUrgent => 'تنبيه عاجل قوي';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'نغمة قوية للجرعات المهمة';
+
+  @override
+  String get medAlarmSoundSystem => 'نغمة منبّه الهاتف';
+
+  @override
+  String get medAlarmSoundSystemDesc => 'يستخدم نغمة المنبّه الافتراضية للهاتف';
+
+  @override
+  String get medSoundPreviewPlay => 'استماع';
+
+  @override
+  String get medSoundPreviewStop => 'إيقاف';
+
+  @override
+  String get medSoundSilent => 'صامت';
+
+  @override
+  String get medPreviewModeBadge => 'معاينة';
 }

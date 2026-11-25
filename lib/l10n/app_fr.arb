@@ -643,5 +643,22 @@
   "donateThanksTitle": "Merci pour votre soutien !",
   "donateThanksBody": "Votre soutien {tier} ({price}) compte énormément pour nous. Merci d'aider VisualCheckUp à grandir !",
   "donateSupporterBadge": "Donateur • Merci !",
-  "donateStoreNotice": "Soutien ponctuel volontaire • Sans abonnement"
+  "donateStoreNotice": "Soutien ponctuel volontaire • Sans abonnement",
+  "medFieldAlarmSound": "Sonnerie d'alarme",
+  "medAlarmSoundClassic": "Alarme classique",
+  "medAlarmSoundClassicDesc": "Sonnerie nette de réveil",
+  "medAlarmSoundGentle": "Mélodie douce",
+  "medAlarmSoundGentleDesc": "Carillon calme et progressif",
+  "medAlarmSoundRadar": "Alarme moderne",
+  "medAlarmSoundRadarDesc": "Impulsion rythmée bien audible",
+  "medAlarmSoundBell": "Cloche santé",
+  "medAlarmSoundBellDesc": "Double sonnette classique lumineuse",
+  "medAlarmSoundUrgent": "Alerte urgente forte",
+  "medAlarmSoundUrgentDesc": "Tonalité puissante pour doses essentielles",
+  "medAlarmSoundSystem": "Alarme du téléphone",
+  "medAlarmSoundSystemDesc": "Utilise la sonnerie d'alarme par défaut",
+  "medSoundPreviewPlay": "Écouter",
+  "medSoundPreviewStop": "Arrêter",
+  "medSoundSilent": "Silencieux",
+  "medPreviewModeBadge": "APERÇU"
 }

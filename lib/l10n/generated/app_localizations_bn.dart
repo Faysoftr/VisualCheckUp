@@ -2133,4 +2133,56 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'এককালীন স্বেচ্ছামূলক সহায়তা • কোনো সাবস্ক্রিপশন নয়';
+
+  @override
+  String get medFieldAlarmSound => 'অ্যালার্মের সুর';
+
+  @override
+  String get medAlarmSoundClassic => 'ক্লাসিক অ্যালার্ম';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'স্পষ্ট অ্যালার্ম ঘড়ির শব্দ';
+
+  @override
+  String get medAlarmSoundGentle => 'মৃদু সুর';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'শান্ত ও কোমল বেল সুর';
+
+  @override
+  String get medAlarmSoundRadar => 'আধুনিক অ্যালার্ম';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'স্পষ্ট ছন্দময় অ্যালার্ম টোন';
+
+  @override
+  String get medAlarmSoundBell => 'স্বাস্থ্য ঘণ্টা';
+
+  @override
+  String get medAlarmSoundBellDesc => 'উজ্জ্বল ক্লাসিক ডাবল বেল রিং';
+
+  @override
+  String get medAlarmSoundUrgent => 'জরুরি উচ্চ সতর্কতা';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'গুরুত্বপূর্ণ ডোজের জন্য জোরালো শব্দ';
+
+  @override
+  String get medAlarmSoundSystem => 'ফোনের অ্যালার্ম সুর';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'ফোনের ডিফল্ট অ্যালার্ম রিংটোন ব্যবহার করে';
+
+  @override
+  String get medSoundPreviewPlay => 'শুনুন';
+
+  @override
+  String get medSoundPreviewStop => 'থামান';
+
+  @override
+  String get medSoundSilent => 'নীরব';
+
+  @override
+  String get medPreviewModeBadge => 'প্রিভিউ';
 }

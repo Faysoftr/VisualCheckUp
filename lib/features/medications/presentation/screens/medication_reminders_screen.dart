@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -6,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/photo_zoom_viewer.dart';
+import 'package:visualcheckup/features/medications/data/medication_alarm_audio_player.dart';
 import 'package:visualcheckup/features/medications/data/medication_alarm_scheduler.dart';
 import 'package:visualcheckup/features/medications/data/medication_reminder_repository.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
@@ -23,11 +25,13 @@ class MedicationRemindersScreen extends StatefulWidget {
     super.key,
     required this.repository,
     this.scheduler,
+    this.audioPlayer,
     this.photoPicker,
   });
 
   final MedicationReminderRepository repository;
   final MedicationAlarmScheduler? scheduler;
+  final MedicationAlarmAudioPlayer? audioPlayer;
   final MedicationPhotoPicker? photoPicker;
 
   @override
@@ -39,6 +43,7 @@ class _MedicationRemindersScreenState extends State<MedicationRemindersScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final MedicationAlarmScheduler _scheduler;
+  late final MedicationAlarmAudioPlayer _audioPlayer;
   List<MedicationReminder> _reminders = const [];
   Map<String, MedicationDoseLog> _todayStatuses = const {};
   bool _loading = true;
@@ -48,6 +53,8 @@ class _MedicationRemindersScreenState extends State<MedicationRemindersScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _scheduler = widget.scheduler ?? LocalMedicationAlarmScheduler.instance;
+    _audioPlayer =
+        widget.audioPlayer ?? PlatformMedicationAlarmAudioPlayer.instance;
     _loadData();
   }
 
@@ -110,6 +117,8 @@ class _MedicationRemindersScreenState extends State<MedicationRemindersScreen>
         existing: existing,
         initialCategory: initialCategory,
         repository: widget.repository,
+        scheduler: _scheduler,
+        audioPlayer: _audioPlayer,
         photoPicker: widget.photoPicker,
       ),
     );
@@ -200,6 +209,7 @@ class _MedicationRemindersScreenState extends State<MedicationRemindersScreen>
       reminder: reminder,
       repository: widget.repository,
       scheduler: _scheduler,
+      audioPlayer: _audioPlayer,
       isPreview: true,
     );
     await _loadData();
@@ -828,12 +838,42 @@ class _AllAlarmCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          reminder.localizedDaysSummary(l10n),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                reminder.localizedDaysSummary(l10n),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              reminder.soundEnabled
+                                  ? reminder.alarmSound.icon
+                                  : Icons.volume_off_rounded,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                reminder.soundEnabled
+                                    ? reminder.alarmSound.localizedLabel(l10n)
+                                    : l10n.medSoundSilent,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -1027,12 +1067,16 @@ class _AddEditMedicationSheet extends StatefulWidget {
     required this.repository,
     this.existing,
     this.initialCategory,
+    this.scheduler,
+    this.audioPlayer,
     this.photoPicker,
   });
 
   final MedicationReminderRepository repository;
   final MedicationReminder? existing;
   final MedicationCategory? initialCategory;
+  final MedicationAlarmScheduler? scheduler;
+  final MedicationAlarmAudioPlayer? audioPlayer;
   final MedicationPhotoPicker? photoPicker;
 
   @override
@@ -1046,6 +1090,7 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
   late final TextEditingController _customCategoryController;
   late final TextEditingController _dosageController;
   late final TextEditingController _descriptionController;
+  late final MedicationAlarmAudioPlayer _audioPlayer;
 
   late MedicationCategory _category;
   late MealTiming _mealTiming;
@@ -1053,6 +1098,10 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
   late Set<int> _weekdays;
   late bool _soundEnabled;
   late bool _vibrateEnabled;
+  late MedicationAlarmSound _alarmSound;
+
+  MedicationAlarmSound? _previewingSound;
+  Timer? _previewStopTimer;
 
   String? _existingPhotoPath;
   Uint8List? _pendingPhotoBytes;
@@ -1063,6 +1112,8 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
   void initState() {
     super.initState();
     final e = widget.existing;
+    _audioPlayer =
+        widget.audioPlayer ?? PlatformMedicationAlarmAudioPlayer.instance;
     _titleController = TextEditingController(text: e?.title ?? '');
     _customCategoryController =
         TextEditingController(text: e?.customCategoryLabel ?? '');
@@ -1076,16 +1127,95 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
     _weekdays = Set<int>.from(e?.weekdays ?? MedicationReminder.allWeekdays);
     _soundEnabled = e?.soundEnabled ?? true;
     _vibrateEnabled = e?.vibrateEnabled ?? true;
+    _alarmSound = e?.alarmSound ?? MedicationAlarmSound.classicAlarm;
     _existingPhotoPath = e?.photoPath;
   }
 
   @override
   void dispose() {
+    _previewStopTimer?.cancel();
+    if (_previewingSound != null) {
+      unawaited(_audioPlayer.stop());
+    }
     _titleController.dispose();
     _customCategoryController.dispose();
     _dosageController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  void _stopSoundPreview({bool updateState = true}) {
+    _previewStopTimer?.cancel();
+    _previewStopTimer = null;
+    final wasPlaying = _previewingSound != null;
+    if (wasPlaying) {
+      unawaited(_audioPlayer.stop());
+    }
+    if (updateState && mounted && wasPlaying) {
+      setState(() => _previewingSound = null);
+    } else {
+      _previewingSound = null;
+    }
+  }
+
+  Future<void> _toggleSoundPreview(MedicationAlarmSound sound) async {
+    if (_previewingSound == sound) {
+      _stopSoundPreview();
+      return;
+    }
+    _previewStopTimer?.cancel();
+    setState(() {
+      _alarmSound = sound;
+      _previewingSound = sound;
+    });
+    await _audioPlayer.play(sound, loop: false);
+    _previewStopTimer = Timer(const Duration(milliseconds: 5400), () {
+      if (mounted && _previewingSound == sound) {
+        setState(() => _previewingSound = null);
+      }
+    });
+  }
+
+  Future<void> _previewDraftAlarm() async {
+    _stopSoundPreview();
+    final l10n = context.l10n;
+    final customCat = _category == MedicationCategory.other
+        ? _customCategoryController.text.trim()
+        : '';
+    final enteredTitle = _titleController.text.trim();
+    final fallbackTitle = customCat.isNotEmpty
+        ? customCat
+        : _category.localizedLabel(l10n);
+
+    final draft = MedicationReminder(
+      id: widget.existing?.id ?? 'draft_preview',
+      title: enteredTitle.isNotEmpty ? enteredTitle : fallbackTitle,
+      category: _category,
+      customCategoryLabel: customCat,
+      hour: _time.hour,
+      minute: _time.minute,
+      weekdays: Set<int>.from(_weekdays),
+      dosage: _dosageController.text.trim(),
+      description: _descriptionController.text.trim(),
+      mealTiming: _mealTiming,
+      photoPath: _photoRemoved ? null : _existingPhotoPath,
+      enabled: true,
+      soundEnabled: _soundEnabled,
+      vibrateEnabled: _vibrateEnabled,
+      alarmSound: _alarmSound,
+      createdAt: widget.existing?.createdAt ?? DateTime.now(),
+    );
+
+    await MedicationAlarmRingScreen.show(
+      context,
+      reminder: draft,
+      repository: widget.repository,
+      scheduler: widget.scheduler,
+      audioPlayer: _audioPlayer,
+      isPreview: true,
+      persistActions: false,
+      previewPhotoBytes: _pendingPhotoBytes,
+    );
   }
 
   Future<void> _pickPhoto(ImageSource source) async {
@@ -1144,6 +1274,7 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    _stopSoundPreview(updateState: false);
     setState(() => _saving = true);
 
     final id = widget.existing?.id ??
@@ -1174,6 +1305,7 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
       enabled: widget.existing?.enabled ?? true,
       soundEnabled: _soundEnabled,
       vibrateEnabled: _vibrateEnabled,
+      alarmSound: _alarmSound,
       createdAt: widget.existing?.createdAt ?? DateTime.now(),
     );
 
@@ -1560,14 +1692,74 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
                 ),
                 const SizedBox(height: 14),
 
-                // 9. Sound & Vibration toggles
+                // 9. Sound, Alarm Ringtone Picker & Vibration toggles
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   secondary: const Icon(Icons.volume_up_rounded),
                   title: Text(l10n.medSoundToggle),
                   value: _soundEnabled,
-                  onChanged: (v) => setState(() => _soundEnabled = v),
+                  onChanged: (v) {
+                    if (!v) _stopSoundPreview();
+                    setState(() => _soundEnabled = v);
+                  },
                 ),
+                if (_soundEnabled) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.medFieldAlarmSound,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    key: const Key('med_alarm_sound_picker'),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant
+                            .withValues(alpha: 0.6),
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      children: [
+                        for (int i = 0;
+                            i < MedicationAlarmSound.values.length;
+                            i++) ...[
+                          if (i > 0)
+                            Divider(
+                              height: 1,
+                              color: colorScheme.outlineVariant
+                                  .withValues(alpha: 0.45),
+                            ),
+                          _AlarmSoundOptionTile(
+                            sound: MedicationAlarmSound.values[i],
+                            selected:
+                                _alarmSound == MedicationAlarmSound.values[i],
+                            playing: _previewingSound ==
+                                MedicationAlarmSound.values[i],
+                            accent: accent,
+                            onSelect: () {
+                              final picked = MedicationAlarmSound.values[i];
+                              if (_previewingSound != null &&
+                                  _previewingSound != picked) {
+                                _stopSoundPreview();
+                              }
+                              setState(() => _alarmSound = picked);
+                            },
+                            onTogglePreview: () => _toggleSoundPreview(
+                              MedicationAlarmSound.values[i],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   secondary: const Icon(Icons.vibration_rounded),
@@ -1579,9 +1771,9 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
                     ),
                   ),
                 ),
-                // 10. Pinned senior-friendly Save button
+                // 10. Pinned senior-friendly Preview & Save action bar
                 Container(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                   decoration: BoxDecoration(
                     color: theme.scaffoldBackgroundColor,
                     border: Border(
@@ -1592,21 +1784,54 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
                   ),
                   child: SafeArea(
                     top: false,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: FilledButton.icon(
-                        key: const Key('med_save_alarm_button'),
-                        onPressed: _saving ? null : _save,
-                        icon: const Icon(Icons.check_rounded),
-                        label: Text(
-                          l10n.medSaveAlarm,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 54,
+                          child: OutlinedButton.icon(
+                            key: const Key('med_form_preview_alarm_button'),
+                            onPressed: _saving ? null : _previewDraftAlarm,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.notifications_active_outlined,
+                              size: 20,
+                            ),
+                            label: Text(
+                              l10n.medActionPreviewAlarm,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: SizedBox(
+                            height: 54,
+                            child: FilledButton.icon(
+                              key: const Key('med_save_alarm_button'),
+                              onPressed: _saving ? null : _save,
+                              icon: const Icon(Icons.check_rounded),
+                              label: Text(
+                                l10n.medSaveAlarm,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1614,6 +1839,120 @@ class _AddEditMedicationSheetState extends State<_AddEditMedicationSheet> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _AlarmSoundOptionTile extends StatelessWidget {
+  const _AlarmSoundOptionTile({
+    required this.sound,
+    required this.selected,
+    required this.playing,
+    required this.accent,
+    required this.onSelect,
+    required this.onTogglePreview,
+  });
+
+  final MedicationAlarmSound sound;
+  final bool selected;
+  final bool playing;
+  final Color accent;
+  final VoidCallback onSelect;
+  final VoidCallback onTogglePreview;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return InkWell(
+      key: Key('med_sound_option_${sound.name}'),
+      onTap: onSelect,
+      child: Container(
+        color: selected ? accent.withValues(alpha: 0.1) : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: selected ? accent : colorScheme.onSurfaceVariant,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (selected ? accent : colorScheme.primary)
+                    .withValues(alpha: 0.13),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                sound.icon,
+                size: 18,
+                color: selected ? accent : colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    sound.localizedLabel(l10n),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    sound.localizedDescription(l10n),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton.tonalIcon(
+              key: Key('med_sound_preview_${sound.name}'),
+              style: FilledButton.styleFrom(
+                backgroundColor: playing
+                    ? accent
+                    : colorScheme.surfaceContainerHighest,
+                foregroundColor: playing ? Colors.white : colorScheme.onSurface,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                minimumSize: const Size(0, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: onTogglePreview,
+              icon: Icon(
+                playing ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                size: 18,
+              ),
+              label: Text(
+                playing
+                    ? l10n.medSoundPreviewStop
+                    : l10n.medSoundPreviewPlay,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

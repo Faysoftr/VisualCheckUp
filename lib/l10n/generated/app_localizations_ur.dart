@@ -2128,4 +2128,56 @@ class AppLocalizationsUr extends AppLocalizations {
   @override
   String get donateStoreNotice =>
       'ایک بار کا رضاکارانہ تعاون • کوئی سبسکرپشن نہیں';
+
+  @override
+  String get medFieldAlarmSound => 'الارم کی آواز';
+
+  @override
+  String get medAlarmSoundClassic => 'کلاسک الارم';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'واضح الارم گھڑی کی آواز';
+
+  @override
+  String get medAlarmSoundGentle => 'نرم دھن';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'پرسکون اور ہلکی گھنٹی کی آواز';
+
+  @override
+  String get medAlarmSoundRadar => 'جدید الارم';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'واضح اور متوازن الارم ٹون';
+
+  @override
+  String get medAlarmSoundBell => 'صحت کی گھنٹی';
+
+  @override
+  String get medAlarmSoundBellDesc => 'کلاسک ڈبل بیل کی آواز';
+
+  @override
+  String get medAlarmSoundUrgent => 'تیز ہنگامی الارم';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'اہم خوراکوں کے لیے تیز آواز';
+
+  @override
+  String get medAlarmSoundSystem => 'فون الارم ٹون';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'فون کی ڈیفالٹ الارم رنگ ٹون استعمال کرتا ہے';
+
+  @override
+  String get medSoundPreviewPlay => 'سنیں';
+
+  @override
+  String get medSoundPreviewStop => 'روکیں';
+
+  @override
+  String get medSoundSilent => 'خاموش';
+
+  @override
+  String get medPreviewModeBadge => 'پیش منظر';
 }

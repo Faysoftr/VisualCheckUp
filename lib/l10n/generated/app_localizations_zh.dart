@@ -2070,4 +2070,55 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get donateStoreNotice => '一次性自愿支持 • 非自动续费订阅';
+
+  @override
+  String get medFieldAlarmSound => '闹钟铃声';
+
+  @override
+  String get medAlarmSoundClassic => '经典闹钟';
+
+  @override
+  String get medAlarmSoundClassicDesc => '清脆的经典闹钟提示音';
+
+  @override
+  String get medAlarmSoundGentle => '轻柔旋律';
+
+  @override
+  String get medAlarmSoundGentleDesc => '柔和舒缓的钟声旋律';
+
+  @override
+  String get medAlarmSoundRadar => '现代雷达';
+
+  @override
+  String get medAlarmSoundRadarDesc => '清晰有节奏的现代闹钟音';
+
+  @override
+  String get medAlarmSoundBell => '健康铃声';
+
+  @override
+  String get medAlarmSoundBellDesc => '清亮的双铃闹钟声';
+
+  @override
+  String get medAlarmSoundUrgent => '强力紧急警报';
+
+  @override
+  String get medAlarmSoundUrgentDesc => '重要剂量专用的响亮提示音';
+
+  @override
+  String get medAlarmSoundSystem => '手机闹钟铃声';
+
+  @override
+  String get medAlarmSoundSystemDesc => '使用设备默认的闹钟铃声';
+
+  @override
+  String get medSoundPreviewPlay => '试听';
+
+  @override
+  String get medSoundPreviewStop => '停止';
+
+  @override
+  String get medSoundSilent => '静音';
+
+  @override
+  String get medPreviewModeBadge => '预览';
 }

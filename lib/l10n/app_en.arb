@@ -1117,5 +1117,22 @@
     }
   },
   "donateSupporterBadge": "Supporter • Thank you!",
-  "donateStoreNotice": "Voluntary one-time support • No subscription"
+  "donateStoreNotice": "Voluntary one-time support • No subscription",
+  "medFieldAlarmSound": "Alarm Ringtone",
+  "medAlarmSoundClassic": "Classic Alarm",
+  "medAlarmSoundClassicDesc": "Crisp alarm clock ring",
+  "medAlarmSoundGentle": "Gentle Chime",
+  "medAlarmSoundGentleDesc": "Calm rising chime melody",
+  "medAlarmSoundRadar": "Modern Radar",
+  "medAlarmSoundRadarDesc": "Clear rhythmic alarm pulse",
+  "medAlarmSoundBell": "Health Bell",
+  "medAlarmSoundBellDesc": "Bright classic twin-bell ring",
+  "medAlarmSoundUrgent": "Urgent High Alert",
+  "medAlarmSoundUrgentDesc": "Strong insistent tone for critical doses",
+  "medAlarmSoundSystem": "Device Alarm Tone",
+  "medAlarmSoundSystemDesc": "Uses your phone's default alarm ringtone",
+  "medSoundPreviewPlay": "Listen",
+  "medSoundPreviewStop": "Stop",
+  "medSoundSilent": "Silent",
+  "medPreviewModeBadge": "PREVIEW"
 }

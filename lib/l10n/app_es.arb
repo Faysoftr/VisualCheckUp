@@ -643,5 +643,22 @@
   "donateThanksTitle": "¡Gracias por tu Apoyo!",
   "donateThanksBody": "Tu aporte de {tier} ({price}) significa muchísimo para nosotros. ¡Gracias por hacer crecer VisualCheckUp!",
   "donateSupporterBadge": "Colaborador • ¡Gracias!",
-  "donateStoreNotice": "Apoyo voluntario único • Sin suscripción"
+  "donateStoreNotice": "Apoyo voluntario único • Sin suscripción",
+  "medFieldAlarmSound": "Tono de alarma",
+  "medAlarmSoundClassic": "Alarma clásica",
+  "medAlarmSoundClassicDesc": "Timbre nítido de despertador",
+  "medAlarmSoundGentle": "Melodía suave",
+  "medAlarmSoundGentleDesc": "Tono armonioso y tranquilo",
+  "medAlarmSoundRadar": "Alarma moderna",
+  "medAlarmSoundRadarDesc": "Pulso rítmico y claro",
+  "medAlarmSoundBell": "Campana de salud",
+  "medAlarmSoundBellDesc": "Timbre clásico de doble campana",
+  "medAlarmSoundUrgent": "Alerta urgente fuerte",
+  "medAlarmSoundUrgentDesc": "Tono potente para dosis críticas",
+  "medAlarmSoundSystem": "Tono del teléfono",
+  "medAlarmSoundSystemDesc": "Usa la alarma predeterminada del dispositivo",
+  "medSoundPreviewPlay": "Escuchar",
+  "medSoundPreviewStop": "Detener",
+  "medSoundSilent": "Silencio",
+  "medPreviewModeBadge": "VISTA PREVIA"
 }

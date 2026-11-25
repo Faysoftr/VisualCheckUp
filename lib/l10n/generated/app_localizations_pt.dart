@@ -2141,4 +2141,56 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get donateStoreNotice => 'Apoio único voluntário • Sem assinatura';
+
+  @override
+  String get medFieldAlarmSound => 'Toque do alarme';
+
+  @override
+  String get medAlarmSoundClassic => 'Alarme clássico';
+
+  @override
+  String get medAlarmSoundClassicDesc => 'Toque nítido de despertador';
+
+  @override
+  String get medAlarmSoundGentle => 'Melodia suave';
+
+  @override
+  String get medAlarmSoundGentleDesc => 'Toque calmo e harmonioso';
+
+  @override
+  String get medAlarmSoundRadar => 'Alarme moderno';
+
+  @override
+  String get medAlarmSoundRadarDesc => 'Pulso rítmico bem audível';
+
+  @override
+  String get medAlarmSoundBell => 'Sino da saúde';
+
+  @override
+  String get medAlarmSoundBellDesc => 'Toque clássico de sino duplo';
+
+  @override
+  String get medAlarmSoundUrgent => 'Alerta urgente forte';
+
+  @override
+  String get medAlarmSoundUrgentDesc => 'Som intenso para doses importantes';
+
+  @override
+  String get medAlarmSoundSystem => 'Alarme do aparelho';
+
+  @override
+  String get medAlarmSoundSystemDesc =>
+      'Usa o toque de alarme padrão do telefone';
+
+  @override
+  String get medSoundPreviewPlay => 'Ouvir';
+
+  @override
+  String get medSoundPreviewStop => 'Parar';
+
+  @override
+  String get medSoundSilent => 'Silencioso';
+
+  @override
+  String get medPreviewModeBadge => 'PRÉVIA';
 }
