@@ -239,3 +239,36 @@ exports.cleanupCommunityMessageImage = functions
     }
     return null;
   });
+
+/**
+ * Broadcasts an admin push notification queued in `admin_push_queue` via FCM
+ * to topic `vc_all` (or `vc_lang_{lang}` when a language is targeted).
+ */
+exports.onAdminPushQueued = functions
+  .region('europe-west1')
+  .firestore.document('admin_push_queue/{pushId}')
+  .onCreate(async (snap) => {
+    const data = snap.data() || {};
+    const title = String(data.title || '').slice(0, 100);
+    const body = String(data.body || '').slice(0, 300);
+    if (!title || !body) {
+      await snap.ref.set({ status: 'invalid' }, { merge: true });
+      return null;
+    }
+    const lang = String(data.targetLanguage || '').toLowerCase();
+    const topic = /^[a-z]{2}$/.test(lang) ? `vc_lang_${lang}` : 'vc_all';
+    try {
+      await admin.messaging().send({
+        topic,
+        notification: { title, body },
+        data: { type: 'admin_push' },
+      });
+      await snap.ref.set(
+        { status: 'sent', topic, sentAt: new Date().toISOString() },
+        { merge: true }
+      );
+    } catch (e) {
+      await snap.ref.set({ status: 'failed', error: String(e) }, { merge: true });
+    }
+    return null;
+  });
