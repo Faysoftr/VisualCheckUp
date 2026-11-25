@@ -2173,4 +2173,242 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => 'معاينة';
+
+  @override
+  String get commMenuTitle => 'مجتمع الصحة';
+
+  @override
+  String get commHomeSubtitle =>
+      'رفقاء صحة عالميون، إعجابات الملف الشخصي ومراسلة آمنة';
+
+  @override
+  String get commTabDiscover => 'استكشاف';
+
+  @override
+  String get commTabMessages => 'الرسائل';
+
+  @override
+  String get commTabMyProfile => 'ملفي';
+
+  @override
+  String get commSafetyBanner =>
+      'للدعم والتحفيز الصحي فقط — ليس تشخيصاً طبياً. لا تُشارك تحاليلك أو صورك الخاصة أبداً.';
+
+  @override
+  String get commSearchHint => 'ابحث بالاسم أو المدينة أو الهدف الصحي...';
+
+  @override
+  String get commFilterAllGoals => 'جميع الأهداف';
+
+  @override
+  String get commFilterAllCountries => 'حول العالم';
+
+  @override
+  String get commEmptyDiscover => 'لا توجد ملفات صحية تطابق البحث حالياً.';
+
+  @override
+  String get commGoalDiabetes => 'السكري وسكر الدم';
+
+  @override
+  String get commGoalBloodPressure => 'ضغط الدم والقلب';
+
+  @override
+  String get commGoalWeightDiet => 'الوزن والغذاء الصحي';
+
+  @override
+  String get commGoalHealthyLiving => 'حياة صحية';
+
+  @override
+  String get commGoalHerbalWellness => 'شاي الأعشاب والعناية الطبيعية';
+
+  @override
+  String get commGoalParentingGrowth => 'الأهل ونمو الأطفال';
+
+  @override
+  String get commGoalSkinCare => 'العناية بالبشرة';
+
+  @override
+  String get commGoalFitnessWalk => 'المشي والحركة';
+
+  @override
+  String get commGoalSleepStress => 'النوم وتوازن التوتر';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count إعجاب';
+  }
+
+  @override
+  String get commLikeAction => 'إعجاب بالملف';
+
+  @override
+  String get commUnlikeAction => 'أُعجبت به';
+
+  @override
+  String get commSendMessage => 'إرسال رسالة';
+
+  @override
+  String get commMessagesDisabled => 'أوقف هذا العضو استقبال الرسائل المباشرة.';
+
+  @override
+  String get commOptInTitle => 'انضم إلى مجتمع الصحة العالمي';
+
+  @override
+  String get commOptInBody =>
+      'تواصل مع أشخاص يشاركونك أهدافك الصحية حول العالم. الانضمام اختياري بالكامل وتبقى تقاريرك وصورك سرية 100%.';
+
+  @override
+  String get commOptInButton => 'إنشاء ملفي الصحي';
+
+  @override
+  String get commFieldDisplayName => 'الاسم المعروض';
+
+  @override
+  String get commFieldNickname => 'اسم المستخدم (@)';
+
+  @override
+  String get commFieldCountry => 'الدولة';
+
+  @override
+  String get commFieldCity => 'المدينة (اختياري)';
+
+  @override
+  String get commFieldLanguage => 'اللغة المفضلة';
+
+  @override
+  String get commFieldGoals => 'الأهداف الصحية';
+
+  @override
+  String get commFieldBio => 'نبذة عني ورحلتي الصحية';
+
+  @override
+  String get commFieldDailyFocus => 'تركيزي الصحي اليومي';
+
+  @override
+  String get commPrivacySection => 'إعدادات الخصوصية والرسائل';
+
+  @override
+  String get commToggleDiscoverable => 'إظهار ملفي في الاستكشاف العالمي';
+
+  @override
+  String get commToggleHideRealName =>
+      'إخفاء الاسم الحقيقي (إظهار @المعرّف فقط)';
+
+  @override
+  String get commToggleHidePhoto => 'إخفاء الصورة الشخصية';
+
+  @override
+  String get commToggleAllowMessages => 'السماح بالرسائل المباشرة';
+
+  @override
+  String get commToggleRequireApproval =>
+      'طلب موافقتي على طلبات الرسائل الجديدة';
+
+  @override
+  String get commUploadPhoto => 'رفع صورة';
+
+  @override
+  String get commRemovePhoto => 'إزالة الصورة';
+
+  @override
+  String get commSaveProfile => 'حفظ الملف الصحي';
+
+  @override
+  String get commProfileSaved => 'تم تحديث ملفك في مجتمع الصحة.';
+
+  @override
+  String get commLeaveCommunity => 'مغادرة المجتمع وحذف الملف العام';
+
+  @override
+  String get commLeftCommunity => 'تمت إزالة ملفك العام من المجتمع.';
+
+  @override
+  String get commInboxEmpty =>
+      'لا توجد محادثات بعد. اكتشف رفقاء الصحة وأرسل تحية!';
+
+  @override
+  String get commMessageRequestBadge => 'طلب رسالة';
+
+  @override
+  String get commRequestBannerTitle => 'طلب رسالة جديد';
+
+  @override
+  String get commRequestBannerBody =>
+      'اقبل لمتابعة المحادثة أو ارفض/احظر هذا العضو.';
+
+  @override
+  String get commRequestAccept => 'قبول';
+
+  @override
+  String get commRequestDecline => 'رفض';
+
+  @override
+  String get commChatPlaceholder => 'اكتب رسالة داعمة...';
+
+  @override
+  String get commAttachPhoto => 'إرفاق صورة';
+
+  @override
+  String get commPhotoLabel => 'صورة';
+
+  @override
+  String get commRateLimited => 'يرجى الانتظار بضع ثوانٍ قبل إرسال رسالة أخرى.';
+
+  @override
+  String get commBlockedNotice =>
+      'لا يمكن مراسلة هذا المستخدم بسبب إعدادات الحظر.';
+
+  @override
+  String get commMuteChat => 'كتم';
+
+  @override
+  String get commUnmuteChat => 'إلغاء الكتم';
+
+  @override
+  String get commHideChat => 'إخفاء المحادثة';
+
+  @override
+  String get commBlockUser => 'حظر المستخدم';
+
+  @override
+  String get commUnblockUser => 'إلغاء الحظر';
+
+  @override
+  String get commBlockedToast => 'تم حظر المستخدم وإخفاء ملفه ورسائله.';
+
+  @override
+  String get commReportUser => 'إبلاغ';
+
+  @override
+  String get commReportTitle => 'الإبلاغ عن محتوى أو عضو';
+
+  @override
+  String get commReportReasonInappropriate => 'محتوى غير لائق';
+
+  @override
+  String get commReportReasonSpam => 'بريد مزعج أو إعلان';
+
+  @override
+  String get commReportReasonHarassment => 'مضايقة أو خطاب كراهية';
+
+  @override
+  String get commReportReasonMisinfo => 'نصيحة طبية غير آمنة / تضليل';
+
+  @override
+  String get commReportReasonOther => 'أخرى';
+
+  @override
+  String get commReportNoteHint => 'تفاصيل إضافية (اختياري)...';
+
+  @override
+  String get commReportSubmit => 'إرسال البلاغ';
+
+  @override
+  String get commReportSent => 'شكراً لك. تم إرسال بلاغ السلامة.';
+
+  @override
+  String get commDeleteForMe => 'حذف لديّ';
+
+  @override
+  String get commDeleteForEveryone => 'حذف لدى الجميع';
 }

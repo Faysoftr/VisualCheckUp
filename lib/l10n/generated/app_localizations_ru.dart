@@ -2190,4 +2190,242 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => 'ПРЕДПРОСМОТР';
+
+  @override
+  String get commMenuTitle => 'Сообщество здоровья';
+
+  @override
+  String get commHomeSubtitle =>
+      'Единомышленники по всему миру, лайки профилей и безопасный чат';
+
+  @override
+  String get commTabDiscover => 'Обзор';
+
+  @override
+  String get commTabMessages => 'Сообщения';
+
+  @override
+  String get commTabMyProfile => 'Мой профиль';
+
+  @override
+  String get commSafetyBanner =>
+      'Только взаимная поддержка и мотивация — не медицинская консультация. Ваши анализы и фото никогда не публикуются.';
+
+  @override
+  String get commSearchHint => 'Поиск по имени, городу или цели...';
+
+  @override
+  String get commFilterAllGoals => 'Все цели';
+
+  @override
+  String get commFilterAllCountries => 'Весь мир';
+
+  @override
+  String get commEmptyDiscover => 'По вашим фильтрам профилей не найдено.';
+
+  @override
+  String get commGoalDiabetes => 'Диабет и сахар';
+
+  @override
+  String get commGoalBloodPressure => 'Давление и сердце';
+
+  @override
+  String get commGoalWeightDiet => 'Вес и здоровое питание';
+
+  @override
+  String get commGoalHealthyLiving => 'Здоровый образ жизни';
+
+  @override
+  String get commGoalHerbalWellness => 'Травяной чай и уход';
+
+  @override
+  String get commGoalParentingGrowth => 'Родители и рост детей';
+
+  @override
+  String get commGoalSkinCare => 'Кожа и уход';
+
+  @override
+  String get commGoalFitnessWalk => 'Ходьба и активность';
+
+  @override
+  String get commGoalSleepStress => 'Сон и антистресс';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count лайков';
+  }
+
+  @override
+  String get commLikeAction => 'Нравится';
+
+  @override
+  String get commUnlikeAction => 'Понравилось';
+
+  @override
+  String get commSendMessage => 'Написать';
+
+  @override
+  String get commMessagesDisabled => 'Пользователь отключил личные сообщения.';
+
+  @override
+  String get commOptInTitle => 'Присоединяйтесь к сообществу здоровья';
+
+  @override
+  String get commOptInBody =>
+      'Находите людей со схожими целями здоровья по всему миру. Участие добровольное — ваши анализы и снимки остаются приватными.';
+
+  @override
+  String get commOptInButton => 'Создать профиль здоровья';
+
+  @override
+  String get commFieldDisplayName => 'Имя';
+
+  @override
+  String get commFieldNickname => 'Никнейм (@handle)';
+
+  @override
+  String get commFieldCountry => 'Страна';
+
+  @override
+  String get commFieldCity => 'Город (необязательно)';
+
+  @override
+  String get commFieldLanguage => 'Язык общения';
+
+  @override
+  String get commFieldGoals => 'Цели здоровья';
+
+  @override
+  String get commFieldBio => 'О себе и пути к здоровью';
+
+  @override
+  String get commFieldDailyFocus => 'Ежедневный фокус';
+
+  @override
+  String get commPrivacySection => 'Приватность и сообщения';
+
+  @override
+  String get commToggleDiscoverable =>
+      'Показывать мой профиль в глобальном поиске';
+
+  @override
+  String get commToggleHideRealName => 'Скрыть настоящее имя (только @ник)';
+
+  @override
+  String get commToggleHidePhoto => 'Скрыть фото профиля';
+
+  @override
+  String get commToggleAllowMessages => 'Разрешить личные сообщения';
+
+  @override
+  String get commToggleRequireApproval =>
+      'Требовать подтверждение новых запросов';
+
+  @override
+  String get commUploadPhoto => 'Загрузить фото';
+
+  @override
+  String get commRemovePhoto => 'Удалить фото';
+
+  @override
+  String get commSaveProfile => 'Сохранить профиль';
+
+  @override
+  String get commProfileSaved => 'Профиль сообщества обновлён.';
+
+  @override
+  String get commLeaveCommunity => 'Покинуть сообщество и удалить профиль';
+
+  @override
+  String get commLeftCommunity => 'Ваш публичный профиль удалён.';
+
+  @override
+  String get commInboxEmpty =>
+      'Пока нет диалогов. Найдите единомышленников в Обзоре!';
+
+  @override
+  String get commMessageRequestBadge => 'Запрос';
+
+  @override
+  String get commRequestBannerTitle => 'Новый запрос на переписку';
+
+  @override
+  String get commRequestBannerBody =>
+      'Примите, чтобы общаться, или отклоните/заблокируйте.';
+
+  @override
+  String get commRequestAccept => 'Принять';
+
+  @override
+  String get commRequestDecline => 'Отклонить';
+
+  @override
+  String get commChatPlaceholder => 'Напишите доброе сообщение...';
+
+  @override
+  String get commAttachPhoto => 'Прикрепить фото';
+
+  @override
+  String get commPhotoLabel => 'Фото';
+
+  @override
+  String get commRateLimited =>
+      'Подождите пару секунд перед следующим сообщением.';
+
+  @override
+  String get commBlockedNotice => 'Отправка невозможна из-за блокировки.';
+
+  @override
+  String get commMuteChat => 'Без звука';
+
+  @override
+  String get commUnmuteChat => 'Включить звук';
+
+  @override
+  String get commHideChat => 'Скрыть чат';
+
+  @override
+  String get commBlockUser => 'Заблокировать';
+
+  @override
+  String get commUnblockUser => 'Разблокировать';
+
+  @override
+  String get commBlockedToast => 'Пользователь заблокирован.';
+
+  @override
+  String get commReportUser => 'Пожаловаться';
+
+  @override
+  String get commReportTitle => 'Пожаловаться на профиль или сообщение';
+
+  @override
+  String get commReportReasonInappropriate => 'Неприемлемый контент';
+
+  @override
+  String get commReportReasonSpam => 'Спам или реклама';
+
+  @override
+  String get commReportReasonHarassment => 'Оскорбления или травля';
+
+  @override
+  String get commReportReasonMisinfo => 'Опасные мед. советы / дезинформация';
+
+  @override
+  String get commReportReasonOther => 'Другое';
+
+  @override
+  String get commReportNoteHint => 'Дополнительные детали...';
+
+  @override
+  String get commReportSubmit => 'Отправить жалобу';
+
+  @override
+  String get commReportSent => 'Спасибо. Жалоба отправлена.';
+
+  @override
+  String get commDeleteForMe => 'Удалить у меня';
+
+  @override
+  String get commDeleteForEveryone => 'Удалить для всех';
 }

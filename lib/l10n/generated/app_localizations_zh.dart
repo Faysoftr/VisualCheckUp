@@ -2121,4 +2121,235 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => '预览';
+
+  @override
+  String get commMenuTitle => '健康社区';
+
+  @override
+  String get commHomeSubtitle => '全球健康伙伴、主页点赞与安全私信';
+
+  @override
+  String get commTabDiscover => '发现';
+
+  @override
+  String get commTabMessages => '消息';
+
+  @override
+  String get commTabMyProfile => '我的主页';
+
+  @override
+  String get commSafetyBanner => '仅供健康经验交流与鼓励，不构成医疗诊断。您的私密化验单和照片绝不会被公开。';
+
+  @override
+  String get commSearchHint => '按姓名、城市或健康目标搜索...';
+
+  @override
+  String get commFilterAllGoals => '全部目标';
+
+  @override
+  String get commFilterAllCountries => '全球';
+
+  @override
+  String get commEmptyDiscover => '暂无符合筛选条件的健康主页。';
+
+  @override
+  String get commGoalDiabetes => '血糖与控糖';
+
+  @override
+  String get commGoalBloodPressure => '血压与心脏';
+
+  @override
+  String get commGoalWeightDiet => '体重与健康饮食';
+
+  @override
+  String get commGoalHealthyLiving => '健康生活';
+
+  @override
+  String get commGoalHerbalWellness => '花草茶与自然调理';
+
+  @override
+  String get commGoalParentingGrowth => '亲子与儿童成长';
+
+  @override
+  String get commGoalSkinCare => '皮肤与日常护理';
+
+  @override
+  String get commGoalFitnessWalk => '步行与运动';
+
+  @override
+  String get commGoalSleepStress => '睡眠与减压';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count 个赞';
+  }
+
+  @override
+  String get commLikeAction => '点赞主页';
+
+  @override
+  String get commUnlikeAction => '已赞';
+
+  @override
+  String get commSendMessage => '发送消息';
+
+  @override
+  String get commMessagesDisabled => '该成员已关闭私信功能。';
+
+  @override
+  String get commOptInTitle => '加入全球健康社区';
+
+  @override
+  String get commOptInBody =>
+      '结识世界各地与您拥有相同健康目标的伙伴。加入完全自愿，您的化验单和扫描记录始终保持 100% 私密。';
+
+  @override
+  String get commOptInButton => '创建我的健康主页';
+
+  @override
+  String get commFieldDisplayName => '显示名称';
+
+  @override
+  String get commFieldNickname => '用户名 (@handle)';
+
+  @override
+  String get commFieldCountry => '国家/地区';
+
+  @override
+  String get commFieldCity => '城市（选填）';
+
+  @override
+  String get commFieldLanguage => '常用语言';
+
+  @override
+  String get commFieldGoals => '健康与养生目标';
+
+  @override
+  String get commFieldBio => '个人简介与健康历程';
+
+  @override
+  String get commFieldDailyFocus => '每日健康关注';
+
+  @override
+  String get commPrivacySection => '隐私与消息设置';
+
+  @override
+  String get commToggleDiscoverable => '在全球发现中展示我的主页';
+
+  @override
+  String get commToggleHideRealName => '隐藏真实姓名（仅显示 @用户名）';
+
+  @override
+  String get commToggleHidePhoto => '隐藏头像照片';
+
+  @override
+  String get commToggleAllowMessages => '允许接收私信';
+
+  @override
+  String get commToggleRequireApproval => '新私信请求需经我同意';
+
+  @override
+  String get commUploadPhoto => '上传照片';
+
+  @override
+  String get commRemovePhoto => '移除照片';
+
+  @override
+  String get commSaveProfile => '保存健康主页';
+
+  @override
+  String get commProfileSaved => '健康社区主页已更新。';
+
+  @override
+  String get commLeaveCommunity => '退出社区并删除公开主页';
+
+  @override
+  String get commLeftCommunity => '您的公开社区主页已移除。';
+
+  @override
+  String get commInboxEmpty => '暂无对话。去发现页结识健康伙伴打个招呼吧！';
+
+  @override
+  String get commMessageRequestBadge => '消息请求';
+
+  @override
+  String get commRequestBannerTitle => '新的消息请求';
+
+  @override
+  String get commRequestBannerBody => '同意后即可继续聊天，也可拒绝或拉黑该成员。';
+
+  @override
+  String get commRequestAccept => '同意';
+
+  @override
+  String get commRequestDecline => '拒绝';
+
+  @override
+  String get commChatPlaceholder => '写一句温暖鼓励的话...';
+
+  @override
+  String get commAttachPhoto => '添加图片';
+
+  @override
+  String get commPhotoLabel => '图片';
+
+  @override
+  String get commRateLimited => '请稍等几秒后再发送下一条消息。';
+
+  @override
+  String get commBlockedNotice => '因拉黑设置无法发送消息。';
+
+  @override
+  String get commMuteChat => '静音';
+
+  @override
+  String get commUnmuteChat => '取消静音';
+
+  @override
+  String get commHideChat => '隐藏对话';
+
+  @override
+  String get commBlockUser => '拉黑用户';
+
+  @override
+  String get commUnblockUser => '取消拉黑';
+
+  @override
+  String get commBlockedToast => '已拉黑该用户。';
+
+  @override
+  String get commReportUser => '举报';
+
+  @override
+  String get commReportTitle => '举报成员或消息';
+
+  @override
+  String get commReportReasonInappropriate => '不当内容';
+
+  @override
+  String get commReportReasonSpam => '垃圾广告';
+
+  @override
+  String get commReportReasonHarassment => '骚扰或仇恨言论';
+
+  @override
+  String get commReportReasonMisinfo => '不安全的医疗建议/虚假信息';
+
+  @override
+  String get commReportReasonOther => '其他';
+
+  @override
+  String get commReportNoteHint => '补充说明（选填）...';
+
+  @override
+  String get commReportSubmit => '提交举报';
+
+  @override
+  String get commReportSent => '感谢反馈，安全举报已提交。';
+
+  @override
+  String get commDeleteForMe => '仅对我删除';
+
+  @override
+  String get commDeleteForEveryone => '对所有人删除';
 }

@@ -33,6 +33,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenMedicationReminders,
     this.onOpenDietMenu,
     this.onOpenAiCalorieScanner,
+    this.onOpenHealthCommunity,
     this.onOpenDonate,
     this.onOpenGrowthBmi,
     this.onOpenChildrenGrowth,
@@ -58,6 +59,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenMedicationReminders;
   final VoidCallback? onOpenDietMenu;
   final VoidCallback? onOpenAiCalorieScanner;
+  final VoidCallback? onOpenHealthCommunity;
   final VoidCallback? onOpenDonate;
   final VoidCallback? onOpenGrowthBmi;
   final VoidCallback? onOpenChildrenGrowth;
@@ -420,6 +422,14 @@ class AppDrawer extends StatelessWidget {
                       accentColor: const Color(0xFFD97706),
                       onTap: () =>
                           _closeAndRun(context, onOpenAiCalorieScanner!),
+                    ),
+                  if (onOpenHealthCommunity != null)
+                    _DrawerTile(
+                      icon: Icons.public_rounded,
+                      label: l10n.commMenuTitle,
+                      accentColor: AppTheme.primaryTeal,
+                      onTap: () =>
+                          _closeAndRun(context, onOpenHealthCommunity!),
                     ),
                   if (onOpenFollowUpPlan != null)
                     _DrawerTile(

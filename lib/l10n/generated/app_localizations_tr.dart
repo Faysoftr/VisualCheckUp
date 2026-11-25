@@ -2207,4 +2207,245 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => 'ÖNİZLEME';
+
+  @override
+  String get commMenuTitle => 'Sağlık Topluluğu';
+
+  @override
+  String get commHomeSubtitle =>
+      'Dünya çapında sağlık arkadaşları, profil beğeni ve güvenli mesaj';
+
+  @override
+  String get commTabDiscover => 'Keşfet';
+
+  @override
+  String get commTabMessages => 'Mesajlar';
+
+  @override
+  String get commTabMyProfile => 'Profilim';
+
+  @override
+  String get commSafetyBanner =>
+      'Yalnızca deneyim ve motivasyon paylaşımı içindir; tıbbi tanı/reçete değildir. Tahlilleriniz ve kamera kayıtlarınız asla paylaşılmaz.';
+
+  @override
+  String get commSearchHint => 'İsim, şehir veya sağlık notu ara...';
+
+  @override
+  String get commFilterAllGoals => 'Tüm Hedefler';
+
+  @override
+  String get commFilterAllCountries => 'Dünya Geneli';
+
+  @override
+  String get commEmptyDiscover => 'Filtrenize uyan sağlık profili bulunamadı.';
+
+  @override
+  String get commGoalDiabetes => 'Diyabet & Kan Şekeri';
+
+  @override
+  String get commGoalBloodPressure => 'Tansiyon & Kalp';
+
+  @override
+  String get commGoalWeightDiet => 'Kilo & Sağlıklı Diyet';
+
+  @override
+  String get commGoalHealthyLiving => 'Sağlıklı Yaşam';
+
+  @override
+  String get commGoalHerbalWellness => 'Bitki Çayı & Doğal Bakım';
+
+  @override
+  String get commGoalParentingGrowth => 'Ebeveyn & Çocuk Büyümesi';
+
+  @override
+  String get commGoalSkinCare => 'Cilt & Günlük Bakım';
+
+  @override
+  String get commGoalFitnessWalk => 'Yürüyüş & Hareket';
+
+  @override
+  String get commGoalSleepStress => 'Uyku & Stres Dengesi';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count Beğeni';
+  }
+
+  @override
+  String get commLikeAction => 'Profili Beğen';
+
+  @override
+  String get commUnlikeAction => 'Beğenildi';
+
+  @override
+  String get commSendMessage => 'Mesaj Gönder';
+
+  @override
+  String get commMessagesDisabled => 'Bu üye özel mesaj almayı kapatmış.';
+
+  @override
+  String get commOptInTitle => 'Küresel Sağlık Topluluğuna Katıl';
+
+  @override
+  String get commOptInBody =>
+      'Dünya çapında benzer sağlık hedeflerine sahip kişilerle tanışın. Katılım tamamen isteğe bağlıdır — tahlil raporlarınız, kamera taramalarınız ve ilaç fotoğraflarınız %100 gizli kalır.';
+
+  @override
+  String get commOptInButton => 'Sağlık Profilimi Oluştur';
+
+  @override
+  String get commFieldDisplayName => 'Görünen Ad';
+
+  @override
+  String get commFieldNickname => 'Kullanıcı Adı (@rumuz)';
+
+  @override
+  String get commFieldCountry => 'Ülke';
+
+  @override
+  String get commFieldCity => 'Şehir (isteğe bağlı)';
+
+  @override
+  String get commFieldLanguage => 'Tercih Edilen Dil';
+
+  @override
+  String get commFieldGoals => 'Sağlık & Yaşam Hedefleri';
+
+  @override
+  String get commFieldBio => 'Hakkımda & Sağlık Yolculuğum';
+
+  @override
+  String get commFieldDailyFocus => 'Günlük Sağlık Odağım';
+
+  @override
+  String get commPrivacySection => 'Gizlilik & Mesajlaşma Ayarları';
+
+  @override
+  String get commToggleDiscoverable => 'Profilim Küresel Keşfet\'te görünsün';
+
+  @override
+  String get commToggleHideRealName =>
+      'Gerçek adımı gizle (sadece @rumuz görünsün)';
+
+  @override
+  String get commToggleHidePhoto => 'Profil fotoğrafımı gizle';
+
+  @override
+  String get commToggleAllowMessages => 'Özel mesaj almaya izin ver';
+
+  @override
+  String get commToggleRequireApproval =>
+      'Yeni mesaj isteklerinde onayım istensin';
+
+  @override
+  String get commUploadPhoto => 'Fotoğraf Yükle';
+
+  @override
+  String get commRemovePhoto => 'Fotoğrafı Kaldır';
+
+  @override
+  String get commSaveProfile => 'Sağlık Profilini Kaydet';
+
+  @override
+  String get commProfileSaved => 'Sağlık topluluğu profiliniz güncellendi.';
+
+  @override
+  String get commLeaveCommunity => 'Topluluktan Ayrıl & Profili Kaldır';
+
+  @override
+  String get commLeftCommunity =>
+      'Herkese açık topluluk profiliniz kaldırıldı.';
+
+  @override
+  String get commInboxEmpty =>
+      'Henüz mesajlaşmanız yok. Keşfet\'ten sağlık arkadaşları bulup merhaba deyin!';
+
+  @override
+  String get commMessageRequestBadge => 'Mesaj İsteği';
+
+  @override
+  String get commRequestBannerTitle => 'Yeni mesaj isteği';
+
+  @override
+  String get commRequestBannerBody =>
+      'Sohbete devam etmek için kabul edin veya reddedip engelleyin.';
+
+  @override
+  String get commRequestAccept => 'Kabul Et';
+
+  @override
+  String get commRequestDecline => 'Reddet';
+
+  @override
+  String get commChatPlaceholder => 'Destekleyici bir mesaj yazın...';
+
+  @override
+  String get commAttachPhoto => 'Fotoğraf ekle';
+
+  @override
+  String get commPhotoLabel => 'Fotoğraf';
+
+  @override
+  String get commRateLimited =>
+      'Yeni mesaj göndermeden önce birkaç saniye bekleyin.';
+
+  @override
+  String get commBlockedNotice =>
+      'Engelleme ayarları nedeniyle bu kişiye mesaj gönderilemez.';
+
+  @override
+  String get commMuteChat => 'Sessize Al';
+
+  @override
+  String get commUnmuteChat => 'Sesi Aç';
+
+  @override
+  String get commHideChat => 'Sohbeti Gizle';
+
+  @override
+  String get commBlockUser => 'Kullanıcıyı Engelle';
+
+  @override
+  String get commUnblockUser => 'Engeli Kaldır';
+
+  @override
+  String get commBlockedToast =>
+      'Kullanıcı engellendi. Profili ve mesajları gizlendi.';
+
+  @override
+  String get commReportUser => 'Şikayet Et';
+
+  @override
+  String get commReportTitle => 'Üyeyi veya Mesajı Şikayet Et';
+
+  @override
+  String get commReportReasonInappropriate => 'Uygunsuz içerik';
+
+  @override
+  String get commReportReasonSpam => 'Spam veya reklam';
+
+  @override
+  String get commReportReasonHarassment => 'Taciz veya nefret söylemi';
+
+  @override
+  String get commReportReasonMisinfo => 'Güvensiz tıbbi tavsiye / yanlış bilgi';
+
+  @override
+  String get commReportReasonOther => 'Diğer';
+
+  @override
+  String get commReportNoteHint => 'Ek açıklama (isteğe bağlı)...';
+
+  @override
+  String get commReportSubmit => 'Şikayeti Gönder';
+
+  @override
+  String get commReportSent => 'Teşekkürler. Güvenlik bildiriminiz iletildi.';
+
+  @override
+  String get commDeleteForMe => 'Benden sil';
+
+  @override
+  String get commDeleteForEveryone => 'Herkesten sil';
 }

@@ -5,6 +5,7 @@ import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 import 'package:visualcheckup/features/checkup/domain/quick_color_swatch.dart';
+import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
@@ -707,5 +708,48 @@ extension MealComplianceStatusL10n on MealComplianceStatus {
     }
   }
 }
+
+extension HealthGoalTagL10n on HealthGoalTag {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case HealthGoalTag.diabetes:
+        return l10n.commGoalDiabetes;
+      case HealthGoalTag.bloodPressure:
+        return l10n.commGoalBloodPressure;
+      case HealthGoalTag.weightDiet:
+        return l10n.commGoalWeightDiet;
+      case HealthGoalTag.healthyLiving:
+        return l10n.commGoalHealthyLiving;
+      case HealthGoalTag.herbalWellness:
+        return l10n.commGoalHerbalWellness;
+      case HealthGoalTag.parentingGrowth:
+        return l10n.commGoalParentingGrowth;
+      case HealthGoalTag.skinCare:
+        return l10n.commGoalSkinCare;
+      case HealthGoalTag.fitnessWalk:
+        return l10n.commGoalFitnessWalk;
+      case HealthGoalTag.sleepStress:
+        return l10n.commGoalSleepStress;
+    }
+  }
+}
+
+extension CommunityReportReasonL10n on CommunityReportReason {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case CommunityReportReason.inappropriate:
+        return l10n.commReportReasonInappropriate;
+      case CommunityReportReason.spam:
+        return l10n.commReportReasonSpam;
+      case CommunityReportReason.harassment:
+        return l10n.commReportReasonHarassment;
+      case CommunityReportReason.medicalMisinformation:
+        return l10n.commReportReasonMisinfo;
+      case CommunityReportReason.other:
+        return l10n.commReportReasonOther;
+    }
+  }
+}
+
 
 

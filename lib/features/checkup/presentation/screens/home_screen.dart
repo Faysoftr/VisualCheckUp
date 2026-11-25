@@ -21,6 +21,8 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/category_car
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/community/data/health_community_repository.dart';
+import 'package:visualcheckup/features/community/presentation/screens/health_community_hub_screen.dart';
 import 'package:visualcheckup/features/diet/data/diet_repository.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/diet/presentation/screens/diet_hub_screen.dart';
@@ -184,6 +186,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     await _loadDashboardData();
+  }
+
+  Future<void> _openHealthCommunity({int initialTabIndex = 0}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => HealthCommunityHubScreen(
+          currentUser: widget.currentUser,
+          repository: HealthCommunityRepository(),
+          initialTabIndex: initialTabIndex,
+        ),
+      ),
+    );
   }
 
   Future<void> _openLabReports() async {
@@ -479,6 +493,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenMedicationReminders: _openMedicationReminders,
         onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
+        onOpenHealthCommunity: () => _openHealthCommunity(initialTabIndex: 0),
         onOpenDonate: () => DonationSupportDialog.show(context),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
@@ -863,6 +878,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 13),
+                      _DashboardModuleCard(
+                        icon: Icons.public_rounded,
+                        accentColor: AppTheme.primaryTeal,
+                        title: l10n.commMenuTitle,
+                        subtitle: l10n.commHomeSubtitle,
+                        onTap: () => _openHealthCommunity(initialTabIndex: 0),
                       ),
                     ],
                   ),

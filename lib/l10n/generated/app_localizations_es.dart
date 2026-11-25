@@ -2198,4 +2198,245 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => 'VISTA PREVIA';
+
+  @override
+  String get commMenuTitle => 'Comunidad de Salud';
+
+  @override
+  String get commHomeSubtitle =>
+      'Compañeros de salud globales, me gusta y mensajería segura';
+
+  @override
+  String get commTabDiscover => 'Explorar';
+
+  @override
+  String get commTabMessages => 'Mensajes';
+
+  @override
+  String get commTabMyProfile => 'Mi Perfil';
+
+  @override
+  String get commSafetyBanner =>
+      'Solo apoyo y motivación entre pares — nunca diagnóstico médico. Tus análisis y fotos privadas nunca se comparten.';
+
+  @override
+  String get commSearchHint => 'Buscar por nombre, ciudad o meta...';
+
+  @override
+  String get commFilterAllGoals => 'Todas las metas';
+
+  @override
+  String get commFilterAllCountries => 'Todo el mundo';
+
+  @override
+  String get commEmptyDiscover =>
+      'No hay perfiles que coincidan con tus filtros.';
+
+  @override
+  String get commGoalDiabetes => 'Diabetes y Glucosa';
+
+  @override
+  String get commGoalBloodPressure => 'Presión Arterial y Corazón';
+
+  @override
+  String get commGoalWeightDiet => 'Peso y Dieta Saludable';
+
+  @override
+  String get commGoalHealthyLiving => 'Vida Saludable';
+
+  @override
+  String get commGoalHerbalWellness => 'Infusiones y Cuidado Natural';
+
+  @override
+  String get commGoalParentingGrowth => 'Padres y Crecimiento Infantil';
+
+  @override
+  String get commGoalSkinCare => 'Piel y Cuidado Diario';
+
+  @override
+  String get commGoalFitnessWalk => 'Caminata y Movimiento';
+
+  @override
+  String get commGoalSleepStress => 'Sueño y Estrés';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count Me gusta';
+  }
+
+  @override
+  String get commLikeAction => 'Me gusta';
+
+  @override
+  String get commUnlikeAction => 'Te gusta';
+
+  @override
+  String get commSendMessage => 'Enviar mensaje';
+
+  @override
+  String get commMessagesDisabled =>
+      'Este miembro desactivó los mensajes directos.';
+
+  @override
+  String get commOptInTitle => 'Únete a la Comunidad Global de Salud';
+
+  @override
+  String get commOptInBody =>
+      'Conecta con personas que comparten tus objetivos de bienestar en todo el mundo. Es 100% opcional y tus análisis privados nunca se comparten.';
+
+  @override
+  String get commOptInButton => 'Crear mi perfil de salud';
+
+  @override
+  String get commFieldDisplayName => 'Nombre visible';
+
+  @override
+  String get commFieldNickname => 'Usuario (@alias)';
+
+  @override
+  String get commFieldCountry => 'País';
+
+  @override
+  String get commFieldCity => 'Ciudad (opcional)';
+
+  @override
+  String get commFieldLanguage => 'Idioma preferido';
+
+  @override
+  String get commFieldGoals => 'Metas de salud y bienestar';
+
+  @override
+  String get commFieldBio => 'Sobre mí y mi camino de salud';
+
+  @override
+  String get commFieldDailyFocus => 'Enfoque diario de bienestar';
+
+  @override
+  String get commPrivacySection => 'Privacidad y Mensajería';
+
+  @override
+  String get commToggleDiscoverable => 'Mostrar mi perfil en Explorar global';
+
+  @override
+  String get commToggleHideRealName => 'Ocultar nombre real (solo @usuario)';
+
+  @override
+  String get commToggleHidePhoto => 'Ocultar foto de perfil';
+
+  @override
+  String get commToggleAllowMessages => 'Permitir mensajes directos';
+
+  @override
+  String get commToggleRequireApproval =>
+      'Requerir mi aprobación para nuevas solicitudes';
+
+  @override
+  String get commUploadPhoto => 'Subir foto';
+
+  @override
+  String get commRemovePhoto => 'Quitar foto';
+
+  @override
+  String get commSaveProfile => 'Guardar perfil de salud';
+
+  @override
+  String get commProfileSaved => 'Perfil comunitario actualizado.';
+
+  @override
+  String get commLeaveCommunity => 'Salir y eliminar perfil público';
+
+  @override
+  String get commLeftCommunity => 'Tu perfil público ha sido eliminado.';
+
+  @override
+  String get commInboxEmpty =>
+      'Aún no tienes conversaciones. ¡Explora y saluda!';
+
+  @override
+  String get commMessageRequestBadge => 'Solicitud';
+
+  @override
+  String get commRequestBannerTitle => 'Nueva solicitud de mensaje';
+
+  @override
+  String get commRequestBannerBody =>
+      'Acepta para chatear, o rechaza/bloquea a este miembro.';
+
+  @override
+  String get commRequestAccept => 'Aceptar';
+
+  @override
+  String get commRequestDecline => 'Rechazar';
+
+  @override
+  String get commChatPlaceholder => 'Escribe un mensaje de apoyo...';
+
+  @override
+  String get commAttachPhoto => 'Adjuntar foto';
+
+  @override
+  String get commPhotoLabel => 'Foto';
+
+  @override
+  String get commRateLimited =>
+      'Espera unos segundos antes de enviar otro mensaje.';
+
+  @override
+  String get commBlockedNotice =>
+      'No puedes enviar mensajes por ajustes de bloqueo.';
+
+  @override
+  String get commMuteChat => 'Silenciar';
+
+  @override
+  String get commUnmuteChat => 'Activar sonido';
+
+  @override
+  String get commHideChat => 'Ocultar chat';
+
+  @override
+  String get commBlockUser => 'Bloquear usuario';
+
+  @override
+  String get commUnblockUser => 'Desbloquear';
+
+  @override
+  String get commBlockedToast => 'Usuario bloqueado.';
+
+  @override
+  String get commReportUser => 'Reportar';
+
+  @override
+  String get commReportTitle => 'Reportar miembro o mensaje';
+
+  @override
+  String get commReportReasonInappropriate => 'Contenido inapropiado';
+
+  @override
+  String get commReportReasonSpam => 'Spam o publicidad';
+
+  @override
+  String get commReportReasonHarassment => 'Acoso o discurso de odio';
+
+  @override
+  String get commReportReasonMisinfo =>
+      'Consejo médico inseguro / desinformación';
+
+  @override
+  String get commReportReasonOther => 'Otro';
+
+  @override
+  String get commReportNoteHint => 'Detalles opcionales...';
+
+  @override
+  String get commReportSubmit => 'Enviar reporte';
+
+  @override
+  String get commReportSent => 'Gracias. Tu reporte de seguridad fue enviado.';
+
+  @override
+  String get commDeleteForMe => 'Eliminar para mí';
+
+  @override
+  String get commDeleteForEveryone => 'Eliminar para todos';
 }

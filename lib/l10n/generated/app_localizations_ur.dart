@@ -2180,4 +2180,243 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get medPreviewModeBadge => 'پیش منظر';
+
+  @override
+  String get commMenuTitle => 'صحت کمیونٹی';
+
+  @override
+  String get commHomeSubtitle =>
+      'دنیا بھر کے صحت دوست، پروفائل لائکس اور محفوظ پیغامات';
+
+  @override
+  String get commTabDiscover => 'دریافت';
+
+  @override
+  String get commTabMessages => 'پیغامات';
+
+  @override
+  String get commTabMyProfile => 'میرا پروفائل';
+
+  @override
+  String get commSafetyBanner =>
+      'صرف باہمی حوصلہ افزائی کے لیے — طبی مشورہ نہیں۔ آپ کی نجی رپورٹس اور تصاویر کبھی شیئر نہیں ہوتیں۔';
+
+  @override
+  String get commSearchHint => 'نام، شہر یا ہدف تلاش کریں...';
+
+  @override
+  String get commFilterAllGoals => 'تمام اہداف';
+
+  @override
+  String get commFilterAllCountries => 'دنیا بھر میں';
+
+  @override
+  String get commEmptyDiscover => 'آپ کے فلٹر کے مطابق کوئی پروفائل نہیں ملا۔';
+
+  @override
+  String get commGoalDiabetes => 'ذیابیطس اور بلڈ شوگر';
+
+  @override
+  String get commGoalBloodPressure => 'بلڈ پریشر اور دل';
+
+  @override
+  String get commGoalWeightDiet => 'وزن اور صحت مند غذا';
+
+  @override
+  String get commGoalHealthyLiving => 'صحت مند طرز زندگی';
+
+  @override
+  String get commGoalHerbalWellness => 'ہربل چائے اور قدرتی دیکھ بھال';
+
+  @override
+  String get commGoalParentingGrowth => 'والدین اور بچوں کی نشوونما';
+
+  @override
+  String get commGoalSkinCare => 'جلد کی روزانہ دیکھ بھال';
+
+  @override
+  String get commGoalFitnessWalk => 'واک اور ورزش';
+
+  @override
+  String get commGoalSleepStress => 'نیند اور ذہنی سکون';
+
+  @override
+  String commLikesCount(int count) {
+    return '$count لائکس';
+  }
+
+  @override
+  String get commLikeAction => 'لائک کریں';
+
+  @override
+  String get commUnlikeAction => 'لائک کیا گیا';
+
+  @override
+  String get commSendMessage => 'پیغام بھیجیں';
+
+  @override
+  String get commMessagesDisabled =>
+      'اس رکن نے براہ راست پیغامات بند کیے ہوئے ہیں۔';
+
+  @override
+  String get commOptInTitle => 'عالمی صحت کمیونٹی میں شامل ہوں';
+
+  @override
+  String get commOptInBody =>
+      'دنیا بھر میں یکساں صحت کے اہداف رکھنے والے لوگوں سے جڑیں۔ شمولیت اختیاری ہے اور آپ کی میڈیکل رپورٹس 100% نجی رہتی ہیں۔';
+
+  @override
+  String get commOptInButton => 'میرا صحت پروفائل بنائیں';
+
+  @override
+  String get commFieldDisplayName => 'ظاہری نام';
+
+  @override
+  String get commFieldNickname => 'صارف نام (@handle)';
+
+  @override
+  String get commFieldCountry => 'ملک';
+
+  @override
+  String get commFieldCity => 'شہر (اختیاری)';
+
+  @override
+  String get commFieldLanguage => 'پسندیدہ زبان';
+
+  @override
+  String get commFieldGoals => 'صحت کے اہداف';
+
+  @override
+  String get commFieldBio => 'میرے بارے میں اور صحت کا سفر';
+
+  @override
+  String get commFieldDailyFocus => 'روزانہ صحت کا ہدف';
+
+  @override
+  String get commPrivacySection => 'رازداری اور پیغامات کی ترتیبات';
+
+  @override
+  String get commToggleDiscoverable => 'عالمی تلاش میں میرا پروفائل دکھائیں';
+
+  @override
+  String get commToggleHideRealName => 'اصل نام چھپائیں (صرف @ہینڈل دکھائیں)';
+
+  @override
+  String get commToggleHidePhoto => 'پروفائل تصویر چھپائیں';
+
+  @override
+  String get commToggleAllowMessages => 'براہ راست پیغامات کی اجازت دیں';
+
+  @override
+  String get commToggleRequireApproval =>
+      'نئی پیغام درخواست پر میری منظوری ضروری ہو';
+
+  @override
+  String get commUploadPhoto => 'تصویر اپ لوڈ کریں';
+
+  @override
+  String get commRemovePhoto => 'تصویر ہٹائیں';
+
+  @override
+  String get commSaveProfile => 'صحت پروفائل محفوظ کریں';
+
+  @override
+  String get commProfileSaved => 'کمیونٹی پروفائل اپ ڈیٹ ہو گیا۔';
+
+  @override
+  String get commLeaveCommunity => 'کمیونٹی چھوڑیں اور پبلک پروفائل حذف کریں';
+
+  @override
+  String get commLeftCommunity => 'آپ کا پبلک پروفائل ہٹا دیا گیا ہے۔';
+
+  @override
+  String get commInboxEmpty =>
+      'ابھی کوئی گفتگو نہیں۔ صحت دوست تلاش کریں اور سلام کہیں!';
+
+  @override
+  String get commMessageRequestBadge => 'پیغام کی درخواست';
+
+  @override
+  String get commRequestBannerTitle => 'نئی پیغام درخواست';
+
+  @override
+  String get commRequestBannerBody =>
+      'بات چیت کے لیے قبول کریں، یا مسترد/بلاک کریں۔';
+
+  @override
+  String get commRequestAccept => 'قبول کریں';
+
+  @override
+  String get commRequestDecline => 'مسترد کریں';
+
+  @override
+  String get commChatPlaceholder => 'مثبت پیغام لکھیں...';
+
+  @override
+  String get commAttachPhoto => 'تصویر منسلک کریں';
+
+  @override
+  String get commPhotoLabel => 'تصویر';
+
+  @override
+  String get commRateLimited =>
+      'اگلا پیغام بھیجنے سے پہلے چند سیکنڈ انتظار کریں۔';
+
+  @override
+  String get commBlockedNotice =>
+      'بلاک سیٹنگ کے باعث پیغام نہیں بھیجا جا سکتا۔';
+
+  @override
+  String get commMuteChat => 'خاموش کریں';
+
+  @override
+  String get commUnmuteChat => 'آواز کھولیں';
+
+  @override
+  String get commHideChat => 'چیٹ چھپائیں';
+
+  @override
+  String get commBlockUser => 'بلاک کریں';
+
+  @override
+  String get commUnblockUser => 'ان بلاک کریں';
+
+  @override
+  String get commBlockedToast => 'صارف کو بلاک کر دیا گیا۔';
+
+  @override
+  String get commReportUser => 'رپورٹ کریں';
+
+  @override
+  String get commReportTitle => 'رکن یا پیغام کی رپورٹ کریں';
+
+  @override
+  String get commReportReasonInappropriate => 'نامناسب مواد';
+
+  @override
+  String get commReportReasonSpam => 'سپیم یا اشتہار';
+
+  @override
+  String get commReportReasonHarassment => 'ہراسانی یا نفرت انگیز کلام';
+
+  @override
+  String get commReportReasonMisinfo => 'غیر محفوظ طبی مشورہ / غلط معلومات';
+
+  @override
+  String get commReportReasonOther => 'دیگر';
+
+  @override
+  String get commReportNoteHint => 'اضافی تفصیل (اختیاری)...';
+
+  @override
+  String get commReportSubmit => 'رپورٹ بھیجیں';
+
+  @override
+  String get commReportSent => 'شکریہ۔ آپ کی حفاظتی رپورٹ موصول ہو گئی۔';
+
+  @override
+  String get commDeleteForMe => 'میرے لیے حذف کریں';
+
+  @override
+  String get commDeleteForEveryone => 'سب کے لیے حذف کریں';
 }

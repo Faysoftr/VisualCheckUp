@@ -370,6 +370,116 @@ service cloud.firestore {
     }
 
     // ===============================================================
+    // Opt-In Global Health Community Collections
+    // Strictly isolated from private medical backup (`users/{userId}`).
+    // ===============================================================
+
+    function isValidCommunityProfile(data, userId) {
+      return hasOnlyAllowedFields([
+          'uid',
+          'displayName',
+          'nickname',
+          'photoUrl',
+          'photoKey',
+          'countryCode',
+          'city',
+          'languageCode',
+          'healthGoals',
+          'bio',
+          'dailyFocus',
+          'hideRealName',
+          'hidePhoto',
+          'showBio',
+          'discoverable',
+          'allowMessages',
+          'requireMessageApproval',
+          'likedBy',
+          'likesCount',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields(['uid', 'displayName', 'discoverable', 'allowMessages']) &&
+        data.uid == userId &&
+        isValidString(data.displayName, 1, 80) &&
+        isValidOptionalString(data, 'nickname', 0, 40) &&
+        isValidOptionalString(data, 'photoUrl', 0, 1000) &&
+        isValidOptionalString(data, 'photoKey', 0, 300) &&
+        isValidOptionalString(data, 'countryCode', 2, 10) &&
+        isValidOptionalString(data, 'city', 0, 80) &&
+        isValidOptionalString(data, 'languageCode', 2, 10) &&
+        isValidOptionalList(data, 'healthGoals', 12) &&
+        isValidOptionalString(data, 'bio', 0, 500) &&
+        isValidOptionalString(data, 'dailyFocus', 0, 180) &&
+        data.discoverable is bool &&
+        data.allowMessages is bool;
+    }
+
+    function isLikeOnlyUpdate() {
+      return isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'likesCount']) &&
+        request.resource.data.likedBy is list &&
+        request.resource.data.likesCount is int &&
+        request.resource.data.likesCount >= 0;
+    }
+
+    match /community_profiles/{userId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.discoverable == true || isOwner(userId));
+      allow create: if isOwner(userId) &&
+        isValidCommunityProfile(request.resource.data, userId);
+      allow update: if (isOwner(userId) &&
+          isValidCommunityProfile(request.resource.data, userId) &&
+          areImmutableFieldsUnchanged(['uid'])) ||
+        isLikeOnlyUpdate();
+      allow delete: if isOwner(userId);
+    }
+
+    match /community_safety/{userId} {
+      allow read, write: if isOwner(userId);
+      match /upload_events/{eventId} {
+        allow read, write: if false; // Managed exclusively by Cloud Functions
+      }
+    }
+
+    match /community_conversations/{chatId} {
+      allow read: if isAuthenticated() &&
+        request.auth.uid in resource.data.members;
+      allow create: if isAuthenticated() &&
+        request.auth.uid in request.resource.data.members &&
+        request.resource.data.members is list &&
+        request.resource.data.members.size() == 2;
+      allow update: if isAuthenticated() &&
+        request.auth.uid in resource.data.members &&
+        areImmutableFieldsUnchanged(['chatId', 'members', 'requesterId']);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members;
+        allow create: if isAuthenticated() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members &&
+          isValidOptionalString(request.resource.data, 'text', 0, 2000) &&
+          isValidOptionalString(request.resource.data, 'imageUrl', 0, 1000) &&
+          isValidOptionalString(request.resource.data, 'imageKey', 0, 300);
+        allow update: if isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'deletedFor']);
+        allow delete: if isAuthenticated() &&
+          resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    match /community_reports/{reportId} {
+      allow create: if isAuthenticated() &&
+        request.resource.data.reporterId == request.auth.uid &&
+        isValidString(request.resource.data.targetType, 1, 32) &&
+        isValidString(request.resource.data.targetId, 1, 200) &&
+        isValidString(request.resource.data.reason, 1, 64) &&
+        isValidOptionalString(request.resource.data, 'note', 0, 1000);
+      allow read, update, delete: if false;
+    }
+
+    // ===============================================================
     // Default Deny Everything Else
     // ===============================================================
 

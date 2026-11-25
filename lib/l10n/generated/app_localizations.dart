@@ -4081,6 +4081,462 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PREVIEW'**
   String get medPreviewModeBadge;
+
+  /// No description provided for @commMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Community'**
+  String get commMenuTitle;
+
+  /// No description provided for @commHomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worldwide health buddies, profile likes & safe messaging'**
+  String get commHomeSubtitle;
+
+  /// No description provided for @commTabDiscover.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get commTabDiscover;
+
+  /// No description provided for @commTabMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get commTabMessages;
+
+  /// No description provided for @commTabMyProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get commTabMyProfile;
+
+  /// No description provided for @commSafetyBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Peer wellness & motivation only — never medical advice or diagnosis. Your private lab reports and scans are never shared.'**
+  String get commSafetyBanner;
+
+  /// No description provided for @commSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, city, or wellness note...'**
+  String get commSearchHint;
+
+  /// No description provided for @commFilterAllGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'All Goals'**
+  String get commFilterAllGoals;
+
+  /// No description provided for @commFilterAllCountries.
+  ///
+  /// In en, this message translates to:
+  /// **'Worldwide'**
+  String get commFilterAllCountries;
+
+  /// No description provided for @commEmptyDiscover.
+  ///
+  /// In en, this message translates to:
+  /// **'No health profiles match your filters yet.'**
+  String get commEmptyDiscover;
+
+  /// No description provided for @commGoalDiabetes.
+  ///
+  /// In en, this message translates to:
+  /// **'Diabetes & Blood Sugar'**
+  String get commGoalDiabetes;
+
+  /// No description provided for @commGoalBloodPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Pressure & Heart'**
+  String get commGoalBloodPressure;
+
+  /// No description provided for @commGoalWeightDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight & Healthy Diet'**
+  String get commGoalWeightDiet;
+
+  /// No description provided for @commGoalHealthyLiving.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy Living'**
+  String get commGoalHealthyLiving;
+
+  /// No description provided for @commGoalHerbalWellness.
+  ///
+  /// In en, this message translates to:
+  /// **'Herbal Tea & Natural Care'**
+  String get commGoalHerbalWellness;
+
+  /// No description provided for @commGoalParentingGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents & Child Growth'**
+  String get commGoalParentingGrowth;
+
+  /// No description provided for @commGoalSkinCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Skin & Daily Care'**
+  String get commGoalSkinCare;
+
+  /// No description provided for @commGoalFitnessWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Walking & Movement'**
+  String get commGoalFitnessWalk;
+
+  /// No description provided for @commGoalSleepStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep & Stress Balance'**
+  String get commGoalSleepStress;
+
+  /// No description provided for @commLikesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Likes'**
+  String commLikesCount(int count);
+
+  /// No description provided for @commLikeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Like Profile'**
+  String get commLikeAction;
+
+  /// No description provided for @commUnlikeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get commUnlikeAction;
+
+  /// No description provided for @commSendMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Message'**
+  String get commSendMessage;
+
+  /// No description provided for @commMessagesDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This member has disabled direct messages.'**
+  String get commMessagesDisabled;
+
+  /// No description provided for @commOptInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Global Health Community'**
+  String get commOptInTitle;
+
+  /// No description provided for @commOptInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with people worldwide who share your health goals. Joining is completely optional — your lab reports, camera scans, and medication photos stay 100% private on your device.'**
+  String get commOptInBody;
+
+  /// No description provided for @commOptInButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create My Health Profile'**
+  String get commOptInButton;
+
+  /// No description provided for @commFieldDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get commFieldDisplayName;
+
+  /// No description provided for @commFieldNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Username (@handle)'**
+  String get commFieldNickname;
+
+  /// No description provided for @commFieldCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get commFieldCountry;
+
+  /// No description provided for @commFieldCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City (optional)'**
+  String get commFieldCity;
+
+  /// No description provided for @commFieldLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Language'**
+  String get commFieldLanguage;
+
+  /// No description provided for @commFieldGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Wellness Goals'**
+  String get commFieldGoals;
+
+  /// No description provided for @commFieldBio.
+  ///
+  /// In en, this message translates to:
+  /// **'About Me & Health Journey'**
+  String get commFieldBio;
+
+  /// No description provided for @commFieldDailyFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Wellness Focus'**
+  String get commFieldDailyFocus;
+
+  /// No description provided for @commPrivacySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Messaging Controls'**
+  String get commPrivacySection;
+
+  /// No description provided for @commToggleDiscoverable.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my profile in Global Discover'**
+  String get commToggleDiscoverable;
+
+  /// No description provided for @commToggleHideRealName.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide real name (show @username only)'**
+  String get commToggleHideRealName;
+
+  /// No description provided for @commToggleHidePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide profile photo'**
+  String get commToggleHidePhoto;
+
+  /// No description provided for @commToggleAllowMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow direct messages'**
+  String get commToggleAllowMessages;
+
+  /// No description provided for @commToggleRequireApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Require my approval for new message requests'**
+  String get commToggleRequireApproval;
+
+  /// No description provided for @commUploadPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Photo'**
+  String get commUploadPhoto;
+
+  /// No description provided for @commRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get commRemovePhoto;
+
+  /// No description provided for @commSaveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Health Profile'**
+  String get commSaveProfile;
+
+  /// No description provided for @commProfileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Health community profile updated.'**
+  String get commProfileSaved;
+
+  /// No description provided for @commLeaveCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Community & Delete Public Profile'**
+  String get commLeaveCommunity;
+
+  /// No description provided for @commLeftCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Your public community profile has been removed.'**
+  String get commLeftCommunity;
+
+  /// No description provided for @commInboxEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet. Discover health buddies and say hello!'**
+  String get commInboxEmpty;
+
+  /// No description provided for @commMessageRequestBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Request'**
+  String get commMessageRequestBadge;
+
+  /// No description provided for @commRequestBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New message request'**
+  String get commRequestBannerTitle;
+
+  /// No description provided for @commRequestBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept to keep chatting, or decline/block this member.'**
+  String get commRequestBannerBody;
+
+  /// No description provided for @commRequestAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get commRequestAccept;
+
+  /// No description provided for @commRequestDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get commRequestDecline;
+
+  /// No description provided for @commChatPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a supportive message...'**
+  String get commChatPlaceholder;
+
+  /// No description provided for @commAttachPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach photo'**
+  String get commAttachPhoto;
+
+  /// No description provided for @commPhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get commPhotoLabel;
+
+  /// No description provided for @commRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait a few seconds before sending another message.'**
+  String get commRateLimited;
+
+  /// No description provided for @commBlockedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot message this user due to block settings.'**
+  String get commBlockedNotice;
+
+  /// No description provided for @commMuteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get commMuteChat;
+
+  /// No description provided for @commUnmuteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get commUnmuteChat;
+
+  /// No description provided for @commHideChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Chat'**
+  String get commHideChat;
+
+  /// No description provided for @commBlockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block User'**
+  String get commBlockUser;
+
+  /// No description provided for @commUnblockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock User'**
+  String get commUnblockUser;
+
+  /// No description provided for @commBlockedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'User blocked. Their profile and messages are hidden.'**
+  String get commBlockedToast;
+
+  /// No description provided for @commReportUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get commReportUser;
+
+  /// No description provided for @commReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Content or Member'**
+  String get commReportTitle;
+
+  /// No description provided for @commReportReasonInappropriate.
+  ///
+  /// In en, this message translates to:
+  /// **'Inappropriate content'**
+  String get commReportReasonInappropriate;
+
+  /// No description provided for @commReportReasonSpam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam or advertising'**
+  String get commReportReasonSpam;
+
+  /// No description provided for @commReportReasonHarassment.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment or hate speech'**
+  String get commReportReasonHarassment;
+
+  /// No description provided for @commReportReasonMisinfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsafe medical advice / misinformation'**
+  String get commReportReasonMisinfo;
+
+  /// No description provided for @commReportReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get commReportReasonOther;
+
+  /// No description provided for @commReportNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details...'**
+  String get commReportNoteHint;
+
+  /// No description provided for @commReportSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get commReportSubmit;
+
+  /// No description provided for @commReportSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Your safety report has been submitted.'**
+  String get commReportSent;
+
+  /// No description provided for @commDeleteForMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for me'**
+  String get commDeleteForMe;
+
+  /// No description provided for @commDeleteForEveryone.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for everyone'**
+  String get commDeleteForEveryone;
 }
 
 class _AppLocalizationsDelegate
