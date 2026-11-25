@@ -1155,6 +1155,10 @@ class HealthCommunityRepository {
     if (!receiver.allowMessages) {
       return SendMessageStatus.receiverDisabledMessages;
     }
+    if (receiver.onlyFriendsCanMessage &&
+        !await areFriends(senderUid, receiver.uid)) {
+      return SendMessageStatus.friendsOnly;
+    }
 
     // 3. Anti-spam cooldown + daily quota check (adapted from Social Formül Bank)
     final now = _clock();
@@ -1275,6 +1279,140 @@ class HealthCommunityRepository {
     }
 
     return SendMessageStatus.sent;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Mutual Health Friends (`community_friendships/{pairId}`) & Mood
+  // ---------------------------------------------------------------------------
+
+  static const String _friendsKey = 'visualcheckup_comm_friends_v1';
+
+  Future<List<FriendshipRecord>> _loadLocalFriendships() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_friendsKey);
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      return (jsonDecode(raw) as List<dynamic>)
+          .whereType<Map<String, dynamic>>()
+          .map(FriendshipRecord.fromJson)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> _saveLocalFriendships(List<FriendshipRecord> list) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _friendsKey,
+      jsonEncode(list.map((f) => f.toJson()).toList()),
+    );
+  }
+
+  Future<List<FriendshipRecord>> loadFriendships(String myUid) async {
+    if (myUid.isEmpty) return const [];
+    final byId = <String, FriendshipRecord>{};
+    for (final f in await _loadLocalFriendships()) {
+      if (f.members.contains(myUid)) byId[f.pairId] = f;
+    }
+    if (_canUseFirestore) {
+      try {
+        final snap = await _db
+            .collection('community_friendships')
+            .where('members', arrayContains: myUid)
+            .get();
+        for (final doc in snap.docs) {
+          byId[doc.id] =
+              FriendshipRecord.fromJson(doc.data(), fallbackId: doc.id);
+        }
+      } catch (_) {}
+    }
+    return byId.values.where((f) => f.status != FriendshipStatus.declined).toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  }
+
+  Future<bool> areFriends(String uidA, String uidB) async {
+    final id = FriendshipRecord.pairIdFor(uidA, uidB);
+    for (final f in await loadFriendships(uidA)) {
+      if (f.pairId == id && f.status == FriendshipStatus.accepted) return true;
+    }
+    return false;
+  }
+
+  Future<void> _upsertFriendship(FriendshipRecord rec) async {
+    final list = await _loadLocalFriendships();
+    list.removeWhere((f) => f.pairId == rec.pairId);
+    list.add(rec);
+    await _saveLocalFriendships(list);
+    if (_canUseFirestore) {
+      try {
+        await _db
+            .collection('community_friendships')
+            .doc(rec.pairId)
+            .set(rec.toJson());
+      } catch (_) {}
+    }
+  }
+
+  Future<FriendshipRecord?> sendFriendRequest({
+    required String myUid,
+    required String myName,
+    required HealthCommunityProfile target,
+  }) async {
+    if (myUid.isEmpty || target.uid.isEmpty || myUid == target.uid) return null;
+    final pairId = FriendshipRecord.pairIdFor(myUid, target.uid);
+    for (final f in await loadFriendships(myUid)) {
+      if (f.pairId == pairId) return f;
+    }
+    final rec = FriendshipRecord(
+      pairId: pairId,
+      members: [myUid, target.uid]..sort(),
+      requesterId: myUid,
+      status: target.isSampleProfile
+          ? FriendshipStatus.accepted
+          : FriendshipStatus.pending,
+      displayNames: {myUid: myName, target.uid: target.visibleName},
+      updatedAt: _clock(),
+    );
+    await _upsertFriendship(rec);
+    return rec;
+  }
+
+  Future<void> respondFriendRequest({
+    required String pairId,
+    required bool accept,
+  }) async {
+    final list = await _loadLocalFriendships();
+    final idx = list.indexWhere((f) => f.pairId == pairId);
+    if (idx == -1) return;
+    final updated = list[idx].copyWith(
+      status: accept ? FriendshipStatus.accepted : FriendshipStatus.declined,
+      updatedAt: _clock(),
+    );
+    await _upsertFriendship(updated);
+  }
+
+  Future<void> removeFriend(String pairId) async {
+    final list = await _loadLocalFriendships();
+    list.removeWhere((f) => f.pairId == pairId);
+    await _saveLocalFriendships(list);
+    if (_canUseFirestore) {
+      try {
+        await _db.collection('community_friendships').doc(pairId).delete();
+      } catch (_) {}
+    }
+  }
+
+  Future<HealthCommunityProfile?> updateMood(
+    String uid,
+    HealthMood? mood,
+  ) async {
+    final existing = await loadMyProfile(uid);
+    if (existing == null) return null;
+    final updated = mood == null
+        ? existing.copyWith(clearMood: true)
+        : existing.copyWith(mood: mood);
+    return saveMyProfile(updated);
   }
 
   Future<void> respondToMessageRequest({

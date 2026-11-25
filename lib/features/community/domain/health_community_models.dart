@@ -201,6 +201,107 @@ extension ChronicConditionX on ChronicCondition {
   }
 }
 
+/// Daily wellness mood displayed on community profiles and discovery cards.
+enum HealthMood {
+  energetic,
+  calm,
+  grateful,
+  focused,
+  tired,
+  recovering,
+}
+
+extension HealthMoodX on HealthMood {
+  String get id => name;
+
+  static HealthMood? fromId(String? value) {
+    for (final m in HealthMood.values) {
+      if (m.name == value) return m;
+    }
+    return null;
+  }
+
+  String get emoji {
+    switch (this) {
+      case HealthMood.energetic:
+        return '⚡';
+      case HealthMood.calm:
+        return '🌿';
+      case HealthMood.grateful:
+        return '💛';
+      case HealthMood.focused:
+        return '🎯';
+      case HealthMood.tired:
+        return '🌙';
+      case HealthMood.recovering:
+        return '🩹';
+    }
+  }
+
+  Color get accentColor {
+    switch (this) {
+      case HealthMood.energetic:
+        return const Color(0xFF16A34A);
+      case HealthMood.calm:
+        return const Color(0xFF0B6E6E);
+      case HealthMood.grateful:
+        return const Color(0xFFD97706);
+      case HealthMood.focused:
+        return const Color(0xFF2563EB);
+      case HealthMood.tired:
+        return const Color(0xFF7C3AED);
+      case HealthMood.recovering:
+        return const Color(0xFFE11D48);
+    }
+  }
+}
+
+/// Computed wellness & community engagement badges shown on profiles.
+enum HealthAchievementBadge {
+  verifiedMember,
+  streak7,
+  streak30,
+  communityHelper,
+  chronicWarrior,
+  musicLover,
+}
+
+extension HealthAchievementBadgeX on HealthAchievementBadge {
+  String get emoji {
+    switch (this) {
+      case HealthAchievementBadge.verifiedMember:
+        return '✅';
+      case HealthAchievementBadge.streak7:
+        return '🔥';
+      case HealthAchievementBadge.streak30:
+        return '🏆';
+      case HealthAchievementBadge.communityHelper:
+        return '💚';
+      case HealthAchievementBadge.chronicWarrior:
+        return '🛡️';
+      case HealthAchievementBadge.musicLover:
+        return '🎵';
+    }
+  }
+
+  Color get accentColor {
+    switch (this) {
+      case HealthAchievementBadge.verifiedMember:
+        return const Color(0xFF2563EB);
+      case HealthAchievementBadge.streak7:
+        return const Color(0xFFEA580C);
+      case HealthAchievementBadge.streak30:
+        return const Color(0xFFD97706);
+      case HealthAchievementBadge.communityHelper:
+        return const Color(0xFF16A34A);
+      case HealthAchievementBadge.chronicWarrior:
+        return const Color(0xFF0B6E6E);
+      case HealthAchievementBadge.musicLover:
+        return const Color(0xFF7C3AED);
+    }
+  }
+}
+
 /// Supported social media platforms on Health Community profiles.
 class SocialLinksHelper {
   SocialLinksHelper._();
@@ -395,11 +496,17 @@ class HealthCommunityProfile {
     this.discoverable = true,
     this.allowMessages = true,
     this.requireMessageApproval = true,
+    this.onlyFriendsCanMessage = false,
     this.isOnline = false,
     this.showOnlineStatus = true,
     this.lastActiveAt,
     this.isVerified = false,
     this.isSuspended = false,
+    this.suspensionReason = '',
+    this.mood,
+    this.streakDays = 1,
+    this.birthMonth,
+    this.birthDay,
     this.likedBy = const [],
     this.isSampleProfile = false,
     required this.updatedAt,
@@ -434,16 +541,37 @@ class HealthCommunityProfile {
   final bool discoverable;
   final bool allowMessages;
   final bool requireMessageApproval;
+  final bool onlyFriendsCanMessage;
   final bool isOnline;
   final bool showOnlineStatus;
   final DateTime? lastActiveAt;
   final bool isVerified;
   final bool isSuspended;
+  final String suspensionReason;
+  final HealthMood? mood;
+  final int streakDays;
+  final int? birthMonth;
+  final int? birthDay;
   final List<String> likedBy;
   final bool isSampleProfile;
   final DateTime updatedAt;
 
   int get likesCount => likedBy.length;
+
+  /// Automatically computes wellness & engagement badges for this member.
+  List<HealthAchievementBadge> get computedBadges {
+    final badges = <HealthAchievementBadge>[];
+    if (isVerified) badges.add(HealthAchievementBadge.verifiedMember);
+    if (streakDays >= 30) {
+      badges.add(HealthAchievementBadge.streak30);
+    } else if (streakDays >= 7) {
+      badges.add(HealthAchievementBadge.streak7);
+    }
+    if (likesCount >= 3) badges.add(HealthAchievementBadge.communityHelper);
+    if (hasAnyChronicCondition) badges.add(HealthAchievementBadge.chronicWarrior);
+    if (hasMusic) badges.add(HealthAchievementBadge.musicLover);
+    return badges;
+  }
 
   bool isLikedBy(String userId) => userId.isNotEmpty && likedBy.contains(userId);
 
@@ -590,11 +718,18 @@ class HealthCommunityProfile {
     bool? discoverable,
     bool? allowMessages,
     bool? requireMessageApproval,
+    bool? onlyFriendsCanMessage,
     bool? isOnline,
     bool? showOnlineStatus,
     DateTime? lastActiveAt,
     bool? isVerified,
     bool? isSuspended,
+    String? suspensionReason,
+    HealthMood? mood,
+    bool clearMood = false,
+    int? streakDays,
+    int? birthMonth,
+    int? birthDay,
     List<String>? likedBy,
     bool? isSampleProfile,
     DateTime? updatedAt,
@@ -632,11 +767,18 @@ class HealthCommunityProfile {
       allowMessages: allowMessages ?? this.allowMessages,
       requireMessageApproval:
           requireMessageApproval ?? this.requireMessageApproval,
+      onlyFriendsCanMessage:
+          onlyFriendsCanMessage ?? this.onlyFriendsCanMessage,
       isOnline: isOnline ?? this.isOnline,
       showOnlineStatus: showOnlineStatus ?? this.showOnlineStatus,
       lastActiveAt: lastActiveAt ?? this.lastActiveAt,
       isVerified: isVerified ?? this.isVerified,
       isSuspended: isSuspended ?? this.isSuspended,
+      suspensionReason: suspensionReason ?? this.suspensionReason,
+      mood: clearMood ? null : (mood ?? this.mood),
+      streakDays: streakDays ?? this.streakDays,
+      birthMonth: birthMonth ?? this.birthMonth,
+      birthDay: birthDay ?? this.birthDay,
       likedBy: likedBy ?? this.likedBy,
       isSampleProfile: isSampleProfile ?? this.isSampleProfile,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -680,11 +822,18 @@ class HealthCommunityProfile {
       'discoverable': discoverable,
       'allowMessages': allowMessages,
       'requireMessageApproval': requireMessageApproval,
+      'onlyFriendsCanMessage': onlyFriendsCanMessage,
       'isOnline': isOnline,
       'showOnlineStatus': showOnlineStatus,
       if (lastActiveAt != null) 'lastActiveAt': lastActiveAt!.toIso8601String(),
       'isVerified': isVerified,
       'isSuspended': isSuspended,
+      if (suspensionReason.trim().isNotEmpty)
+        'suspensionReason': suspensionReason.trim(),
+      if (mood != null) 'mood': mood!.id,
+      'streakDays': streakDays,
+      if (birthMonth != null) 'birthMonth': birthMonth,
+      if (birthDay != null) 'birthDay': birthDay,
       'likedBy': likedBy,
       'likesCount': likedBy.length,
       'updatedAt': updatedAt.toIso8601String(),
@@ -762,11 +911,18 @@ class HealthCommunityProfile {
       allowMessages: (json['allowMessages'] as bool?) ?? true,
       requireMessageApproval:
           (json['requireMessageApproval'] as bool?) ?? true,
+      onlyFriendsCanMessage:
+          (json['onlyFriendsCanMessage'] as bool?) ?? false,
       isOnline: (json['isOnline'] as bool?) ?? false,
       showOnlineStatus: (json['showOnlineStatus'] as bool?) ?? true,
       lastActiveAt: parsedLastActive,
       isVerified: (json['isVerified'] as bool?) ?? false,
       isSuspended: (json['isSuspended'] as bool?) ?? false,
+      suspensionReason: (json['suspensionReason'] as String?) ?? '',
+      mood: HealthMoodX.fromId(json['mood'] as String?),
+      streakDays: (json['streakDays'] as num?)?.toInt() ?? 1,
+      birthMonth: (json['birthMonth'] as num?)?.toInt(),
+      birthDay: (json['birthDay'] as num?)?.toInt(),
       likedBy: rawLikedBy,
       isSampleProfile: (json['isSampleProfile'] as bool?) ?? false,
       updatedAt: parsedUpdated,
@@ -798,6 +954,7 @@ enum SendMessageStatus {
   blocked,
   senderDisabledMessages,
   receiverDisabledMessages,
+  friendsOnly,
   requestDeclined,
   unsafeContent,
   emptyContent,
@@ -1043,4 +1200,106 @@ enum CommunityReportReason {
   harassment,
   medicalMisinformation,
   other,
+}
+
+/// Mutual health friendship state (`community_friendships/{pairId}`).
+enum FriendshipStatus {
+  pending,
+  accepted,
+  declined,
+}
+
+extension FriendshipStatusX on FriendshipStatus {
+  static FriendshipStatus fromId(String? value) {
+    for (final s in FriendshipStatus.values) {
+      if (s.name == value) return s;
+    }
+    return FriendshipStatus.pending;
+  }
+}
+
+/// Mutual health-buddy friendship link between two community members.
+class FriendshipRecord {
+  const FriendshipRecord({
+    required this.pairId,
+    required this.members,
+    required this.requesterId,
+    required this.status,
+    this.displayNames = const {},
+    required this.updatedAt,
+  });
+
+  final String pairId;
+  final List<String> members;
+  final String requesterId;
+  final FriendshipStatus status;
+  final Map<String, String> displayNames;
+  final DateTime updatedAt;
+
+  static String pairIdFor(String uidA, String uidB) {
+    final ids = [uidA, uidB]..sort();
+    return ids.join('_');
+  }
+
+  String peerIdFor(String myUid) =>
+      members.firstWhere((id) => id != myUid, orElse: () => '');
+
+  String peerNameFor(String myUid) {
+    final peer = peerIdFor(myUid);
+    return displayNames[peer] ?? 'Member';
+  }
+
+  bool isIncomingPendingFor(String myUid) =>
+      status == FriendshipStatus.pending && requesterId != myUid;
+
+  bool isOutgoingPendingFor(String myUid) =>
+      status == FriendshipStatus.pending && requesterId == myUid;
+
+  FriendshipRecord copyWith({
+    FriendshipStatus? status,
+    Map<String, String>? displayNames,
+    DateTime? updatedAt,
+  }) {
+    return FriendshipRecord(
+      pairId: pairId,
+      members: members,
+      requesterId: requesterId,
+      status: status ?? this.status,
+      displayNames: displayNames ?? this.displayNames,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'pairId': pairId,
+        'members': members,
+        'requesterId': requesterId,
+        'status': status.name,
+        'displayNames': displayNames,
+        'updatedAt': updatedAt.toIso8601String(),
+      };
+
+  factory FriendshipRecord.fromJson(
+    Map<String, dynamic> json, {
+    String? fallbackId,
+  }) {
+    final rawNames = <String, String>{};
+    if (json['displayNames'] is Map) {
+      (json['displayNames'] as Map).forEach((k, v) {
+        if (k is String && v != null) rawNames[k] = v.toString();
+      });
+    }
+    return FriendshipRecord(
+      pairId: (json['pairId'] as String?) ?? fallbackId ?? '',
+      members: (json['members'] as List<dynamic>?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
+      requesterId: (json['requesterId'] as String?) ?? '',
+      status: FriendshipStatusX.fromId(json['status'] as String?),
+      displayNames: rawNames,
+      updatedAt: DateTime.tryParse((json['updatedAt'] as String?) ?? '') ??
+          DateTime.now(),
+    );
+  }
 }

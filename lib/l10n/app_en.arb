@@ -1409,5 +1409,15 @@
   "specNutritionDietetics": "Nutrition & Dietetics",
   "specPsychiatry": "Psychiatry",
   "specPulmonology": "Pulmonology",
-  "specNephrology": "Nephrology"
+  "specNephrology": "Nephrology",
+  "dailyHealthTipTitle": "Daily health tip",
+  "birthdayCardTitle": "Happy birthday, {name}! 🎉",
+  "birthdayCardSubtitle": "Wishing you a healthy and happy year ahead.",
+  "@birthdayCardTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

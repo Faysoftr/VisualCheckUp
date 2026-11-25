@@ -890,5 +890,8 @@
   "specPsychiatry": "Psychiatrie",
   "specPulmonology": "Longgeneeskunde",
   "specNephrology": "Nefrologie",
-  "@@locale": "nl"
+  "@@locale": "nl",
+  "dailyHealthTipTitle": "Gezondheidstip van de dag",
+  "birthdayCardTitle": "Gefeliciteerd, {name}! 🎉",
+  "birthdayCardSubtitle": "Wij wensen je een gezond en gelukkig jaar."
 }

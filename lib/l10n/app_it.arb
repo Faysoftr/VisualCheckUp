@@ -890,5 +890,8 @@
   "specPsychiatry": "Psichiatria",
   "specPulmonology": "Pneumologia",
   "specNephrology": "Nefrologia",
-  "@@locale": "it"
+  "@@locale": "it",
+  "dailyHealthTipTitle": "Consiglio di salute del giorno",
+  "birthdayCardTitle": "Buon compleanno, {name}! 🎉",
+  "birthdayCardSubtitle": "Ti auguriamo un anno sano e felice."
 }

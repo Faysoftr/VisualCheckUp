@@ -2939,4 +2939,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get specNephrology => 'Nephrology';
+
+  @override
+  String get dailyHealthTipTitle => 'Daily health tip';
+
+  @override
+  String birthdayCardTitle(String name) {
+    return 'Happy birthday, $name! 🎉';
+  }
+
+  @override
+  String get birthdayCardSubtitle =>
+      'Wishing you a healthy and happy year ahead.';
 }

@@ -2918,4 +2918,15 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get specNephrology => 'Nephrology';
+
+  @override
+  String get dailyHealthTipTitle => 'আজকের স্বাস্থ্য টিপ';
+
+  @override
+  String birthdayCardTitle(String name) {
+    return 'শুভ জন্মদিন, $name! 🎉';
+  }
+
+  @override
+  String get birthdayCardSubtitle => 'সুস্থ ও সুখী একটি বছর কামনা করি।';
 }

@@ -890,5 +890,8 @@
   "specPsychiatry": "Psychiatrie",
   "specPulmonology": "Pneumologie",
   "specNephrology": "Nephrologie",
-  "@@locale": "de"
+  "@@locale": "de",
+  "dailyHealthTipTitle": "Gesundheitstipp des Tages",
+  "birthdayCardTitle": "Alles Gute, {name}! 🎉",
+  "birthdayCardSubtitle": "Wir wünschen ein gesundes, glückliches Jahr."
 }

@@ -890,5 +890,8 @@
   "specPsychiatry": "Psykiatri",
   "specPulmonology": "Lungmedicin",
   "specNephrology": "Nefrologi",
-  "@@locale": "sv"
+  "@@locale": "sv",
+  "dailyHealthTipTitle": "Dagens hälsotips",
+  "birthdayCardTitle": "Grattis, {name}! 🎉",
+  "birthdayCardSubtitle": "Vi önskar dig ett friskt och lyckligt år."
 }

@@ -2926,4 +2926,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get specNephrology => 'Nephrology';
+
+  @override
+  String get dailyHealthTipTitle => 'Dica de saúde do dia';
+
+  @override
+  String birthdayCardTitle(String name) {
+    return 'Feliz aniversário, $name! 🎉';
+  }
+
+  @override
+  String get birthdayCardSubtitle => 'Desejamos um ano saudável e feliz.';
 }

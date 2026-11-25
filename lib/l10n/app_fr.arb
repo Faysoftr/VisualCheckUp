@@ -890,5 +890,8 @@
   "specNutritionDietetics": "Nutrition & Diététique",
   "specPsychiatry": "Psychiatrie",
   "specPulmonology": "Pneumologie",
-  "specNephrology": "Néphrologie"
+  "specNephrology": "Néphrologie",
+  "dailyHealthTipTitle": "Conseil santé du jour",
+  "birthdayCardTitle": "Joyeux anniversaire, {name} ! 🎉",
+  "birthdayCardSubtitle": "Nous vous souhaitons une année saine et heureuse."
 }

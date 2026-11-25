@@ -890,5 +890,8 @@
   "specNutritionDietetics": "Nutrition & Dietetics",
   "specPsychiatry": "Psychiatry",
   "specPulmonology": "Pulmonology",
-  "specNephrology": "Nephrology"
+  "specNephrology": "Nephrology",
+  "dailyHealthTipTitle": "آج کی صحت کی ٹپ",
+  "birthdayCardTitle": "سالگرہ مبارک، {name}! 🎉",
+  "birthdayCardSubtitle": "آپ کو صحت مند اور خوشگوار سال مبارک۔"
 }

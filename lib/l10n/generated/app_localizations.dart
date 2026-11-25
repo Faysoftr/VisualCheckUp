@@ -5469,6 +5469,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nephrology'**
   String get specNephrology;
+
+  /// No description provided for @dailyHealthTipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily health tip'**
+  String get dailyHealthTipTitle;
+
+  /// No description provided for @birthdayCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy birthday, {name}! 🎉'**
+  String birthdayCardTitle(String name);
+
+  /// No description provided for @birthdayCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishing you a healthy and happy year ahead.'**
+  String get birthdayCardSubtitle;
 }
 
 class _AppLocalizationsDelegate

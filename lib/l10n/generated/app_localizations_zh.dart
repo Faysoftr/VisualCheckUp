@@ -2844,4 +2844,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get specNephrology => 'Nephrology';
+
+  @override
+  String get dailyHealthTipTitle => '每日健康小贴士';
+
+  @override
+  String birthdayCardTitle(String name) {
+    return '生日快乐，$name！🎉';
+  }
+
+  @override
+  String get birthdayCardSubtitle => '祝你新的一岁健康快乐。';
 }

@@ -136,6 +136,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
         break;
       case SendMessageStatus.receiverDisabledMessages:
       case SendMessageStatus.senderDisabledMessages:
+      case SendMessageStatus.friendsOnly:
         _toast(l10n.commMessagesDisabled);
         break;
       case SendMessageStatus.requestDeclined:
