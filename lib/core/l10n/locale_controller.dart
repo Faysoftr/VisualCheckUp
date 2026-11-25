@@ -55,9 +55,29 @@ class LocaleController extends ValueNotifier<Locale?> {
       englishName: 'Spanish',
     ),
     AppLanguageOption(
+      locale: Locale('de'),
+      nativeName: 'Deutsch',
+      englishName: 'German',
+    ),
+    AppLanguageOption(
+      locale: Locale('sv'),
+      nativeName: 'Svenska',
+      englishName: 'Swedish',
+    ),
+    AppLanguageOption(
       locale: Locale('fr'),
       nativeName: 'Français',
       englishName: 'French',
+    ),
+    AppLanguageOption(
+      locale: Locale('it'),
+      nativeName: 'Italiano',
+      englishName: 'Italian',
+    ),
+    AppLanguageOption(
+      locale: Locale('nl'),
+      nativeName: 'Nederlands',
+      englishName: 'Dutch',
     ),
     AppLanguageOption(
       locale: Locale('ar'),

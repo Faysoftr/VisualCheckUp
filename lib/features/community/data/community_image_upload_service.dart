@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'package:visualcheckup/core/safety/content_safety_service.dart';
 
 /// User-facing upload error for community avatar & chat image uploads.
 class CommunityUploadException implements Exception {
@@ -113,6 +114,13 @@ class R2CommunityImageUploadService implements CommunityImageUploadService {
     required String folder,
     String fileExtension = '.jpg',
   }) async {
+    final safety = ContentSafetyService.validateImageBytes(rawBytes);
+    if (!safety.isSafe) {
+      throw const CommunityUploadException(
+        'Image failed safety validation and could not be uploaded.',
+      );
+    }
+
     final compressed = await ensureImageUnderLimit(rawBytes);
     final sizeBytes = compressed.lengthInBytes;
     if (sizeBytes > maxFileSizeBytes) {
@@ -129,8 +137,8 @@ class R2CommunityImageUploadService implements CommunityImageUploadService {
     // Attempt production Cloudflare R2 presigned upload when Firebase is active
     if (Firebase.apps.isNotEmpty) {
       try {
-        final callable =
-            FirebaseFunctions.instance.httpsCallable('getR2UploadUrl');
+        final callable = FirebaseFunctions.instanceFor(region: 'europe-west1')
+            .httpsCallable('getR2UploadUrl');
         final result = await callable.call<dynamic>(<String, dynamic>{
           'contentType': contentType,
           'sizeBytes': sizeBytes,
@@ -147,6 +155,16 @@ class R2CommunityImageUploadService implements CommunityImageUploadService {
           body: compressed,
         );
         if (response.statusCode == 200) {
+          final remoteSafety =
+              await ContentSafetyService.moderateImageServerSide(
+            imageUrl: publicUrl,
+            objectKey: key,
+          );
+          if (!remoteSafety.isSafe) {
+            throw const CommunityUploadException(
+              'Image was rejected by automated safety moderation.',
+            );
+          }
           return CommunityUploadResult(url: publicUrl, objectKey: key);
         }
         throw CommunityUploadException(

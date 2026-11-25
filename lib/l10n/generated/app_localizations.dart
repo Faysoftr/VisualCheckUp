@@ -7,12 +7,16 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
 import 'app_localizations_bn.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_nl.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ru.dart';
+import 'app_localizations_sv.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_ur.dart';
 import 'app_localizations_zh.dart';
@@ -105,12 +109,16 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
     Locale('bn'),
+    Locale('de'),
     Locale('en'),
     Locale('es'),
     Locale('fr'),
     Locale('hi'),
+    Locale('it'),
+    Locale('nl'),
     Locale('pt'),
     Locale('ru'),
+    Locale('sv'),
     Locale('tr'),
     Locale('ur'),
     Locale('zh'),
@@ -5011,6 +5019,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preview My Profile'**
   String get commPreviewMyProfile;
+
+  /// No description provided for @safetyContentBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This text contains inappropriate language, insults, or restricted content and cannot be posted.'**
+  String get safetyContentBlocked;
+
+  /// No description provided for @safetyImageBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This image did not pass safety verification and could not be uploaded.'**
+  String get safetyImageBlocked;
+
+  /// No description provided for @safetyAccountSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Your community access is temporarily suspended due to safety policy violations.'**
+  String get safetyAccountSuspended;
+
+  /// No description provided for @proMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'VisualCheckUp Pro'**
+  String get proMenuTitle;
+
+  /// No description provided for @proMenuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited lab analyses & ad-free health tracking'**
+  String get proMenuSubtitle;
+
+  /// No description provided for @proPaywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to VisualCheckUp Pro'**
+  String get proPaywallTitle;
+
+  /// No description provided for @proPaywallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock unlimited lab report analyses, full health trends, and an ad-free experience.'**
+  String get proPaywallSubtitle;
+
+  /// No description provided for @proPlanMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get proPlanMonthly;
+
+  /// No description provided for @proPlanYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get proPlanYearly;
+
+  /// No description provided for @proSaveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Value • Save 42%'**
+  String get proSaveBadge;
+
+  /// No description provided for @proPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'/ month'**
+  String get proPerMonth;
+
+  /// No description provided for @proPerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'/ year'**
+  String get proPerYear;
+
+  /// No description provided for @proBenefitUnlimitedLabs.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited blood & lab report analyses'**
+  String get proBenefitUnlimitedLabs;
+
+  /// No description provided for @proBenefitAiInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited AI PDF & photo lab extraction'**
+  String get proBenefitAiInsights;
+
+  /// No description provided for @proBenefitAdFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Completely ad-free experience'**
+  String get proBenefitAdFree;
+
+  /// No description provided for @proBenefitDoctorPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority verified doctor search & follow-up requests'**
+  String get proBenefitDoctorPriority;
+
+  /// No description provided for @proSubscribeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate VisualCheckUp Pro'**
+  String get proSubscribeButton;
+
+  /// No description provided for @proRestoreButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get proRestoreButton;
+
+  /// No description provided for @proActiveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'VisualCheckUp Pro Active'**
+  String get proActiveBadge;
+
+  /// No description provided for @proActivatedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'VisualCheckUp Pro activated! Unlimited lab analyses unlocked.'**
+  String get proActivatedToast;
+
+  /// No description provided for @labFreeQuotaBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Lab Analyses This Month: {remaining} / {limit}'**
+  String labFreeQuotaBanner(int remaining, int limit);
+
+  /// No description provided for @labProUnlimitedBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'VisualCheckUp Pro • Unlimited Lab Analyses'**
+  String get labProUnlimitedBanner;
+
+  /// No description provided for @labLimitReachedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Free Lab Limit Reached'**
+  String get labLimitReachedTitle;
+
+  /// No description provided for @labLimitReachedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Free accounts can analyze up to 3 lab reports per month. Upgrade to VisualCheckUp Pro for unlimited analyses.'**
+  String get labLimitReachedBody;
+
+  /// No description provided for @labUpgradeToProBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Pro (Unlimited)'**
+  String get labUpgradeToProBtn;
+
+  /// No description provided for @doctorSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a Verified Doctor'**
+  String get doctorSearchTitle;
+
+  /// No description provided for @doctorSearchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search licensed doctors by country & specialty for guidance and patient follow-up'**
+  String get doctorSearchSubtitle;
+
+  /// No description provided for @doctorSearchHomeCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Doctors'**
+  String get doctorSearchHomeCta;
+
+  /// No description provided for @doctorApplyCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Application'**
+  String get doctorApplyCta;
+
+  /// No description provided for @doctorSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by doctor name, city, clinic, or specialty...'**
+  String get doctorSearchHint;
+
+  /// No description provided for @doctorFilterAllSpecialties.
+  ///
+  /// In en, this message translates to:
+  /// **'All Specialties'**
+  String get doctorFilterAllSpecialties;
+
+  /// No description provided for @doctorFilterFollowUpOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Follow-Up Open'**
+  String get doctorFilterFollowUpOnly;
+
+  /// No description provided for @doctorEmptyResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No verified doctors match your selected country or specialty yet.'**
+  String get doctorEmptyResults;
+
+  /// No description provided for @doctorVerifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Doctor'**
+  String get doctorVerifiedBadge;
+
+  /// No description provided for @doctorFollowUpBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient Follow-Up'**
+  String get doctorFollowUpBadge;
+
+  /// No description provided for @doctorExperienceYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{years} yrs exp.'**
+  String doctorExperienceYears(int years);
+
+  /// No description provided for @doctorRequestFollowUpBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Follow-Up'**
+  String get doctorRequestFollowUpBtn;
+
+  /// No description provided for @doctorFollowUpDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Patient Follow-Up'**
+  String get doctorFollowUpDialogTitle;
+
+  /// No description provided for @doctorFollowUpNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefly describe your chronic condition or follow-up goal...'**
+  String get doctorFollowUpNoteHint;
+
+  /// No description provided for @doctorFollowUpSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your patient follow-up request has been sent to the doctor!'**
+  String get doctorFollowUpSent;
+
+  /// No description provided for @doctorApplicationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Doctor Application'**
+  String get doctorApplicationTitle;
+
+  /// No description provided for @doctorApplicationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join VisualCheckUp\'s global doctor directory to guide patients and offer structured follow-ups.'**
+  String get doctorApplicationSubtitle;
+
+  /// No description provided for @doctorFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Title'**
+  String get doctorFieldTitle;
+
+  /// No description provided for @doctorFieldFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get doctorFieldFullName;
+
+  /// No description provided for @doctorFieldSpecialty.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical Specialty'**
+  String get doctorFieldSpecialty;
+
+  /// No description provided for @doctorFieldClinic.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital / Clinic Name'**
+  String get doctorFieldClinic;
+
+  /// No description provided for @doctorFieldLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical License / Diploma No'**
+  String get doctorFieldLicense;
+
+  /// No description provided for @doctorFieldExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Years of Experience'**
+  String get doctorFieldExperience;
+
+  /// No description provided for @doctorFieldBio.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional Bio & Clinical Focus'**
+  String get doctorFieldBio;
+
+  /// No description provided for @doctorToggleFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept Patient Follow-Up Requests'**
+  String get doctorToggleFollowUp;
+
+  /// No description provided for @doctorUploadDocBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Diploma / License Photo (Optional)'**
+  String get doctorUploadDocBtn;
+
+  /// No description provided for @doctorPlanSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Directory Membership Plan'**
+  String get doctorPlanSectionTitle;
+
+  /// No description provided for @doctorPlanMonthlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Standard (Monthly)'**
+  String get doctorPlanMonthlyTitle;
+
+  /// No description provided for @doctorPlanMonthlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified badge, country & specialty listing, direct patient chat'**
+  String get doctorPlanMonthlyDesc;
+
+  /// No description provided for @doctorPlanYearlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Pro + Follow-Up (Yearly)'**
+  String get doctorPlanYearlyTitle;
+
+  /// No description provided for @doctorPlanYearlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority country ranking, structured patient follow-ups, unlimited connections'**
+  String get doctorPlanYearlyDesc;
+
+  /// No description provided for @doctorSubmitApplicationBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Doctor Application'**
+  String get doctorSubmitApplicationBtn;
+
+  /// No description provided for @doctorApplicationSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your doctor application has been submitted for admin verification!'**
+  String get doctorApplicationSubmitted;
+
+  /// No description provided for @doctorApplicationPendingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Application Pending Verification'**
+  String get doctorApplicationPendingBadge;
+
+  /// No description provided for @adminTabDoctors.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors'**
+  String get adminTabDoctors;
+
+  /// No description provided for @adminApproveDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get adminApproveDoctor;
+
+  /// No description provided for @adminRejectDoctor.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get adminRejectDoctor;
+
+  /// No description provided for @adminNoDoctorApps.
+  ///
+  /// In en, this message translates to:
+  /// **'No doctor applications yet.'**
+  String get adminNoDoctorApps;
+
+  /// No description provided for @specInternalMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal Medicine'**
+  String get specInternalMedicine;
+
+  /// No description provided for @specCardiology.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardiology'**
+  String get specCardiology;
+
+  /// No description provided for @specDermatology.
+  ///
+  /// In en, this message translates to:
+  /// **'Dermatology'**
+  String get specDermatology;
+
+  /// No description provided for @specEndocrinology.
+  ///
+  /// In en, this message translates to:
+  /// **'Endocrinology'**
+  String get specEndocrinology;
+
+  /// No description provided for @specNeurology.
+  ///
+  /// In en, this message translates to:
+  /// **'Neurology'**
+  String get specNeurology;
+
+  /// No description provided for @specOphthalmology.
+  ///
+  /// In en, this message translates to:
+  /// **'Ophthalmology'**
+  String get specOphthalmology;
+
+  /// No description provided for @specPediatrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Pediatrics'**
+  String get specPediatrics;
+
+  /// No description provided for @specFamilyMedicine.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Medicine'**
+  String get specFamilyMedicine;
+
+  /// No description provided for @specNutritionDietetics.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition & Dietetics'**
+  String get specNutritionDietetics;
+
+  /// No description provided for @specPsychiatry.
+  ///
+  /// In en, this message translates to:
+  /// **'Psychiatry'**
+  String get specPsychiatry;
+
+  /// No description provided for @specPulmonology.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulmonology'**
+  String get specPulmonology;
+
+  /// No description provided for @specNephrology.
+  ///
+  /// In en, this message translates to:
+  /// **'Nephrology'**
+  String get specNephrology;
 }
 
 class _AppLocalizationsDelegate
@@ -5026,12 +5484,16 @@ class _AppLocalizationsDelegate
   bool isSupported(Locale locale) => <String>[
     'ar',
     'bn',
+    'de',
     'en',
     'es',
     'fr',
     'hi',
+    'it',
+    'nl',
     'pt',
     'ru',
+    'sv',
     'tr',
     'ur',
     'zh',
@@ -5048,6 +5510,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsAr();
     case 'bn':
       return AppLocalizationsBn();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
     case 'es':
@@ -5056,10 +5520,16 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsFr();
     case 'hi':
       return AppLocalizationsHi();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'nl':
+      return AppLocalizationsNl();
     case 'pt':
       return AppLocalizationsPt();
     case 'ru':
       return AppLocalizationsRu();
+    case 'sv':
+      return AppLocalizationsSv();
     case 'tr':
       return AppLocalizationsTr();
     case 'ur':

@@ -34,6 +34,9 @@ class AppDrawer extends StatelessWidget {
     this.onOpenDietMenu,
     this.onOpenAiCalorieScanner,
     this.onOpenHealthCommunity,
+    this.onOpenDoctorSearch,
+    this.onOpenDoctorApplication,
+    this.onOpenProSubscription,
     this.onOpenAdminPanel,
     this.onOpenDonate,
     this.onOpenGrowthBmi,
@@ -61,6 +64,9 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenDietMenu;
   final VoidCallback? onOpenAiCalorieScanner;
   final VoidCallback? onOpenHealthCommunity;
+  final VoidCallback? onOpenDoctorSearch;
+  final VoidCallback? onOpenDoctorApplication;
+  final VoidCallback? onOpenProSubscription;
   final VoidCallback? onOpenAdminPanel;
   final VoidCallback? onOpenDonate;
   final VoidCallback? onOpenGrowthBmi;
@@ -432,6 +438,32 @@ class AppDrawer extends StatelessWidget {
                       accentColor: AppTheme.primaryTeal,
                       onTap: () =>
                           _closeAndRun(context, onOpenHealthCommunity!),
+                    ),
+                  if (onOpenDoctorSearch != null)
+                    _DrawerTile(
+                      key: const Key('drawer_doctor_search_tile'),
+                      icon: Icons.medical_services_rounded,
+                      label: l10n.doctorSearchTitle,
+                      accentColor: const Color(0xFF0284C7),
+                      onTap: () => _closeAndRun(context, onOpenDoctorSearch!),
+                    ),
+                  if (onOpenDoctorApplication != null)
+                    _DrawerTile(
+                      key: const Key('drawer_doctor_apply_tile'),
+                      icon: Icons.verified_user_outlined,
+                      label: l10n.doctorApplyCta,
+                      accentColor: const Color(0xFF0F766E),
+                      onTap: () =>
+                          _closeAndRun(context, onOpenDoctorApplication!),
+                    ),
+                  if (onOpenProSubscription != null)
+                    _DrawerTile(
+                      key: const Key('drawer_pro_tile'),
+                      icon: Icons.workspace_premium_rounded,
+                      label: l10n.proMenuTitle,
+                      accentColor: const Color(0xFFD97706),
+                      onTap: () =>
+                          _closeAndRun(context, onOpenProSubscription!),
                     ),
                   if (onOpenFollowUpPlan != null)
                     _DrawerTile(

@@ -11,6 +11,9 @@ import 'package:visualcheckup/features/labs_vitals/data/lab_unit_converter.dart'
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/widgets/trend_sparkline_card.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
+import 'package:visualcheckup/features/subscription/domain/subscription_models.dart';
+import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 
 class LabReportsScreen extends StatefulWidget {
   const LabReportsScreen({
@@ -18,18 +21,24 @@ class LabReportsScreen extends StatefulWidget {
     required this.repository,
     this.documentPicker = const DeviceLabDocumentPicker(),
     this.aiExtractor,
+    this.subscriptionRepository,
+    this.userId,
   });
 
   final LabsVitalsRepository repository;
   final LabDocumentPicker documentPicker;
   final LabDocumentAiExtractor? aiExtractor;
+  final SubscriptionRepository? subscriptionRepository;
+  final String? userId;
 
   @override
   State<LabReportsScreen> createState() => _LabReportsScreenState();
 }
 
 class _LabReportsScreenState extends State<LabReportsScreen> {
+  late final SubscriptionRepository _subscriptionRepository;
   List<LabReportRecord> _reports = const [];
+  UserSubscriptionState _subscription = const UserSubscriptionState();
   bool _loading = true;
   bool _showComparisonTable = true;
   bool _onlyAbnormalInTable = false;
@@ -40,19 +49,49 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
   @override
   void initState() {
     super.initState();
+    _subscriptionRepository =
+        widget.subscriptionRepository ?? SubscriptionRepository();
     _load();
   }
 
   Future<void> _load() async {
     final reports = await widget.repository.loadLabReports();
+    final sub = await _subscriptionRepository.loadSubscription(
+      uid: widget.userId,
+    );
     if (!mounted) return;
     setState(() {
       _reports = reports;
+      _subscription = sub;
       _loading = false;
     });
   }
 
+  Future<void> _openProPaywall({bool triggeredByLimit = false}) async {
+    final upgraded = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ProPaywallScreen(
+          repository: _subscriptionRepository,
+          userId: widget.userId,
+          triggeredByLabLimit: triggeredByLimit,
+        ),
+      ),
+    );
+    if (upgraded == true) {
+      await _load();
+    }
+  }
+
   Future<void> _openAddReport() async {
+    final canAdd = _subscriptionRepository.canAddLabReport(
+      existingReports: _reports,
+      subscription: _subscription,
+    );
+    if (!canAdd) {
+      await _openProPaywall(triggeredByLimit: true);
+      return;
+    }
+
     final created = await showModalBottomSheet<LabReportRecord>(
       context: context,
       isScrollControlled: true,
@@ -90,6 +129,79 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
     );
   }
 
+  Widget _buildQuotaBanner(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final isPro = _subscription.isPro;
+    final remaining = _subscriptionRepository.remainingFreeLabReports(
+      existingReports: _reports,
+      subscription: _subscription,
+    );
+
+    return Container(
+      key: const Key('lab_quota_banner'),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isPro
+            ? AppTheme.primaryTeal.withValues(alpha: 0.12)
+            : (remaining == 0
+                ? const Color(0xFFDC2626).withValues(alpha: 0.12)
+                : const Color(0xFFD97706).withValues(alpha: 0.12)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isPro
+              ? AppTheme.primaryTeal.withValues(alpha: 0.4)
+              : (remaining == 0
+                  ? const Color(0xFFDC2626).withValues(alpha: 0.4)
+                  : const Color(0xFFD97706).withValues(alpha: 0.4)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPro
+                ? Icons.workspace_premium_rounded
+                : Icons.biotech_rounded,
+            size: 19,
+            color: isPro
+                ? AppTheme.primaryTeal
+                : (remaining == 0
+                    ? const Color(0xFFDC2626)
+                    : const Color(0xFFD97706)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              isPro
+                  ? l10n.labProUnlimitedBanner
+                  : l10n.labFreeQuotaBanner(
+                      remaining,
+                      UserSubscriptionState.freeMonthlyLabReportLimit,
+                    ),
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          if (!isPro)
+            TextButton(
+              key: const Key('lab_quota_upgrade_button'),
+              onPressed: () => _openProPaywall(),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: AppTheme.primaryTeal,
+              ),
+              child: Text(
+                l10n.labUpgradeToProBtn,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -114,16 +226,24 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton.extended(
+          key: const Key('lab_add_report_fab'),
           onPressed: _openAddReport,
           icon: const Icon(Icons.add_rounded),
           label: Text(l10n.labAddBtn),
         ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
-            : TabBarView(
+            : Column(
                 children: [
-                  _buildReportsTab(context),
-                  _buildTrendsTab(context, trends),
+                  _buildQuotaBanner(context),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildReportsTab(context),
+                        _buildTrendsTab(context, trends),
+                      ],
+                    ),
+                  ),
                 ],
               ),
       ),

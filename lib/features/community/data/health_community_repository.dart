@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/core/safety/content_safety_service.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 
 /// Repository powering VisualCheckUp's opt-in Global Health Community:
@@ -1126,6 +1127,14 @@ class HealthCommunityRepository {
     }
     if (senderUid.isEmpty || receiver.uid.isEmpty || senderUid == receiver.uid) {
       return SendMessageStatus.error;
+    }
+
+    // 0. Content safety check (profanity, insults, hate speech, ad-spam)
+    if (trimmedText.isNotEmpty) {
+      final safety = ContentSafetyService.checkText(trimmedText);
+      if (!safety.isSafe) {
+        return SendMessageStatus.unsafeContent;
+      }
     }
 
     // 1. Two-way block check

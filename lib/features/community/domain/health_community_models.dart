@@ -88,8 +88,13 @@ class CommunityCountryOption {
     CommunityCountryOption(code: 'US', flag: '🇺🇸', label: 'United States'),
     CommunityCountryOption(code: 'GB', flag: '🇬🇧', label: 'United Kingdom'),
     CommunityCountryOption(code: 'DE', flag: '🇩🇪', label: 'Deutschland'),
+    CommunityCountryOption(code: 'SE', flag: '🇸🇪', label: 'Sverige'),
     CommunityCountryOption(code: 'FR', flag: '🇫🇷', label: 'France'),
     CommunityCountryOption(code: 'ES', flag: '🇪🇸', label: 'España'),
+    CommunityCountryOption(code: 'IT', flag: '🇮🇹', label: 'Italia'),
+    CommunityCountryOption(code: 'NL', flag: '🇳🇱', label: 'Nederland'),
+    CommunityCountryOption(code: 'CH', flag: '🇨🇭', label: 'Schweiz'),
+    CommunityCountryOption(code: 'AT', flag: '🇦🇹', label: 'Österreich'),
     CommunityCountryOption(code: 'BR', flag: '🇧🇷', label: 'Brasil'),
     CommunityCountryOption(code: 'SA', flag: '🇸🇦', label: 'السعودية'),
     CommunityCountryOption(code: 'AE', flag: '🇦🇪', label: 'UAE'),
@@ -100,7 +105,6 @@ class CommunityCountryOption {
     CommunityCountryOption(code: 'CN', flag: '🇨🇳', label: '中国'),
     CommunityCountryOption(code: 'JP', flag: '🇯🇵', label: '日本'),
     CommunityCountryOption(code: 'CA', flag: '🇨🇦', label: 'Canada'),
-    CommunityCountryOption(code: 'NL', flag: '🇳🇱', label: 'Nederland'),
     CommunityCountryOption(code: 'GLOBAL', flag: '🌍', label: 'Global'),
   ];
 
@@ -795,6 +799,7 @@ enum SendMessageStatus {
   senderDisabledMessages,
   receiverDisabledMessages,
   requestDeclined,
+  unsafeContent,
   emptyContent,
   error,
 }

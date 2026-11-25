@@ -2696,4 +2696,251 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get commPreviewMyProfile => 'Profilimi Önizle';
+
+  @override
+  String get safetyContentBlocked =>
+      'Bu metin küfür, hakaret veya topluluk kurallarına aykırı içerik barındırdığı için engellendi.';
+
+  @override
+  String get safetyImageBlocked =>
+      'Bu görsel güvenlik kontrolünden geçemedi ve yüklenemedi.';
+
+  @override
+  String get safetyAccountSuspended =>
+      'Güvenlik kuralları ihlali nedeniyle topluluk erişiminiz geçici olarak askıya alındı.';
+
+  @override
+  String get proMenuTitle => 'VisualCheckUp Pro';
+
+  @override
+  String get proMenuSubtitle =>
+      'Sınırsız tahlil analizi ve reklamsız sağlık takibi';
+
+  @override
+  String get proPaywallTitle => 'VisualCheckUp Pro\'ya Yükselt';
+
+  @override
+  String get proPaywallSubtitle =>
+      'Sınırsız tahlil analizi, gelişmiş trend takibi ve reklamsız deneyimin kilidini açın.';
+
+  @override
+  String get proPlanMonthly => 'Aylık Plan';
+
+  @override
+  String get proPlanYearly => 'Yıllık Plan';
+
+  @override
+  String get proSaveBadge => 'En Avantajlı • %42 Tasarruf';
+
+  @override
+  String get proPerMonth => '/ ay';
+
+  @override
+  String get proPerYear => '/ yıl';
+
+  @override
+  String get proBenefitUnlimitedLabs =>
+      'Sınırsız kan ve laboratuvar tahlili analizi';
+
+  @override
+  String get proBenefitAiInsights => 'Sınırsız AI PDF ve fotoğraf tahlil okuma';
+
+  @override
+  String get proBenefitAdFree => 'Tamamen reklamsız deneyim';
+
+  @override
+  String get proBenefitDoctorPriority =>
+      'Doğrulanmış doktor arama ve öncelikli hasta takibi';
+
+  @override
+  String get proSubscribeButton => 'VisualCheckUp Pro\'yu Başlat';
+
+  @override
+  String get proRestoreButton => 'Satın Alımları Geri Yükle';
+
+  @override
+  String get proActiveBadge => 'VisualCheckUp Pro Aktif';
+
+  @override
+  String get proActivatedToast =>
+      'VisualCheckUp Pro aktif! Artık sınırsız tahlil analizi yapabilirsiniz.';
+
+  @override
+  String labFreeQuotaBanner(int remaining, int limit) {
+    return 'Bu Ay Kalan Ücretsiz Tahlil Hakkı: $remaining / $limit';
+  }
+
+  @override
+  String get labProUnlimitedBanner =>
+      'VisualCheckUp Pro • Sınırsız Tahlil Analizi';
+
+  @override
+  String get labLimitReachedTitle => 'Aylık Ücretsiz Tahlil Sınırına Ulaşıldı';
+
+  @override
+  String get labLimitReachedBody =>
+      'Ücretsiz hesaplarda ayda en fazla 3 tahlil analizi yapılabilir. Sınırsız tahlil için VisualCheckUp Pro\'ya geçin.';
+
+  @override
+  String get labUpgradeToProBtn => 'Pro\'ya Geç (Sınırsız)';
+
+  @override
+  String get doctorSearchTitle => 'Ülkelere Göre Doktor Ara';
+
+  @override
+  String get doctorSearchSubtitle =>
+      'Ülke ve branşa göre doğrulanmış doktorları bulun, hasta takibi talep edin';
+
+  @override
+  String get doctorSearchHomeCta => 'Doktor Ara';
+
+  @override
+  String get doctorApplyCta => 'Doktor Başvurusu';
+
+  @override
+  String get doctorSearchHint => 'Doktor adı, şehir, klinik veya branş ara...';
+
+  @override
+  String get doctorFilterAllSpecialties => 'Tüm Branşlar';
+
+  @override
+  String get doctorFilterFollowUpOnly => 'Hasta Takibi Açık';
+
+  @override
+  String get doctorEmptyResults =>
+      'Seçtiğiniz ülke veya branşta henüz doğrulanmış doktor bulunamadı.';
+
+  @override
+  String get doctorVerifiedBadge => 'Doğrulanmış Doktor';
+
+  @override
+  String get doctorFollowUpBadge => 'Hasta Takibi';
+
+  @override
+  String doctorExperienceYears(int years) {
+    return '$years yıl deneyim';
+  }
+
+  @override
+  String get doctorRequestFollowUpBtn => 'Hasta Takibi İste';
+
+  @override
+  String get doctorFollowUpDialogTitle => 'Hasta Takibi Talebi Gönder';
+
+  @override
+  String get doctorFollowUpNoteHint =>
+      'Kronik hastalığınızı veya takip amacınızı kısaca yazın...';
+
+  @override
+  String get doctorFollowUpSent => 'Hasta takibi talebiniz doktora iletildi!';
+
+  @override
+  String get doctorApplicationTitle => 'Doğrulanmış Doktor Başvurusu';
+
+  @override
+  String get doctorApplicationSubtitle =>
+      'VisualCheckUp global doktor rehberine katılın, hastalarınıza rehberlik ve düzenli takip sunun.';
+
+  @override
+  String get doctorFieldTitle => 'Unvan (Dr., Uzm. Dr., Prof. Dr.)';
+
+  @override
+  String get doctorFieldFullName => 'Ad Soyad';
+
+  @override
+  String get doctorFieldSpecialty => 'Uzmanlık Branşı';
+
+  @override
+  String get doctorFieldClinic => 'Hastane / Klinik Adı';
+
+  @override
+  String get doctorFieldLicense => 'Diploma / Tescil Numarası';
+
+  @override
+  String get doctorFieldExperience => 'Deneyim Yılı';
+
+  @override
+  String get doctorFieldBio => 'Klinik Özgeçmiş ve İlgi Alanları';
+
+  @override
+  String get doctorToggleFollowUp => 'Hasta Takibi Taleplerini Kabul Et';
+
+  @override
+  String get doctorUploadDocBtn =>
+      'Diploma / Kimlik Belgesi Yükle (İsteğe Bağlı)';
+
+  @override
+  String get doctorPlanSectionTitle => 'Doktor Rehberi Üyelik Planı';
+
+  @override
+  String get doctorPlanMonthlyTitle => 'Doktor Standart (Aylık)';
+
+  @override
+  String get doctorPlanMonthlyDesc =>
+      'Doğrulanmış rozet, ülke & branş listelemesi, hasta mesajlaşma';
+
+  @override
+  String get doctorPlanYearlyTitle => 'Doktor Pro + Hasta Takibi (Yıllık)';
+
+  @override
+  String get doctorPlanYearlyDesc =>
+      'Ülke aramasında öncelik, yapılandırılmış hasta takibi, sınırsız hasta bağlantısı';
+
+  @override
+  String get doctorSubmitApplicationBtn => 'Doktor Başvurusunu Gönder';
+
+  @override
+  String get doctorApplicationSubmitted =>
+      'Doktor başvurunuz yönetici onayı için iletildi!';
+
+  @override
+  String get doctorApplicationPendingBadge => 'Başvurunuz Onay Bekliyor';
+
+  @override
+  String get adminTabDoctors => 'Doktorlar';
+
+  @override
+  String get adminApproveDoctor => 'Onayla';
+
+  @override
+  String get adminRejectDoctor => 'Reddet';
+
+  @override
+  String get adminNoDoctorApps => 'Henüz doktor başvurusu yok.';
+
+  @override
+  String get specInternalMedicine => 'İç Hastalıkları (Dahiliye)';
+
+  @override
+  String get specCardiology => 'Kardiyoloji';
+
+  @override
+  String get specDermatology => 'Dermatoloji (Cildiye)';
+
+  @override
+  String get specEndocrinology => 'Endokrinoloji';
+
+  @override
+  String get specNeurology => 'Nöroloji';
+
+  @override
+  String get specOphthalmology => 'Göz Hastalıkları';
+
+  @override
+  String get specPediatrics => 'Çocuk Sağlığı (Pediatri)';
+
+  @override
+  String get specFamilyMedicine => 'Aile Hekimliği';
+
+  @override
+  String get specNutritionDietetics => 'Beslenme ve Diyetetik';
+
+  @override
+  String get specPsychiatry => 'Psikiyatri';
+
+  @override
+  String get specPulmonology => 'Göğüs Hastalıkları';
+
+  @override
+  String get specNephrology => 'Nefroloji';
 }

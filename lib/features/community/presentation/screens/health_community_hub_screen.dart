@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/safety/content_safety_service.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
@@ -369,6 +370,16 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     final l10n = context.l10n;
     final name = _displayNameController.text.trim();
     if (name.isEmpty) return;
+
+    final profileTextCheck = ContentSafetyService.checkText(
+      '$name ${_nicknameController.text} ${_bioController.text} ${_dailyFocusController.text} ${_customConditionController.text}',
+    );
+    if (!profileTextCheck.isSafe) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.safetyContentBlocked)),
+      );
+      return;
+    }
 
     final musicUrl = _musicUrlController.text.trim();
     if (!MusicLinkHelper.isSupportedMusicUrl(musicUrl)) {

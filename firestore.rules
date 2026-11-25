@@ -547,6 +547,43 @@ service cloud.firestore {
     }
 
     // ===============================================================
+    // VisualCheckUp Pro Subscriptions & Verified Doctors Directory
+    // ===============================================================
+
+    match /subscriptions/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /doctor_profiles/{doctorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /doctor_applications/{doctorId} {
+      allow read: if isOwner(doctorId) || isAdmin();
+      allow create, update: if isOwner(doctorId) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.isVerified == false &&
+        request.resource.data.status == 'pending';
+      allow update, delete: if isAdmin();
+    }
+
+    match /doctor_followups/{requestId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        (resource.data.patientUid == request.auth.uid ||
+         resource.data.doctorUid == request.auth.uid));
+      allow create: if isAuthenticated() &&
+        request.resource.data.patientUid == request.auth.uid &&
+        isValidString(request.resource.data.doctorUid, 1, 128);
+      allow update: if isAdmin() || (isAuthenticated() &&
+        (resource.data.doctorUid == request.auth.uid ||
+         resource.data.patientUid == request.auth.uid));
+      allow delete: if isAdmin();
+    }
+
+    // ===============================================================
     // Default Deny Everything Else
     // ===============================================================
 

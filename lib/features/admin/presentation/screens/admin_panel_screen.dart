@@ -10,20 +10,24 @@ import 'package:visualcheckup/features/community/data/community_image_upload_ser
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/doctors/data/doctor_repository.dart';
+import 'package:visualcheckup/features/doctors/domain/doctor_models.dart';
 
 /// VisualCheckUp Admin Control Panel (health-community native; no student/exam
 /// sections). Manages live statistics, global announcements, ads/banners,
-/// community users, and safety reports.
+/// community users, safety reports, and verified doctor applications.
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({
     super.key,
     required this.repository,
+    this.doctorRepository,
     this.uploadService,
     this.photoPicker,
     this.initialTabIndex = 0,
   });
 
   final AdminRepository repository;
+  final DoctorRepository? doctorRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
   final int initialTabIndex;
@@ -36,6 +40,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final CommunityImageUploadService _uploadService;
+  late final DoctorRepository _doctorRepository;
   final TextEditingController _userSearchController = TextEditingController();
 
   bool _loading = true;
@@ -44,17 +49,20 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   List<HealthPromotion> _promotions = const [];
   List<HealthCommunityProfile> _users = const [];
   List<AdminReportItem> _reports = const [];
+  List<DoctorProfile> _doctorApps = const [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 5,
+      length: 6,
       vsync: this,
-      initialIndex: widget.initialTabIndex.clamp(0, 4),
+      initialIndex: widget.initialTabIndex.clamp(0, 5),
     );
     _uploadService =
         widget.uploadService ?? R2CommunityImageUploadService.instance;
+    _doctorRepository = widget.doctorRepository ??
+        DoctorRepository(useFirebase: widget.repository.useFirebase);
     _refreshAll();
   }
 
@@ -72,6 +80,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     final users =
         await widget.repository.communityRepository.loadAllProfilesForAdmin();
     final reports = await widget.repository.loadReports();
+    final doctorApps = await _doctorRepository.loadApplicationsForAdmin();
     if (!mounted) return;
     setState(() {
       _stats = stats;
@@ -79,6 +88,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       _promotions = promotions;
       _users = users;
       _reports = reports;
+      _doctorApps = doctorApps;
       _loading = false;
     });
   }
@@ -120,6 +130,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final pendingReports = _stats?.pendingReports ?? 0;
+    final pendingDoctors = _doctorApps
+        .where((d) => d.status == DoctorApplicationStatus.pending)
+        .length;
 
     return Scaffold(
       appBar: AppBar(
@@ -157,6 +170,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   ? '${l10n.adminTabReports} ($pendingReports)'
                   : l10n.adminTabReports,
             ),
+            Tab(
+              icon: const Icon(Icons.medical_services_outlined, size: 18),
+              text: pendingDoctors > 0
+                  ? '${l10n.adminTabDoctors} ($pendingDoctors)'
+                  : l10n.adminTabDoctors,
+            ),
           ],
         ),
       ),
@@ -170,8 +189,111 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                 _buildPromotionsTab(context),
                 _buildUsersTab(context),
                 _buildReportsTab(context),
+                _buildDoctorsTab(context),
               ],
             ),
+    );
+  }
+
+  Widget _buildDoctorsTab(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    if (_doctorApps.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.adminNoDoctorApps,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: _doctorApps.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
+      itemBuilder: (ctx, i) {
+        final doc = _doctorApps[i];
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        doc.displayTitleName,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Chip(
+                      visualDensity: VisualDensity.compact,
+                      label: Text(doc.status.name.toUpperCase()),
+                    ),
+                  ],
+                ),
+                Text(
+                  '${doc.country.flag} ${doc.city}, ${doc.country.label} • ${doc.specialty.localizedLabel(l10n)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (doc.licenseNumber.isNotEmpty)
+                  Text(
+                    '${l10n.doctorFieldLicense}: ${doc.licenseNumber}',
+                    style: theme.textTheme.labelSmall,
+                  ),
+                if (doc.hospitalOrClinic.isNotEmpty)
+                  Text(
+                    doc.hospitalOrClinic,
+                    style: theme.textTheme.labelSmall,
+                  ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    FilledButton.tonalIcon(
+                      key: Key('admin_approve_doc_${doc.uid}'),
+                      onPressed: doc.status == DoctorApplicationStatus.approved
+                          ? null
+                          : () async {
+                              await _doctorRepository.reviewApplication(
+                                doctorUid: doc.uid,
+                                approve: true,
+                              );
+                              await _refreshAll();
+                            },
+                      icon: const Icon(Icons.verified_rounded, size: 17),
+                      label: Text(l10n.adminApproveDoctor),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      key: Key('admin_reject_doc_${doc.uid}'),
+                      onPressed: doc.status == DoctorApplicationStatus.rejected
+                          ? null
+                          : () async {
+                              await _doctorRepository.reviewApplication(
+                                doctorUid: doc.uid,
+                                approve: false,
+                              );
+                              await _refreshAll();
+                            },
+                      icon: const Icon(Icons.close_rounded, size: 17),
+                      label: Text(l10n.adminRejectDoctor),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

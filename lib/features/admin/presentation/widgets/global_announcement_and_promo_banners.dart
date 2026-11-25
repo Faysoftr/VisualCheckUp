@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 
 /// Displays the newest active [GlobalAnnouncement] published from Admin Panel.
 class GlobalAnnouncementBanner extends StatefulWidget {
@@ -123,6 +124,12 @@ class _HealthPromotionBannerState extends State<HealthPromotionBanner> {
   }
 
   Future<void> _load() async {
+    final sub = await SubscriptionRepository().loadSubscription();
+    if (sub.isPro) {
+      if (!mounted) return;
+      setState(() => _promo = null);
+      return;
+    }
     final repo = widget.repository ?? AdminRepository();
     final list = await repo.loadPromotions(
       activeOnly: true,

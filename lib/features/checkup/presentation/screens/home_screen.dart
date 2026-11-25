@@ -30,6 +30,9 @@ import 'package:visualcheckup/features/community/presentation/screens/health_com
 import 'package:visualcheckup/features/diet/data/diet_repository.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/diet/presentation/screens/diet_hub_screen.dart';
+import 'package:visualcheckup/features/doctors/data/doctor_repository.dart';
+import 'package:visualcheckup/features/doctors/presentation/screens/doctor_application_screen.dart';
+import 'package:visualcheckup/features/doctors/presentation/screens/doctor_search_screen.dart';
 import 'package:visualcheckup/features/growth/presentation/screens/growth_bmi_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
@@ -43,6 +46,8 @@ import 'package:visualcheckup/features/medications/presentation/screens/medicati
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
+import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 import 'package:visualcheckup/features/support/presentation/widgets/donation_support_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -61,6 +66,8 @@ class HomeScreen extends StatefulWidget {
     this.dietRepository,
     this.alarmScheduler,
     this.adminRepository,
+    this.doctorRepository,
+    this.subscriptionRepository,
   });
 
   final ColorHealthAnalyzer analyzer;
@@ -70,6 +77,8 @@ class HomeScreen extends StatefulWidget {
   final DietRepository? dietRepository;
   final MedicationAlarmScheduler? alarmScheduler;
   final AdminRepository? adminRepository;
+  final DoctorRepository? doctorRepository;
+  final SubscriptionRepository? subscriptionRepository;
   final AuthUser currentUser;
   final ThemeController themeController;
   final LocaleController? localeController;
@@ -212,15 +221,55 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute<void>(
         builder: (_) => AdminPanelScreen(
           repository: widget.adminRepository ?? AdminRepository(),
+          doctorRepository: widget.doctorRepository,
         ),
       ),
     );
   }
 
+  Future<void> _openDoctorSearch({String initialCountryCode = 'ALL'}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DoctorSearchScreen(
+          currentUser: widget.currentUser,
+          repository: widget.doctorRepository ?? DoctorRepository(),
+          initialCountryCode: initialCountryCode,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openDoctorApplication() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DoctorApplicationScreen(
+          currentUser: widget.currentUser,
+          repository: widget.doctorRepository ?? DoctorRepository(),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openProSubscription() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProPaywallScreen(
+          repository: widget.subscriptionRepository ?? SubscriptionRepository(),
+          userId: widget.currentUser.id,
+        ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
   Future<void> _openLabReports() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => LabReportsScreen(repository: _labsVitalsRepository),
+        builder: (_) => LabReportsScreen(
+          repository: _labsVitalsRepository,
+          subscriptionRepository: widget.subscriptionRepository,
+          userId: widget.currentUser.id,
+        ),
       ),
     );
     await _loadDashboardData();
@@ -511,6 +560,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
         onOpenHealthCommunity: () => _openHealthCommunity(initialTabIndex: 0),
+        onOpenDoctorSearch: () => _openDoctorSearch(),
+        onOpenDoctorApplication: _openDoctorApplication,
+        onOpenProSubscription: _openProSubscription,
         onOpenAdminPanel: AdminUtils.isAdmin(
           email: widget.currentUser.email,
           uid: widget.currentUser.id,
@@ -816,13 +868,57 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 5. Labs & Vitals Bento Section
+              // 5. Doctors by Country, Pro & Labs/Vitals Bento Section
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // 5a. Country-Based Verified Doctor Search & Patient Follow-Up Card
+                      _HomeDoctorSearchCard(
+                        title: l10n.doctorSearchTitle,
+                        subtitle: l10n.doctorSearchSubtitle,
+                        searchCta: l10n.doctorSearchHomeCta,
+                        applyCta: l10n.doctorApplyCta,
+                        onSearchCountry: (code) =>
+                            _openDoctorSearch(initialCountryCode: code),
+                        onApplyDoctor: _openDoctorApplication,
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 5b. VisualCheckUp Pro Quick Banner
+                      Card(
+                        key: const Key('home_pro_card'),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          onTap: _openProSubscription,
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFFF59E0B)
+                                .withValues(alpha: 0.16),
+                            child: const Icon(
+                              Icons.workspace_premium_rounded,
+                              color: Color(0xFFD97706),
+                            ),
+                          ),
+                          title: Text(
+                            l10n.proMenuTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          subtitle: Text(
+                            l10n.proMenuSubtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
                       _SectionHeader(
                         title: l10n.homeLabsVitalsTitle,
                         subtitle: l10n.homeLabsVitalsSubtitle,
@@ -2014,4 +2110,156 @@ class _MedicationQuickBanner extends StatelessWidget {
     );
   }
 }
+
+class _HomeDoctorSearchCard extends StatelessWidget {
+  const _HomeDoctorSearchCard({
+    required this.title,
+    required this.subtitle,
+    required this.searchCta,
+    required this.applyCta,
+    required this.onSearchCountry,
+    required this.onApplyDoctor,
+  });
+
+  final String title;
+  final String subtitle;
+  final String searchCta;
+  final String applyCta;
+  final ValueChanged<String> onSearchCountry;
+  final VoidCallback onApplyDoctor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    const accent = Color(0xFF0284C7);
+
+    const quickCountries = [
+      ('TR', '🇹🇷 TR'),
+      ('DE', '🇩🇪 DE'),
+      ('SE', '🇸🇪 SE'),
+      ('ES', '🇪🇸 ES'),
+      ('US', '🇺🇸 US'),
+    ];
+
+    return Container(
+      key: const Key('home_doctor_search_card'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF102028) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: accent.withValues(alpha: 0.28)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: isDark ? 0.16 : 0.10),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.medical_services_rounded,
+                  color: accent,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final (code, label) in quickCountries)
+                ActionChip(
+                  key: Key('home_doctor_country_$code'),
+                  visualDensity: VisualDensity.compact,
+                  label: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  onPressed: () => onSearchCountry(code),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  key: const Key('home_doctor_search_btn'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    minimumSize: const Size(0, 44),
+                  ),
+                  onPressed: () => onSearchCountry('ALL'),
+                  icon: const Icon(Icons.search_rounded, size: 18),
+                  label: Text(
+                    searchCta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  key: const Key('home_doctor_apply_btn'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 44),
+                  ),
+                  onPressed: onApplyDoctor,
+                  icon: const Icon(Icons.verified_user_outlined, size: 17),
+                  label: Text(
+                    applyCta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 

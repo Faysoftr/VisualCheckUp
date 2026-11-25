@@ -2684,4 +2684,250 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get commPreviewMyProfile => 'Aperçu de mon profil';
+
+  @override
+  String get safetyContentBlocked =>
+      'Ce texte contient un langage inapproprié, des insultes ou un contenu interdit.';
+
+  @override
+  String get safetyImageBlocked =>
+      'Cette image n\'a pas passé la vérification de sécurité.';
+
+  @override
+  String get safetyAccountSuspended =>
+      'Votre accès communautaire est temporairement suspendu.';
+
+  @override
+  String get proMenuTitle => 'VisualCheckUp Pro';
+
+  @override
+  String get proMenuSubtitle =>
+      'Analyses de laboratoire illimitées & sans publicité';
+
+  @override
+  String get proPaywallTitle => 'Passer à VisualCheckUp Pro';
+
+  @override
+  String get proPaywallSubtitle =>
+      'Débloquez les analyses de laboratoire illimitées et une expérience sans publicité.';
+
+  @override
+  String get proPlanMonthly => 'Mensuel';
+
+  @override
+  String get proPlanYearly => 'Annuel';
+
+  @override
+  String get proSaveBadge => 'Meilleure offre • -42%';
+
+  @override
+  String get proPerMonth => '/ mois';
+
+  @override
+  String get proPerYear => '/ an';
+
+  @override
+  String get proBenefitUnlimitedLabs =>
+      'Analyses sanguines et de laboratoire illimitées';
+
+  @override
+  String get proBenefitAiInsights => 'Extraction IA illimitée de PDF et photos';
+
+  @override
+  String get proBenefitAdFree => 'Expérience 100% sans publicité';
+
+  @override
+  String get proBenefitDoctorPriority =>
+      'Recherche prioritaire de médecins & suivi';
+
+  @override
+  String get proSubscribeButton => 'Activer VisualCheckUp Pro';
+
+  @override
+  String get proRestoreButton => 'Restaurer les achats';
+
+  @override
+  String get proActiveBadge => 'VisualCheckUp Pro Actif';
+
+  @override
+  String get proActivatedToast =>
+      'VisualCheckUp Pro activé ! Analyses illimitées débloquées.';
+
+  @override
+  String labFreeQuotaBanner(int remaining, int limit) {
+    return 'Analyses gratuites ce mois-ci : $remaining / $limit';
+  }
+
+  @override
+  String get labProUnlimitedBanner => 'VisualCheckUp Pro • Analyses illimitées';
+
+  @override
+  String get labLimitReachedTitle => 'Limite mensuelle gratuite atteinte';
+
+  @override
+  String get labLimitReachedBody =>
+      'Les comptes gratuits sont limités à 3 analyses par mois. Passez à Pro pour un accès illimité.';
+
+  @override
+  String get labUpgradeToProBtn => 'Passer à Pro (Illimité)';
+
+  @override
+  String get doctorSearchTitle => 'Trouver un médecin par pays';
+
+  @override
+  String get doctorSearchSubtitle =>
+      'Recherchez des médecins vérifiés par pays et spécialité';
+
+  @override
+  String get doctorSearchHomeCta => 'Chercher un médecin';
+
+  @override
+  String get doctorApplyCta => 'Candidature médecin';
+
+  @override
+  String get doctorSearchHint => 'Nom, ville, clinique ou spécialité...';
+
+  @override
+  String get doctorFilterAllSpecialties => 'Toutes spécialités';
+
+  @override
+  String get doctorFilterFollowUpOnly => 'Suivi patient ouvert';
+
+  @override
+  String get doctorEmptyResults =>
+      'Aucun médecin vérifié pour cette sélection.';
+
+  @override
+  String get doctorVerifiedBadge => 'Médecin vérifié';
+
+  @override
+  String get doctorFollowUpBadge => 'Suivi patient';
+
+  @override
+  String doctorExperienceYears(int years) {
+    return '$years ans d\'exp.';
+  }
+
+  @override
+  String get doctorRequestFollowUpBtn => 'Demander un suivi';
+
+  @override
+  String get doctorFollowUpDialogTitle => 'Demander un suivi patient';
+
+  @override
+  String get doctorFollowUpNoteHint =>
+      'Décrivez brièvement votre pathologie ou objectif...';
+
+  @override
+  String get doctorFollowUpSent =>
+      'Votre demande de suivi a été envoyée au médecin !';
+
+  @override
+  String get doctorApplicationTitle => 'Candidature Médecin Vérifié';
+
+  @override
+  String get doctorApplicationSubtitle =>
+      'Rejoignez l\'annuaire mondial des médecins VisualCheckUp.';
+
+  @override
+  String get doctorFieldTitle => 'Titre médical';
+
+  @override
+  String get doctorFieldFullName => 'Nom complet';
+
+  @override
+  String get doctorFieldSpecialty => 'Spécialité';
+
+  @override
+  String get doctorFieldClinic => 'Hôpital / Clinique';
+
+  @override
+  String get doctorFieldLicense => 'Numéro de licence / diplôme';
+
+  @override
+  String get doctorFieldExperience => 'Années d\'expérience';
+
+  @override
+  String get doctorFieldBio => 'Biographie clinique';
+
+  @override
+  String get doctorToggleFollowUp => 'Accepter les demandes de suivi';
+
+  @override
+  String get doctorUploadDocBtn => 'Téléverser le diplôme (Optionnel)';
+
+  @override
+  String get doctorPlanSectionTitle => 'Offre Annuaire Médecins';
+
+  @override
+  String get doctorPlanMonthlyTitle => 'Médecin Standard (Mensuel)';
+
+  @override
+  String get doctorPlanMonthlyDesc =>
+      'Badge vérifié, annuaire par pays & spécialité, messagerie';
+
+  @override
+  String get doctorPlanYearlyTitle => 'Médecin Pro + Suivi (Annuel)';
+
+  @override
+  String get doctorPlanYearlyDesc =>
+      'Classement prioritaire, suivi structuré, connexions illimitées';
+
+  @override
+  String get doctorSubmitApplicationBtn => 'Envoyer la candidature';
+
+  @override
+  String get doctorApplicationSubmitted =>
+      'Votre candidature médecin a été soumise pour validation !';
+
+  @override
+  String get doctorApplicationPendingBadge => 'Candidature en attente';
+
+  @override
+  String get adminTabDoctors => 'Médecins';
+
+  @override
+  String get adminApproveDoctor => 'Approuver';
+
+  @override
+  String get adminRejectDoctor => 'Refuser';
+
+  @override
+  String get adminNoDoctorApps => 'Aucune candidature médecin.';
+
+  @override
+  String get specInternalMedicine => 'Médecine interne';
+
+  @override
+  String get specCardiology => 'Cardiologie';
+
+  @override
+  String get specDermatology => 'Dermatologie';
+
+  @override
+  String get specEndocrinology => 'Endocrinologie';
+
+  @override
+  String get specNeurology => 'Neurologie';
+
+  @override
+  String get specOphthalmology => 'Ophtalmologie';
+
+  @override
+  String get specPediatrics => 'Pédiatrie';
+
+  @override
+  String get specFamilyMedicine => 'Médecine familiale';
+
+  @override
+  String get specNutritionDietetics => 'Nutrition & Diététique';
+
+  @override
+  String get specPsychiatry => 'Psychiatrie';
+
+  @override
+  String get specPulmonology => 'Pneumologie';
+
+  @override
+  String get specNephrology => 'Néphrologie';
 }

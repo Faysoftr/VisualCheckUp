@@ -144,6 +144,9 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
       case SendMessageStatus.dailyLimitExceeded:
         _toast(l10n.commRateLimited);
         break;
+      case SendMessageStatus.unsafeContent:
+        _toast(l10n.safetyContentBlocked);
+        break;
       case SendMessageStatus.emptyContent:
       case SendMessageStatus.error:
         break;

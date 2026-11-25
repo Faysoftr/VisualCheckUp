@@ -18,9 +18,12 @@ import 'package:visualcheckup/features/labs_vitals/presentation/screens/vitals_t
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
 void main() {
-  group('LocaleController, SettingsScreen & 11-language support', () {
-    test('all 11 ARB files have identical complete key sets and non-empty translations', () {
-      const codes = ['en', 'tr', 'ar', 'bn', 'es', 'fr', 'hi', 'pt', 'ru', 'ur', 'zh'];
+  group('LocaleController, SettingsScreen & 15-language support', () {
+    test('all 15 ARB files have identical complete key sets and non-empty translations', () {
+      const codes = [
+        'en', 'tr', 'ar', 'bn', 'de', 'es', 'fr', 'hi', 'it', 'nl', 'pt', 'ru',
+        'sv', 'ur', 'zh',
+      ];
       final templateJson =
           jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
               as Map<String, dynamic>;
@@ -60,17 +63,20 @@ void main() {
       }
     });
 
-    test('defaults to system locale (null), supports 11 languages, and persists overrides', () async {
+    test('defaults to system locale (null), supports 15 languages, and persists overrides', () async {
       SharedPreferences.setMockInitialValues({});
 
-      expect(LocaleController.supportedLanguages.length, 11);
-      expect(AppLocalizations.supportedLocales.length, 11);
+      expect(LocaleController.supportedLanguages.length, 15);
+      expect(AppLocalizations.supportedLocales.length, 15);
 
       final codes =
           LocaleController.supportedLanguages.map((l) => l.code).toSet();
       expect(
         codes,
-        containsAll(['tr', 'en', 'zh', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ur']),
+        containsAll([
+          'tr', 'en', 'zh', 'hi', 'es', 'de', 'sv', 'fr', 'it', 'nl', 'ar',
+          'bn', 'pt', 'ru', 'ur',
+        ]),
       );
 
       // Default is null -> follows phone system language automatically

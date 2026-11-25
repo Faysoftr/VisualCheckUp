@@ -8,6 +8,7 @@ import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
 import 'package:visualcheckup/features/checkup/domain/quick_color_swatch.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
+import 'package:visualcheckup/features/doctors/domain/doctor_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
@@ -810,6 +811,38 @@ extension PromotionPlacementL10n on PromotionPlacement {
     }
   }
 }
+
+extension DoctorSpecialtyL10n on DoctorSpecialty {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case DoctorSpecialty.internalMedicine:
+        return l10n.specInternalMedicine;
+      case DoctorSpecialty.cardiology:
+        return l10n.specCardiology;
+      case DoctorSpecialty.dermatology:
+        return l10n.specDermatology;
+      case DoctorSpecialty.endocrinology:
+        return l10n.specEndocrinology;
+      case DoctorSpecialty.neurology:
+        return l10n.specNeurology;
+      case DoctorSpecialty.ophthalmology:
+        return l10n.specOphthalmology;
+      case DoctorSpecialty.pediatrics:
+        return l10n.specPediatrics;
+      case DoctorSpecialty.familyMedicine:
+        return l10n.specFamilyMedicine;
+      case DoctorSpecialty.nutritionDietetics:
+        return l10n.specNutritionDietetics;
+      case DoctorSpecialty.psychiatry:
+        return l10n.specPsychiatry;
+      case DoctorSpecialty.pulmonology:
+        return l10n.specPulmonology;
+      case DoctorSpecialty.nephrology:
+        return l10n.specNephrology;
+    }
+  }
+}
+
 
 
 
