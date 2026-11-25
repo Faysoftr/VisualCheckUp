@@ -4,23 +4,28 @@
       "collectionGroup": "community_profiles",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "discoverable", "order": "ASCENDING" },
-        { "fieldPath": "likesCount", "order": "DESCENDING" }
+        {
+          "fieldPath": "discoverable",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "likesCount",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "community_conversations",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "members", "arrayConfig": "CONTAINS" },
-        { "fieldPath": "lastMessageAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "musicListeners",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "listenedAt", "order": "DESCENDING" }
+        {
+          "fieldPath": "members",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "lastMessageAt",
+          "order": "DESCENDING"
+        }
       ]
     }
   ],
