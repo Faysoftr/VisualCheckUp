@@ -2,7 +2,7 @@
   "name": "visualcheckup-functions",
   "description": "Cloudflare R2 presigned image upload & cleanup functions for VisualCheckUp Health Community",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
