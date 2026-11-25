@@ -89,6 +89,26 @@ extension CheckCategoryX on CheckCategory {
     }
   }
 
+  /// Soft photorealistic editorial background image for HomeScreen & Hub cards.
+  String get cardBackgroundAsset {
+    switch (this) {
+      case CheckCategory.eye:
+        return 'assets/images/card_eye.jpg';
+      case CheckCategory.nail:
+        return 'assets/images/card_nail.jpg';
+      case CheckCategory.tongue:
+        return 'assets/images/card_tongue.jpg';
+      case CheckCategory.face:
+        return 'assets/images/card_face.jpg';
+      case CheckCategory.skinCondition:
+        return 'assets/images/card_skin.jpg';
+      case CheckCategory.urine:
+        return 'assets/images/card_urine.jpg';
+      case CheckCategory.stool:
+        return 'assets/images/card_stool.jpg';
+    }
+  }
+
   String get captureGuide {
     switch (this) {
       case CheckCategory.eye:

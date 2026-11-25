@@ -5,6 +5,7 @@ import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/category_icon.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 
 /// Main side navigation drawer for VisualCheckUp.
@@ -238,6 +239,11 @@ class AppDrawer extends StatelessWidget {
                     if (onOpenCategory != null)
                       _DrawerTile(
                         icon: category.icon,
+                        leadingWidget: CategoryIcon(
+                          category: category,
+                          color: category.accentColor,
+                          size: 22,
+                        ),
                         label: category.localizedTitle(l10n),
                         accentColor: category.accentColor,
                         onTap: () => _closeAndRun(
@@ -257,10 +263,10 @@ class AppDrawer extends StatelessWidget {
                       collapsedShape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      leading: Icon(
-                        Icons.healing_rounded,
+                      leading: CategoryIcon(
+                        category: CheckCategory.skinCondition,
                         color: CheckCategory.skinCondition.accentColor,
-                        size: 21,
+                        size: 22,
                       ),
                       title: Text(
                         l10n.menuSkinGroup,
@@ -516,6 +522,7 @@ class _DrawerTile extends StatelessWidget {
     required this.onTap,
     this.selected = false,
     this.accentColor,
+    this.leadingWidget,
   });
 
   final IconData icon;
@@ -523,6 +530,7 @@ class _DrawerTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool selected;
   final Color? accentColor;
+  final Widget? leadingWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -535,7 +543,7 @@ class _DrawerTile extends StatelessWidget {
       selected: selected,
       selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      leading: Icon(icon, color: foreground, size: 21),
+      leading: leadingWidget ?? Icon(icon, color: foreground, size: 21),
       title: Text(
         label,
         style: TextStyle(

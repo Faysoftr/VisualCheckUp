@@ -1354,4 +1354,169 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'مقياس بريستول';
+
+  @override
+  String get hubStartNewScan => 'بدء فحص جديد';
+
+  @override
+  String get hubPickFromGallery => 'المعرض';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'الفحوصات السابقة ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'إجمالي الفحوصات';
+
+  @override
+  String get hubLastScanLabel => 'آخر فحص';
+
+  @override
+  String get hubLatestStatusLabel => 'آخر حالة';
+
+  @override
+  String get hubFilterAll => 'الكل';
+
+  @override
+  String get hubFilterAttention => 'متابعة / عاجل';
+
+  @override
+  String get hubFilterWithPhoto => 'بصورة';
+
+  @override
+  String get hubColPhoto => 'الصورة';
+
+  @override
+  String get hubColDate => 'التاريخ';
+
+  @override
+  String get hubColFinding => 'النتيجة والملخص';
+
+  @override
+  String get hubColStatus => 'الحالة';
+
+  @override
+  String get hubCompareModeBtn => 'مقارنة فحصين';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'اختر فحصين من الجدول للمقارنة جنباً إلى جنب ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'مقارنة جنباً إلى جنب';
+
+  @override
+  String get hubCompareCancelBtn => 'إلغاء';
+
+  @override
+  String get hubCompareSheetTitle => 'مقارنة الفحوصات جنباً إلى جنب';
+
+  @override
+  String get hubCompareOlderLabel => 'الأقدم';
+
+  @override
+  String get hubCompareNewerLabel => 'الأحدث';
+
+  @override
+  String get hubCompareMetricsTitle => 'مقارنة القياسات السريرية';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'لا توجد فحوصات $category بعد';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'ابدأ أول فحص من الأعلى. يُحفظ كل فحص هنا مرتباً بالتاريخ مع صورته المصغرة وتقرير التحليل الكامل.';
+
+  @override
+  String get hubDoctorSummaryBtn => 'ملخص الطبيب';
+
+  @override
+  String get photoTapToZoomHint => 'اضغط على الصورة للتكبير بملء الشاشة';
+
+  @override
+  String get photoZoomTitle => 'الصورة الملتقطة';
+
+  @override
+  String get resultDeleteRecordTooltip => 'حذف السجل';
+
+  @override
+  String get resultDeleteConfirmTitle => 'حذف هذا الفحص؟';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'سيتم حذف سجل الفحص هذا نهائياً من سجلك المحلي.';
+
+  @override
+  String get resultDeleteBtn => 'حذف';
+
+  @override
+  String get labLargeTextBtn => 'خط كبير';
+
+  @override
+  String get labLargeTextOnBtn => 'خط كبير: مفعّل';
+
+  @override
+  String get labSeniorOverviewTitle => 'ملخص حالتك ببساطة';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count من نتائجك ضمن النطاق الطبيعي.';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count من نتائجك خارج النطاق المرجعي — مشروحة ببساطة أدناه.';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count من نتائجك خارج الحدود بشكل ملحوظ — يُنصح بعرضها على الطبيب قريباً.';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$count من الفحوصات الأساسية غير مدرجة في هذا التقرير.';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'قيم تحتاج إلى انتباهك';
+
+  @override
+  String get labNormalSectionTitle => 'القيم الطبيعية (مطمئنة)';
+
+  @override
+  String get labMissingSectionTitle => 'فحوصات غير مدرجة في هذا التقرير';
+
+  @override
+  String get labMissingSectionExplain =>
+      'لا يشمل كل تحليل دم جميع الفحوصات. الفحوصات الأساسية أدناه غير موجودة في هذا التقرير لذا لم يتم تقييمها.';
+
+  @override
+  String get labNotInReportBadge => 'غير مدرج في التقرير';
+
+  @override
+  String get labWhatItMeansLabel => 'ماذا يعني ذلك؟';
+
+  @override
+  String get labWhatToDoLabel => 'ماذا يمكنك فعله؟';
+
+  @override
+  String get labAddAnotherPageBtn => 'تصوير صفحة أخرى';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return 'تمت قراءة $count صفحة';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'تم إرفاق صورة التقرير. فعّل الذكاء السحابي من الإعدادات لقراءة الصور تلقائياً أو أدخل القيم يدوياً أدناه.';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'جميع القيم المسجلة في هذا التقرير ضمن النطاق المرجعي.';
 }

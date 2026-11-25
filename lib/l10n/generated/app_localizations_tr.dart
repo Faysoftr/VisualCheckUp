@@ -1376,4 +1376,170 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'Bristol Skalası';
+
+  @override
+  String get hubStartNewScan => 'Yeni Tarama Başlat';
+
+  @override
+  String get hubPickFromGallery => 'Galeriden';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'Geçmiş Taramalar ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'Toplam Tarama';
+
+  @override
+  String get hubLastScanLabel => 'Son Tarama';
+
+  @override
+  String get hubLatestStatusLabel => 'Son Durum';
+
+  @override
+  String get hubFilterAll => 'Tümü';
+
+  @override
+  String get hubFilterAttention => 'Uyarı / Takip';
+
+  @override
+  String get hubFilterWithPhoto => 'Fotoğraflı';
+
+  @override
+  String get hubColPhoto => 'Fotoğraf';
+
+  @override
+  String get hubColDate => 'Tarih';
+
+  @override
+  String get hubColFinding => 'Bulgu & Özet';
+
+  @override
+  String get hubColStatus => 'Durum';
+
+  @override
+  String get hubCompareModeBtn => '2 Taramayı Karşılaştır';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'Yan yana karşılaştırmak için tablodan 2 tarama seçin ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'Yan Yana Karşılaştır';
+
+  @override
+  String get hubCompareCancelBtn => 'Vazgeç';
+
+  @override
+  String get hubCompareSheetTitle => 'Yan Yana Tarama Karşılaştırması';
+
+  @override
+  String get hubCompareOlderLabel => 'Önceki';
+
+  @override
+  String get hubCompareNewerLabel => 'Sonraki';
+
+  @override
+  String get hubCompareMetricsTitle => 'Klinik Ölçüm Karşılaştırması';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'Henüz $category taraması yok';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'Yukarıdan ilk taramanızı başlatın. Her kontrol, küçük fotoğrafı ve detaylı analiz raporuyla burada tarih sırasıyla saklanır.';
+
+  @override
+  String get hubDoctorSummaryBtn => 'Doktor Özeti';
+
+  @override
+  String get photoTapToZoomHint => 'Tam ekran büyütmek için fotoğrafa dokunun';
+
+  @override
+  String get photoZoomTitle => 'Çekilen Fotoğraf';
+
+  @override
+  String get resultDeleteRecordTooltip => 'Kaydı Sil';
+
+  @override
+  String get resultDeleteConfirmTitle => 'Bu tarama silinsin mi?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'Bu kontrol kaydı yerel geçmişinizden kalıcı olarak silinecektir.';
+
+  @override
+  String get resultDeleteBtn => 'Sil';
+
+  @override
+  String get labLargeTextBtn => 'Büyük Yazı';
+
+  @override
+  String get labLargeTextOnBtn => 'Büyük Yazı: Açık';
+
+  @override
+  String get labSeniorOverviewTitle => 'Özetle Durumunuz';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count değeriniz normal aralıkta görünüyor.';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count değeriniz referans aralığının dışında — aşağıda sade açıklaması var.';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count değeriniz belirgin şekilde sınır dışı — gecikmeden doktorunuza gösterin.';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return 'Temel kan panelindeki $count test bu raporda yer almıyor.';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'Dikkat Etmeniz Gereken Değerler';
+
+  @override
+  String get labNormalSectionTitle =>
+      'Normal Çıkan Değerler (İçiniz Rahat Olsun)';
+
+  @override
+  String get labMissingSectionTitle => 'Bu Raporda Yer Almayan Temel Testler';
+
+  @override
+  String get labMissingSectionExplain =>
+      'Her tahlilde bütün testler istenmez. Aşağıdaki temel testler yüklediğiniz raporda yer almadığı için boş bırakılmıştır.';
+
+  @override
+  String get labNotInReportBadge => 'Raporda yer almıyor';
+
+  @override
+  String get labWhatItMeansLabel => 'Ne anlama gelir?';
+
+  @override
+  String get labWhatToDoLabel => 'Ne yapmalısınız?';
+
+  @override
+  String get labAddAnotherPageBtn => 'Başka Sayfa Çek';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '$count sayfa okundu';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'Rapor fotoğrafı eklendi. Kağıt fotoğraflarının otomatik okunması için Ayarlar > Bulut AI seçeneğini açabilir veya değerleri aşağıdan elle ekleyebilirsiniz.';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'Bu rapordaki tüm değerleriniz referans aralığında görünüyor.';
 }

@@ -716,5 +716,109 @@
   "metricSplinterStreak": "Splinter Streak Ratio",
   "metricGeographicTongue": "Geographic Tongue Score",
   "metricYellowCoating": "Yellow Coating Ratio",
-  "metricBristolScale": "Bristol Scale"
+  "metricBristolScale": "Bristol Scale",
+  "hubStartNewScan": "Start New Scan",
+  "hubPickFromGallery": "Gallery",
+  "hubPastScansTitle": "Past Scans ({count})",
+  "@hubPastScansTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hubTotalScansLabel": "Total Scans",
+  "hubLastScanLabel": "Last Scan",
+  "hubLatestStatusLabel": "Latest Status",
+  "hubFilterAll": "All",
+  "hubFilterAttention": "Attention / Urgent",
+  "hubFilterWithPhoto": "With Photo",
+  "hubColPhoto": "Photo",
+  "hubColDate": "Date",
+  "hubColFinding": "Finding & Summary",
+  "hubColStatus": "Status",
+  "hubCompareModeBtn": "Compare 2 Scans",
+  "hubCompareSelectHint": "Select 2 scans from the table to compare side-by-side ({count}/2)",
+  "@hubCompareSelectHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hubCompareActionBtn": "Compare Side-by-Side",
+  "hubCompareCancelBtn": "Cancel",
+  "hubCompareSheetTitle": "Side-by-Side Scan Comparison",
+  "hubCompareOlderLabel": "Earlier",
+  "hubCompareNewerLabel": "Later",
+  "hubCompareMetricsTitle": "Clinical Metrics Comparison",
+  "hubEmptyTitle": "No {category} scans yet",
+  "@hubEmptyTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "hubEmptySubtitle": "Start your first scan above. Every check is saved chronologically here with its thumbnail photo and full analysis report.",
+  "hubDoctorSummaryBtn": "Doctor Summary",
+  "photoTapToZoomHint": "Tap photo to zoom full-screen",
+  "photoZoomTitle": "Captured Photo",
+  "resultDeleteRecordTooltip": "Delete Record",
+  "resultDeleteConfirmTitle": "Delete this scan?",
+  "resultDeleteConfirmBody": "This checkup record will be permanently removed from your local history.",
+  "resultDeleteBtn": "Delete",
+  "labLargeTextBtn": "Large Text",
+  "labLargeTextOnBtn": "Large Text: On",
+  "labSeniorOverviewTitle": "Your Summary at a Glance",
+  "labSeniorNormalBullet": "{count} test(s) are within the normal range.",
+  "@labSeniorNormalBullet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labSeniorAbnormalBullet": "{count} test(s) are outside the reference range — explained simply below.",
+  "@labSeniorAbnormalBullet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labSeniorCriticalBullet": "{count} test(s) are noticeably outside normal limits — please show your doctor soon.",
+  "@labSeniorCriticalBullet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labSeniorMissingBullet": "{count} common routine test(s) are not included in this report.",
+  "@labSeniorMissingBullet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labAttentionSectionTitle": "Values to Pay Attention To",
+  "labNormalSectionTitle": "Normal Values (Good News)",
+  "labMissingSectionTitle": "Tests Not Included in This Report",
+  "labMissingSectionExplain": "Not every blood test order includes all panels. The common tests below were not listed in this report, so they were not evaluated.",
+  "labNotInReportBadge": "Not in report",
+  "labWhatItMeansLabel": "What it means",
+  "labWhatToDoLabel": "What you can do",
+  "labAddAnotherPageBtn": "Scan Another Page",
+  "labPagesReadBadge": "{count} page(s) read",
+  "@labPagesReadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labPhotoOfflineHint": "Paper photo attached. Enable Cloud AI in Settings to read paper photos automatically, or enter values manually below.",
+  "labAllValuesNormalMsg": "All recorded values in this report are within the reference range."
 }

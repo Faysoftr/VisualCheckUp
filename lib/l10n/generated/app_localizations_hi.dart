@@ -1358,4 +1358,170 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'ब्रिस्टल स्केल';
+
+  @override
+  String get hubStartNewScan => 'नया स्कैन शुरू करें';
+
+  @override
+  String get hubPickFromGallery => 'गैलरी';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'पिछले स्कैन ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'कुल स्कैन';
+
+  @override
+  String get hubLastScanLabel => 'अंतिम स्कैन';
+
+  @override
+  String get hubLatestStatusLabel => 'ताज़ा स्थिति';
+
+  @override
+  String get hubFilterAll => 'सभी';
+
+  @override
+  String get hubFilterAttention => 'ध्यान / तत्काल';
+
+  @override
+  String get hubFilterWithPhoto => 'फोटो सहित';
+
+  @override
+  String get hubColPhoto => 'फोटो';
+
+  @override
+  String get hubColDate => 'तारीख';
+
+  @override
+  String get hubColFinding => 'निष्कर्ष और सारांश';
+
+  @override
+  String get hubColStatus => 'स्थिति';
+
+  @override
+  String get hubCompareModeBtn => '2 स्कैन की तुलना करें';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'साथ-साथ तुलना के लिए तालिका से 2 स्कैन चुनें ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'साथ-साथ तुलना करें';
+
+  @override
+  String get hubCompareCancelBtn => 'रद्द करें';
+
+  @override
+  String get hubCompareSheetTitle => 'स्कैन की साथ-साथ तुलना';
+
+  @override
+  String get hubCompareOlderLabel => 'पहले का';
+
+  @override
+  String get hubCompareNewerLabel => 'बाद का';
+
+  @override
+  String get hubCompareMetricsTitle => 'क्लिनिकल माप तुलना';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'अभी तक कोई $category स्कैन नहीं';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'ऊपर से अपना पहला स्कैन शुरू करें। प्रत्येक जांच छोटे फोटो और विस्तृत रिपोर्ट के साथ यहाँ तिथि अनुसार सहेजी जाती है।';
+
+  @override
+  String get hubDoctorSummaryBtn => 'डॉक्टर सारांश';
+
+  @override
+  String get photoTapToZoomHint => 'पूर्ण स्क्रीन ज़ूम के लिए फोटो पर टैप करें';
+
+  @override
+  String get photoZoomTitle => 'ली गई फोटो';
+
+  @override
+  String get resultDeleteRecordTooltip => 'रिकॉर्ड हटाएं';
+
+  @override
+  String get resultDeleteConfirmTitle => 'क्या यह स्कैन हटाएं?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'यह जांच रिकॉर्ड आपके स्थानीय इतिहास से स्थायी रूप से हटा दिया जाएगा।';
+
+  @override
+  String get resultDeleteBtn => 'हटाएं';
+
+  @override
+  String get labLargeTextBtn => 'बड़ा टेक्स्ट';
+
+  @override
+  String get labLargeTextOnBtn => 'बड़ा टेक्स्ट: चालू';
+
+  @override
+  String get labSeniorOverviewTitle => 'संक्षेप में आपकी रिपोर्ट';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count जांच के मान सामान्य सीमा के भीतर हैं।';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count मान सामान्य सीमा से बाहर हैं — नीचे सरल भाषा में समझाया गया है।';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count मान सीमा से काफी बाहर हैं — कृपया जल्द डॉक्टर को दिखाएं।';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$count सामान्य बुनियादी जांच इस रिपोर्ट में शामिल नहीं हैं।';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'ध्यान देने योग्य मान';
+
+  @override
+  String get labNormalSectionTitle => 'सामान्य मान (चिंता न करें)';
+
+  @override
+  String get labMissingSectionTitle =>
+      'इस रिपोर्ट में शामिल न होने वाली जांचें';
+
+  @override
+  String get labMissingSectionExplain =>
+      'हर ब्लड टेस्ट में सभी जांचें नहीं कराई जातीं। नीचे दी गई सामान्य जांचें इस रिपोर्ट में नहीं थीं।';
+
+  @override
+  String get labNotInReportBadge => 'रिपोर्ट में नहीं है';
+
+  @override
+  String get labWhatItMeansLabel => 'इसका क्या अर्थ है?';
+
+  @override
+  String get labWhatToDoLabel => 'आपको क्या करना चाहिए?';
+
+  @override
+  String get labAddAnotherPageBtn => 'अगला पेज स्कैन करें';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '$count पेज पढ़े गए';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'रिपोर्ट की फोटो जुड़ गई है। फोटो से मान अपने आप पढ़ने के लिए सेटिंग्स में क्लाउड AI चालू करें या नीचे मैन्युअल रूप से जोड़ें।';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'इस रिपोर्ट के सभी दर्ज मान सामान्य सीमा के भीतर हैं।';
 }

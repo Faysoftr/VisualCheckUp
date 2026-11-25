@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/category_icon.dart';
 
 class CategoryCard extends StatelessWidget {
   const CategoryCard({
@@ -58,27 +59,82 @@ class CategoryCard extends StatelessWidget {
             splashColor: accent.withValues(alpha: 0.12),
             highlightColor: accent.withValues(alpha: 0.06),
             child: Stack(
+              fit: StackFit.expand,
               children: [
-                // Subtle pastel ambient aura in the top-right corner
-                Positioned(
-                  top: -26,
-                  right: -26,
+                // Real photorealistic module backdrop biased gently toward right
+                Positioned.fill(
                   child: IgnorePointer(
-                    child: Container(
-                      width: 96,
-                      height: 96,
+                    child: Image.asset(
+                      category.cardBackgroundAsset,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.centerRight,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+
+                // Soft directional frosted scrim: keeps photo crisp & visible
+                // in the upper-right while ensuring AAA readability for text
+                // at the bottom-left in both Light and Dark themes.
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            accent.withValues(alpha: isDark ? 0.22 : 0.14),
-                            accent.withValues(alpha: 0.0),
-                          ],
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          stops: const [0.0, 0.48, 0.80, 1.0],
+                          colors: isDark
+                              ? [
+                                  const Color(0xFF101D1D)
+                                      .withValues(alpha: 0.94),
+                                  const Color(0xFF142424)
+                                      .withValues(alpha: 0.78),
+                                  const Color(0xFF162626)
+                                      .withValues(alpha: 0.42),
+                                  accent.withValues(alpha: 0.16),
+                                ]
+                              : [
+                                  Colors.white.withValues(alpha: 0.94),
+                                  Colors.white.withValues(alpha: 0.76),
+                                  Colors.white.withValues(alpha: 0.34),
+                                  accent.withValues(alpha: 0.08),
+                                ],
                         ),
                       ),
                     ),
                   ),
                 ),
+
+                // Subtle bottom readability veil behind title & subtitle
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 92,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: isDark
+                              ? [
+                                  const Color(0xFF0E1A1A)
+                                      .withValues(alpha: 0.88),
+                                  const Color(0xFF0E1A1A)
+                                      .withValues(alpha: 0.0),
+                                ]
+                              : [
+                                  Colors.white.withValues(alpha: 0.90),
+                                  Colors.white.withValues(alpha: 0.0),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
                 Padding(
                   padding: const EdgeInsets.all(15),
                   child: Column(
@@ -88,8 +144,8 @@ class CategoryCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            width: 44,
-                            height: 44,
+                            width: 46,
+                            height: 46,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
@@ -100,32 +156,36 @@ class CategoryCard extends StatelessWidget {
                               boxShadow: [
                                 BoxShadow(
                                   color: accent.withValues(
-                                    alpha: isDark ? 0.30 : 0.28,
+                                    alpha: isDark ? 0.35 : 0.30,
                                   ),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: Icon(
-                              category.icon,
+                            alignment: Alignment.center,
+                            child: CategoryIcon(
+                              category: category,
                               color: Colors.white,
-                              size: 22,
+                              size: 25,
                             ),
                           ),
                           Container(
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
-                              color: accent.withValues(
-                                alpha: isDark ? 0.18 : 0.10,
-                              ),
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.42)
+                                  : Colors.white.withValues(alpha: 0.82),
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                color: accent.withValues(alpha: 0.28),
+                              ),
                             ),
                             child: Icon(
                               Icons.arrow_forward_rounded,
                               size: 15,
-                              color: accent,
+                              color: isDark ? Colors.white : accent,
                             ),
                           ),
                         ],
@@ -145,9 +205,12 @@ class CategoryCard extends StatelessWidget {
                       Text(
                         category.localizedSubtitle(context.l10n),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.84)
+                              : colorScheme.onSurface.withValues(alpha: 0.78),
                           height: 1.28,
                           fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

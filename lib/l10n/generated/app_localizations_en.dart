@@ -1371,4 +1371,169 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'Bristol Scale';
+
+  @override
+  String get hubStartNewScan => 'Start New Scan';
+
+  @override
+  String get hubPickFromGallery => 'Gallery';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'Past Scans ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'Total Scans';
+
+  @override
+  String get hubLastScanLabel => 'Last Scan';
+
+  @override
+  String get hubLatestStatusLabel => 'Latest Status';
+
+  @override
+  String get hubFilterAll => 'All';
+
+  @override
+  String get hubFilterAttention => 'Attention / Urgent';
+
+  @override
+  String get hubFilterWithPhoto => 'With Photo';
+
+  @override
+  String get hubColPhoto => 'Photo';
+
+  @override
+  String get hubColDate => 'Date';
+
+  @override
+  String get hubColFinding => 'Finding & Summary';
+
+  @override
+  String get hubColStatus => 'Status';
+
+  @override
+  String get hubCompareModeBtn => 'Compare 2 Scans';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'Select 2 scans from the table to compare side-by-side ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'Compare Side-by-Side';
+
+  @override
+  String get hubCompareCancelBtn => 'Cancel';
+
+  @override
+  String get hubCompareSheetTitle => 'Side-by-Side Scan Comparison';
+
+  @override
+  String get hubCompareOlderLabel => 'Earlier';
+
+  @override
+  String get hubCompareNewerLabel => 'Later';
+
+  @override
+  String get hubCompareMetricsTitle => 'Clinical Metrics Comparison';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'No $category scans yet';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'Start your first scan above. Every check is saved chronologically here with its thumbnail photo and full analysis report.';
+
+  @override
+  String get hubDoctorSummaryBtn => 'Doctor Summary';
+
+  @override
+  String get photoTapToZoomHint => 'Tap photo to zoom full-screen';
+
+  @override
+  String get photoZoomTitle => 'Captured Photo';
+
+  @override
+  String get resultDeleteRecordTooltip => 'Delete Record';
+
+  @override
+  String get resultDeleteConfirmTitle => 'Delete this scan?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'This checkup record will be permanently removed from your local history.';
+
+  @override
+  String get resultDeleteBtn => 'Delete';
+
+  @override
+  String get labLargeTextBtn => 'Large Text';
+
+  @override
+  String get labLargeTextOnBtn => 'Large Text: On';
+
+  @override
+  String get labSeniorOverviewTitle => 'Your Summary at a Glance';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count test(s) are within the normal range.';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count test(s) are outside the reference range — explained simply below.';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count test(s) are noticeably outside normal limits — please show your doctor soon.';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$count common routine test(s) are not included in this report.';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'Values to Pay Attention To';
+
+  @override
+  String get labNormalSectionTitle => 'Normal Values (Good News)';
+
+  @override
+  String get labMissingSectionTitle => 'Tests Not Included in This Report';
+
+  @override
+  String get labMissingSectionExplain =>
+      'Not every blood test order includes all panels. The common tests below were not listed in this report, so they were not evaluated.';
+
+  @override
+  String get labNotInReportBadge => 'Not in report';
+
+  @override
+  String get labWhatItMeansLabel => 'What it means';
+
+  @override
+  String get labWhatToDoLabel => 'What you can do';
+
+  @override
+  String get labAddAnotherPageBtn => 'Scan Another Page';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '$count page(s) read';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'Paper photo attached. Enable Cloud AI in Settings to read paper photos automatically, or enter values manually below.';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'All recorded values in this report are within the reference range.';
 }

@@ -321,6 +321,11 @@ void main() {
       // Detail sheet shows PDF attachment, diagnosis, and plain-Turkish interpretation.
       expect(find.text('enabiz_tahlil.pdf'), findsOneWidget);
       expect(find.text('Girilen Hastane / Doktor Teşhisi'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Anlaşılır Değerlendirme & Yorum'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
       expect(find.text('Anlaşılır Değerlendirme & Yorum'), findsOneWidget);
       expect(find.textContaining('Tiroid bezinin'), findsOneWidget);
       expect(await repo.loadLabReports(), hasLength(1));

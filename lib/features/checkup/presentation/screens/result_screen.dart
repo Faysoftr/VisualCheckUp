@@ -13,6 +13,7 @@ import 'package:visualcheckup/features/checkup/domain/module_reference.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/clinical_visual_illustration.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/doctor_summary_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/photo_zoom_viewer.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -122,6 +123,38 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
+  Future<void> _confirmAndDelete() async {
+    final repo = widget.historyRepository;
+    if (repo == null) return;
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.resultDeleteConfirmTitle),
+        content: Text(l10n.resultDeleteConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.hubCompareCancelBtn),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.resultDeleteBtn),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await repo.deleteResult(widget.result.id);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final result = widget.result;
@@ -150,6 +183,13 @@ class _ResultScreenState extends State<ResultScreen> {
             tooltip: l10n.tooltipReferenceGuide,
             icon: const Icon(Icons.menu_book_outlined),
           ),
+          if (widget.historyRepository != null)
+            IconButton(
+              key: const Key('result_delete_btn'),
+              onPressed: _confirmAndDelete,
+              tooltip: l10n.resultDeleteRecordTooltip,
+              icon: const Icon(Icons.delete_outline_rounded),
+            ),
         ],
       ),
       body: ListView(
@@ -872,6 +912,7 @@ class _BeforeAfterPhotoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final df = DateFormat('dd.MM.yyyy');
     final hasBefore = previousWithPhoto != null;
 
@@ -892,8 +933,8 @@ class _BeforeAfterPhotoCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     hasBefore
-                        ? 'Önce / Sonra Görsel Kıyaslama'
-                        : 'Kaydedilen Kontrol Fotoğrafı',
+                        ? l10n.hubCompareSheetTitle
+                        : l10n.photoZoomTitle,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -908,7 +949,9 @@ class _BeforeAfterPhotoCard extends StatelessWidget {
                   Expanded(
                     child: _PhotoTile(
                       path: previousWithPhoto!.imagePath!,
-                      caption: 'Önce • ${df.format(previousWithPhoto!.createdAt)}',
+                      title: previousWithPhoto!.localizedSummaryTitle(l10n),
+                      caption:
+                          '${l10n.hubCompareOlderLabel} • ${df.format(previousWithPhoto!.createdAt)}',
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -916,8 +959,27 @@ class _BeforeAfterPhotoCard extends StatelessWidget {
                 Expanded(
                   child: _PhotoTile(
                     path: currentResult.imagePath!,
+                    title: currentResult.localizedSummaryTitle(l10n),
                     caption:
-                        '${hasBefore ? 'Sonra • ' : ''}${df.format(currentResult.createdAt)}',
+                        '${hasBefore ? '${l10n.hubCompareNewerLabel} • ' : ''}${df.format(currentResult.createdAt)}',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.zoom_in_rounded,
+                  size: 14,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.photoTapToZoomHint,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -932,41 +994,74 @@ class _BeforeAfterPhotoCard extends StatelessWidget {
 class _PhotoTile extends StatelessWidget {
   const _PhotoTile({
     required this.path,
+    required this.title,
     required this.caption,
   });
 
   final String path;
+  final String title;
   final String caption;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: AspectRatio(
-            aspectRatio: 1.15,
-            child: Image.file(
-              File(path),
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: const Icon(Icons.broken_image_outlined),
+    return GestureDetector(
+      key: Key('result_photo_${path.hashCode}'),
+      onTap: () => PhotoZoomViewer.show(
+        context,
+        imagePath: path,
+        title: title,
+        subtitle: caption,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(
+                    File(path),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Container(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: const Icon(Icons.broken_image_outlined),
+                    ),
+                  ),
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.zoom_in_rounded,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          caption,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Text(
+            caption,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }

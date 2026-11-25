@@ -1361,4 +1361,169 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'ব্রিস্টল স্কেল';
+
+  @override
+  String get hubStartNewScan => 'নতুন স্ক্যান শুরু করুন';
+
+  @override
+  String get hubPickFromGallery => 'গ্যালারি';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'পূর্ববর্তী স্ক্যানসমূহ ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'মোট স্ক্যান';
+
+  @override
+  String get hubLastScanLabel => 'শেষ স্ক্যান';
+
+  @override
+  String get hubLatestStatusLabel => 'সর্বশেষ অবস্থা';
+
+  @override
+  String get hubFilterAll => 'সব';
+
+  @override
+  String get hubFilterAttention => 'সতর্কতা / জরুরি';
+
+  @override
+  String get hubFilterWithPhoto => 'ছবিসহ';
+
+  @override
+  String get hubColPhoto => 'ছবি';
+
+  @override
+  String get hubColDate => 'তারিখ';
+
+  @override
+  String get hubColFinding => 'ফলাফল ও সারসংক্ষেপ';
+
+  @override
+  String get hubColStatus => 'অবস্থা';
+
+  @override
+  String get hubCompareModeBtn => '২টি স্ক্যান তুলনা করুন';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'পাশাপাশি তুলনা করতে তালিকা থেকে ২টি স্ক্যান নির্বাচন করুন ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'পাশাপাশি তুলনা করুন';
+
+  @override
+  String get hubCompareCancelBtn => 'বাতিল';
+
+  @override
+  String get hubCompareSheetTitle => 'পাশাপাশি স্ক্যান তুলনা';
+
+  @override
+  String get hubCompareOlderLabel => 'পূর্বের';
+
+  @override
+  String get hubCompareNewerLabel => 'পরবর্তী';
+
+  @override
+  String get hubCompareMetricsTitle => 'ক্লিনিক্যাল পরিমাপ তুলনা';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'এখনো কোনো $category স্ক্যান নেই';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'উপর থেকে প্রথম স্ক্যান শুরু করুন। প্রতিটি পরীক্ষা ছোট ছবি ও বিস্তারিত রিপোর্টসহ এখানে তারিখ অনুযায়ী সংরক্ষিত থাকবে।';
+
+  @override
+  String get hubDoctorSummaryBtn => 'ডাক্তারের সারসংক্ষেপ';
+
+  @override
+  String get photoTapToZoomHint => 'পূর্ণ স্ক্রিনে বড় করতে ছবিতে ট্যাপ করুন';
+
+  @override
+  String get photoZoomTitle => 'তোলা ছবি';
+
+  @override
+  String get resultDeleteRecordTooltip => 'রেকর্ড মুছুন';
+
+  @override
+  String get resultDeleteConfirmTitle => 'এই স্ক্যানটি মুছবেন?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'এই পরীক্ষার রেকর্ডটি আপনার স্থানীয় ইতিহাস থেকে স্থায়ীভাবে মুছে ফেলা হবে।';
+
+  @override
+  String get resultDeleteBtn => 'মুছুন';
+
+  @override
+  String get labLargeTextBtn => 'বড় লেখা';
+
+  @override
+  String get labLargeTextOnBtn => 'বড় লেখা: চালু';
+
+  @override
+  String get labSeniorOverviewTitle => 'এক নজরে আপনার সারসংক্ষেপ';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$countটি পরীক্ষার মান স্বাভাবিক সীমার মধ্যে আছে।';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$countটি মান স্বাভাবিক সীমার বাইরে — নিচে সহজ ভাষায় ব্যাখ্যা করা হয়েছে।';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$countটি মান উল্লেখযোগ্যভাবে সীমার বাইরে — অনুগ্রহ করে দ্রুত ডাক্তারকে দেখান।';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$countটি সাধারণ মৌলিক পরীক্ষা এই রিপোর্টে অন্তর্ভুক্ত নেই।';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'যে মানগুলোতে মনোযোগ দেওয়া প্রয়োজন';
+
+  @override
+  String get labNormalSectionTitle => 'স্বাভাবিক মানসমূহ (নিশ্চিন্ত থাকুন)';
+
+  @override
+  String get labMissingSectionTitle => 'এই রিপোর্টে না থাকা মৌলিক পরীক্ষা';
+
+  @override
+  String get labMissingSectionExplain =>
+      'সব রক্ত পরীক্ষায় সব টেস্ট করা হয় না। নিচের সাধারণ পরীক্ষাগুলো এই রিপোর্টে না থাকায় মূল্যায়ন করা হয়নি।';
+
+  @override
+  String get labNotInReportBadge => 'রিপোর্টে নেই';
+
+  @override
+  String get labWhatItMeansLabel => 'এর অর্থ কী?';
+
+  @override
+  String get labWhatToDoLabel => 'আপনার করণীয় কী?';
+
+  @override
+  String get labAddAnotherPageBtn => 'আরেকটি পাতার ছবি তুলুন';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '$count পাতা পড়া হয়েছে';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'রিপোর্টের ছবি যুক্ত হয়েছে। কাগজের ছবি স্বয়ংক্রিয়ভাবে পড়তে সেটিংস থেকে ক্লাউড এআই চালু করুন অথবা নিচে হাতে মান লিখুন।';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'এই রিপোর্টের সব মান স্বাভাবিক সীমার মধ্যে রয়েছে।';
 }

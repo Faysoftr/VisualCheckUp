@@ -77,9 +77,13 @@ class GeminiLabReportExtractor implements LabDocumentAiExtractor {
             'parts': [
               {
                 'text':
-                    'You are a high-precision clinical laboratory report parser. '
-                    'Extract EVERY numeric laboratory test result from ALL pages of the attached PDF or image, '
-                    'regardless of hospital format or language. Never invent or omit numeric test rows. '
+                    'You are a high-precision international clinical laboratory report parser. '
+                    'You accurately read digital PDFs AND smartphone photographs of paper lab printouts '
+                    '(even if slightly tilted, creased, or shadowed) from ANY country or hospital format '
+                    '(e.g. Turkey e-Nabız, USA Quest Diagnostics/LabCorp, UK NHS, Germany MVZ/Laborbefund, '
+                    'France Biologie Médicale, Spain/LatAm Hemograma, Russia Invitro/Гемотест, India Lal PathLabs/Thyrocare, '
+                    'Arabic, Urdu, Bengali, Hindi, and Chinese hospital reports). '
+                    'Extract EVERY numeric laboratory test result from ALL pages. Never invent, guess, or omit numeric rows. '
                     'Return strictly valid JSON only.',
               },
             ],
@@ -96,26 +100,28 @@ class GeminiLabReportExtractor implements LabDocumentAiExtractor {
                 },
                 {
                   'text':
-                      'Extract ALL lab test parameters from this hospital report into JSON with this exact schema:\n'
+                      'Extract ALL lab test parameters from this hospital report (PDF or paper photograph) into JSON with this exact schema:\n'
                       '{\n'
                       '  "hospitalName": "string or null",\n'
                       '  "reportDate": "YYYY-MM-DD or null",\n'
                       '  "items": [\n'
                       '    {\n'
-                      '      "name": "exact test name as printed (e.g. ALT, Demir, HDL Kolesterol, LYM%, eGFR)",\n'
+                      '      "name": "exact test name as printed (e.g. ALT, Demir, HDL Kolesterol, Glucose, Hämoglobin, Гемоглобин, 血红蛋白, LYM%, eGFR)",\n'
                       '      "value": 12.3,\n'
-                      '      "unit": "unit string (e.g. mg/dL, U/L, %, 10^3/mm^3)",\n'
+                      '      "unit": "exact printed unit (e.g. mg/dL, mmol/L, g/L, g/dL, umol/L, mmol/mol, U/L, %, 10^3/uL)",\n'
                       '      "refMin": 0.0,\n'
                       '      "refMax": 35.0\n'
                       '    }\n'
                       '  ]\n'
                       '}\n'
                       'Rules:\n'
-                      '- Convert decimal commas (14,3) to dots (14.3).\n'
-                      '- Include EVERY single numeric test row across all pages (biochemistry, hemogram/CBC, hormones, vitamins, lipids, urine, etc.).\n'
-                      '- Keep # and % tests separate (e.g. LYM# and LYM%, NEU# and NEU%).\n'
-                      '- Use null for refMin or refMax if only an upper (< 50) or lower (> 60) bound is printed, or if no reference range is given.\n'
-                      '- Do NOT include patient age, birth date, phone numbers, page numbers, or section headers as items.',
+                      '- Convert decimal commas (14,3) to dots (14.3) and remove thousand separators (245,000 -> 245000).\n'
+                      '- Strip high/low flag markers (H, L, HIGH, LOW, *, ↑, ↓, +, -) from numeric values and units.\n'
+                      '- Keep the EXACT printed unit (whether SI like mmol/L, g/L, umol/L, mmol/mol or conventional like mg/dL, g/dL, %) — the app handles unit standardization.\n'
+                      '- Include EVERY numeric test row across all pages (CBC/hemogram, biochemistry, liver, kidney, lipids, thyroid, iron, vitamins, HbA1c, inflammation, electrolytes).\n'
+                      '- Keep # (absolute) and % (percentage) differential tests separate (e.g. LYM# vs LYM%, NEU# vs NEU%).\n'
+                      '- Use null for refMin or refMax if only an upper (< 200) or lower (> 40) bound is printed, or if no reference range is printed.\n'
+                      '- Do NOT include patient age, birth date, ID/barcode, phone numbers, page numbers, or section headers as items.',
                 },
               ],
             },

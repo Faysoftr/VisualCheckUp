@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/constants/medical_disclaimer.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_unit_converter.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 
@@ -585,6 +586,57 @@ class LabReportAnalyzer {
       highNote: 'Kalsiyum yüksek; hekim değerlendirmesi önerilir.',
       specialtyHint: 'Dahiliye veya Endokrinoloji',
     ),
+    LabParameterSpec(
+      code: 'TBIL',
+      name: 'Total Bilirubin',
+      aliases: ['total bilirubin', 'bilirubin total', 'bilirubin', 'tbil', 't. bili'],
+      unit: 'mg/dL',
+      minNormal: 0.1,
+      maxNormal: 1.2,
+      criticalHigh: 3.0,
+      lowNote: 'Referans aralığında.',
+      highNote:
+          'Bilirubin yüksekliği göz/cilt sarılığı, safra yolları veya karaciğer açısından doktor değerlendirmesi gerektirir.',
+      specialtyHint: 'Dahiliye veya Gastroenteroloji',
+    ),
+    LabParameterSpec(
+      code: 'ALP',
+      name: 'Alkalen Fosfataz (ALP)',
+      aliases: ['alkalen fosfataz', 'alkaline phosphatase', 'alp'],
+      unit: 'U/L',
+      minNormal: 35,
+      maxNormal: 130,
+      lowNote: 'Genellikle klinik sorun oluşturmaz.',
+      highNote:
+          'Karaciğer, safra yolları veya kemik metabolizması açısından GGT ve kalsiyum ile birlikte değerlendirilir.',
+      specialtyHint: 'Dahiliye veya Gastroenteroloji',
+    ),
+    LabParameterSpec(
+      code: 'ALB',
+      name: 'Albümin',
+      aliases: ['albümin', 'albumin', 'alb'],
+      unit: 'g/dL',
+      minNormal: 3.5,
+      maxNormal: 5.2,
+      criticalLow: 2.5,
+      lowNote:
+          'Albümin düşüklüğü beslenme durumu, karaciğer veya böbrek protein kaybı açısından değerlendirilir.',
+      highNote: 'Genellikle sıvı azlığına bağlı hafif yükselebilir.',
+      specialtyHint: 'Dahiliye',
+    ),
+    LabParameterSpec(
+      code: 'ESR',
+      name: 'Sedimantasyon (ESR)',
+      aliases: ['sedimantasyon', 'sedimentation', 'esr'],
+      unit: 'mm/saat',
+      minNormal: 0,
+      maxNormal: 20,
+      criticalHigh: 80,
+      lowNote: 'Normal aralıkta.',
+      highNote:
+          'Vücutta iltihabi veya romatizmal süreçlere eşlik edebilir; CRP ile birlikte hekim tarafından değerlendirilir.',
+      specialtyHint: 'Dahiliye',
+    ),
   ];
 
   static LabParameterSpec? specByCode(String code) {
@@ -593,6 +645,24 @@ class LabReportAnalyzer {
       if (spec.code == upper) return spec;
     }
     return null;
+  }
+
+  /// Returns core checkup parameters from [LabUnitConverter.coreCheckupCodes]
+  /// that were NOT present in the uploaded/entered [items], so the UI can
+  /// transparently tell elderly/general users "Not included in this report"
+  /// rather than leaving silent gaps.
+  static List<LabParameterSpec> findMissingCoreParameters(
+    List<LabTestItem> items,
+  ) {
+    final presentCodes = items.map((e) => e.code.toUpperCase()).toSet();
+    final missing = <LabParameterSpec>[];
+    for (final code in LabUnitConverter.coreCheckupCodes) {
+      if (!presentCodes.contains(code)) {
+        final spec = specByCode(code);
+        if (spec != null) missing.add(spec);
+      }
+    }
+    return missing;
   }
 
   /// Evaluates a single known parameter against its adult reference spec
@@ -644,7 +714,7 @@ class LabReportAnalyzer {
 
   /// Evaluates ANY extracted lab test row (known catalog OR custom/dynamic
   /// hospital parameter) into a normalized [LabTestItem] so cross-hospital
-  /// reports align automatically in the comparison table.
+  /// and cross-country reports align automatically in the comparison table.
   static LabTestItem evaluateExtractedItem({
     required String rawName,
     required double value,
@@ -657,11 +727,24 @@ class LabReportAnalyzer {
     final cleanUnit = (unit ?? '').trim();
 
     if (matchedSpec != null) {
+      // Automatically convert international SI units (mmol/L, g/L, umol/L,
+      // nmol/L, pmol/L, mmol/mol IFCC, /uL, BUN) into canonical conventional
+      // units so thresholds and cross-country comparisons stay 100% consistent.
+      final normalized = LabUnitConverter.normalizeToCanonical(
+        code: matchedSpec.code,
+        value: value,
+        rawUnit: cleanUnit,
+        canonicalUnit: matchedSpec.unit,
+        rawName: cleanName,
+        refMin: refMin,
+        refMax: refMax,
+      );
+
       // Special clinical safeguard for HDL: many Turkish e-Nabız reports print
       // "< 50 *" as the risk flag threshold rather than an upper limit (HDL < 50
       // is LOW for women, not high).
-      var adjMin = refMin;
-      var adjMax = refMax;
+      var adjMin = normalized.refMin;
+      var adjMax = normalized.refMax;
       if (matchedSpec.code == 'HDL' && adjMin == null && adjMax != null && adjMax <= 60) {
         adjMin = adjMax;
         adjMax = null;
@@ -669,8 +752,8 @@ class LabReportAnalyzer {
 
       return evaluateKnownParameter(
         spec: matchedSpec,
-        value: value,
-        customUnit: cleanUnit.isNotEmpty ? cleanUnit : null,
+        value: normalized.value,
+        customUnit: normalized.unit.isNotEmpty ? normalized.unit : null,
         customRefMin: adjMin,
         customRefMax: adjMax,
       );
@@ -826,7 +909,7 @@ class LabReportAnalyzer {
   static bool _looksLikeStandaloneTestLabel(String line) {
     if (line.length < 2 || line.length > 56) return false;
     if (_isUnitToken(line)) return false;
-    if (!RegExp(r'[A-Za-zÇĞİÖŞÜçğıöşü]').hasMatch(line)) return false;
+    if (!RegExp(r'\p{L}', unicode: true).hasMatch(line)) return false;
     final lower = _normalizeTr(line);
     const nonLabels = [
       'tarih',
@@ -844,6 +927,12 @@ class LabReportAnalyzer {
       'saglik tesisi',
       'tam kan (hemogram)',
       'hemogram',
+      'test',
+      'result',
+      'units',
+      'reference interval',
+      'reference range',
+      'flag',
     ];
     if (nonLabels.contains(lower)) return false;
     if (lower.startsWith('sayfa ') || lower.contains('enabiz')) return false;
@@ -882,11 +971,16 @@ class LabReportAnalyzer {
       'pg/ml',
       'pg',
       'fl',
+      'l/l',
       'mmol/l',
+      'mmol/mol',
       'umol/l',
+      'nmol/l',
+      'pmol/l',
       'meq/l',
       'mm/saat',
       'mm/h',
+      'mm/hr',
       'sn',
       'saniye',
       '10^3/mm^3',
@@ -897,6 +991,12 @@ class LabReportAnalyzer {
       '10^12/l',
       'k/ul',
       'm/ul',
+      'th/ul',
+      'mil/ul',
+      '/ul',
+      '/mm3',
+      '/mm^3',
+      'cells/ul',
       'ml/dk/1.73',
       'ml/dk/1.73m2',
       'ml/min/1.73m2',
@@ -939,6 +1039,13 @@ class LabReportAnalyzer {
       'tarih:',
       'doktor',
       'hekim',
+      'patient name',
+      'date of birth',
+      'dob:',
+      'accession',
+      'page ',
+      'collected:',
+      'reported:',
     ];
     for (final prefix in skipPrefixes) {
       if (lower.startsWith(prefix)) return true;
@@ -957,15 +1064,19 @@ class LabReportAnalyzer {
     if (RegExp(r'^\d{2}:\d{2}(?::\d{2})?$').hasMatch(line)) return true;
     if (RegExp(r'^0\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2}$').hasMatch(line)) return true;
 
-    // Must contain at least one letter AND one digit to be a test result row
-    if (!RegExp(r'[a-zA-ZçğıöşüÇĞİÖŞÜ]').hasMatch(line)) return true;
+    // Must contain at least one Unicode letter AND one digit to be a test result row
+    if (!RegExp(r'\p{L}', unicode: true).hasMatch(line)) return true;
     if (!RegExp(r'\d').hasMatch(line)) return true;
 
     return false;
   }
 
-  /// Parses a general hospital table row in ANY layout:
-  ///   `<TestName> [:|=] <Value> [<Unit>] [<RefRange>]`
+  /// Parses a general hospital table row in ANY international layout:
+  ///   - Turkey e-Nabız: `Hemoglobin 13,8 g/dL 12,0 - 16,5`
+  ///   - USA Quest/LabCorp: `Glucose 142 H mg/dL 70-99` / `Platelets 245,000 /uL 150,000-450,000`
+  ///   - UK NHS / SI: `Haemoglobin 138 g/L (120 - 160)` / `HbA1c 42 mmol/mol (< 48)`
+  ///   - Germany / EU: `Glukose 5,4 mmol/L [3,9 - 5,5]`
+  ///   - Russia / Arabic / Chinese: `Гемоглобин 135 г/л 120-160`, `血糖 5.6 mmol/L 3.9-6.1`
   static ({
     String name,
     double value,
@@ -982,34 +1093,70 @@ class LabReportAnalyzer {
         .replaceFirst(RegExp(r'^[✓✔!•\-\*]+\s*'), '')
         .trim();
 
-    // Match: <name> followed by whitespace or ':'/'=' and a standalone numeric result
-    // Name can contain letters, spaces, #, %, -, /, (, ), digits like B12, HbA1c, 25-OH
+    // Normalize thousands-separated integers like "245,000" or "6,500" -> "245000"
+    // WITHOUT touching European/Turkish decimal commas like "0,282" or "13,8".
+    final usesCommaDecimals = RegExp(r'(?<!\d)0,\d|(?<!\d)\d+,\d{1,2}(?!\d)').hasMatch(cleaned);
+    if (!usesCommaDecimals) {
+      cleaned = cleaned.replaceAllMapped(
+        RegExp(r'(?<!\d)([1-9]\d{0,2}),(\d{3})(?!\d)'),
+        (m) => '${m.group(1)}${m.group(2)}',
+      );
+    }
+
+    // Match: <Unicode name> followed by whitespace or ':'/'=' and a standalone numeric result
     final rowRegex = RegExp(
-      r'^([A-Za-zÇĞİÖŞÜçğıöşü0-9#%().,/\-\s]+?)(?:\s*[:=]\s*|\s+)(-?\d+(?:[.,]\d+)?)(?:\s+(.*))?$',
+      r'^([\p{L}0-9#%().,/\-\s]+?)(?:\s*[:=]\s*|\s+)(-?\d+(?:[.,]\d+)?)(?:\s+(.*))?$',
+      unicode: true,
     );
     final match = rowRegex.firstMatch(cleaned);
     if (match == null) return null;
 
     final rawName = (match.group(1) ?? '').trim();
     final rawVal = (match.group(2) ?? '').replaceAll(',', '.');
-    final tail = (match.group(3) ?? '').trim();
+    var tail = (match.group(3) ?? '').trim();
 
     if (rawName.length < 2 || rawName.length > 56) return null;
     if (_isUnitToken(rawName)) return null;
-    if (!RegExp(r'[A-Za-zÇĞİÖŞÜçğıöşü]').hasMatch(rawName)) return null;
+    if (!RegExp(r'\p{L}', unicode: true).hasMatch(rawName)) return null;
     // Reject dates mistakenly split as "07.05" + "2026"
     if (RegExp(r'^\d+[./-]\d+$').hasMatch(rawName)) return null;
 
     final value = double.tryParse(rawVal);
     if (value == null) return null;
 
-    // Extract reference range from tail (either "min - max", "< max", or "> min")
+    // Strip leading Quest/LabCorp/EU abnormal flag between value & unit
+    // e.g. "H mg/dL 70-99", "HIGH mg/dL (70-99)", "↑ mmol/L 3.9-5.5"
+    tail = tail
+        .replaceFirst(
+          RegExp(
+            r'^(?:\(?(?:H|L|HH|LL|HIGH|LOW|CRIT|ABNORMAL|Yüksek|Düşük|Yuksek|Dusuk|Выше|Ниже)\)?|[↑↓\*]+)\s+',
+            caseSensitive: false,
+          ),
+          '',
+        )
+        .trim();
+
+    // Strip trailing abnormal flag after reference range
+    tail = tail
+        .replaceFirst(
+          RegExp(
+            r'\s+(?:\(?(?:H|L|HH|LL|HIGH|LOW|Normal|Yüksek|Düşük|Yuksek|Dusuk|Выше|Ниже)\)?|[↑↓\*]+)$',
+            caseSensitive: false,
+          ),
+          '',
+        )
+        .trim();
+
+    // Extract reference range from tail:
+    // supports "min - max", "(min - max)", "[min - max]", "min to max", "min..max",
+    // "< max", "(< max)", "> min", "(>= min)"
     double? refMin;
     double? refMax;
     var unitPart = tail;
 
     final rangeMatch = RegExp(
-      r'(-?\d+(?:[.,]\d+)?)\s*[-–—]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+      r'[\(\[]?\s*(-?\d+(?:[.,]\d+)?)\s*(?:[-–—]|\.\.|\bto\b)\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*[\)\]]?\s*$',
+      caseSensitive: false,
     ).firstMatch(tail);
     if (rangeMatch != null) {
       refMin = double.tryParse(rangeMatch.group(1)!.replaceAll(',', '.'));
@@ -1017,14 +1164,14 @@ class LabReportAnalyzer {
       unitPart = tail.substring(0, rangeMatch.start).trim();
     } else {
       final upperMatch = RegExp(
-        r'[<≤]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+        r'[\(\[]?\s*(?:<=?|[<≤])\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*[\)\]]?\s*$',
       ).firstMatch(tail);
       if (upperMatch != null) {
         refMax = double.tryParse(upperMatch.group(1)!.replaceAll(',', '.'));
         unitPart = tail.substring(0, upperMatch.start).trim();
       } else {
         final lowerMatch = RegExp(
-          r'[>≥]\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*$',
+          r'[\(\[]?\s*(?:>=?|[>≥])\s*(-?\d+(?:[.,]\d+)?)\s*\*?\s*[\)\]]?\s*$',
         ).firstMatch(tail);
         if (lowerMatch != null) {
           refMin = double.tryParse(lowerMatch.group(1)!.replaceAll(',', '.'));
@@ -1033,9 +1180,25 @@ class LabReportAnalyzer {
       }
     }
 
-    // Clean trailing status markers like "H", "L", "*", "Normal", "Yüksek", "Düşük"
+    // Clean any remaining status markers or Cyrillic unit equivalents
     unitPart = unitPart
-        .replaceAll(RegExp(r'\s+(?:H|L|HH|LL|\*|Normal|Yüksek|Düşük|Yuksek|Dusuk)$', caseSensitive: false), '')
+        .replaceAll(
+          RegExp(
+            r'\s+(?:H|L|HH|LL|HIGH|LOW|\*|↑|↓|Normal|Yüksek|Düşük|Yuksek|Dusuk)$',
+            caseSensitive: false,
+          ),
+          '',
+        )
+        .replaceAll('г/л', 'g/L')
+        .replaceAll('г/дл', 'g/dL')
+        .replaceAll('ммоль/л', 'mmol/L')
+        .replaceAll('мкмоль/л', 'umol/L')
+        .replaceAll('нмоль/л', 'nmol/L')
+        .replaceAll('пмоль/л', 'pmol/L')
+        .replaceAll('мг/дл', 'mg/dL')
+        .replaceAll('мг/л', 'mg/L')
+        .replaceAll('Ед/л', 'U/L')
+        .replaceAll('ед/л', 'U/L')
         .trim();
 
     // If neither a known catalog match NOR a unit NOR a reference range exists,
@@ -1056,21 +1219,11 @@ class LabReportAnalyzer {
 
   static LabTestItem? _parseKnownAliasFallback(String line) {
     final lower = _normalizeTr(line);
-    final aliasPairs = <(String alias, LabParameterSpec spec)>[];
-    for (final spec in catalog) {
-      for (final alias in spec.aliases) {
-        aliasPairs.add((_normalizeTr(alias), spec));
-      }
-    }
-    aliasPairs.sort((a, b) => b.$1.length.compareTo(a.$1.length));
+    final aliasPairs = _allAliasPairs();
 
     final numRegex = RegExp(r'(-?\d+(?:[.,]\d+)?)');
     for (final (normAlias, spec) in aliasPairs) {
-      final match = RegExp(
-        '(^|[^a-z0-9#%])'
-        '${RegExp.escape(normAlias)}'
-        '([^a-z0-9#%]|\$)',
-      ).firstMatch(lower);
+      final match = _matchAliasWithBoundaries(lower, normAlias);
       if (match == null) continue;
 
       final afterAlias = line.substring(match.end);
@@ -1085,6 +1238,37 @@ class LabReportAnalyzer {
     return null;
   }
 
+  static List<(String alias, LabParameterSpec spec)> _allAliasPairs() {
+    final aliasPairs = <(String alias, LabParameterSpec spec)>[];
+    for (final spec in catalog) {
+      for (final alias in spec.aliases) {
+        aliasPairs.add((_normalizeTr(alias), spec));
+      }
+      final intlAliases = LabUnitConverter.multilingualAliases[spec.code];
+      if (intlAliases != null) {
+        for (final alias in intlAliases) {
+          aliasPairs.add((_normalizeTr(alias), spec));
+        }
+      }
+    }
+    aliasPairs.sort((a, b) => b.$1.length.compareTo(a.$1.length));
+    return aliasPairs;
+  }
+
+  static RegExpMatch? _matchAliasWithBoundaries(String normText, String normAlias) {
+    // Non-Latin scripts (Chinese/Arabic) may not use ASCII word spaces around names.
+    final isNonLatin = RegExp(r'[\u0600-\u06FF\u4E00-\u9FFF]').hasMatch(normAlias);
+    if (isNonLatin) {
+      return RegExp(RegExp.escape(normAlias)).firstMatch(normText);
+    }
+    return RegExp(
+      r'(^|[^\p{L}0-9#%])'
+      '${RegExp.escape(normAlias)}'
+      r'([^\p{L}0-9#%]|$)',
+      unicode: true,
+    ).firstMatch(normText);
+  }
+
   static LabParameterSpec? _matchCatalogSpec(String rawName) {
     final norm = _normalizeTr(rawName)
         .replaceAll(RegExp(r'\s+'), ' ')
@@ -1094,29 +1278,16 @@ class LabReportAnalyzer {
     // Keep "LDL Kolesterol(Hesaplama)" distinct from direct "LDL Kolesterol"
     if (norm.contains('hesaplama')) return null;
 
-    // 1. Exact alias match first
-    for (final spec in catalog) {
-      for (final alias in spec.aliases) {
-        if (norm == _normalizeTr(alias)) return spec;
-      }
-    }
+    final aliasPairs = _allAliasPairs();
 
-    // 2. Word-boundary longest alias match (respecting # and % suffixes!)
-    final aliasPairs = <(String alias, LabParameterSpec spec)>[];
-    for (final spec in catalog) {
-      for (final alias in spec.aliases) {
-        aliasPairs.add((_normalizeTr(alias), spec));
-      }
-    }
-    aliasPairs.sort((a, b) => b.$1.length.compareTo(a.$1.length));
-
+    // 1. Exact alias match first (catalog + international aliases)
     for (final (normAlias, spec) in aliasPairs) {
-      final match = RegExp(
-        '(^|[^a-z0-9#%])'
-        '${RegExp.escape(normAlias)}'
-        '([^a-z0-9#%]|\$)',
-      ).firstMatch(norm);
-      if (match != null) return spec;
+      if (norm == normAlias) return spec;
+    }
+
+    // 2. Boundary-aware longest alias match (respecting # and % suffixes!)
+    for (final (normAlias, spec) in aliasPairs) {
+      if (_matchAliasWithBoundaries(norm, normAlias) != null) return spec;
     }
 
     return null;

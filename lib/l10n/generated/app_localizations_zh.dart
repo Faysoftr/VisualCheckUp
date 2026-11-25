@@ -1317,4 +1317,166 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metricBristolScale => '布里斯托量表';
+
+  @override
+  String get hubStartNewScan => '开始新扫描';
+
+  @override
+  String get hubPickFromGallery => '相册';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return '历史记录 ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => '总检查次数';
+
+  @override
+  String get hubLastScanLabel => '最近检查';
+
+  @override
+  String get hubLatestStatusLabel => '最新状态';
+
+  @override
+  String get hubFilterAll => '全部';
+
+  @override
+  String get hubFilterAttention => '关注 / 紧急';
+
+  @override
+  String get hubFilterWithPhoto => '含照片';
+
+  @override
+  String get hubColPhoto => '照片';
+
+  @override
+  String get hubColDate => '日期';
+
+  @override
+  String get hubColFinding => '结果与摘要';
+
+  @override
+  String get hubColStatus => '状态';
+
+  @override
+  String get hubCompareModeBtn => '对比两次记录';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return '从表格中选择 2 条记录进行并排对比 ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => '并排对比';
+
+  @override
+  String get hubCompareCancelBtn => '取消';
+
+  @override
+  String get hubCompareSheetTitle => '历史记录并排对比';
+
+  @override
+  String get hubCompareOlderLabel => '较早';
+
+  @override
+  String get hubCompareNewerLabel => '较新';
+
+  @override
+  String get hubCompareMetricsTitle => '临床指标对比';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return '暂无 $category 扫描记录';
+  }
+
+  @override
+  String get hubEmptySubtitle => '点击上方开始首次扫描。每次检查都会连同缩略图与完整分析报告按日期保存在此处。';
+
+  @override
+  String get hubDoctorSummaryBtn => '医生摘要';
+
+  @override
+  String get photoTapToZoomHint => '点击照片全屏缩放查看';
+
+  @override
+  String get photoZoomTitle => '拍摄照片';
+
+  @override
+  String get resultDeleteRecordTooltip => '删除记录';
+
+  @override
+  String get resultDeleteConfirmTitle => '删除此条检查记录？';
+
+  @override
+  String get resultDeleteConfirmBody => '此检查记录将从本地历史记录中永久删除。';
+
+  @override
+  String get resultDeleteBtn => '删除';
+
+  @override
+  String get labLargeTextBtn => '大字模式';
+
+  @override
+  String get labLargeTextOnBtn => '大字模式：已开启';
+
+  @override
+  String get labSeniorOverviewTitle => '您的报告简明总结';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '有 $count 项指标在正常参考范围内。';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '有 $count 项指标超出参考范围——下方有通俗易懂的逐条说明。';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '有 $count 项指标明显偏离正常值——请尽快带报告咨询医生。';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '有 $count 项常见基础检查未包含在本次报告中。';
+  }
+
+  @override
+  String get labAttentionSectionTitle => '需要重点关注的指标';
+
+  @override
+  String get labNormalSectionTitle => '正常的指标（请放心）';
+
+  @override
+  String get labMissingSectionTitle => '本次报告未包含的基础项目';
+
+  @override
+  String get labMissingSectionExplain =>
+      '并非每次抽血都会检查所有项目。以下常见基础指标不在本次报告内，因此未作评估。';
+
+  @override
+  String get labNotInReportBadge => '报告中未包含';
+
+  @override
+  String get labWhatItMeansLabel => '这是什么意思？';
+
+  @override
+  String get labWhatToDoLabel => '建议怎么做？';
+
+  @override
+  String get labAddAnotherPageBtn => '拍摄下一页';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '已读取 $count 页';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      '已添加报告照片。如需自动识别纸质报告照片，请在设置中开启云端 AI，或在下方手动输入数值。';
+
+  @override
+  String get labAllValuesNormalMsg => '本次报告记录的所有指标均在正常参考范围内。';
 }

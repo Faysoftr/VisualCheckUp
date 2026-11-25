@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:visualcheckup/core/ai/gemini_vision_ai_client.dart';
-import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
@@ -13,7 +11,7 @@ import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
-import 'package:visualcheckup/features/checkup/presentation/screens/camera_check_screen.dart';
+import 'package:visualcheckup/features/checkup/presentation/screens/category_hub_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/history_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/quick_color_card_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
@@ -155,38 +153,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openCategory(CheckCategory category) async {
-    if (category == CheckCategory.skinCondition) {
-      await Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => SkinCheckScreen(
-            historyRepository: widget.historyRepository,
-          ),
-        ),
-      );
-      await _loadDashboardData();
-      return;
-    }
-
-    if (category.supportsQuickColorCard) {
-      await _showColorCardOrCameraChoice(category);
-      return;
-    }
-
-    await _openCameraFor(category);
-  }
-
-  Future<void> _openCameraFor(CheckCategory category) async {
-    final hybridAnalyzer = HybridHealthAnalyzer(
-      fallbackAnalyzer: widget.analyzer,
-      aiClient: GeminiVisionAiClient.fromEnvironment(),
-      cacheRepository: widget.historyRepository,
-    );
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => CameraCheckScreen(
+        builder: (_) => CategoryHubScreen(
           category: category,
-          analyzer: hybridAnalyzer,
           historyRepository: widget.historyRepository,
+          analyzer: widget.analyzer,
+          labsVitalsRepository: _labsVitalsRepository,
         ),
       ),
     );
@@ -204,98 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     await _loadDashboardData();
-  }
-
-  Future<void> _showColorCardOrCameraChoice(CheckCategory category) async {
-    final choice = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      useSafeArea: true,
-      builder: (sheetContext) {
-        final theme = Theme.of(sheetContext);
-        final colorScheme = theme.colorScheme;
-        final sheetL10n = sheetContext.l10n;
-        return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  sheetL10n.checkMethodTitle(
-                    category.localizedTitle(sheetL10n),
-                  ),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sheetL10n.checkMethodSubtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Card(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.4),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: colorScheme.primary,
-                      child: const Icon(
-                        Icons.palette_outlined,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      sheetL10n.colorCardRecommendedTitle,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    subtitle: Text(
-                      sheetL10n.colorCardRecommendedSubtitle,
-                    ),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.of(sheetContext).pop('card'),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.photo_camera_outlined,
-                        color: colorScheme.onSurface,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      sheetL10n.cameraMeasureTitle,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      sheetL10n.cameraMeasureSubtitle,
-                    ),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.of(sheetContext).pop('camera'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    if (!mounted || choice == null) return;
-    if (choice == 'card') {
-      await _openQuickColorCard(category);
-    } else if (choice == 'camera') {
-      await _openCameraFor(category);
-    }
   }
 
   Future<void> _openQuickColorCardPicker() async {

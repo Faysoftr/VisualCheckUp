@@ -7,6 +7,7 @@ import 'package:visualcheckup/features/labs_vitals/data/gemini_lab_report_extrac
 import 'package:visualcheckup/features/labs_vitals/data/lab_document_picker.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_analyzer.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
+import 'package:visualcheckup/features/labs_vitals/data/lab_unit_converter.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/presentation/widgets/trend_sparkline_card.dart';
@@ -82,380 +83,10 @@ class _LabReportsScreenState extends State<LabReportsScreen> {
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (sheetContext) {
-        final theme = Theme.of(sheetContext);
-        final colorScheme = theme.colorScheme;
-        final l10n = sheetContext.l10n;
-        final df = DateFormat('dd.MM.yyyy');
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.88,
-          minChildSize: 0.55,
-          maxChildSize: 0.96,
-          builder: (_, scrollController) => ListView(
-            controller: scrollController,
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: colorScheme.primaryContainer,
-                    child: Icon(
-                      Icons.biotech_outlined,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          report.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        Text(
-                          '${df.format(report.reportDate)} • ${report.source.localizedLabel(l10n)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (report.hasAttachment) ...[
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Chip(
-                    avatar: Icon(
-                      report.attachmentMimeType == 'application/pdf'
-                          ? Icons.picture_as_pdf_outlined
-                          : Icons.image_outlined,
-                      size: 16,
-                      color: colorScheme.primary,
-                    ),
-                    label: Text(report.attachmentFileName!),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 12),
-              Card(
-                color: report.hasCritical
-                    ? const Color(0xFFFFF4F4)
-                    : colorScheme.primaryContainer.withValues(alpha: 0.35),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        report.overallSummary,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.local_hospital_outlined,
-                            size: 16,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              l10n.recommendedSpecialtyLabel(
-                                report.suggestedSpecialty,
-                              ),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (report.hospitalDiagnosis != null ||
-                  report.userComplaintNote != null) ...[
-                const SizedBox(height: 12),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (report.hospitalDiagnosis != null) ...[
-                          Text(
-                            l10n.labEnteredDiagnosisTitle,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            report.hospitalDiagnosis!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                        if (report.hospitalDiagnosis != null &&
-                            report.userComplaintNote != null)
-                          const Divider(height: 18),
-                        if (report.userComplaintNote != null) ...[
-                          Text(
-                            l10n.labEnteredComplaintTitle,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            report.userComplaintNote!,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              if (report.contextualInterpretation != null &&
-                  report.contextualInterpretation!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.auto_awesome_outlined,
-                              size: 19,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                l10n.labInterpretationTitle,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          report.contextualInterpretation!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              if (report.items.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Text(
-                  l10n.labDetailParamsTitle(report.items.length),
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _ReportComparisonSummaryTable(
-                  report: report,
-                  previousReport: _findPreviousReport(report),
-                ),
-                const SizedBox(height: 10),
-                for (final item in report.items)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    item.name,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 9,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: item.status.color
-                                        .withValues(alpha: 0.14),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    item.status.localizedLabel(l10n),
-                                    style: TextStyle(
-                                      color: item.status.color,
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Text(
-                                  item.formattedValue,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: item.status.color,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    'Ref: ${item.referenceRangeText}',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              item.note,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                height: 1.38,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-              if (report.followUpQuestions.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.help_outline_rounded,
-                              size: 19,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                l10n.questionsForDoctorTitle,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        for (final q in report.followUpQuestions)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Text(
-                              '• $q',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                height: 1.38,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 10),
-              Text(
-                l10n.disclaimerShort,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 14),
-              FilledButton.icon(
-                onPressed: () async {
-                  try {
-                    await LabReportPdfGenerator.saveAndShareSummaryPdf(
-                      report: report,
-                      previousReport: _findPreviousReport(report),
-                    );
-                  } catch (e) {
-                    if (sheetContext.mounted) {
-                      ScaffoldMessenger.of(sheetContext).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.cameraAnalysisFailed(e.toString())),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: Text(l10n.labExportPdfBtn),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await Clipboard.setData(
-                    ClipboardData(
-                      text: LabReportAnalyzer.formatReportForDoctor(report),
-                    ),
-                  );
-                  if (sheetContext.mounted) {
-                    ScaffoldMessenger.of(sheetContext).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.labSummaryCopied),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.copy_rounded, size: 18),
-                label: Text(l10n.labCopyDoctorSummaryBtn),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (_) => _SeniorFriendlyLabReportDetailSheet(
+        report: report,
+        previousReport: _findPreviousReport(report),
+      ),
     );
   }
 
@@ -803,6 +434,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
   LabParameterSpec _selectedSpec = LabReportAnalyzer.catalog.first;
   final Map<String, LabTestItem> _itemsByCode = <String, LabTestItem>{};
   PickedLabDocument? _attachedDocument;
+  int _scannedPagesCount = 0;
   String? _parseFeedback;
   bool _pickingFile = false;
   bool _readingDocument = false;
@@ -902,6 +534,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
     final defaultTitle = l10n.labDefaultReportTitle;
     setState(() {
       _attachedDocument = doc;
+      _scannedPagesCount += 1;
       _source = doc.isPdf ? LabReportSource.pdfUpload : LabReportSource.photoScan;
       _readingDocument = true;
       _parseFeedback = l10n.cameraAnalyzing;
@@ -931,15 +564,14 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
               ? ' • ${DateFormat('dd.MM.yyyy').format(parsed.detectedDate!)}'
               : '';
           feedback = l10n.localeName == 'tr'
-              ? 'PDF okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.'
-              : '${doc.badgeLabel} (${doc.fileName}$dateInfo): ${l10n.labParamsCount(extractedCount)}';
+              ? 'PDF okundu (${doc.fileName}$dateInfo): ${_itemsByCode.length} tahlil değeri tabloya aktarıldı.'
+              : '${doc.badgeLabel} (${doc.fileName}$dateInfo): ${l10n.labParamsCount(_itemsByCode.length)}';
         }
       }
     }
 
-    // 2. Universal AI Document/Vision fallback when PDF is scanned (0 items),
-    //    sparse (< 3 items on a multi-line hospital doc), or an image/photo is
-    //    uploaded and Gemini AI is available.
+    // 2. Universal AI Document/Vision extraction for photographed paper reports,
+    //    scanned PDFs (0 items), or sparse PDFs (< 3 items).
     if ((extractedCount == 0 || (doc.isPdf && extractedCount < 3)) &&
         widget.aiExtractor.isAvailable) {
       try {
@@ -952,21 +584,23 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
             _titleController.text.trim() == defaultTitle) {
           _titleController.text = aiResult.hospitalName!;
         }
-        if (aiResult.items.length > extractedCount) {
+        if (aiResult.items.isNotEmpty) {
           for (final item in aiResult.items) {
             _itemsByCode[item.code] = item;
           }
-          extractedCount = _itemsByCode.length;
+          extractedCount = aiResult.items.length;
           final dateInfo = aiResult.detectedDate != null
               ? ' • ${DateFormat('dd.MM.yyyy').format(aiResult.detectedDate!)}'
               : '';
           feedback = l10n.localeName == 'tr'
-              ? 'Yapay Zeka ile okundu (${doc.fileName}$dateInfo): $extractedCount tahlil değeri tabloya aktarıldı.'
-              : 'AI (${doc.fileName}$dateInfo): ${l10n.labParamsCount(extractedCount)}';
+              ? 'Yapay Zeka ile okundu (${doc.fileName}$dateInfo): toplam ${_itemsByCode.length} tahlil değeri tabloya aktarıldı.'
+              : 'AI (${doc.fileName}$dateInfo): ${l10n.labParamsCount(_itemsByCode.length)}';
         }
       } catch (_) {
         // Keep base file-loaded feedback so user can enter values or notes.
       }
+    } else if (doc.isImage && extractedCount == 0 && !widget.aiExtractor.isAvailable) {
+      feedback = l10n.labPhotoOfflineHint;
     }
 
     if (!mounted) return;
@@ -1003,7 +637,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
       setState(() {
         _readingDocument = false;
         _parseFeedback =
-            'AI (${doc.fileName}): ${l10n.labParamsCount(aiResult.items.length)}';
+            'AI (${doc.fileName}): ${l10n.labParamsCount(_itemsByCode.length)}';
       });
     } catch (e) {
       if (!mounted) return;
@@ -1139,13 +773,19 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
                           ),
                           label: Text(l10n.labUploadPdfJpgBtn),
                         ),
-                        OutlinedButton.icon(
+                        FilledButton.icon(
+                          key: const Key('lab_camera_scan_btn'),
                           onPressed: _pickingFile ? null : _pickCameraReport,
                           icon: const Icon(
                             Icons.photo_camera_outlined,
                             size: 18,
                           ),
-                          label: Text(l10n.labCameraCaptureBtn),
+                          label: Text(
+                            _scannedPagesCount > 0 &&
+                                    _attachedDocument?.isImage == true
+                                ? l10n.labAddAnotherPageBtn
+                                : l10n.labCameraCaptureBtn,
+                          ),
                         ),
                       ],
                     ),
@@ -1165,12 +805,16 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
                               color: colorScheme.primary,
                             ),
                             label: Text(
-                              '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
+                              _scannedPagesCount > 1
+                                  ? '${l10n.labPagesReadBadge(_scannedPagesCount)} • ${_attachedDocument!.fileName}'
+                                  : '${_attachedDocument!.badgeLabel} • ${_attachedDocument!.fileName}',
                             ),
                             onDeleted: _readingDocument
                                 ? null
-                                : () =>
-                                    setState(() => _attachedDocument = null),
+                                : () => setState(() {
+                                      _attachedDocument = null;
+                                      _scannedPagesCount = 0;
+                                    }),
                           ),
                           if (widget.aiExtractor.isAvailable)
                             ActionChip(
@@ -1197,6 +841,7 @@ class _AddLabReportSheetState extends State<_AddLabReportSheet> {
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.w600,
+                          height: 1.38,
                         ),
                       ),
                     ],
@@ -1609,7 +1254,14 @@ class _MultiReportComparisonTable extends StatelessWidget {
                 for (final byCode in itemsByReport)
                   DataCell(
                     byCode[trend.code] == null
-                        ? const Text('—')
+                        ? Text(
+                            l10n.labNotInReportBadge,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          )
                         : Text(
                             _fmtCompact(byCode[trend.code]!.value),
                             style: TextStyle(
@@ -1634,6 +1286,853 @@ class _MultiReportComparisonTable extends StatelessWidget {
               ],
             );
           }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Elderly-friendly, uncluttered, bullet-by-bullet lab report detail sheet.
+///
+/// Features a one-tap Large Text (`Aa+`) readability toggle, an at-a-glance
+/// bulleted summary, out-of-range parameters explained first in plain everyday
+/// language ("What it means" + "What you can do"), a calm green normal-values
+/// list, an explicit "Not Included in This Report" section for absent core
+/// tests, a comparison table, numbered doctor questions, and PDF/Copy export.
+class _SeniorFriendlyLabReportDetailSheet extends StatefulWidget {
+  const _SeniorFriendlyLabReportDetailSheet({
+    required this.report,
+    required this.previousReport,
+  });
+
+  final LabReportRecord report;
+  final LabReportRecord? previousReport;
+
+  @override
+  State<_SeniorFriendlyLabReportDetailSheet> createState() =>
+      _SeniorFriendlyLabReportDetailSheetState();
+}
+
+class _SeniorFriendlyLabReportDetailSheetState
+    extends State<_SeniorFriendlyLabReportDetailSheet> {
+  bool _largeText = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final report = widget.report;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
+    final df = DateFormat('dd.MM.yyyy');
+    final media = MediaQuery.of(context);
+
+    final criticalItems =
+        report.items.where((i) => i.status.isCritical).toList();
+    final abnormalItems =
+        report.items.where((i) => i.status.isAbnormal).toList()
+          ..sort((a, b) => (b.status.isCritical ? 1 : 0)
+              .compareTo(a.status.isCritical ? 1 : 0));
+    final normalItems =
+        report.items.where((i) => !i.status.isAbnormal).toList();
+    final missingCore = LabReportAnalyzer.findMissingCoreParameters(
+      report.items,
+    );
+
+    return MediaQuery(
+      data: media.copyWith(
+        textScaler: TextScaler.linear(_largeText ? 1.22 : 1.0),
+      ),
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.90,
+        minChildSize: 0.55,
+        maxChildSize: 0.97,
+        builder: (_, scrollController) => ListView(
+          controller: scrollController,
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+          children: [
+            // Header + One-Tap Large Text Toggle (Aa+)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundColor: colorScheme.primaryContainer,
+                  child: Icon(
+                    Icons.biotech_outlined,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        report.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${df.format(report.reportDate)} • ${report.source.localizedLabel(l10n)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                FilterChip(
+                  key: const Key('lab_large_text_toggle'),
+                  avatar: const Icon(Icons.text_fields_rounded, size: 16),
+                  label: Text(
+                    _largeText
+                        ? l10n.labLargeTextOnBtn
+                        : l10n.labLargeTextBtn,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  selected: _largeText,
+                  onSelected: (v) => setState(() => _largeText = v),
+                ),
+              ],
+            ),
+
+            if (report.hasAttachment) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Chip(
+                  avatar: Icon(
+                    report.attachmentMimeType == 'application/pdf'
+                        ? Icons.picture_as_pdf_outlined
+                        : Icons.image_outlined,
+                    size: 16,
+                    color: colorScheme.primary,
+                  ),
+                  label: Text(report.attachmentFileName!),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 12),
+
+            // 1. Senior-Friendly At-a-Glance Bulleted Overview Card
+            Card(
+              color: report.hasCritical
+                  ? const Color(0xFFFFF2F2)
+                  : colorScheme.primaryContainer.withValues(alpha: 0.35),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          report.hasCritical
+                              ? Icons.priority_high_rounded
+                              : Icons.fact_check_outlined,
+                          color: report.hasCritical
+                              ? const Color(0xFFC93B3B)
+                              : colorScheme.primary,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.labSeniorOverviewTitle,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    if (report.items.isNotEmpty) ...[
+                      if (criticalItems.isNotEmpty)
+                        _SummaryBulletRow(
+                          icon: Icons.warning_amber_rounded,
+                          color: const Color(0xFFC93B3B),
+                          text: l10n
+                              .labSeniorCriticalBullet(criticalItems.length),
+                        ),
+                      if (abnormalItems.isNotEmpty)
+                        _SummaryBulletRow(
+                          icon: Icons.info_outline_rounded,
+                          color: const Color(0xFFD9822B),
+                          text: l10n
+                              .labSeniorAbnormalBullet(abnormalItems.length),
+                        ),
+                      if (normalItems.isNotEmpty)
+                        _SummaryBulletRow(
+                          icon: Icons.check_circle_outline_rounded,
+                          color: const Color(0xFF1B8A5A),
+                          text: l10n.labSeniorNormalBullet(normalItems.length),
+                        ),
+                      if (missingCore.isNotEmpty)
+                        _SummaryBulletRow(
+                          icon: Icons.assignment_late_outlined,
+                          color: colorScheme.onSurfaceVariant,
+                          text:
+                              l10n.labSeniorMissingBullet(missingCore.length),
+                        ),
+                      const Divider(height: 18),
+                    ],
+                    Text(
+                      report.overallSummary,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.45,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.local_hospital_outlined,
+                          size: 18,
+                          color: colorScheme.primary,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            l10n.recommendedSpecialtyLabel(
+                              report.suggestedSpecialty,
+                            ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Optional Hospital Diagnosis & Complaint Card
+            if (report.hospitalDiagnosis != null ||
+                report.userComplaintNote != null) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (report.hospitalDiagnosis != null) ...[
+                        Text(
+                          l10n.labEnteredDiagnosisTitle,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          report.hospitalDiagnosis!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                      if (report.hospitalDiagnosis != null &&
+                          report.userComplaintNote != null)
+                        const Divider(height: 18),
+                      if (report.userComplaintNote != null) ...[
+                        Text(
+                          l10n.labEnteredComplaintTitle,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          report.userComplaintNote!,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
+            // Plain-Language Contextual Interpretation (split cleanly into readable bullets)
+            if (report.contextualInterpretation != null &&
+                report.contextualInterpretation!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_outlined,
+                            size: 19,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.labInterpretationTitle,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      for (final line in report.contextualInterpretation!
+                          .split(RegExp(r'\n+'))
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 7),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (!line.startsWith('•'))
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 6,
+                                    right: 8,
+                                  ),
+                                  child: Icon(
+                                    Icons.circle,
+                                    size: 6,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              Expanded(
+                                child: Text(
+                                  line,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    height: 1.48,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
+            // 2. Attention / Out-of-Range Items FIRST (Plain Bulleted Cards)
+            if (report.items.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(
+                    abnormalItems.isEmpty
+                        ? Icons.verified_outlined
+                        : Icons.error_outline_rounded,
+                    color: abnormalItems.isEmpty
+                        ? const Color(0xFF1B8A5A)
+                        : const Color(0xFFD9822B),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.labAttentionSectionTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (abnormalItems.isEmpty)
+                Card(
+                  color: const Color(0xFF1B8A5A).withValues(alpha: 0.08),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: Color(0xFF1B8A5A),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            l10n.labAllValuesNormalMsg,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF166B46),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                for (final item in abnormalItems) ...[
+                  _SeniorAbnormalItemCard(item: item),
+                  const SizedBox(height: 10),
+                ],
+
+              // 3. Normal Values (Clean Bulleted Reassuring Card)
+              if (normalItems.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline_rounded,
+                      color: Color(0xFF1B8A5A),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.labNormalSectionTitle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF166B46),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var i = 0; i < normalItems.length; i++) ...[
+                          if (i > 0)
+                            Divider(
+                              height: 14,
+                              color: colorScheme.outlineVariant
+                                  .withValues(alpha: 0.45),
+                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 2),
+                                child: Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 16,
+                                  color: Color(0xFF1B8A5A),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      normalItems[i].name,
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Ref: ${normalItems[i].referenceRangeText}',
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                normalItems[i].formattedValue,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF1B8A5A),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
+              // 4. Core Tests NOT Included in This Report
+              if (missingCore.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Card(
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.45),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.assignment_late_outlined,
+                              size: 20,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.labMissingSectionTitle,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.labMissingSectionExplain,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final spec in missingCore)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: colorScheme.outlineVariant,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${spec.name} • ${l10n.labNotInReportBadge}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+
+            // Compact Comparison Summary Table
+            if (report.items.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Text(
+                l10n.labDetailParamsTitle(report.items.length),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _ReportComparisonSummaryTable(
+                report: report,
+                previousReport: widget.previousReport,
+              ),
+            ],
+
+            // Numbered Questions for Doctor
+            if (report.followUpQuestions.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.help_outline_rounded,
+                            size: 20,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.questionsForDoctorTitle,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      for (var i = 0; i < report.followUpQuestions.length; i++)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 11,
+                                backgroundColor: colorScheme.primaryContainer,
+                                child: Text(
+                                  '${i + 1}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  report.followUpQuestions[i],
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    height: 1.42,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 12),
+            Text(
+              l10n.disclaimerShort,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 14),
+            FilledButton.icon(
+              onPressed: () async {
+                try {
+                  await LabReportPdfGenerator.saveAndShareSummaryPdf(
+                    report: report,
+                    previousReport: widget.previousReport,
+                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.cameraAnalysisFailed(e.toString())),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: Text(l10n.labExportPdfBtn),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await Clipboard.setData(
+                  ClipboardData(
+                    text: LabReportAnalyzer.formatReportForDoctor(report),
+                  ),
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.labSummaryCopied),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.copy_rounded, size: 18),
+              label: Text(l10n.labCopyDoctorSummaryBtn),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryBulletRow extends StatelessWidget {
+  const _SummaryBulletRow({
+    required this.icon,
+    required this.color,
+    required this.text,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(icon, size: 19, color: color),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.38,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeniorAbnormalItemCard extends StatelessWidget {
+  const _SeniorAbnormalItemCard({required this.item});
+
+  final LabTestItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
+    final isLow =
+        item.status == LabStatus.low || item.status == LabStatus.criticalLow;
+
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: item.status.color.withValues(alpha: 0.35),
+          width: 1.2,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  isLow
+                      ? Icons.arrow_downward_rounded
+                      : Icons.arrow_upward_rounded,
+                  color: item.status.color,
+                  size: 20,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    item.name,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: item.status.color.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    item.status.localizedLabel(l10n),
+                    style: TextStyle(
+                      color: item.status.color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  item.formattedValue,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: item.status.color,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Ref: ${item.referenceRangeText}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 18),
+            Text(
+              '• ${l10n.labWhatItMeansLabel}',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              item.note,
+              style: theme.textTheme.bodyMedium?.copyWith(height: 1.42),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• ${l10n.labWhatToDoLabel}',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              LabUnitConverter.plainActionAdvice(item),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.42,
+              ),
+            ),
+          ],
         ),
       ),
     );

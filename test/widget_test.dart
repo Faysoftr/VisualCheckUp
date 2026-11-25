@@ -66,6 +66,11 @@ void main() {
       await tester.tap(find.text('Cilt Hastalıkları'));
       await tester.pumpAndSettle();
 
+      // CategoryHubScreen opens first with Start New Scan + Past Scans table.
+      expect(find.text('Yeni Tarama Başlat'), findsOneWidget);
+      await tester.tap(find.text('Yeni Tarama Başlat'));
+      await tester.pumpAndSettle();
+
       expect(find.text('Cilt Hastalıkları Ön Kontrol'), findsOneWidget);
       expect(find.text('Ben & Cilt Kanseri Risk'), findsOneWidget);
       expect(find.text('Siğil Ön Kontrol'), findsOneWidget);

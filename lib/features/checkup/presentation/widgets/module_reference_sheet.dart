@@ -4,6 +4,7 @@ import 'package:visualcheckup/features/checkup/data/module_reference_catalog.dar
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/module_reference.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/category_icon.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/clinical_visual_illustration.dart';
 
 /// Visual clinical reference atlas displaying illustrated healthy vs. abnormal
@@ -223,7 +224,11 @@ class _ReferenceContentState extends State<_ReferenceContent> {
       children: [
         Row(
           children: [
-            Icon(widget.category.icon, color: widget.category.accentColor),
+            CategoryIcon(
+              category: widget.category,
+              color: widget.category.accentColor,
+              size: 26,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

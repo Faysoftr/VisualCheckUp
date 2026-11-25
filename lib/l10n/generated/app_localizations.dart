@@ -2563,6 +2563,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bristol Scale'**
   String get metricBristolScale;
+
+  /// No description provided for @hubStartNewScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Start New Scan'**
+  String get hubStartNewScan;
+
+  /// No description provided for @hubPickFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get hubPickFromGallery;
+
+  /// No description provided for @hubPastScansTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Scans ({count})'**
+  String hubPastScansTitle(int count);
+
+  /// No description provided for @hubTotalScansLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Scans'**
+  String get hubTotalScansLabel;
+
+  /// No description provided for @hubLastScanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Scan'**
+  String get hubLastScanLabel;
+
+  /// No description provided for @hubLatestStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Status'**
+  String get hubLatestStatusLabel;
+
+  /// No description provided for @hubFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get hubFilterAll;
+
+  /// No description provided for @hubFilterAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention / Urgent'**
+  String get hubFilterAttention;
+
+  /// No description provided for @hubFilterWithPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'With Photo'**
+  String get hubFilterWithPhoto;
+
+  /// No description provided for @hubColPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get hubColPhoto;
+
+  /// No description provided for @hubColDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get hubColDate;
+
+  /// No description provided for @hubColFinding.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding & Summary'**
+  String get hubColFinding;
+
+  /// No description provided for @hubColStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get hubColStatus;
+
+  /// No description provided for @hubCompareModeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare 2 Scans'**
+  String get hubCompareModeBtn;
+
+  /// No description provided for @hubCompareSelectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select 2 scans from the table to compare side-by-side ({count}/2)'**
+  String hubCompareSelectHint(int count);
+
+  /// No description provided for @hubCompareActionBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Side-by-Side'**
+  String get hubCompareActionBtn;
+
+  /// No description provided for @hubCompareCancelBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get hubCompareCancelBtn;
+
+  /// No description provided for @hubCompareSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Side-by-Side Scan Comparison'**
+  String get hubCompareSheetTitle;
+
+  /// No description provided for @hubCompareOlderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get hubCompareOlderLabel;
+
+  /// No description provided for @hubCompareNewerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get hubCompareNewerLabel;
+
+  /// No description provided for @hubCompareMetricsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Metrics Comparison'**
+  String get hubCompareMetricsTitle;
+
+  /// No description provided for @hubEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No {category} scans yet'**
+  String hubEmptyTitle(String category);
+
+  /// No description provided for @hubEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your first scan above. Every check is saved chronologically here with its thumbnail photo and full analysis report.'**
+  String get hubEmptySubtitle;
+
+  /// No description provided for @hubDoctorSummaryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Summary'**
+  String get hubDoctorSummaryBtn;
+
+  /// No description provided for @photoTapToZoomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap photo to zoom full-screen'**
+  String get photoTapToZoomHint;
+
+  /// No description provided for @photoZoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured Photo'**
+  String get photoZoomTitle;
+
+  /// No description provided for @resultDeleteRecordTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Record'**
+  String get resultDeleteRecordTooltip;
+
+  /// No description provided for @resultDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this scan?'**
+  String get resultDeleteConfirmTitle;
+
+  /// No description provided for @resultDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This checkup record will be permanently removed from your local history.'**
+  String get resultDeleteConfirmBody;
+
+  /// No description provided for @resultDeleteBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get resultDeleteBtn;
+
+  /// No description provided for @labLargeTextBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Text'**
+  String get labLargeTextBtn;
+
+  /// No description provided for @labLargeTextOnBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Text: On'**
+  String get labLargeTextOnBtn;
+
+  /// No description provided for @labSeniorOverviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Summary at a Glance'**
+  String get labSeniorOverviewTitle;
+
+  /// No description provided for @labSeniorNormalBullet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} test(s) are within the normal range.'**
+  String labSeniorNormalBullet(int count);
+
+  /// No description provided for @labSeniorAbnormalBullet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} test(s) are outside the reference range — explained simply below.'**
+  String labSeniorAbnormalBullet(int count);
+
+  /// No description provided for @labSeniorCriticalBullet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} test(s) are noticeably outside normal limits — please show your doctor soon.'**
+  String labSeniorCriticalBullet(int count);
+
+  /// No description provided for @labSeniorMissingBullet.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} common routine test(s) are not included in this report.'**
+  String labSeniorMissingBullet(int count);
+
+  /// No description provided for @labAttentionSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Values to Pay Attention To'**
+  String get labAttentionSectionTitle;
+
+  /// No description provided for @labNormalSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Values (Good News)'**
+  String get labNormalSectionTitle;
+
+  /// No description provided for @labMissingSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tests Not Included in This Report'**
+  String get labMissingSectionTitle;
+
+  /// No description provided for @labMissingSectionExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Not every blood test order includes all panels. The common tests below were not listed in this report, so they were not evaluated.'**
+  String get labMissingSectionExplain;
+
+  /// No description provided for @labNotInReportBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in report'**
+  String get labNotInReportBadge;
+
+  /// No description provided for @labWhatItMeansLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What it means'**
+  String get labWhatItMeansLabel;
+
+  /// No description provided for @labWhatToDoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What you can do'**
+  String get labWhatToDoLabel;
+
+  /// No description provided for @labAddAnotherPageBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Another Page'**
+  String get labAddAnotherPageBtn;
+
+  /// No description provided for @labPagesReadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} page(s) read'**
+  String labPagesReadBadge(int count);
+
+  /// No description provided for @labPhotoOfflineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paper photo attached. Enable Cloud AI in Settings to read paper photos automatically, or enter values manually below.'**
+  String get labPhotoOfflineHint;
+
+  /// No description provided for @labAllValuesNormalMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'All recorded values in this report are within the reference range.'**
+  String get labAllValuesNormalMsg;
 }
 
 class _AppLocalizationsDelegate

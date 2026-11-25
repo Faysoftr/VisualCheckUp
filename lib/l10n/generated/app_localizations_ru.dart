@@ -1360,4 +1360,172 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'Шкала Бристоля';
+
+  @override
+  String get hubStartNewScan => 'Начать новое сканирование';
+
+  @override
+  String get hubPickFromGallery => 'Галерея';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'Прошлые проверки ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'Всего проверок';
+
+  @override
+  String get hubLastScanLabel => 'Последняя';
+
+  @override
+  String get hubLatestStatusLabel => 'Последний статус';
+
+  @override
+  String get hubFilterAll => 'Все';
+
+  @override
+  String get hubFilterAttention => 'Внимание / Срочно';
+
+  @override
+  String get hubFilterWithPhoto => 'С фото';
+
+  @override
+  String get hubColPhoto => 'Фото';
+
+  @override
+  String get hubColDate => 'Дата';
+
+  @override
+  String get hubColFinding => 'Результат и сводка';
+
+  @override
+  String get hubColStatus => 'Статус';
+
+  @override
+  String get hubCompareModeBtn => 'Сравнить 2 проверки';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'Выберите 2 проверки в таблице для сравнения рядом ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'Сравнить рядом';
+
+  @override
+  String get hubCompareCancelBtn => 'Отмена';
+
+  @override
+  String get hubCompareSheetTitle => 'Сравнение проверок рядом';
+
+  @override
+  String get hubCompareOlderLabel => 'Ранее';
+
+  @override
+  String get hubCompareNewerLabel => 'Позже';
+
+  @override
+  String get hubCompareMetricsTitle => 'Сравнение клинических показателей';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'Проверок «$category» пока нет';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'Начните первую проверку выше. Каждая запись сохраняется здесь по дате с миниатюрой фото и полным отчётом.';
+
+  @override
+  String get hubDoctorSummaryBtn => 'Сводка врачу';
+
+  @override
+  String get photoTapToZoomHint =>
+      'Нажмите на фото для увеличения на весь экран';
+
+  @override
+  String get photoZoomTitle => 'Сделанное фото';
+
+  @override
+  String get resultDeleteRecordTooltip => 'Удалить запись';
+
+  @override
+  String get resultDeleteConfirmTitle => 'Удалить эту проверку?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'Запись проверки будет безвозвратно удалена из локальной истории.';
+
+  @override
+  String get resultDeleteBtn => 'Удалить';
+
+  @override
+  String get labLargeTextBtn => 'Крупный шрифт';
+
+  @override
+  String get labLargeTextOnBtn => 'Крупный шрифт: Вкл';
+
+  @override
+  String get labSeniorOverviewTitle => 'Краткий итог простыми словами';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count показател(ей) находятся в пределах нормы.';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count показател(ей) выходят за пределы нормы — простое объяснение ниже.';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count показател(ей) заметно отклоняются от нормы — покажите отчёт врачу в ближайшее время.';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$count базовых анализов отсутствуют в этом бланке.';
+  }
+
+  @override
+  String get labAttentionSectionTitle =>
+      'Показатели, на которые стоит обратить внимание';
+
+  @override
+  String get labNormalSectionTitle => 'Показатели в норме';
+
+  @override
+  String get labMissingSectionTitle =>
+      'Базовые анализы, которых нет в этом отчёте';
+
+  @override
+  String get labMissingSectionExplain =>
+      'Не в каждом анализе крови назначают все показатели. Перечисленные ниже базовые тесты отсутствуют в загруженном бланке.';
+
+  @override
+  String get labNotInReportBadge => 'Нет в отчёте';
+
+  @override
+  String get labWhatItMeansLabel => 'Что это означает?';
+
+  @override
+  String get labWhatToDoLabel => 'Что рекомендуется сделать?';
+
+  @override
+  String get labAddAnotherPageBtn => 'Снять ещё страницу';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return 'Прочитано страниц: $count';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'Фото бланка прикреплено. Включите облачный ИИ в Настройках для автоматического чтения фото или введите значения вручную ниже.';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'Все записанные показатели в этом отчёте находятся в пределах нормы.';
 }

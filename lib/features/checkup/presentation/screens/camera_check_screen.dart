@@ -22,12 +22,16 @@ class CameraCheckScreen extends StatefulWidget {
     required this.analyzer,
     required this.historyRepository,
     this.permissionService = const PermissionHandlerCameraService(),
+    this.initialEyeScanMode = EyeScanMode.sclera,
+    this.autoPickFromGallery = false,
   });
 
   final CheckCategory category;
   final HealthAnalyzer analyzer;
   final HistoryRepository historyRepository;
   final CameraPermissionService permissionService;
+  final EyeScanMode initialEyeScanMode;
+  final bool autoPickFromGallery;
 
   @override
   State<CameraCheckScreen> createState() => _CameraCheckScreenState();
@@ -50,15 +54,21 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   double _maxZoom = 1.0;
   double _currentZoom = 1.0;
   Offset? _focusPoint;
-  EyeScanMode _eyeScanMode = EyeScanMode.sclera;
+  late EyeScanMode _eyeScanMode;
 
   @override
   void initState() {
     super.initState();
     _useWhiteReference = widget.category.recommendsWhiteReference;
+    _eyeScanMode = widget.initialEyeScanMode;
     WidgetsBinding.instance.addObserver(this);
     _loadBaseline();
     _initCamera();
+    if (widget.autoPickFromGallery) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _pickFromGallery();
+      });
+    }
   }
 
   Future<void> _loadBaseline() async {

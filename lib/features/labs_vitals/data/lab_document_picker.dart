@@ -65,7 +65,9 @@ class DeviceLabDocumentPicker implements LabDocumentPicker {
   Future<PickedLabDocument?> pickCameraPhoto() async {
     final photo = await ImagePicker().pickImage(
       source: ImageSource.camera,
-      imageQuality: 85,
+      maxWidth: 1800,
+      maxHeight: 2400,
+      imageQuality: 88,
     );
     if (photo == null) return null;
     final bytes = await photo.readAsBytes();

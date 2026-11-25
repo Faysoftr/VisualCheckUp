@@ -1367,4 +1367,169 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get metricBristolScale => 'Escala de Bristol';
+
+  @override
+  String get hubStartNewScan => 'Iniciar Novo Exame';
+
+  @override
+  String get hubPickFromGallery => 'Galeria';
+
+  @override
+  String hubPastScansTitle(int count) {
+    return 'Exames Anteriores ($count)';
+  }
+
+  @override
+  String get hubTotalScansLabel => 'Total de Exames';
+
+  @override
+  String get hubLastScanLabel => 'Último Exame';
+
+  @override
+  String get hubLatestStatusLabel => 'Último Status';
+
+  @override
+  String get hubFilterAll => 'Todos';
+
+  @override
+  String get hubFilterAttention => 'Atenção / Urgente';
+
+  @override
+  String get hubFilterWithPhoto => 'Com Foto';
+
+  @override
+  String get hubColPhoto => 'Foto';
+
+  @override
+  String get hubColDate => 'Data';
+
+  @override
+  String get hubColFinding => 'Achado e Resumo';
+
+  @override
+  String get hubColStatus => 'Status';
+
+  @override
+  String get hubCompareModeBtn => 'Comparar 2 Exames';
+
+  @override
+  String hubCompareSelectHint(int count) {
+    return 'Selecione 2 exames na tabela para comparar lado a lado ($count/2)';
+  }
+
+  @override
+  String get hubCompareActionBtn => 'Comparar Lado a Lado';
+
+  @override
+  String get hubCompareCancelBtn => 'Cancelar';
+
+  @override
+  String get hubCompareSheetTitle => 'Comparação Lado a Lado';
+
+  @override
+  String get hubCompareOlderLabel => 'Anterior';
+
+  @override
+  String get hubCompareNewerLabel => 'Mais recente';
+
+  @override
+  String get hubCompareMetricsTitle => 'Comparação de Métricas Clínicas';
+
+  @override
+  String hubEmptyTitle(String category) {
+    return 'Nenhum exame de $category ainda';
+  }
+
+  @override
+  String get hubEmptySubtitle =>
+      'Inicie seu primeiro exame acima. Cada registro fica salvo aqui por data com miniatura e relatório completo.';
+
+  @override
+  String get hubDoctorSummaryBtn => 'Resumo Médico';
+
+  @override
+  String get photoTapToZoomHint => 'Toque na foto para ampliar em tela cheia';
+
+  @override
+  String get photoZoomTitle => 'Foto Capturada';
+
+  @override
+  String get resultDeleteRecordTooltip => 'Excluir Registro';
+
+  @override
+  String get resultDeleteConfirmTitle => 'Excluir este exame?';
+
+  @override
+  String get resultDeleteConfirmBody =>
+      'Este registro será removido permanentemente do seu histórico local.';
+
+  @override
+  String get resultDeleteBtn => 'Excluir';
+
+  @override
+  String get labLargeTextBtn => 'Texto Grande';
+
+  @override
+  String get labLargeTextOnBtn => 'Texto Grande: Sim';
+
+  @override
+  String get labSeniorOverviewTitle => 'Seu Resumo Simplificado';
+
+  @override
+  String labSeniorNormalBullet(int count) {
+    return '$count resultado(s) estão dentro da faixa normal.';
+  }
+
+  @override
+  String labSeniorAbnormalBullet(int count) {
+    return '$count resultado(s) estão fora da referência — explicados de forma simples abaixo.';
+  }
+
+  @override
+  String labSeniorCriticalBullet(int count) {
+    return '$count resultado(s) estão bem fora dos limites — mostre ao seu médico em breve.';
+  }
+
+  @override
+  String labSeniorMissingBullet(int count) {
+    return '$count exames básicos comuns não constam neste laudo.';
+  }
+
+  @override
+  String get labAttentionSectionTitle => 'Valores que Merecem Atenção';
+
+  @override
+  String get labNormalSectionTitle => 'Valores Normais (Fique Tranquilo)';
+
+  @override
+  String get labMissingSectionTitle => 'Exames Não Incluídos Neste Laudo';
+
+  @override
+  String get labMissingSectionExplain =>
+      'Nem todo pedido inclui todos os exames. Os exames comuns abaixo não aparecem neste relatório e não foram avaliados.';
+
+  @override
+  String get labNotInReportBadge => 'Não consta no laudo';
+
+  @override
+  String get labWhatItMeansLabel => 'O que significa?';
+
+  @override
+  String get labWhatToDoLabel => 'O que fazer?';
+
+  @override
+  String get labAddAnotherPageBtn => 'Fotografar Outra Página';
+
+  @override
+  String labPagesReadBadge(int count) {
+    return '$count página(s) lida(s)';
+  }
+
+  @override
+  String get labPhotoOfflineHint =>
+      'Foto do laudo anexada. Ative a IA na Nuvem em Configurações para leitura automática ou adicione os valores manualmente abaixo.';
+
+  @override
+  String get labAllValuesNormalMsg =>
+      'Todos os valores registrados neste laudo estão dentro da faixa normal.';
 }
