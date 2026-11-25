@@ -34,24 +34,39 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     final g = (c.g * 255).round().clamp(0, 255);
     final b = (c.b * 255).round().clamp(0, 255);
 
-    var result = analyzeRgb(
-      category: category,
-      r: r,
-      g: g,
-      b: b,
-      baseline: options.baseline,
-    );
-
     final structural = StructuralFeatureAnalyzer.analyze(
       image: decoded,
       category: category,
+      gains: sample.gains,
     );
-    result = _applyStructuralFindings(
-      result: result,
-      category: category,
-      structural: structural,
-      whiteBalanceApplied: sample.whiteBalanceApplied,
-    );
+
+    AnalysisResult result;
+    if (category == CheckCategory.eye &&
+        options.eyeScanMode == EyeScanMode.palpebralConjunctiva) {
+      result = _evaluatePalpebralConjunctiva(
+        color: c,
+        r: r,
+        g: g,
+        b: b,
+        lab: sample.lab,
+        structural: structural,
+        baseline: options.baseline,
+      );
+    } else {
+      result = analyzeRgb(
+        category: category,
+        r: r,
+        g: g,
+        b: b,
+        baseline: options.baseline,
+      );
+      result = _applyStructuralFindings(
+        result: result,
+        category: category,
+        structural: structural,
+        whiteBalanceApplied: sample.whiteBalanceApplied,
+      );
+    }
 
     final extraObservations = <String>[];
     var adjustedConfidence = result.confidence;
@@ -75,11 +90,25 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       );
     }
 
+    final mergedMetrics = <String, String>{
+      ...result.clinicalMetrics,
+      ..._buildColorAndStructuralMetrics(
+        category: category,
+        r: r,
+        g: g,
+        b: b,
+        lab: sample.lab,
+        structural: structural,
+        eyeScanMode: options.eyeScanMode,
+      ),
+    };
+
     result = result.copyWith(
       confidence: adjustedConfidence,
       whiteBalanceCalibrated: sample.whiteBalanceApplied,
       lightingNote: sample.lightingNote,
       observations: [...result.observations, ...extraObservations],
+      clinicalMetrics: mergedMetrics,
     );
 
     return result;
@@ -130,7 +159,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       case CheckCategory.eye:
         result = _evaluateEye(id, color, h, s, v, lab, now);
       case CheckCategory.nail:
-        result = _evaluateNail(id, color, h, s, v, lab, now);
+        result = _evaluateNail(id, color, r, g, h, s, v, lab, now);
       case CheckCategory.tongue:
         result = _evaluateTongue(id, color, h, s, v, lab, now);
       case CheckCategory.face:
@@ -196,6 +225,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.68,
         createdAt: now,
+        matchedFindingIds: const ['eye_jaundice_sclera'],
       );
     }
 
@@ -221,6 +251,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['eye_mild_redness'],
       );
     }
 
@@ -242,18 +273,23 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.72,
       createdAt: now,
+      matchedFindingIds: const ['eye_healthy_white'],
     );
   }
 
   AnalysisResult _evaluateNail(
     String id,
     Color color,
+    int r,
+    int g,
     double h,
     double s,
     double v,
     LabColor lab,
     DateTime now,
   ) {
+    final nailEi = ColorCalibrator.erythemaIndex(r, g);
+
     // Bluish / cyanotic tint (HSV hue + Lab negative b* blue channel)
     if ((h >= 190 && h <= 275 && s >= 0.22) || lab.b <= -10.0) {
       return AnalysisResult(
@@ -276,6 +312,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.66,
         createdAt: now,
+        matchedFindingIds: const ['nail_cyanotic_blue'],
       );
     }
 
@@ -300,6 +337,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.64,
         createdAt: now,
+        matchedFindingIds: const ['nail_dark_vertical_band'],
       );
     }
 
@@ -324,6 +362,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['nail_green_pseudomonas'],
       );
     }
 
@@ -346,6 +385,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['nail_yellow_thickened'],
       );
     }
 
@@ -370,28 +410,31 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.63,
         createdAt: now,
+        matchedFindingIds: const ['nail_paronychia_inflamed'],
       );
     }
 
-    // Very pale / white nail bed (anemia / Terry / Lindsay)
-    if (s < 0.14 && v > 0.72) {
+    // Very pale / white nail bed (Mannino anemia EI + low saturation / high lightness)
+    if ((s < 0.14 && v > 0.72) || (nailEi < 5.2 && lab.l > 74.0 && lab.a < 7.5)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.nail,
         riskLevel: RiskLevel.attention,
         summaryTitle: 'Soluk / Yaygın Beyaz Tırnak Tonu',
         summaryDetail:
-            'Tırnak yatağı normal pembe tona göre oldukça soluk veya beyaz görünüyor. Işık yansıması değilse demir eksikliği anemisi; tüm tırnaklarda yaygın beyazlaşma varsa karaciğer, böbrek veya albümin/protein düzeyleri açısından değerlendirilebilir.',
+            'Tırnak yatağı normal pembe tona göre oldukça soluk veya beyaz görünüyor (Eritem İndeksi: ${nailEi.toStringAsFixed(1)}). Işık yansıması değilse demir eksikliği anemisi; tüm tırnaklarda yaygın beyazlaşma varsa karaciğer, böbrek veya albümin/protein düzeyleri açısından değerlendirilebilir.',
         dominantColorValue: color.toARGB32(),
-        observations: const [
-          'Düşük renk doygunluğu ve yüksek parlaklık (soluk/beyaz görünüm).',
+        observations: [
+          'Düşük renk doygunluğu ve düşük tırnak yatağı Eritem İndeksi (EI=${nailEi.toStringAsFixed(1)} — solukluk ipucu).',
         ],
         recommendations: const [
-          'Halsizlik, çabuk yorulma veya birden fazla tırnakta yaygın beyazlaşma varsa kan sayımı ve biyokimya için doktora danışın.',
+          'Halsizlik, çabuk yorulma veya birden fazla tırnakta yaygın beyazlaşma varsa tam kan sayımı (hemogram, ferritin, B12) için doktora danışın.',
+          'Alt göz kapağı içi (konjonktiva) ve dil kontrolüyle birlikte çoklu solukluk kontrolü yapabilirsiniz.',
         ],
         warningFlags: const [],
-        confidence: 0.62,
+        confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['nail_pale_bed'],
       );
     }
 
@@ -408,11 +451,12 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       ],
       recommendations: const [
         'Tırnak bakımı ve dengeli beslenmeye devam edin.',
-        'Renk normal görünse bile çomaklaşma (saat camı bombeleşmesi), kaşık tırnak, enine derin oluk veya yeni dikey koyu çizgi fark ederseniz dermatoloğa danışın.',
+        'Renk normal görünse bile çomaklaşma (Schamroth pencere testi), kaşık tırnak, enine derin oluk veya yeni dikey koyu çizgi fark ederseniz dermatoloğa danışın.',
       ],
       warningFlags: const [],
       confidence: 0.70,
       createdAt: now,
+      matchedFindingIds: const ['nail_healthy_pink'],
     );
   }
 
@@ -447,6 +491,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.68,
         createdAt: now,
+        matchedFindingIds: const ['tongue_cyanotic_purple_blue'],
       );
     }
 
@@ -470,6 +515,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.60,
         createdAt: now,
+        matchedFindingIds: const ['tongue_black_hairy'],
       );
     }
 
@@ -493,6 +539,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.62,
         createdAt: now,
+        matchedFindingIds: const ['tongue_greenish_coating'],
       );
     }
 
@@ -518,6 +565,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['tongue_thick_white_coating'],
       );
     }
 
@@ -541,6 +589,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.63,
         createdAt: now,
+        matchedFindingIds: const ['tongue_yellow_orange_coating'],
       );
     }
 
@@ -563,6 +612,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.60,
         createdAt: now,
+        matchedFindingIds: const ['tongue_pale_anemic'],
       );
     }
 
@@ -588,6 +638,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.66,
         createdAt: now,
+        matchedFindingIds: const ['tongue_strawberry_or_atrophic_red'],
       );
     }
 
@@ -609,6 +660,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.70,
       createdAt: now,
+      matchedFindingIds: const ['tongue_healthy_pink'],
     );
   }
 
@@ -621,7 +673,41 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     LabColor lab,
     DateTime now,
   ) {
-    if ((h >= 40 && h <= 65 && s >= 0.42) || (lab.b >= 34.0 && lab.a < 18.0)) {
+    final phototype = lab.fitzpatrickPhototype;
+    final ita = lab.individualTypologyAngle;
+
+    // Perioral / facial cyanosis (bluish-purple tint)
+    if ((h >= 200 && h <= 295 && s >= 0.20) || lab.b <= -8.0) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.face,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle: 'Dudak / Yüz Çevresinde Morarma İpucu (Siyanoz)',
+        summaryDetail:
+            'Soğuk ortam dışı mavimsi-morumsu cilt/dudak tonu oksijenlenme veya dolaşım açısından tıbbi değerlendirme gerektirir.',
+        dominantColorValue: color.toARGB32(),
+        observations: const [
+          'Mavi-mor renk ekseninde belirgin kayma saptandı.',
+        ],
+        recommendations: const [
+          'Doğal gün ışığında dudak ve tırnak renginizi birlikte kontrol edin.',
+          'Morarma kalıcıysa gecikmeden sağlık kuruluşuna başvurun.',
+        ],
+        warningFlags: const [
+          'Nefes darlığı, göğüs ağrısı veya baş dönmesi eşlik ediyorsa acil servise başvurun.',
+        ],
+        confidence: 0.66,
+        createdAt: now,
+        matchedFindingIds: const ['face_perioral_cyanosis'],
+      );
+    }
+
+    // Fitzpatrick-adaptive jaundice threshold: darker skin phototypes (IV-VI)
+    // naturally have higher b* warm golden undertones; raise b* threshold to
+    // prevent false jaundice flags on healthy darker skin.
+    final jaundiceBThreshold = phototype.isDarkerSkinOfColor ? 42.0 : 34.0;
+    if ((h >= 40 && h <= 65 && s >= 0.42 && !phototype.isDarkerSkinOfColor) ||
+        (lab.b >= jaundiceBThreshold && lab.a < 18.0)) {
       return AnalysisResult(
         id: id,
         category: CheckCategory.face,
@@ -630,18 +716,19 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         summaryDetail:
             'Ortam ışığı sarı değilse ciltte belirgin sararma tıbbi değerlendirme gerektirir.',
         dominantColorValue: color.toARGB32(),
-        observations: const [
-          'Yüz bölgesinde sarı spektrum ağırlığı yüksek.',
+        observations: [
+          'Yüz bölgesinde sarı spektrum ağırlığı yüksek (CIE b*=${lab.b.toStringAsFixed(1)}, ITA=${ita.toStringAsFixed(0)}°).',
         ],
         recommendations: const [
-          'Göz akınızı da gün ışığında kontrol edin.',
+          'Göz akınızı (sklera) da gün ışığında kontrol edin; sarılık sklerada cilt tonundan bağımsız olarak çok daha erken görülür.',
           'Gerçek bir sararma fark ediyorsanız hekime başvurun.',
         ],
         warningFlags: const [
-          'Göz akında sararma veya halsizlik eşlik ediyorsa gecikmeden doktora başvurun.',
+          'Göz akında sararma, koyu idrar veya halsizlik eşlik ediyorsa gecikmeden doktora başvurun.',
         ],
         confidence: 0.62,
         createdAt: now,
+        matchedFindingIds: const ['face_jaundice_tint'],
       );
     }
 
@@ -652,10 +739,10 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         riskLevel: RiskLevel.attention,
         summaryTitle: 'Yüzde Kızarıklık / Sıcaklık İpucu',
         summaryDetail:
-            'Cilt tonunda belirgin kızarıklık saptandı. Güneş, egzersiz, hassasiyet veya ateş kaynaklı olabilir.',
+            'Cilt tonunda belirgin kızarıklık saptandı. Güneş, egzersiz, rozasea, hassasiyet veya ateş kaynaklı olabilir.',
         dominantColorValue: color.toARGB32(),
-        observations: const [
-          'Yüz bölgesinde kırmızı ton yoğunluğu yüksek.',
+        observations: [
+          'Yüz bölgesinde kırmızı ton yoğunluğu yüksek (CIE a*=${lab.a.toStringAsFixed(1)}).',
         ],
         recommendations: const [
           'Ateş, kaşıntı veya döküntü varsa takip edin ve gerekirse doktora danışın.',
@@ -663,6 +750,31 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.64,
         createdAt: now,
+        matchedFindingIds: const ['face_flushing_erythema'],
+      );
+    }
+
+    // Noticeable pallor on fair/intermediate tones
+    if (lab.l >= 82.0 && lab.a < 5.5 && s < 0.14) {
+      return AnalysisResult(
+        id: id,
+        category: CheckCategory.face,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Yüzde Solgunluk / Matlık İpucu',
+        summaryDetail:
+            'Yüz tonunda canlılık/kırmızılık düşük ve belirgin solukluk gözlendi. Yorgunluk, susuzluk veya kansızlık açısından takip edilebilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: [
+          'Düşük kırmızı doygunluk ve yüksek açıklık (L*=${lab.l.toStringAsFixed(1)}, a*=${lab.a.toStringAsFixed(1)}).',
+        ],
+        recommendations: const [
+          'Alt göz kapağı içi (konjonktiva) ve tırnak yatağı kontrolünü de birlikte yapabilirsiniz.',
+          'Halsizlik veya baş dönmesi eşlik ediyorsa kan sayımı için hekime danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.60,
+        createdAt: now,
+        matchedFindingIds: const ['face_pallor'],
       );
     }
 
@@ -674,8 +786,8 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       summaryDetail:
           'Yüz bölgesinde aşırı kızarıklık veya belirgin renk sapması tespit edilmedi.',
       dominantColorValue: color.toARGB32(),
-      observations: const [
-        'Cilt tonu dengeli ve doğal aralıkta.',
+      observations: [
+        'Cilt tonu dengeli ve doğal aralıkta (Fitzpatrick ${phototype.shortLabel}, ITA ${ita.toStringAsFixed(0)}°).',
       ],
       recommendations: const [
         'Güneş koruyucu kullanımı ve yeterli su alımı cilt sağlığını destekler.',
@@ -683,6 +795,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.68,
       createdAt: now,
+      matchedFindingIds: const ['face_healthy_balanced'],
     );
   }
 
@@ -717,6 +830,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.72,
         createdAt: now,
+        matchedFindingIds: const ['urine_pink_red_hematuria'],
       );
     }
 
@@ -743,6 +857,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.70,
         createdAt: now,
+        matchedFindingIds: const ['urine_dark_amber_tea'],
       );
     }
 
@@ -766,6 +881,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.76,
         createdAt: now,
+        matchedFindingIds: const ['urine_dark_yellow_dehydration'],
       );
     }
 
@@ -787,6 +903,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.78,
       createdAt: now,
+      matchedFindingIds: const ['urine_healthy_pale_straw'],
     );
   }
 
@@ -820,6 +937,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.68,
         createdAt: now,
+        matchedFindingIds: const ['stool_black_tarry_melena'],
       );
     }
 
@@ -844,6 +962,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.70,
         createdAt: now,
+        matchedFindingIds: const ['stool_pale_clay_white'],
       );
     }
 
@@ -868,6 +987,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         ],
         confidence: 0.70,
         createdAt: now,
+        matchedFindingIds: const ['stool_bright_red_blood'],
       );
     }
 
@@ -891,6 +1011,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.68,
         createdAt: now,
+        matchedFindingIds: const ['stool_greenish'],
       );
     }
 
@@ -913,6 +1034,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         warningFlags: const [],
         confidence: 0.65,
         createdAt: now,
+        matchedFindingIds: const ['stool_yellow_greasy'],
       );
     }
 
@@ -933,12 +1055,115 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       warningFlags: const [],
       confidence: 0.74,
       createdAt: now,
+      matchedFindingIds: const ['stool_healthy_brown'],
     );
   }
 
-  /// Merges 2D structural/texture findings (tongue fissures, eye capillary
-  /// redness, nail white lines/spots, nail cracks/roughness, dark vertical
-  /// nail bands) into the color-based [AnalysisResult].
+  /// Dedicated Collings-style lower-eyelid palpebral conjunctiva anemia
+  /// screening using hemoglobin Erythema Index (`100 * (log10(R) - log10(G))`)
+  /// and CIE `a*`.
+  AnalysisResult _evaluatePalpebralConjunctiva({
+    required Color color,
+    required int r,
+    required int g,
+    required int b,
+    required LabColor lab,
+    required StructuralFeatures structural,
+    CategoryBaseline? baseline,
+  }) {
+    final now = DateTime.now();
+    final id = 'eye_conj_${now.microsecondsSinceEpoch}';
+    final ei = structural.conjunctivaErythemaIndex > 0
+        ? structural.conjunctivaErythemaIndex
+        : ColorCalibrator.erythemaIndex(r, g);
+
+    // Collings et al. (PLOS ONE): low palpebral conjunctival EI and low CIE a*
+    // strongly correlate with hemoglobin < 11.5 g/dL (anemia pallor).
+    final isMarkedPallor = ei < 8.5 || (lab.a < 10.5 && lab.l > 66.0);
+    final isMildPallor = ei < 13.0 || (lab.a < 15.5 && lab.l > 62.0);
+
+    AnalysisResult res;
+    if (isMarkedPallor) {
+      res = AnalysisResult(
+        id: id,
+        category: CheckCategory.eye,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Alt Göz Kapağı İçinde Belirgin Solukluk (Anemi Ön İpucu)',
+        summaryDetail:
+            'Alt göz kapağı iç mukozası (palpebral konjonktiva) sağlıklı canlı pembe-kırmızı tondan belirgin şekilde soluk ölçüldü (Eritem İndeksi: ${ei.toStringAsFixed(1)}, CIE a*: ${lab.a.toStringAsFixed(1)}). Demir, B12 veya folik asit eksikliğine bağlı kansızlık (anemi) açısından kan tahliliyle değerlendirilmesi önerilir.',
+        dominantColorValue: color.toARGB32(),
+        observations: [
+          'Konjonktiva Eritem İndeksi düşük (EI=${ei.toStringAsFixed(1)} — normal referans ≥13).',
+          'Mukoza kırmızı kanlanma bileşeni düşük (CIE a*=${lab.a.toStringAsFixed(1)}).',
+        ],
+        recommendations: const [
+          'Halsizlik, çabuk yorulma, üşüme veya baş dönmesi eşlik ediyorsa Dahiliye uzmanına başvurarak tam kan sayımı (HGB, Ferritin, B12) yaptırın.',
+          'Tırnak yatağı ve dil kontrolünü de ekleyerek çoklu bölge anemi ön farkındalığını kontrol edebilirsiniz.',
+        ],
+        warningFlags: const [
+          'Şiddetli halsizlik, çarpıntı, nefes darlığı veya baygınlık hissi varsa gecikmeden sağlık kuruluşuna başvurun.',
+        ],
+        confidence: 0.72,
+        createdAt: now,
+        matchedFindingIds: const ['eye_conjunctiva_pallor'],
+      );
+    } else if (isMildPallor) {
+      res = AnalysisResult(
+        id: id,
+        category: CheckCategory.eye,
+        riskLevel: RiskLevel.attention,
+        summaryTitle: 'Alt Göz Kapağı İçinde Hafif Solukluk Eğilimi',
+        summaryDetail:
+            'Palpebral konjonktiva tonu sınırda/hafif soluk aralıkta ölçüldü (Eritem İndeksi: ${ei.toStringAsFixed(1)}). Doğal gün ışığında tekrar kontrol etmeniz ve şikayetiniz varsa kan değerlerinizi takip etmeniz faydalı olur.',
+        dominantColorValue: color.toARGB32(),
+        observations: [
+          'Konjonktiva Eritem İndeksi sınırda (EI=${ei.toStringAsFixed(1)}).',
+        ],
+        recommendations: const [
+          'Doğal gün ışığında tekrar çekim yapın; yorgunluk veya solukluk sürerse hemogram/ferritin kontrolü için doktora danışın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.66,
+        createdAt: now,
+        matchedFindingIds: const ['eye_conjunctiva_pallor'],
+      );
+    } else {
+      res = AnalysisResult(
+        id: id,
+        category: CheckCategory.eye,
+        riskLevel: RiskLevel.normal,
+        summaryTitle: 'Alt Göz Kapağı (Konjonktiva) Tonu Canlı ve Olağan',
+        summaryDetail:
+            'Palpebral konjonktiva sağlıklı pembe-kırmızı kanlanma aralığında görünüyor (Eritem İndeksi: ${ei.toStringAsFixed(1)}). Belirgin anemi solukluğu saptanmadı.',
+        dominantColorValue: color.toARGB32(),
+        observations: [
+          'Konjonktiva Eritem İndeksi canlı aralıkta (EI=${ei.toStringAsFixed(1)}, CIE a*=${lab.a.toStringAsFixed(1)}).',
+        ],
+        recommendations: const [
+          'Görsel ön tarama kesin kan sayımı yerine geçmez; halsizlik şikayetiniz varsa rutin kan testi yaptırın.',
+        ],
+        warningFlags: const [],
+        confidence: 0.74,
+        createdAt: now,
+        matchedFindingIds: const ['eye_healthy_white'],
+      );
+    }
+
+    if (baseline != null) {
+      final comp = baseline.compare(lab);
+      res = res.copyWith(
+        baselineDeltaE: comp.deltaE,
+        baselineComparisonNote: comp.note,
+        observations: [...res.observations, comp.note],
+      );
+    }
+    return res;
+  }
+
+  /// Merges 2D structural/texture findings (tongue fissures, geographic tongue,
+  /// yellow/white coating, eye capillary redness, subconjunctival hemorrhage,
+  /// nail white lines/spots, cracks, Beau grooves, Terry/Lindsay split,
+  /// splinter hemorrhages, dark vertical nail bands) into [AnalysisResult].
   AnalysisResult _applyStructuralFindings({
     required AnalysisResult result,
     required CheckCategory category,
@@ -948,16 +1173,33 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     final obs = [...result.observations];
     final recs = [...result.recommendations];
     final warns = [...result.warningFlags];
+    final findings = [...result.matchedFindingIds];
     var risk = result.riskLevel;
     var title = result.summaryTitle;
     var detail = result.summaryDetail;
 
     switch (category) {
       case CheckCategory.tongue:
+        if (structural.hasGeographicTongueCue) {
+          obs.add(
+            'Dil yüzeyinde beyaz kenarlı düzensiz kırmızı yamalar — Coğrafi Dil deseni (skor %${(structural.geographicPatchScore * 100).toStringAsFixed(0)}) saptandı.',
+          );
+          findings.add('tongue_geographic_patches');
+          if (risk == RiskLevel.normal) {
+            risk = RiskLevel.attention;
+            title = 'Coğrafi Dil (Benign Migrator Glossit) Deseni İpucu';
+            detail =
+                'Dil sırtında beyazımsı kenarlarla çevrili düzensiz kırmızı adacıklar gözlendi. Çoğunlukla tamamen iyi huylu bir varyasyondur; baharatlı/asitli gıdalarda hassasiyet yapabilir.';
+            recs.add(
+              'Harita benzeri lekelerin günler içinde yer değiştirip değiştirmediğini izleyin; ağrı, yanma veya 2 haftadan uzun süren sabit lezyon varsa diş hekimi/KBB uzmanına danışın.',
+            );
+          }
+        }
         if (structural.hasTongueFissures) {
           obs.add(
             'Dil yüzeyinde çizgisel yarık / çatlak dokusu (fissür oranı %${(structural.fissureGrooveRatio * 100).toStringAsFixed(1)}) saptandı.',
           );
+          findings.add('tongue_fissured_grooves');
           if (risk == RiskLevel.normal) {
             risk = RiskLevel.attention;
             title = 'Dilde Yarık / Çatlak Görünümü (Fissürlü Dil İpucu)';
@@ -968,20 +1210,46 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
             );
           }
         }
-        if (structural.hasTongueCoatingPatch && risk == RiskLevel.normal) {
+        if (structural.hasTongueYellowCoating && risk == RiskLevel.normal) {
+          obs.add(
+            'Dil üzerinde bölgesel sarımsı pas/biyofilm tabakası (%${(structural.yellowCoatingRatio * 100).toStringAsFixed(0)}) gözlendi.',
+          );
+          findings.add('tongue_yellow_orange_coating');
+          risk = RiskLevel.attention;
+          title = 'Dilde Bölgesel Sarımsı Pas Tabakası İpucu';
+          detail =
+              'Dil yüzeyinin bir bölümünde sarımsı tabaka tespit edildi. Ağız kuruluğu, kahve/çay/sigara, antibiyotik veya reflü hassasiyetine bağlı olabilir.';
+        } else if (structural.hasTongueCoatingPatch && risk == RiskLevel.normal) {
           obs.add(
             'Dil üzerinde bölgesel açık renkli pas/tabaka kaplaması (%${(structural.coatingPatchRatio * 100).toStringAsFixed(0)}) gözlendi.',
           );
+          findings.add('tongue_thick_white_coating');
           risk = RiskLevel.attention;
           title = 'Dilde Bölgesel Beyaz/Sarı Pas Tabakası İpucu';
           detail =
               'Dil yüzeyinin bir bölümünde açık renkli tabaka tespit edildi. Susuzluk, ağız kuruluğu veya geçici oral flora değişikliğine bağlı olabilir.';
         }
       case CheckCategory.eye:
-        if (structural.hasEyeRedVessels) {
+        if (structural.hasSubconjunctivalHemorrhage) {
+          obs.add(
+            'Sklera üzerinde keskin sınırlı yoğun parlak kırmızı kanama alanı (%${(structural.hemorrhagePatchRatio * 100).toStringAsFixed(1)}) saptandı.',
+          );
+          findings.add('eye_subconjunctival_hemorrhage');
+          risk = RiskLevel.urgent;
+          title = 'Göz Akında Odaklanmış Kanama Lekesi (Subkonjonktival Kanama İpucu)';
+          detail =
+              'Göz akında yaygın ince damarlanmadan farklı olarak yoğun, keskin sınırlı parlak kırmızı bir alan tespit edildi. Öksürük/zorlanma veya yüksek tansiyon kaynaklı subkonjonktival kanama olabilir.';
+          recs.add(
+            'Tansiyonunuzu ölçün ve gözünüzü ovalamayın; kan sulandırıcı kullanıyorsanız veya travma olduysa göz hekimine başvurun.',
+          );
+          warns.add(
+            'Görme bulanıklığı, şiddetli göz ağrısı, travma veya tekrarlayan kanamalar varsa acil göz muayenesi gerekir.',
+          );
+        } else if (structural.hasEyeRedVessels) {
           obs.add(
             'Göz akında (sklera) kılcal damar kanlanması / kızarıklık (%${(structural.scleraVesselRatio * 100).toStringAsFixed(1)}) tespit edildi.',
           );
+          findings.add('eye_mild_redness');
           if (risk == RiskLevel.normal) {
             risk = RiskLevel.attention;
             title = 'Göz Akında Kılcal Kanlanma / Kızarıklık İpucu';
@@ -1002,16 +1270,18 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
           obs.add(
             'Sklera kenarlarında bölgesel sarımsı ton artışı (%${(structural.scleraYellowRatio * 100).toStringAsFixed(1)}) gözlendi.',
           );
+          findings.add('eye_localized_yellow_spot');
           risk = RiskLevel.attention;
           title = 'Göz Akında Bölgesel Sarımsı Ton İpucu';
           detail =
-              'Göz akının bir kısmında sarımsı renk kayması saptandı. Doğal gün ışığında tekrar kontrol edilmesi ve sürüyorsa hekime danışılması önerilir.';
+              'Göz akının bir kısmında sarımsı renk kayması saptandı. Güneş kaynaklı pinguekula olabileceği gibi doğal gün ışığında tekrar kontrol edilmesi ve sürüyorsa hekime danışılması önerilir.';
         }
       case CheckCategory.nail:
         if (structural.hasNailDarkVerticalBand) {
           obs.add(
             'Tırnak plağında dar dikey koyu pigment bandı (skor %${(structural.darkVerticalBandScore * 100).toStringAsFixed(0)}) saptandı.',
           );
+          findings.add('nail_dark_vertical_band');
           risk = RiskLevel.urgent;
           title = 'Tırnakta Dikey Koyu Çizgi (Melanoniki Uyarısı)';
           detail =
@@ -1020,13 +1290,59 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
             'Bilinen bir darbe yoksa vakit kaybetmeden bir Dermatoloji (Cildiye) uzmanına muayene olun.',
           );
           warns.add(
-            'Koyu çizgi 3 mm’den genişse, düzensiz koyulaşıyorsa veya tırnak dibi etine taşıyorsa acil dermatoloji değerlendirmesi önerilir.',
+            'Koyu çizgi 3 mm’den genişse, düzensiz koyulaşıyorsa veya tırnak dibi etine taşıyorsa (Hutchinson işareti) acil dermatoloji değerlendirmesi önerilir.',
+          );
+        } else if (structural.hasSplinterHemorrhage) {
+          obs.add(
+            'Tırnak altında ince dikey koyu kırmızı kıymık benzeri çizgiler (oran %${(structural.splinterStreakRatio * 100).toStringAsFixed(1)}) saptandı.',
+          );
+          findings.add('nail_splinter_hemorrhage');
+          risk = RiskLevel.urgent;
+          title = 'Tırnak Altında İnce Kırmızı/Kahverengi Kıymık Çizgileri İpucu';
+          detail =
+              'Tırnak plağı altında uzunlamasına uzanan ince kıymık benzeri kırmızı-kahverengi mikro çizgiler algılandı. Tek tırnakta darbe kaynaklı olabilir; birden fazla tırnakta travmasız görülüyorsa dahiliye değerlendirmesi önemlidir.';
+          recs.add(
+            'Yakın zamanda tırnak travması yaşamadıysanız ve birden fazla tırnakta görülüyorsa Dahiliye veya Dermatoloji uzmanına başvurun.',
+          );
+          warns.add(
+            'Ateş, halsizlik veya birden fazla tırnakta kendiliğinden kıymık kanamaları eşlik ediyorsa gecikmeden doktora başvurun.',
           );
         } else {
+          if (structural.hasTerryOrLindsaySplit) {
+            obs.add(
+              'Tırnak kökünde yaygın beyazlık ve uçta koyu pembe/kahverengi bant ayrımı (Terry/Lindsay skoru %${(structural.proximalDistalSplitScore * 100).toStringAsFixed(0)}) gözlendi.',
+            );
+            findings.add('nail_terry_or_half_and_half');
+            if (risk == RiskLevel.normal) {
+              risk = RiskLevel.attention;
+              title = 'Yaygın Beyaz / Yarım-Yarım Tırnak Deseni (Terry / Lindsay İpucu)';
+              detail =
+                  'Tırnağın gövdesinde belirgin beyazlaşma ve uç kısmında daha koyu şerit ayrımı algılandı. Birden fazla tırnakta görülüyorsa karaciğer, böbrek veya protein/albümin düzeyleri açısından Dahiliye kontrolü önerilir.';
+              recs.add(
+                'Tüm el tırnaklarınızda benzer görünüm varsa karaciğer/böbrek biyokimyası ve tam kan sayımı için Dahiliye uzmanına danışın.',
+              );
+            }
+          }
+          if (structural.hasNailTransverseGroove) {
+            obs.add(
+              'Tırnak boyunca enine derin çöküntü / oluk (Beau çizgisi skoru %${(structural.transverseGrooveScore * 100).toStringAsFixed(0)}) tespit edildi.',
+            );
+            findings.add('nail_pitting_or_ridges');
+            if (risk == RiskLevel.normal) {
+              risk = RiskLevel.attention;
+              title = 'Tırnakta Enine Oluklanma (Beau Çizgisi İpucu)';
+              detail =
+                  'Tırnak plağını yatay kesen derin oluk/çöküntü dokusu saptandı. Geçirilmiş yüksek ateşli enfeksiyon, yoğun stres, beslenme/çinko eksikliği veya sistemik hastalık sonrası geçici tırnak büyüme duraksamasına işaret edebilir.';
+              recs.add(
+                'Birden fazla tırnakta aynı hizada enine oluk görüyorsanız son 2–3 aydaki sağlık öykünüzle birlikte Dahiliye veya Dermatoloji uzmanına danışın.',
+              );
+            }
+          }
           if (structural.hasNailWhiteLinesOrSpots) {
             obs.add(
               'Tırnak plağında beyaz nokta / yatay beyaz çizgi kontrastı (%${(structural.whiteLineSpotRatio * 100).toStringAsFixed(1)}) tespit edildi.',
             );
+            findings.add('nail_white_spots_leukonychia');
             if (risk == RiskLevel.normal) {
               risk = RiskLevel.attention;
               title = 'Tırnakta Beyaz Çizgi / Nokta (Lökoniki İpucu)';
@@ -1041,6 +1357,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
             obs.add(
               'Tırnak yüzeyinde/ucunda kırılma, soyulma veya pürüzlü oluk dokusu (pürüzlülük %${(structural.fractureEdgeRoughness * 100).toStringAsFixed(0)}) saptandı.',
             );
+            findings.add('nail_brittle_splitting_vertical');
             if (risk == RiskLevel.normal) {
               risk = RiskLevel.attention;
               title = 'Tırnakta Kırılma / Soyulma / Yüzey Pürüzlülüğü';
@@ -1056,6 +1373,12 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         break;
     }
 
+    // If an abnormal finding was added, remove generic healthy fallback IDs.
+    final deduplicatedFindings = findings.toSet().toList();
+    if (risk != RiskLevel.normal && deduplicatedFindings.length > 1) {
+      deduplicatedFindings.removeWhere((id) => id.contains('_healthy_'));
+    }
+
     return result.copyWith(
       riskLevel: risk,
       summaryTitle: title,
@@ -1063,6 +1386,89 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       observations: obs.toSet().toList(),
       recommendations: recs.toSet().toList(),
       warningFlags: warns.toSet().toList(),
+      matchedFindingIds: deduplicatedFindings,
     );
+  }
+
+  Map<String, String> _buildColorAndStructuralMetrics({
+    required CheckCategory category,
+    required int r,
+    required int g,
+    required int b,
+    required LabColor lab,
+    required StructuralFeatures structural,
+    required EyeScanMode eyeScanMode,
+  }) {
+    final ei = ColorCalibrator.erythemaIndex(r, g);
+    switch (category) {
+      case CheckCategory.eye:
+        if (eyeScanMode == EyeScanMode.palpebralConjunctiva) {
+          final conjEi = structural.conjunctivaErythemaIndex > 0
+              ? structural.conjunctivaErythemaIndex
+              : ei;
+          return {
+            'Tarama Modu': 'Alt Göz Kapağı (Anemi)',
+            'Konjonktiva Eritem İndeksi': conjEi.toStringAsFixed(1),
+            'CIE a* (Kırmızılık)': lab.a.toStringAsFixed(1),
+            'CIE L* (Aydınlık)': lab.l.toStringAsFixed(1),
+          };
+        }
+        return {
+          'Sklera Sarılık (b*)': lab.b.toStringAsFixed(1),
+          'BiliScreen İndeksi': structural.scleralBilirubinIndex.toStringAsFixed(1),
+          'Kılcal Damar Oranı':
+              '%${(structural.scleraVesselRatio * 100).toStringAsFixed(1)}',
+          if (structural.hemorrhagePatchRatio > 0)
+            'Kanama Odağı':
+                '%${(structural.hemorrhagePatchRatio * 100).toStringAsFixed(1)}',
+        };
+      case CheckCategory.nail:
+        final nailEi =
+            structural.nailErythemaIndex > 0 ? structural.nailErythemaIndex : ei;
+        return {
+          'Tırnak Eritem İndeksi (Anemi)': nailEi.toStringAsFixed(1),
+          'Beyaz Nokta/Çizgi':
+              '%${(structural.whiteLineSpotRatio * 100).toStringAsFixed(1)}',
+          'Yüzey Pürüzlülük':
+              '%${(structural.fractureEdgeRoughness * 100).toStringAsFixed(0)}',
+          if (structural.darkVerticalBandScore > 0)
+            'Dikey Bant Skoru':
+                '%${(structural.darkVerticalBandScore * 100).toStringAsFixed(0)}',
+          if (structural.transverseGrooveScore > 0)
+            'Beau Enine Oluk':
+                '%${(structural.transverseGrooveScore * 100).toStringAsFixed(0)}',
+          if (structural.proximalDistalSplitScore > 0)
+            'Terry/Lindsay Ayrım':
+                '%${(structural.proximalDistalSplitScore * 100).toStringAsFixed(0)}',
+        };
+      case CheckCategory.tongue:
+        return {
+          'Fissür / Çatlak Oranı':
+              '%${(structural.fissureGrooveRatio * 100).toStringAsFixed(1)}',
+          'Pas / Kaplama Oranı':
+              '%${(structural.coatingPatchRatio * 100).toStringAsFixed(0)}',
+          'Mukoza Eritem İndeksi': (structural.mucosalErythemaIndex > 0
+                  ? structural.mucosalErythemaIndex
+                  : ei)
+              .toStringAsFixed(1),
+          if (structural.geographicPatchScore > 0)
+            'Coğrafi Dil Deseni':
+                '%${(structural.geographicPatchScore * 100).toStringAsFixed(0)}',
+        };
+      case CheckCategory.face:
+        return {
+          'Fitzpatrick Fototip': lab.fitzpatrickPhototype.shortLabel,
+          'ITA° Açısı': '${lab.individualTypologyAngle.toStringAsFixed(0)}°',
+          'Eritem İndeksi': ei.toStringAsFixed(1),
+          'CIE b* (Sarı Eksen)': lab.b.toStringAsFixed(1),
+        };
+      case CheckCategory.urine:
+      case CheckCategory.stool:
+      case CheckCategory.skinCondition:
+        return {
+          'CIE L* / a* / b*':
+              '${lab.l.toStringAsFixed(0)} / ${lab.a.toStringAsFixed(0)} / ${lab.b.toStringAsFixed(0)}',
+        };
+    }
   }
 }

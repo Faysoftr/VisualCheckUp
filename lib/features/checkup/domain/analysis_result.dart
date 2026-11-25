@@ -67,6 +67,8 @@ class AnalysisResult {
     this.baselineDeltaE,
     this.baselineComparisonNote,
     this.imagePath,
+    this.matchedFindingIds = const [],
+    this.clinicalMetrics = const {},
   });
 
   final String id;
@@ -86,6 +88,16 @@ class AnalysisResult {
   final String? baselineComparisonNote;
   final String? imagePath;
 
+  /// Reference finding IDs from [ModuleReferenceCatalog] matched by either
+  /// on-device CV/colorimetry or Vision AI, enabling side-by-side visual
+  /// reference comparison on [ResultScreen].
+  final List<String> matchedFindingIds;
+
+  /// Objective quantitative biomarkers (e.g. Fitzpatrick ITA°, Erythema Index,
+  /// ABCDE scores, fissure ratio, capillary ratio) shown on [ResultScreen]
+  /// and exported to Doctor Visit Reports.
+  final Map<String, String> clinicalMetrics;
+
   Color get dominantColor => Color(dominantColorValue);
 
   AnalysisResult copyWith({
@@ -101,6 +113,8 @@ class AnalysisResult {
     double? baselineDeltaE,
     String? baselineComparisonNote,
     String? imagePath,
+    List<String>? matchedFindingIds,
+    Map<String, String>? clinicalMetrics,
   }) {
     return AnalysisResult(
       id: id,
@@ -121,6 +135,8 @@ class AnalysisResult {
       baselineComparisonNote:
           baselineComparisonNote ?? this.baselineComparisonNote,
       imagePath: imagePath ?? this.imagePath,
+      matchedFindingIds: matchedFindingIds ?? this.matchedFindingIds,
+      clinicalMetrics: clinicalMetrics ?? this.clinicalMetrics,
     );
   }
 
@@ -143,10 +159,19 @@ class AnalysisResult {
       if (baselineComparisonNote != null)
         'baselineComparisonNote': baselineComparisonNote,
       if (imagePath != null) 'imagePath': imagePath,
+      if (matchedFindingIds.isNotEmpty) 'matchedFindingIds': matchedFindingIds,
+      if (clinicalMetrics.isNotEmpty) 'clinicalMetrics': clinicalMetrics,
     };
   }
 
   factory AnalysisResult.fromJson(Map<String, dynamic> json) {
+    final rawMetrics = json['clinicalMetrics'];
+    final metrics = <String, String>{};
+    if (rawMetrics is Map) {
+      for (final entry in rawMetrics.entries) {
+        metrics[entry.key.toString()] = entry.value.toString();
+      }
+    }
     return AnalysisResult(
       id: json['id'] as String,
       category: CheckCategoryX.fromId(json['category'] as String),
@@ -166,6 +191,11 @@ class AnalysisResult {
       baselineDeltaE: (json['baselineDeltaE'] as num?)?.toDouble(),
       baselineComparisonNote: json['baselineComparisonNote'] as String?,
       imagePath: json['imagePath'] as String?,
+      matchedFindingIds: (json['matchedFindingIds'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      clinicalMetrics: metrics,
     );
   }
 }

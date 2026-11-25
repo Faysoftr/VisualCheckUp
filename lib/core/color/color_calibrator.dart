@@ -3,6 +3,44 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
+/// Objective constitutive skin-tone categories derived from CIE L*a*b*
+/// Individual Typology Angle (Chardon / Del Bino ISO-24444 standard):
+/// `ITA° = atan((L* - 50) / b*) * (180 / π)`.
+enum FitzpatrickPhototype {
+  veryLight, // > 55° (Type I)
+  light, // 41° .. 55° (Type II)
+  intermediate, // 28° .. 41° (Type III)
+  tan, // 10° .. 28° (Type IV)
+  brown, // -30° .. 10° (Type V)
+  dark, // < -30° (Type VI)
+}
+
+extension FitzpatrickPhototypeX on FitzpatrickPhototype {
+  String get shortLabel {
+    switch (this) {
+      case FitzpatrickPhototype.veryLight:
+        return 'Tip I (Çok Açık)';
+      case FitzpatrickPhototype.light:
+        return 'Tip II (Açık)';
+      case FitzpatrickPhototype.intermediate:
+        return 'Tip III (Buğday)';
+      case FitzpatrickPhototype.tan:
+        return 'Tip IV (Esmer)';
+      case FitzpatrickPhototype.brown:
+        return 'Tip V (Koyu Esmer)';
+      case FitzpatrickPhototype.dark:
+        return 'Tip VI (Çok Koyu)';
+    }
+  }
+
+  /// Whether darker constitutive melanin requires relative contrast checks
+  /// rather than absolute low-luminance / high-b* thresholds.
+  bool get isDarkerSkinOfColor =>
+      this == FitzpatrickPhototype.tan ||
+      this == FitzpatrickPhototype.brown ||
+      this == FitzpatrickPhototype.dark;
+}
+
 /// Perceptual CIE L*a*b* color (D65 reference white).
 ///
 /// Separates lightness (L*) from chromaticity (a*: green-to-red,
@@ -46,6 +84,27 @@ class LabColor {
       a: 500.0 * (fx - fy),
       b: 200.0 * (fy - fz),
     );
+  }
+
+  /// Perceptual chroma C* = sqrt(a*^2 + b*^2).
+  double get chroma => math.sqrt(a * a + b * b);
+
+  /// Individual Typology Angle (ITA°) in degrees for objective skin-tone
+  /// quantification (Chardon et al., ISO 24444).
+  double get individualTypologyAngle {
+    final safeB = b.abs() < 0.5 ? (b >= 0 ? 0.5 : -0.5) : b;
+    return math.atan((l - 50.0) / safeB) * (180.0 / math.pi);
+  }
+
+  /// Maps [individualTypologyAngle] to standard 6-tier skin phototype.
+  FitzpatrickPhototype get fitzpatrickPhototype {
+    final ita = individualTypologyAngle;
+    if (ita > 55.0) return FitzpatrickPhototype.veryLight;
+    if (ita > 41.0) return FitzpatrickPhototype.light;
+    if (ita > 28.0) return FitzpatrickPhototype.intermediate;
+    if (ita > 10.0) return FitzpatrickPhototype.tan;
+    if (ita > -30.0) return FitzpatrickPhototype.brown;
+    return FitzpatrickPhototype.dark;
   }
 
   /// CIE76 perceptual color distance.
@@ -388,5 +447,42 @@ class ColorCalibrator {
       (sumG / take).round().clamp(0, 255),
       (sumB / take).round().clamp(0, 255),
     );
+  }
+
+  /// Collings / Mannino Erythema Index (EI):
+  /// `EI = 100 * (log10(max(1, R)) - log10(max(1, G)))`.
+  ///
+  /// Because it is a log-ratio of red-to-green reflectance, EI is robust to
+  /// overall brightness shifts and strongly correlates with mucosal/nailbed
+  /// hemoglobin concentration (anemia pallor screening) and skin erythema.
+  static double erythemaIndex(int r, int g) {
+    final safeR = math.max(1, r).toDouble();
+    final safeG = math.max(1, g).toDouble();
+    return 100.0 * ((math.log(safeR) - math.log(safeG)) / math.ln10);
+  }
+
+  /// Melanin Index (MI): `100 * log10(255 / max(1, R))`.
+  static double melaninIndex(int r) {
+    final safeR = math.max(1, r).toDouble();
+    return 100.0 * ((math.log(255.0) - math.log(safeR)) / math.ln10);
+  }
+
+  /// Applies Von Kries [gains] to every pixel of [roi] (typically a small
+  /// resized 96x96 ROI) so downstream 2D structural detectors run on
+  /// white-balance-calibrated pixels.
+  static img.Image applyGainsToImage(img.Image roi, WhiteBalanceGains gains) {
+    final out = img.Image(width: roi.width, height: roi.height);
+    for (int y = 0; y < roi.height; y++) {
+      for (int x = 0; x < roi.width; x++) {
+        final p = roi.getPixel(x, y);
+        final (nr, ng, nb) = gains.applyToRgb(
+          p.r.round().clamp(0, 255),
+          p.g.round().clamp(0, 255),
+          p.b.round().clamp(0, 255),
+        );
+        out.setPixelRgb(x, y, nr, ng, nb);
+      }
+    }
+    return out;
   }
 }

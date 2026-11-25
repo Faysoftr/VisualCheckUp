@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/ai/gemini_vision_ai_client.dart';
+import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
@@ -76,7 +78,12 @@ class _SkinCheckScreenState extends State<SkinCheckScreen> {
           : _bodyAreaLabel(_selectedBodyArea!, context),
     );
 
-    final analyzer = SkinConditionAnalyzer(skinContext: skinContext);
+    final analyzer = HybridHealthAnalyzer(
+      fallbackAnalyzer: SkinConditionAnalyzer(skinContext: skinContext),
+      aiClient: GeminiVisionAiClient.fromEnvironment(),
+      cacheRepository: widget.historyRepository,
+      skinContext: skinContext,
+    );
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(

@@ -285,15 +285,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: _showTermsError
-                                        ? colorScheme.errorContainer
-                                            .withValues(alpha: 0.35)
-                                        : colorScheme.surfaceContainerHighest
-                                            .withValues(alpha: 0.45),
+                                Material(
+                                  color: _showTermsError
+                                      ? colorScheme.errorContainer
+                                          .withValues(alpha: 0.35)
+                                      : colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.45),
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
+                                    side: BorderSide(
                                       color: _showTermsError
                                           ? colorScheme.error
                                           : (_termsAccepted
@@ -303,6 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       width: _showTermsError ? 1.5 : 1.0,
                                     ),
                                   ),
+                                  clipBehavior: Clip.antiAlias,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,

@@ -16,6 +16,7 @@ class QuickColorSwatch {
     required this.recommendations,
     this.warningFlags = const [],
     this.canBeBenignFoodOrMed = false,
+    this.referenceFindingId,
   });
 
   final String id;
@@ -28,6 +29,7 @@ class QuickColorSwatch {
   final List<String> recommendations;
   final List<String> warningFlags;
   final bool canBeBenignFoodOrMed;
+  final String? referenceFindingId;
 }
 
 class QuickContextOption {
@@ -46,8 +48,74 @@ class QuickContextOption {
   final bool isRedFlagSymptom;
 }
 
+/// Standard gastroenterology Bristol Stool Form Scale (Types 1–7).
+class BristolStoolType {
+  const BristolStoolType({
+    required this.typeNumber,
+    required this.title,
+    required this.detail,
+    required this.clinicalCue,
+    this.isAbnormal = false,
+  });
+
+  final int typeNumber;
+  final String title;
+  final String detail;
+  final String clinicalCue;
+  final bool isAbnormal;
+}
+
 class QuickColorCardCatalog {
   QuickColorCardCatalog._();
+
+  static const List<BristolStoolType> bristolScale = [
+    BristolStoolType(
+      typeNumber: 1,
+      title: 'Tip 1 • Sert Topaklar',
+      detail: 'Ayrı sert topaklar (fındık gibi)',
+      clinicalCue: 'Belirgin kabızlık — su ve lif alımını artırın.',
+      isAbnormal: true,
+    ),
+    BristolStoolType(
+      typeNumber: 2,
+      title: 'Tip 2 • Topaklı Sert',
+      detail: 'Topaklı, sert ve sosis şeklinde',
+      clinicalCue: 'Hafif kabızlık eğilimi — hareket ve lif önerilir.',
+      isAbnormal: true,
+    ),
+    BristolStoolType(
+      typeNumber: 3,
+      title: 'Tip 3 • Çatlaklı Şekilli',
+      detail: 'Yüzeyinde ince çatlaklar olan şekilli',
+      clinicalCue: 'İdeal bağırsak geçişi aralığı.',
+    ),
+    BristolStoolType(
+      typeNumber: 4,
+      title: 'Tip 4 • Pürüzsüz Yumuşak',
+      detail: 'Pürüzsüz, yumuşak ve kolay geçişli',
+      clinicalCue: 'En ideal sindirim ve hidrasyon dengesi.',
+    ),
+    BristolStoolType(
+      typeNumber: 5,
+      title: 'Tip 5 • Yumuşak Parçalar',
+      detail: 'Keskin kenarlı yumuşak parçalar',
+      clinicalCue: 'Lif azlığı veya hafif hızlı geçiş.',
+    ),
+    BristolStoolType(
+      typeNumber: 6,
+      title: 'Tip 6 • Lapa / Dağınık',
+      detail: 'Pürüzlü kenarlı yumuşak lapa kıvamı',
+      clinicalCue: 'Hafif ishal eğilimi — sıvı alımını artırın.',
+      isAbnormal: true,
+    ),
+    BristolStoolType(
+      typeNumber: 7,
+      title: 'Tip 7 • Tamamen Sulu',
+      detail: 'Katı parça içermeyen tamamen sıvı',
+      clinicalCue: 'Akut ishal — sıvı/elektrolit desteği ve 48+ saat sürerse hekim kontrolü gerekir.',
+      isAbnormal: true,
+    ),
+  ];
 
   static List<QuickColorSwatch> swatchesFor(CheckCategory category) {
     switch (category) {
@@ -71,10 +139,30 @@ class QuickColorCardCatalog {
     }
   }
 
+  static String? _resolveFindingId(QuickColorSwatch swatch) {
+    if (swatch.referenceFindingId != null) return swatch.referenceFindingId;
+    return switch (swatch.id) {
+      'urine_clear' => 'urine_clear_overhydrated',
+      'urine_straw' => 'urine_healthy_pale_straw',
+      'urine_amber' => 'urine_dark_yellow_dehydration',
+      'urine_cloudy' => 'urine_cloudy_foamy',
+      'urine_tea' => 'urine_dark_amber_tea',
+      'urine_pink_red' => 'urine_pink_red_hematuria',
+      'stool_brown' => 'stool_healthy_brown',
+      'stool_green' => 'stool_greenish',
+      'stool_yellow' => 'stool_yellow_greasy',
+      'stool_pale_clay' => 'stool_pale_clay_white',
+      'stool_black_tar' => 'stool_black_tarry_melena',
+      'stool_red' => 'stool_bright_red_blood',
+      _ => null,
+    };
+  }
+
   static AnalysisResult buildResult({
     required CheckCategory category,
     required QuickColorSwatch swatch,
     Set<String> selectedContextIds = const {},
+    BristolStoolType? bristolType,
     DateTime? now,
   }) {
     final timestamp = now ?? DateTime.now();
@@ -91,10 +179,17 @@ class QuickColorCardCatalog {
     } else if (hasRedFlag && riskLevel == RiskLevel.attention) {
       riskLevel = RiskLevel.urgent;
     }
+    if (bristolType != null &&
+        bristolType.isAbnormal &&
+        riskLevel == RiskLevel.normal) {
+      riskLevel = RiskLevel.attention;
+    }
 
     final observations = <String>[
       'Kamerasız renk kartı seçimi: ${swatch.title}',
       ...swatch.observations,
+      if (bristolType != null)
+        'Bristol Kıvam Skalası: ${bristolType.title} — ${bristolType.clinicalCue}',
       for (final opt in selectedOptions) opt.note,
     ];
 
@@ -114,6 +209,13 @@ class QuickColorCardCatalog {
       );
     }
 
+    final refId = _resolveFindingId(swatch);
+    final metrics = <String, String>{
+      'Yöntem': 'Standart Renk Kartı',
+      if (bristolType != null)
+        'Bristol Kıvamı': 'Tip ${bristolType.typeNumber} (${bristolType.title.split('•').last.trim()})',
+    };
+
     return AnalysisResult(
       id: 'quick_${category.id}_${timestamp.microsecondsSinceEpoch}',
       category: category,
@@ -129,6 +231,8 @@ class QuickColorCardCatalog {
       whiteBalanceCalibrated: false,
       lightingNote:
           'Fotoğraf çekmeden standart renk kartı üzerinden doğrudan kullanıcı seçimiyle kaydedildi.',
+      matchedFindingIds: refId != null ? [refId] : const [],
+      clinicalMetrics: metrics,
     );
   }
 

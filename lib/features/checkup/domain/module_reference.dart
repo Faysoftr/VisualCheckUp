@@ -44,6 +44,29 @@ class ReferenceFinding {
       };
 }
 
+/// Evidence-based bedside self-check protocol (e.g., Schamroth Window Test for
+/// nail clubbing, Diascopy glass test for non-blanching petechiae, ABCDEF nail
+/// melanoma rule, Lower Eyelid pallor check, Bristol Stool Scale).
+class ClinicalSelfTest {
+  const ClinicalSelfTest({
+    required this.id,
+    required this.title,
+    required this.purpose,
+    required this.steps,
+    required this.normalResult,
+    required this.warningResult,
+    required this.icon,
+  });
+
+  final String id;
+  final String title;
+  final String purpose;
+  final List<String> steps;
+  final String normalResult;
+  final String warningResult;
+  final IconData icon;
+}
+
 /// Complete healthy vs. unhealthy visual reference specification for a module.
 class ModuleReferenceSpec {
   const ModuleReferenceSpec({
@@ -51,12 +74,20 @@ class ModuleReferenceSpec {
     required this.healthySummary,
     required this.captureQualityChecklist,
     required this.findings,
+    this.selfTests = const [],
+    this.clinicalMethodSummary,
   });
 
   final CheckCategory category;
   final String healthySummary;
   final List<String> captureQualityChecklist;
   final List<ReferenceFinding> findings;
+
+  /// Guided evidence-based home self-checks complementing smartphone photos.
+  final List<ClinicalSelfTest> selfTests;
+
+  /// Concise summary of the clinical colorimetry / computer vision method used.
+  final String? clinicalMethodSummary;
 
   List<ReferenceFinding> get healthyReferences =>
       findings.where((f) => f.isHealthyReference).toList();

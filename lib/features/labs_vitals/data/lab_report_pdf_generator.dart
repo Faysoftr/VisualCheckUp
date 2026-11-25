@@ -446,7 +446,10 @@ class LabReportPdfGenerator {
       y = h.bounds.bottom + 6;
 
       final vLines = visualChecks.take(10).map((c) {
-        return '• ${df.format(c.createdAt)} — ${c.category.title}: ${c.summaryTitle} [${c.riskLevel.label}]';
+        final metricsSuffix = c.clinicalMetrics.isEmpty
+            ? ''
+            : '\n   Ölçümler: ${c.clinicalMetrics.entries.take(4).map((e) => '${e.key}=${e.value}').join(' | ')}';
+        return '• ${df.format(c.createdAt)} — ${c.category.title}: ${c.summaryTitle} [${c.riskLevel.label}]$metricsSuffix';
       }).join('\n');
 
       final body = sf.PdfTextElement(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/ai/gemini_vision_ai_client.dart';
+import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
@@ -9,7 +11,8 @@ import 'package:visualcheckup/features/checkup/presentation/screens/camera_check
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
 
 /// Camera-free 2-second color chart picker for privacy-sensitive categories
-/// (urine hydration and stool awareness) with optional food/medication context.
+/// (urine hydration and stool awareness + Bristol Scale) with optional
+/// food/medication context.
 class QuickColorCardScreen extends StatefulWidget {
   const QuickColorCardScreen({
     super.key,
@@ -30,6 +33,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
   late final List<QuickColorSwatch> _swatches;
   late final List<QuickContextOption> _contextOptions;
   String? _selectedSwatchId;
+  BristolStoolType? _selectedBristol;
   final Set<String> _selectedContexts = <String>{};
   bool _saving = false;
 
@@ -57,6 +61,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
       category: widget.category,
       swatch: swatch,
       selectedContextIds: _selectedContexts,
+      bristolType: _selectedBristol,
     );
     await widget.historyRepository.saveResult(result);
 
@@ -73,11 +78,16 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
   }
 
   Future<void> _switchToCamera() async {
+    final hybrid = HybridHealthAnalyzer(
+      fallbackAnalyzer: widget.analyzer ?? ColorHealthAnalyzer(),
+      aiClient: GeminiVisionAiClient.fromEnvironment(),
+      cacheRepository: widget.historyRepository,
+    );
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (_) => CameraCheckScreen(
           category: widget.category,
-          analyzer: widget.analyzer ?? ColorHealthAnalyzer(),
+          analyzer: hybrid,
           historyRepository: widget.historyRepository,
         ),
       ),
@@ -214,6 +224,43 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
               );
             },
           ),
+          if (widget.category == CheckCategory.stool) ...[
+            const SizedBox(height: 20),
+            Text(
+              'Bristol Dışkı Kıvam Skalası (Opsiyonel • Tip 1–7)',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: QuickColorCardCatalog.bristolScale.map((item) {
+                final selected =
+                    _selectedBristol?.typeNumber == item.typeNumber;
+                return ChoiceChip(
+                  selected: selected,
+                  label: Text(item.title),
+                  onSelected: (val) {
+                    setState(() {
+                      _selectedBristol = val ? item : null;
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            if (_selectedBristol != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                '${_selectedBristol!.detail} — ${_selectedBristol!.clinicalCue}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ],
           if (_contextOptions.isNotEmpty) ...[
             const SizedBox(height: 20),
             Text(

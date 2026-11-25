@@ -50,6 +50,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   double _maxZoom = 1.0;
   double _currentZoom = 1.0;
   Offset? _focusPoint;
+  EyeScanMode _eyeScanMode = EyeScanMode.sclera;
 
   @override
   void initState() {
@@ -199,9 +200,21 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     _torchEnabled = false;
     await previous?.dispose();
 
+    final preset = switch (widget.category) {
+      CheckCategory.skinCondition ||
+      CheckCategory.nail ||
+      CheckCategory.eye ||
+      CheckCategory.tongue =>
+        ResolutionPreset.high,
+      CheckCategory.face ||
+      CheckCategory.urine ||
+      CheckCategory.stool =>
+        ResolutionPreset.medium,
+    };
+
     final controller = CameraController(
       _cameras[index],
-      ResolutionPreset.medium,
+      preset,
       enableAudio: false,
     );
 
@@ -364,6 +377,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
           baseline: _baseline,
           allowCloudAi: allowCloudAi,
           languageCode: langCode,
+          eyeScanMode: _eyeScanMode,
         ),
       );
       final savedPhotoPath = await CheckupPhotoStorage.savePhoto(
@@ -514,6 +528,99 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                                 color: _useWhiteReference
                                     ? Colors.white
                                     : Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (widget.category == CheckCategory.eye)
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () => setState(() {
+                          _eyeScanMode = _eyeScanMode == EyeScanMode.sclera
+                              ? EyeScanMode.palpebralConjunctiva
+                              : EyeScanMode.sclera;
+                        }),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _eyeScanMode ==
+                                    EyeScanMode.palpebralConjunctiva
+                                ? const Color(0xFFD65A6F)
+                                    .withValues(alpha: 0.28)
+                                : Colors.white10,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: _eyeScanMode ==
+                                      EyeScanMode.palpebralConjunctiva
+                                  ? const Color(0xFFFF8FA2)
+                                  : Colors.white24,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _eyeScanMode == EyeScanMode.palpebralConjunctiva
+                                    ? Icons.bloodtype_outlined
+                                    : Icons.visibility_outlined,
+                                size: 14,
+                                color: _eyeScanMode ==
+                                        EyeScanMode.palpebralConjunctiva
+                                    ? const Color(0xFFFFA6B5)
+                                    : Colors.white70,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _eyeScanMode == EyeScanMode.palpebralConjunctiva
+                                    ? 'Alt Göz Kapağı (Anemi)'
+                                    : 'Mod: Sklera (Sarılık)',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => ModuleReferenceSheet.show(
+                        context,
+                        widget.category,
+                        focusSelfTests: true,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.fact_check_outlined,
+                              size: 14,
+                              color: Color(0xFF5CE1D6),
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              'Klinik Test & Atlas',
+                              style: TextStyle(
+                                color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -704,15 +811,14 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                             fit: StackFit.expand,
                             children: [
                               Center(
-                                child: Container(
-                                  width: 210,
-                                  height: 210,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      width: 2.5,
+                                child: SizedBox(
+                                  width: 224,
+                                  height: 224,
+                                  child: CustomPaint(
+                                    painter: _AnatomicalReticlePainter(
+                                      category: widget.category,
+                                      eyeScanMode: _eyeScanMode,
                                     ),
-                                    borderRadius: BorderRadius.circular(28),
                                   ),
                                 ),
                               ),
@@ -900,5 +1006,149 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     }
 
     return Center(child: CameraPreview(_controller!));
+  }
+}
+
+class _AnatomicalReticlePainter extends CustomPainter {
+  const _AnatomicalReticlePainter({
+    required this.category,
+    required this.eyeScanMode,
+  });
+
+  final CheckCategory category;
+  final EyeScanMode eyeScanMode;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cx = w * 0.5;
+    final cy = h * 0.5;
+
+    final framePaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.90)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4;
+    final guidePaint = Paint()
+      ..color = const Color(0xFF5CE1D6).withValues(alpha: 0.85)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6;
+
+    // Outer subtle rounded bounding frame
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(4, 4, w - 8, h - 8),
+        const Radius.circular(28),
+      ),
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.42)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6,
+    );
+
+    switch (category) {
+      case CheckCategory.eye:
+        if (eyeScanMode == EyeScanMode.palpebralConjunctiva) {
+          // Lower eyelid inner mucosa arc guide
+          final arc = Path()
+            ..moveTo(w * 0.14, h * 0.44)
+            ..quadraticBezierTo(cx, h * 0.54, w * 0.86, h * 0.44)
+            ..quadraticBezierTo(cx, h * 0.86, w * 0.14, h * 0.44);
+          canvas.drawPath(arc, guidePaint..strokeWidth = 2.4);
+          _drawLabel(canvas, 'Alt Göz Kapağı İçi', Offset(cx, h * 0.88));
+        } else {
+          final eye = Path()
+            ..moveTo(w * 0.10, cy)
+            ..quadraticBezierTo(cx, h * 0.22, w * 0.90, cy)
+            ..quadraticBezierTo(cx, h * 0.78, w * 0.10, cy)
+            ..close();
+          canvas.drawPath(eye, framePaint);
+          canvas.drawCircle(Offset(cx, cy), w * 0.14, guidePaint);
+          _drawLabel(canvas, 'Göz Akını Ortala', Offset(cx, h * 0.86));
+        }
+      case CheckCategory.nail:
+        // Fingernail plate arch + lunula marker
+        final nail = RRect.fromLTRBAndCorners(
+          w * 0.26,
+          h * 0.14,
+          w * 0.74,
+          h * 0.82,
+          topLeft: Radius.circular(w * 0.20),
+          topRight: Radius.circular(w * 0.20),
+          bottomLeft: Radius.circular(w * 0.14),
+          bottomRight: Radius.circular(w * 0.14),
+        );
+        canvas.drawRRect(nail, framePaint);
+        canvas.drawArc(
+          Rect.fromCenter(
+            center: Offset(cx, h * 0.82),
+            width: w * 0.30,
+            height: h * 0.16,
+          ),
+          3.14159,
+          3.14159,
+          false,
+          guidePaint,
+        );
+        _drawLabel(canvas, 'Tırnak Plağı', Offset(cx, h * 0.90));
+      case CheckCategory.tongue:
+        final tongue = Path()
+          ..moveTo(w * 0.22, h * 0.14)
+          ..lineTo(w * 0.78, h * 0.14)
+          ..quadraticBezierTo(w * 0.84, h * 0.64, cx, h * 0.86)
+          ..quadraticBezierTo(w * 0.16, h * 0.64, w * 0.22, h * 0.14)
+          ..close();
+        canvas.drawPath(tongue, framePaint);
+        canvas.drawLine(
+          Offset(cx, h * 0.20),
+          Offset(cx, h * 0.72),
+          guidePaint,
+        );
+        _drawLabel(canvas, 'Dil Yüzeyi', Offset(cx, h * 0.92));
+      case CheckCategory.skinCondition:
+        // Outer healthy-skin ring + inner lesion target + 6mm reference guide
+        canvas.drawCircle(Offset(cx, cy), w * 0.36, framePaint);
+        canvas.drawCircle(Offset(cx, cy), w * 0.18, guidePaint..strokeWidth = 2.0);
+        // Crosshair ticks
+        canvas.drawLine(Offset(cx - 10, cy), Offset(cx + 10, cy), guidePaint);
+        canvas.drawLine(Offset(cx, cy - 10), Offset(cx, cy + 10), guidePaint);
+        _drawLabel(canvas, 'Lezyon + Çevre Deri (10-15 cm)', Offset(cx, h * 0.90));
+      case CheckCategory.face:
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(cx, cy), width: w * 0.66, height: h * 0.82),
+          framePaint,
+        );
+      case CheckCategory.urine:
+      case CheckCategory.stool:
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromCenter(center: Offset(cx, cy), width: w * 0.78, height: h * 0.78),
+            const Radius.circular(24),
+          ),
+          framePaint,
+        );
+    }
+  }
+
+  void _drawLabel(Canvas canvas, String text, Offset center) {
+    final tp = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          shadows: [Shadow(color: Colors.black87, blurRadius: 4)],
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(center.dx - tp.width / 2, center.dy - tp.height / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant _AnatomicalReticlePainter oldDelegate) {
+    return oldDelegate.category != category ||
+        oldDelegate.eyeScanMode != eyeScanMode;
   }
 }

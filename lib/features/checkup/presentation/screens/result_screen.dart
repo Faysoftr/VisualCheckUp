@@ -6,8 +6,11 @@ import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/data/cross_module_correlator.dart';
 import 'package:visualcheckup/features/checkup/data/doctor_report_builder.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
+import 'package:visualcheckup/features/checkup/data/module_reference_catalog.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/category_baseline.dart';
+import 'package:visualcheckup/features/checkup/domain/module_reference.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/clinical_visual_illustration.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/doctor_summary_sheet.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
@@ -54,6 +57,7 @@ class _ResultScreenState extends State<ResultScreen> {
       labReports: labs,
       bpReadings: bp,
       sugarReadings: sugar,
+      visualHistory: history,
     );
     if (!mounted) return;
     setState(() {
@@ -427,6 +431,25 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
             ),
           ),
+
+          if (result.matchedFindingIds.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _MatchedVisualReferenceCard(
+              result: result,
+              onOpenAtlas: () =>
+                  ModuleReferenceSheet.show(context, result.category),
+              onOpenSelfTests: () => ModuleReferenceSheet.show(
+                context,
+                result.category,
+                focusSelfTests: true,
+              ),
+            ),
+          ],
+
+          if (result.clinicalMetrics.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _ClinicalBiomarkersCard(metrics: result.clinicalMetrics),
+          ],
 
           if (previousInCategory.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -944,6 +967,237 @@ class _PhotoTile extends StatelessWidget {
               ),
         ),
       ],
+    );
+  }
+}
+
+class _MatchedVisualReferenceCard extends StatelessWidget {
+  const _MatchedVisualReferenceCard({
+    required this.result,
+    required this.onOpenAtlas,
+    required this.onOpenSelfTests,
+  });
+
+  final AnalysisResult result;
+  final VoidCallback onOpenAtlas;
+  final VoidCallback onOpenSelfTests;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spec = ModuleReferenceCatalog.forCategory(result.category);
+    final healthyRef = spec.healthyReferences.firstOrNull;
+    final matchedFindings = <ReferenceFinding>[];
+    for (final id in result.matchedFindingIds) {
+      final f = ModuleReferenceCatalog.findById(id, category: result.category);
+      if (f != null) matchedFindings.add(f);
+    }
+    if (matchedFindings.isEmpty) return const SizedBox.shrink();
+
+    final primary = matchedFindings.first;
+    final showHealthySide =
+        healthyRef != null && !primary.isHealthyReference;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.auto_stories_outlined,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Resimli Klinik Referans Kıyaslaması',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showHealthySide) ...[
+                  Column(
+                    children: [
+                      ClinicalVisualIllustration(
+                        findingId: healthyRef.id,
+                        category: result.category,
+                        fallbackColor: healthyRef.swatchColor,
+                        size: 74,
+                        borderRadius: 14,
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        'Sağlıklı',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1B8A5A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 28),
+                    child: Icon(Icons.compare_arrows_rounded, size: 18),
+                  ),
+                ],
+                Column(
+                  children: [
+                    ClinicalVisualIllustration(
+                      findingId: primary.id,
+                      category: result.category,
+                      fallbackColor: primary.swatchColor,
+                      size: 74,
+                      borderRadius: 14,
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      primary.isHealthyReference ? 'Sağlıklı' : 'Eşleşen',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: primary.riskLevel.color,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        primary.title,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        primary.visualSignature,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          height: 1.38,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: onOpenAtlas,
+                  icon: const Icon(Icons.menu_book_outlined, size: 16),
+                  label: const Text('Tüm Resimli Atlası Gör'),
+                ),
+                if (spec.selfTests.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: onOpenSelfTests,
+                    icon: const Icon(Icons.fact_check_outlined, size: 16),
+                    label: const Text('Evde Klinik Testler'),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ClinicalBiomarkersCard extends StatelessWidget {
+  const _ClinicalBiomarkersCard({required this.metrics});
+
+  final Map<String, String> metrics;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.analytics_outlined,
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Kantitatif Klinik Ölçümler',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: metrics.entries.map((entry) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        entry.key,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 10.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        entry.value,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

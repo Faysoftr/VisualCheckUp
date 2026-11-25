@@ -27,6 +27,7 @@ class CrossModuleHealthCorrelator {
     required List<LabReportRecord> labReports,
     List<BloodPressureReading> bpReadings = const [],
     List<BloodSugarReading> sugarReadings = const [],
+    List<AnalysisResult> visualHistory = const [],
   }) {
     final insights = <CrossModuleInsight>[];
     final df = DateFormat('dd.MM.yyyy');
@@ -50,10 +51,11 @@ class CrossModuleHealthCorrelator {
           byCode[code]?.status == LabStatus.high ||
           byCode[code]?.status == LabStatus.criticalHigh;
 
-      // 1. Anemia / Iron / B12 / Folate <-> Nail, Tongue, Face pallor/brittleness/fissures
+      // 1. Anemia / Iron / B12 / Folate <-> Nail, Tongue, Face, Eye conjunctiva pallor
       if (visualResult.category == CheckCategory.nail ||
           visualResult.category == CheckCategory.tongue ||
-          visualResult.category == CheckCategory.face) {
+          visualResult.category == CheckCategory.face ||
+          visualResult.category == CheckCategory.eye) {
         final lowAnemiaMarkers = [
           if (isLow('HGB')) byCode['HGB']!,
           if (isLow('HCT')) byCode['HCT']!,
@@ -63,13 +65,15 @@ class CrossModuleHealthCorrelator {
           if (isLow('FOLATE')) byCode['FOLATE']!,
         ];
         final visualMatchesAnemia = visualText.contains('soluk') ||
+            visualText.contains('anemi') ||
             visualText.contains('kırıl') ||
             visualText.contains('soyul') ||
             visualText.contains('kaşık') ||
             visualText.contains('beyaz') ||
             visualText.contains('yarık') ||
             visualText.contains('çatlak') ||
-            visualResult.riskLevel != RiskLevel.normal;
+            (visualResult.category != CheckCategory.eye &&
+                visualResult.riskLevel != RiskLevel.normal);
 
         if (lowAnemiaMarkers.isNotEmpty && visualMatchesAnemia) {
           final markerText = lowAnemiaMarkers
@@ -79,7 +83,7 @@ class CrossModuleHealthCorrelator {
             CrossModuleInsight(
               title: 'Kan Tahliliyle Örtüşen Bulgu (Demir / Vitamin Profili)',
               detail:
-                  '$labDateStr tarihli tahlilinizde düşük görünen $markerText değerleri, tırnak/dil/yüzdeki solukluk, kırılganlık veya çatlak görünümüyle ilişkili olabilir. İki kaydı doktorunuza birlikte göstermeniz faydalı olur.',
+                  '$labDateStr tarihli tahlilinizde düşük görünen $markerText değerleri, tırnak/dil/göz kapağı/yüzdeki solukluk, kırılganlık veya çatlak görünümüyle ilişkili olabilir. İki kaydı doktorunuza birlikte göstermeniz faydalı olur.',
               sourceLabel: 'Tahlil • $labDateStr',
             ),
           );
@@ -193,6 +197,123 @@ class CrossModuleHealthCorrelator {
             sourceLabel: 'Kan Şekeri • ${df.format(latestSugar.recordedAt)}',
           ),
         );
+      }
+    }
+
+    // 7. Multi-Module Visual Triads across recent visual checks (within 14 days)
+    if (visualHistory.isNotEmpty) {
+      final recentOthers = visualHistory.where((r) {
+        if (r.id == visualResult.id || r.category == visualResult.category) {
+          return false;
+        }
+        final diffDays = visualResult.createdAt.difference(r.createdAt).inDays.abs();
+        return diffDays <= 14;
+      }).toList();
+
+      bool hasAnyCue(AnalysisResult r, List<String> keywords) {
+        final combined =
+            '${r.summaryTitle} ${r.summaryDetail} ${r.matchedFindingIds.join(' ')}'
+                .toLowerCase();
+        return keywords.any(combined.contains);
+      }
+
+      // 7a. Hepatobiliary / Jaundice Triad: Eye/Face yellow + Dark urine / Clay stool
+      final currentJaundiceCue =
+          (visualResult.category == CheckCategory.eye &&
+                  hasAnyCue(visualResult, ['sarı', 'jaundice'])) ||
+              (visualResult.category == CheckCategory.urine &&
+                  hasAnyCue(visualResult, ['kehribar', 'çay', 'dark_amber'])) ||
+              (visualResult.category == CheckCategory.stool &&
+                  hasAnyCue(visualResult, ['kil', 'beyaz', 'pale_clay'])) ||
+              (visualResult.category == CheckCategory.face &&
+                  hasAnyCue(visualResult, ['sarı', 'jaundice']));
+      if (currentJaundiceCue) {
+        final partner = recentOthers.where((r) {
+          if (r.category == CheckCategory.eye || r.category == CheckCategory.face) {
+            return hasAnyCue(r, ['sarı', 'jaundice']);
+          }
+          if (r.category == CheckCategory.urine) {
+            return hasAnyCue(r, ['kehribar', 'çay', 'dark_amber']);
+          }
+          if (r.category == CheckCategory.stool) {
+            return hasAnyCue(r, ['kil', 'beyaz', 'pale_clay']);
+          }
+          return false;
+        }).firstOrNull;
+        if (partner != null) {
+          insights.add(
+            CrossModuleInsight(
+              title: 'Çoklu Modül Sarılık / Safra Yolu Uyarısı',
+              detail:
+                  '${partner.category.title} kaydınızdaki "${partner.summaryTitle}" bulgusu ile bugünkü ${visualResult.category.title} bulgunuz birlikte görüldüğünde karaciğer/safra yolu (bilirubin) değerlendirmesi için gecikmeden Dahiliye uzmanına başvurmanız önerilir.',
+              sourceLabel: 'Çapraz Görsel • ${df.format(partner.createdAt)}',
+            ),
+          );
+        }
+      }
+
+      // 7b. Multi-Site Anemia Pallor Triad: Nail + Tongue + Eye conjunctiva + Face
+      final currentAnemiaCue = (visualResult.category == CheckCategory.nail ||
+              visualResult.category == CheckCategory.tongue ||
+              visualResult.category == CheckCategory.eye ||
+              visualResult.category == CheckCategory.face) &&
+          hasAnyCue(visualResult, [
+            'soluk',
+            'anemi',
+            'pale',
+            'conjunctiva_pallor',
+            'kaşık',
+            'yarık',
+          ]);
+      if (currentAnemiaCue) {
+        final partner = recentOthers.where((r) {
+          return (r.category == CheckCategory.nail ||
+                  r.category == CheckCategory.tongue ||
+                  r.category == CheckCategory.eye ||
+                  r.category == CheckCategory.face) &&
+              hasAnyCue(r, [
+                'soluk',
+                'anemi',
+                'pale',
+                'conjunctiva_pallor',
+                'kaşık',
+                'yarık',
+              ]);
+        }).firstOrNull;
+        if (partner != null) {
+          insights.add(
+            CrossModuleInsight(
+              title: 'Çoklu Bölge Anemi (Kansızlık) Ön Farkındalığı',
+              detail:
+                  'Hem ${partner.category.title} hem de ${visualResult.category.title} taramalarında solukluk/eksiklik ipucu saptandı. Birden fazla bölgede solukluk görülmesi tam kan sayımı (HGB, Ferritin, Demir, B12, Folat) kontrolünü destekler.',
+              sourceLabel: 'Çapraz Görsel • ${df.format(partner.createdAt)}',
+            ),
+          );
+        }
+      }
+
+      // 7c. Cardiopulmonary Oxygenation / Cyanosis Triad: Nail + Tongue + Face
+      final currentCyanosisCue = (visualResult.category == CheckCategory.nail ||
+              visualResult.category == CheckCategory.tongue ||
+              visualResult.category == CheckCategory.face) &&
+          hasAnyCue(visualResult, ['mor', 'mavi', 'siyanoz', 'cyanot']);
+      if (currentCyanosisCue) {
+        final partner = recentOthers.where((r) {
+          return (r.category == CheckCategory.nail ||
+                  r.category == CheckCategory.tongue ||
+                  r.category == CheckCategory.face) &&
+              hasAnyCue(r, ['mor', 'mavi', 'siyanoz', 'cyanot']);
+        }).firstOrNull;
+        if (partner != null) {
+          insights.add(
+            CrossModuleInsight(
+              title: 'Çoklu Bölge Morarma (Oksijenlenme / Dolaşım Uyarısı)',
+              detail:
+                  'Hem ${partner.category.title} hem de ${visualResult.category.title} kayıtlarında mor/mavimsi ton saptandı. Nefes darlığı, çarpıntı veya göğüs rahatsızlığı eşlik ediyorsa acil tıbbi değerlendirme alın.',
+              sourceLabel: 'Çapraz Görsel • ${df.format(partner.createdAt)}',
+            ),
+          );
+        }
       }
     }
 

@@ -15,17 +15,69 @@ class ModuleReferenceCatalog {
     return _specs[category]!;
   }
 
+  /// Looks up a [ReferenceFinding] by its stable snake_case [id] across all
+  /// modules (or optionally scoped to [category]).
+  static ReferenceFinding? findById(String id, {CheckCategory? category}) {
+    if (category != null) {
+      for (final f in forCategory(category).findings) {
+        if (f.id == id) return f;
+      }
+      return null;
+    }
+    for (final spec in _specs.values) {
+      for (final f in spec.findings) {
+        if (f.id == id) return f;
+      }
+    }
+    return null;
+  }
+
   static List<ModuleReferenceSpec> get all =>
       CheckCategory.values.map(forCategory).toList();
 
   static const Map<CheckCategory, ModuleReferenceSpec> _specs = {
     CheckCategory.eye: ModuleReferenceSpec(
       category: CheckCategory.eye,
+      clinicalMethodSummary:
+          'BiliScreen benzeri CIE L*a*b* b* sklera sarılık indeksi, 2D kılcal damar / subkonjonktival kanama ayrımı ve alt göz kapağı içi (palpebral konjonktiva) Collings Eritem İndeksi ile anemi ön farkındalığı.',
       healthySummary:
-          'Sağlıklı göz akı (sklera) pürüzsüz, parlak, nötr porselen beyazı tondadır; yaygın sarılık, belirgin kanlanma veya odaklanmış kanama lekesi bulunmaz.',
+          'Sağlıklı göz akı (sklera) pürüzsüz, parlak, nötr porselen beyazı tondadır; yaygın sarılık, belirgin kanlanma veya odaklanmış kanama lekesi bulunmaz. Alt göz kapağı içi ise canlı pembe-kırmızıdır.',
       captureQualityChecklist: [
         'Doğal gün ışığında çekim yapın; sarı ampul altında sklera olduğundan sarı görünebilir.',
         'Flaş kullanmayın; göz kapağını nazikçe aralayarak skleranın net görünmesini sağlayın.',
+        'Anemi ön kontrolü için kamera üst çubuğundan "Alt Göz Kapağı (Anemi)" modunu seçip alt kapağı nazikçe aşağı çekin.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'eye_lower_eyelid_pallor',
+          title: 'Alt Göz Kapağı İçi (Konjonktiva) Anemi Kontrolü',
+          purpose:
+              'Palpebral konjonktiva melanin pigmenti içermediği için tüm ten renklerinde kansızlık (anemi) solukluğunu en objektif gösteren bölgelerden biridir.',
+          steps: [
+            'Doğal gün ışığı alan bir ayna karşısına geçin.',
+            'Temiz bir parmakla alt göz kapağınızı nazikçe aşağı doğru çekin ve yukarı bakın.',
+            'Kamera ekranında "Alt Göz Kapağı" modunu açıp iç mukozayı çerçeveleyin.',
+          ],
+          normalResult:
+              'İç mukoza canlı pembe-kırmızı ve ince damarlı görünür (Eritem İndeksi ≥ 13).',
+          warningResult:
+              'Belirgin soluk pembe veya beyazımsı görünüm kansızlık (HGB/Ferritin düşüklüğü) ipucu olabilir; tam kan sayımı önerilir.',
+          icon: Icons.visibility_outlined,
+        ),
+        ClinicalSelfTest(
+          id: 'eye_pediatric_red_reflex',
+          title: 'Çocuklarda Kırmızı Göz Reflesi (Lökokori) Farkındalığı',
+          purpose:
+              'Flaşlı normal fotoğraflarda gözbebeğinde beyaz/sarı parlama görülmesi (lökokori) erken göz muayenesi gerektirir.',
+          steps: [
+            'Çocuğunuzun flaşlı normal fotoğraflarında iki gözbebeğinin simetrik göründüğüne dikkat edin.',
+            'Bir gözbebeğinde tekrarlayıcı biçimde parlak beyaz veya sarımsı yansıma varsa not alın.',
+          ],
+          normalResult: 'Her iki gözbebeği koyu veya simetrik kırmızı refle verir.',
+          warningResult:
+              'Tek veya iki gözde tekrarlayan beyaz gözbebeği yansıması görürseniz gecikmeden Çocuk Göz Hastalıkları uzmanına başvurun.',
+          icon: Icons.child_care_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -99,16 +151,81 @@ class ModuleReferenceCatalog {
           redFlagNote:
               'Travma, görme kaybı, şiddetli ağrı veya yüksek tansiyon öyküsü varsa acil değerlendirme alın.',
         ),
+        ReferenceFinding(
+          id: 'eye_pediatric_leukocoria',
+          title: 'Gözbebeğinde Beyaz Refle (Lökokori Farkındalığı)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFFEFECE0),
+          visualSignature:
+              'Flaşlı fotoğraflarda bir veya iki gözbebeğinin siyah/kırmızı yerine parlak beyaz veya sarımsı görünmesi.',
+          possibleAssociations:
+              'Çocuklarda doğumsal katarakt, retina hassasiyetleri veya erken göz muayenesi gerektiren durumların önemli uyarı bulgusudur.',
+          redFlagNote:
+              'Fotoğraflarda tekrarlayan beyaz gözbebeği yansıması görülürse gecikmeden Göz Hastalıkları uzmanına başvurun.',
+        ),
       ],
     ),
     CheckCategory.nail: ModuleReferenceSpec(
       category: CheckCategory.nail,
+      clinicalMethodSummary:
+          'Mannino (Nature Comm.) tırnak yatağı Eritem İndeksi ile anemi ön taraması, beyaz kağıt Von Kries kalibrasyonu, 2D dikey melanoniki bandı, Beau enine oluk, Terry/Lindsay ayrım ve kıymık kanama analizi.',
       healthySummary:
           'Sağlıklı tırnak plağı pürüzsüz, yarı saydam, esnek ve hafif kavisli yapıdadır; altındaki tırnak yatağı canlı doğal pembe tondadır, belirgin sararma, yeşerme, morarma, yaygın beyazlaşma, çökme, saat camı bombeleşmesi, ayrılma veya koyu dikey bant içermez. Kesin tanı için dermatoloji muayenesi ve kan testleri gerekir.',
       captureQualityChecklist: [
         'Tırnakta oje, cila veya kalıcı jel bulunmamalıdır.',
         'Eller oda sıcaklığındayken (üşümemişken) beyaz bir kâğıt/zemin üzerinde, doğal gün ışığında çekin.',
         'Çomak parmak (bombeleşme) veya kaşık tırnak şüphesinde tırnağı hem üstten hem yandan inceleyin.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'nail_schamroth_window',
+          title: 'Schamroth Pencere Testi (Çomak Parmak Kontrolü)',
+          purpose:
+              'Tırnak taban açısındaki (Lovibond açısı) artışı ve erken evre çomaklaşmayı (kalp/akciğer bulgusu) 5 saniyede kontrol eder.',
+          steps: [
+            'Her iki elinizin işaret parmaklarının tırnak yüzeylerini sırt sırta birleştirin.',
+            'Tırnak köklerinin birleştiği noktaya ışık önünde yandan bakın.',
+          ],
+          normalResult:
+              'İki tırnak dibi arasında küçük, elmas (baklava) şeklinde ince bir ışık boşluğu ("Schamroth penceresi") görünür.',
+          warningResult:
+              'Elmas şeklindeki boşluk tamamen kaybolmuşsa ve tırnaklar saat camı gibi bombeliyse Dahiliye veya Göğüs Hastalıkları uzmanına başvurun.',
+          icon: Icons.back_hand_outlined,
+        ),
+        ClinicalSelfTest(
+          id: 'nail_abcdef_melanoma',
+          title: 'Tırnak Altı Koyu Çizgi — ABCDEF Kuralı',
+          purpose:
+              'Tek tırnaktaki dikey kahverengi/siyah çizginin (melanoniki) dermatoloji (dermoskopi) aciliyetini değerlendirir.',
+          steps: [
+            'A (Age): 50 yaş üzeri erişkinlerde yeni oluşan koyu bantlar daha dikkatli izlenir.',
+            'B (Band): Kahverengi-siyah bant genişliği >3 mm veya düzensiz bulanık kenarlı mı?',
+            'C (Change): Bant zamanla genişliyor veya koyulaşıyor mu?',
+            'D (Digit): Tek bir tırnakta (özellikle başparmak, işaret veya ayak başparmağı) mı?',
+            'E (Extension): Koyu pigment tırnak dibi etine taşıyor mu? (Hutchinson işareti)',
+            'F (Family): Kişisel veya ailede melanom öyküsü var mı?',
+          ],
+          normalResult:
+              'Bilinen darbe sonrası oluşan hematom tırnak uzadıkça uca doğru ilerleyip 4–6 ayda kaybolur.',
+          warningResult:
+              'Darbesiz, tek tırnakta >3 mm genişlikte, büyüyen veya tırnak etine taşan çizgilerde gecikmeden Dermatoloji muayenesi gerekir.',
+          icon: Icons.biotech_outlined,
+        ),
+        ClinicalSelfTest(
+          id: 'nail_capillary_refill',
+          title: 'Kapiller Dolum Süresi (Periferik Dolaşım Testi)',
+          purpose:
+              'Parmak ucu mikro dolaşımını ve soğuk kaynaklı geçici solukluğu hızlıca test eder.',
+          steps: [
+            'Oda sıcaklığında tırnak plağının ortasına 3 saniye hafifçe bastırın (tırnak beyazlar).',
+            'Parmağınızı bırakın ve pembe rengin tamamen geri gelme süresini sayın.',
+          ],
+          normalResult: 'Pembe renk 2 saniye veya daha kısa sürede geri döner.',
+          warningResult:
+              'Sıcak ortamda 3 saniyeden uzun süren gecikme veya morarma kalıcıysa dolaşım değerlendirmesi için doktora danışın.',
+          icon: Icons.timer_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -291,12 +408,45 @@ class ModuleReferenceCatalog {
     ),
     CheckCategory.tongue: ModuleReferenceSpec(
       category: CheckCategory.tongue,
+      clinicalMethodSummary:
+          '2D yarık/fissür derinlik analizi, beyaz vs. sarı pas ayrımı, coğrafi dil kırmızı-beyaz sınır kontrastı ve mukoza Eritem İndeksi ile kanıta dayalı oral mukoza ön değerlendirmesi.',
       healthySummary:
           'Sağlıklı dil nemli, esnek, doğal canlı pembe tonda ve üzerinde çok ince şeffaf/hafif beyazımsı fizyolojik bir tabaka bulunur; kalın pas, yoğun kızarıklık, morarma, pürüzsüz parlaklık veya 2 haftadan uzun süren yara/plak yoktur. (Kanıta dayalı modern tıbbi değerlendirme esas alınır; geleneksel organ haritası yaklaşımları tanı aracı değildir.)',
       captureQualityChecklist: [
         'Kahve, çay, renkli yiyecek, sigara veya ağız gargarası sonrası en az 30 dakika bekleyin.',
         'Doğal gün ışığında dilinizi aşırı germeden dışarı çıkararak üst yüzeyi ve mümkünse kenarları net çerçeveleyin.',
         'Sarı ampul altında dil olduğundan daha sarı/turuncu görünebilir; mümkünse beyaz referans kalibrasyonu kullanın.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'tongue_gentle_wipe_test',
+          title: 'Nazik Silme Testi (Pamukçuk vs. Lökoplaki Ayrımı)',
+          purpose:
+              'Beyaz tabakanın ağız kuruluğu/pamukçuk mu yoksa silinmeyen sabit beyaz plak (lökoplaki) mı olduğunu anlamaya yardımcı olur.',
+          steps: [
+            'Temiz bir gazlı bez veya yumuşak dil fırçasıyla beyaz alanı zorlamadan nazikçe silin.',
+            'Tabakanın çıkıp çıkmadığını ve altındaki dokunun rengini gözlemleyin.',
+          ],
+          normalResult:
+              'İnce fizyolojik pas su tüketimi ve nazik fırçalamayla kolayca azalır, altta sağlıklı pembe doku görünür.',
+          warningResult:
+              'Silinince altı kızarık/kanamalı kalıyorsa mantar (kandida); hiç silinmeyen sert beyaz plak varsa (lökoplaki riski) diş hekimi veya KBB muayenesi gerekir.',
+          icon: Icons.cleaning_services_outlined,
+        ),
+        ClinicalSelfTest(
+          id: 'tongue_two_week_rule',
+          title: '2 Hafta Kuralı (Dil Kenarı & Yara Kontrolü)',
+          purpose:
+              'İyileşmeyen oral ülserlerin ve yan kenar lezyonlarının erken KBB/diş hekimi değerlendirmesini sağlar.',
+          steps: [
+            'Dilinizi sağa ve sola doğru uzatarak iki yan kenarını ve alt yüzeyini de aynada kontrol edin.',
+            'Herhangi bir yara, sertlik veya kırmızı-beyaz yamanın başlangıç tarihini not alın.',
+          ],
+          normalResult: 'Basit ısırma veya aftlar 7–14 gün içinde tamamen iyileşir.',
+          warningResult:
+              '14 günü geçen iyileşmeyen yara, sertleşmiş kenar, kanama veya geçmeyen beyaz/kırmızı plak varsa gecikmeden KBB veya Diş Hekimine başvurun.',
+          icon: Icons.event_available_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -446,11 +596,30 @@ class ModuleReferenceCatalog {
     ),
     CheckCategory.face: ModuleReferenceSpec(
       category: CheckCategory.face,
+      clinicalMethodSummary:
+          'ISO-24444 Individual Typology Angle (ITA°) ile Fitzpatrick I–VI fototip uyarlamalı renk dengesi, Eritem İndeksi ve kişisel normal (bazal ΔE) karşılaştırması.',
       healthySummary:
           'Sağlıklı yüz cildi kişinin doğal ten alt tonuyla uyumlu, dengeli renktedir; ani sararma, belirgin solgunluk, yaygın kızarıklık veya dudak çevresi morarması yoktur.',
       captureQualityChecklist: [
         'Makyajsız, filtresiz ve doğrudan gün ışığı alan bir ortamda çekim yapın.',
         'Kişisel normal (bazal) kaydınız varsa aynı ışıkta kıyaslama çok daha doğru olur.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'face_daylight_baseline',
+          title: 'Doğal Gün Işığı & Kişisel Bazal Kıyas Protokolü',
+          purpose:
+              'Her bireyin doğal cilt alt tonu (Fitzpatrick I–VI) farklıdır; en doğru değerlendirme sağlıklı gününüzde kaydettiğiniz bazal ton ile ΔE farkıdır.',
+          steps: [
+            'Pencere kenarında, makyajsız ve filtresiz olarak yüzünüzün doğal bir fotoğrafını kaydedin.',
+            'Sonuç ekranından "Kişisel Normalim Olarak Kaydet" seçeneğini işaretleyin.',
+            'Şüpheli günlerde göz akı ve dudak rengiyle birlikte tekrar çekin.',
+          ],
+          normalResult: 'Bazal kaydınıza göre renk sapması ΔE < 8 aralığında kalır.',
+          warningResult:
+              'Ani sararma (özellikle göz akıyla birlikte), belirgin solgunluk veya dudak morarması görülürse hekime başvurun.',
+          icon: Icons.face_retouching_natural_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -515,11 +684,47 @@ class ModuleReferenceCatalog {
     ),
     CheckCategory.skinCondition: ModuleReferenceSpec(
       category: CheckCategory.skinCondition,
+      clinicalMethodSummary:
+          'CIE ΔE lezyon segmentasyonu, kantitatif ABCDE (Asimetri, Sınır kompaktlık indeksi P²/4πA, 6-renkli dermoskopik palet), çevre deri Fitzpatrick ITA° uyarlaması ve anüler halka (mantar) analizi.',
       healthySummary:
           'Sağlıklı cilt yüzeyi homojen renkli, pürüzsüz ve bütünlüğü korunmuş durumdadır; çevre ciltten keskin biçimde ayrılan kızarık plak, pullanma, akıntı veya asimetrik çok renkli lezyon bulunmaz.',
       captureQualityChecklist: [
         'Lezyonu 10–15 cm mesafeden net odaklayın ve çevresinde sağlıklı deriden küçük bir alan bırakın.',
         'Doğal gün ışığında çekin; krem/merhem sürülü değilken görüntü alın.',
+        'Ben çapını izlemek için yanına küçük bir cetvel veya 6 mm kurşun kalem silgisi koyarak karşılaştırma yapabilirsiniz.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'skin_glass_diascopy_test',
+          title: 'Şeffaf Bardak (Diaskopi) Testi — Döküntü Aciliyet Kontrolü',
+          purpose:
+              'Kızarıklığın basit damar genişlemesi/alerji mi yoksa cilt altı kanaması (peteşi/purpura) mı olduğunu ayırt eder.',
+          steps: [
+            'Temiz, şeffaf bir cam bardağın kenarını kızarık/mor döküntünün üzerine hafifçe bastırın.',
+            'Camın içinden bakarak kızarıklığın baskı altında solup solmadığını izleyin.',
+          ],
+          normalResult:
+              'Döküntü baskı altında beyazlaşıp soluyorsa ("blanching") genellikle basit kızarıklık, egzama veya ürtikerdir.',
+          warningResult:
+              'Baskıya rağmen hiç solmayan toplu iğne başı kırmızı-mor noktacıklar (peteşi/purpura) — özellikle ateş veya halsizlik varsa — ACİL tıbbi değerlendirme gerektirir!',
+          icon: Icons.science_outlined,
+        ),
+        ClinicalSelfTest(
+          id: 'skin_abcde_ugly_duckling',
+          title: 'ABCDE + "Çirkin Ördek Yavrusu" & EFG Kuralı',
+          purpose:
+              'Benlerde melanom ve melanom dışı nodüler cilt kanserleri açısından dermoskopi önceliğini belirler.',
+          steps: [
+            'A-B-C-D-E: Asimetri, düzensiz sınır (Border), 2+ renk (Color), >6 mm çap (Diameter) veya değişim (Evolving) var mı?',
+            'Çirkin Ördek Yavrusu: Bu ben vücudunuzdaki diğer tüm benlerden belirgin şekilde farklı mı?',
+            'EFG (Nodüler Lezyon): Kabarık (Elevated), sert (Firm) ve 1 aydan uzun süredir büyüyor (Growing) mu?',
+          ],
+          normalResult:
+              'Simetrik, keskin düzgün sınırlı, tek tonlu ve yıllardır değişmeyen benler genellikle olağan nevüs görünümündedir.',
+          warningResult:
+              'Herhangi bir ABCDE, EFG, "Çirkin Ördek" bulgusu veya 4+ haftadır iyileşmeyen kanamalı yara varsa gecikmeden Dermatoloji (dermoskopi) muayenesi alın.',
+          icon: Icons.biotech_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -663,15 +868,47 @@ class ModuleReferenceCatalog {
           possibleAssociations:
               'Güneş lekesi (solar lentigo), melazma veya post-inflamatuar hiperpigmentasyon. Asimetrik/çok renkli veya değişen lekelerde önce dermoskopi yapılmalıdır.',
         ),
+        ReferenceFinding(
+          id: 'skin_non_blanching_petechiae',
+          title: 'Baskıyla Solmayan Mor Noktacıklar (Peteşi / Purpura — Cam Testi)',
+          isHealthyReference: false,
+          riskLevel: RiskLevel.urgent,
+          swatchColor: Color(0xFF8C1E35),
+          visualSignature:
+              'Cilt yüzeyinden kabarık olmayan, şeffaf cam bardakla bastırıldığında dahi beyazlamayan toplu iğne başı kırmızı-mor noktacıklar.',
+          possibleAssociations:
+              'Trombosit düşüklüğü, damar duvarı hassasiyeti veya ateşli durumlarda acil tıbbi değerlendirme gerektiren cilt altı mikro kanamaları.',
+          redFlagNote:
+              'Ateş, ense sertliği, şiddetli halsizlik veya hızla yayılan solmayan mor döküntüler varsa DERHAL acil servise başvurun.',
+        ),
       ],
     ),
     CheckCategory.urine: ModuleReferenceSpec(
       category: CheckCategory.urine,
+      clinicalMethodSummary:
+          'Armstrong hidrasyon renk skalası, beyaz referans kutulu Von Kries renk kalibrasyonu ve gıda/ilaç/semptom bağlam filtrelemesi.',
       healthySummary:
           'Sağlıklı idrar berrak ve açık saman sarısı tondadır; bu görünüm yeterli sıvı alımını (iyi hidrasyon) gösterir.',
       captureQualityChecklist: [
         'Beyaz bir zemin/kap veya beyaz klozet kenarını "Beyaz Referans" kutusuna hizalayın.',
         'Sarı banyo ışığı idrarı olduğundan daha koyu gösterebilir; Beyaz Referans modunu açık tutun.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'urine_armstrong_hydration',
+          title: 'Armstrong Hidrasyon & Gıda/İlaç Kontrolü',
+          purpose:
+              'İdrar rengindeki koyulaşmanın basit susuzluk mu yoksa tıbbi değerlendirme gerektiren bir bulgu mu olduğunu hızla ayırır.',
+          steps: [
+            'Son 24 saatte B vitamini, pancar, böğürtlen veya rifampisin/fenazopiridin gibi renk veren ilaç alıp almadığınızı kontrol edin.',
+            'Koyu sarı idrar gördüyseniz 2 saat içinde 2–3 bardak su içip bir sonraki idrar rengini gözlemleyin.',
+          ],
+          normalResult:
+              'Su içtikten sonra 1–2 idrarda rengin açık saman sarısına açılması olağan sıvı ihtiyacını gösterir.',
+          warningResult:
+              'Su içmenize rağmen çay/kola rengi sürüyorsa, pembe/kırmızı renk varsa veya yanma/ateş eşlik ediyorsa hekime başvurun.',
+          icon: Icons.water_drop_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(
@@ -746,11 +983,30 @@ class ModuleReferenceCatalog {
     ),
     CheckCategory.stool: ModuleReferenceSpec(
       category: CheckCategory.stool,
+      clinicalMethodSummary:
+          'Standart dışkı renk uyarı skalası (melena, akolik kil rengi, hematokezya) + Bristol Dışkı Kıvam Skalası (Tip 1–7) ve ilaç/diyet bağlamı.',
       healthySummary:
           'Sağlıklı dışkı açık, orta veya koyu kahverengi tonlardadır; siyah katran, beyaz/kil rengi veya belirgin kırmızı kan rengi içermez.',
       captureQualityChecklist: [
         'Gölge düşmeyecek doğrudan aydınlatma altında çekin; Beyaz Referans kutusunu beyaz klozet kenarına hizalayın.',
         'Son 48 saatteki gıda (pancar, ıspanak) ve ilaç (demir, bizmut) kullanımınızı dikkate alın.',
+      ],
+      selfTests: [
+        ClinicalSelfTest(
+          id: 'stool_bristol_scale',
+          title: 'Bristol Dışkı Kıvam Skalası (Tip 1–7)',
+          purpose:
+              'Renk kontrolüne ek olarak bağırsak geçiş hızını (kabızlık vs. ideal vs. ishal) gastroenteroloji standardıyla takip etmenizi sağlar.',
+          steps: [
+            'Tip 1–2 (Sert topak / çatlaklı sert): Kabızlık eğilimi — lif ve su alımını artırın.',
+            'Tip 3–4 (Pürüzsüz, yumuşak şekilli): İdeal bağırsak geçişi.',
+            'Tip 5–7 (Yumuşak parçalar / lapa / tamamen sulu): Hızlı geçiş veya ishal — sıvı/elektrolit desteği önemlidir.',
+          ],
+          normalResult: 'Kahverengi ton ve Bristol Tip 3–4 aralığı olağandır.',
+          warningResult:
+              'Demir/bizmut olmadan siyah katran, kil/beyaz renk, parlak kırmızı kan veya 3 günden uzun sulu ishal varsa hekime başvurun.',
+          icon: Icons.health_and_safety_outlined,
+        ),
       ],
       findings: [
         ReferenceFinding(

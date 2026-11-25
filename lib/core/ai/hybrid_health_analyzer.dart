@@ -97,6 +97,7 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
     final structural = StructuralFeatureAnalyzer.analyze(
       image: decoded,
       category: category,
+      gains: sample.gains,
     );
 
     final request = AiVisionPromptBuilder.build(
@@ -110,6 +111,18 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
       skinContext: skinContext,
     );
 
+    final aiClinicalMetrics = <String, String>{
+      'CIE L* / a* / b*':
+          '${sample.lab.l.toStringAsFixed(0)} / ${sample.lab.a.toStringAsFixed(0)} / ${sample.lab.b.toStringAsFixed(0)}',
+      if (category == CheckCategory.face ||
+          category == CheckCategory.skinCondition)
+        'Fitzpatrick Fototip':
+            '${sample.lab.fitzpatrickPhototype.shortLabel} (ITA ${sample.lab.individualTypologyAngle.toStringAsFixed(0)}°)',
+      if (category == CheckCategory.eye &&
+          options.eyeScanMode == EyeScanMode.palpebralConjunctiva)
+        'Tarama Modu': 'Alt Göz Kapağı (Anemi)',
+    };
+
     try {
       final rawJson = await client.analyzeWithVisionAi(request);
       final parsed = AiVisionResponseParser.parse(
@@ -120,6 +133,7 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
         lightingNote: sample.lightingNote,
         baselineDeltaE: baselineDeltaE,
         baselineComparisonNote: baselineNote,
+        clinicalMetrics: aiClinicalMetrics,
       );
       if (cache != null) {
         await cache.saveCachedAiResult(preprocessed.contentFingerprint, parsed);

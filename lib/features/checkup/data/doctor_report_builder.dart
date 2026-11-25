@@ -42,6 +42,13 @@ class DoctorVisitReport {
       );
     }
 
+    if (currentResult.clinicalMetrics.isNotEmpty) {
+      buffer.writeln('\nKantitatif Görsel Ölçümler:');
+      for (final entry in currentResult.clinicalMetrics.entries) {
+        buffer.writeln('- ${entry.key}: ${entry.value}');
+      }
+    }
+
     if (currentResult.observations.isNotEmpty) {
       buffer.writeln('\nGözlemler:');
       for (final item in currentResult.observations) {

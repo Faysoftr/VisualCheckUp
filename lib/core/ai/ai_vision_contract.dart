@@ -194,6 +194,7 @@ class AiVisionResponseParser {
     String? lightingNote,
     double? baselineDeltaE,
     String? baselineComparisonNote,
+    Map<String, String> clinicalMetrics = const {},
     DateTime? now,
   }) {
     final cleaned = _stripCodeFences(rawResponse).trim();
@@ -214,6 +215,13 @@ class AiVisionResponseParser {
     final observations = _stringList(decoded['observations']);
     final recommendations = _stringList(decoded['recommendations']);
     final warningFlags = _stringList(decoded['warning_flags']);
+    final allowedIds = ModuleReferenceCatalog.forCategory(category)
+        .findings
+        .map((f) => f.id)
+        .toSet();
+    final matchedIds = _stringList(decoded['matched_finding_ids'])
+        .where(allowedIds.contains)
+        .toList();
     final rawConfidence =
         ((decoded['confidence'] as num?)?.toDouble() ?? 0.65).clamp(0.15, 0.95);
 
@@ -241,6 +249,8 @@ class AiVisionResponseParser {
       lightingNote: lightingNote,
       baselineDeltaE: baselineDeltaE,
       baselineComparisonNote: baselineComparisonNote,
+      matchedFindingIds: matchedIds,
+      clinicalMetrics: clinicalMetrics,
     );
   }
 
