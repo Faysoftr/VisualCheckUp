@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/health_drawer_background.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
@@ -119,23 +120,11 @@ class AppDrawer extends StatelessWidget {
           ).nativeName;
 
     return Drawer(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/app_bg.jpg',
-            fit: BoxFit.cover,
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppTheme.darkCanvas.withValues(alpha: 0.90)
-                  : Colors.white.withValues(alpha: 0.42),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
+      clipBehavior: Clip.antiAlias,
+      child: HealthDrawerBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Container(
@@ -145,10 +134,26 @@ class AppDrawer extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: isDark
-                        ? const [Color(0xFF133333), Color(0xFF0E2323)]
+                        ? [
+                            const Color(0xFF133A3A).withValues(alpha: 0.92),
+                            const Color(0xFF0C2425).withValues(alpha: 0.94),
+                          ]
                         : const [AppTheme.primaryTeal, AppTheme.secondaryMint],
                   ),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark
+                        ? AppTheme.secondaryMint.withValues(alpha: 0.35)
+                        : Colors.white.withValues(alpha: 0.45),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isDark ? Colors.black : AppTheme.primaryTeal)
+                          .withValues(alpha: isDark ? 0.32 : 0.18),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -563,38 +568,47 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
-              child: Column(
-                children: [
-                  if (currentUser.isGuest)
-                    _DrawerTile(
-                      icon: Icons.login_rounded,
-                      label: l10n.signInGoogleOrApple,
-                      accentColor: colorScheme.primary,
-                      onTap: () => _closeAndRun(context, onSignOut),
-                    )
-                  else ...[
-                    _DrawerTile(
-                      icon: Icons.logout_rounded,
-                      label: l10n.signOut,
-                      onTap: () => _closeAndRun(context, onSignOut),
-                    ),
-                    _DrawerTile(
-                      icon: Icons.delete_outline_rounded,
-                      label: l10n.deleteAccount,
-                      accentColor: colorScheme.error,
-                      onTap: () => _confirmDeleteAccount(context),
-                    ),
-                  ],
-                ],
+            Divider(
+              height: 1,
+              color: colorScheme.outlineVariant.withValues(
+                alpha: isDark ? 0.35 : 0.6,
               ),
             ),
-          ],
+            Material(
+              color: isDark
+                  ? const Color(0xFF0A1415).withValues(alpha: 0.45)
+                  : Colors.white.withValues(alpha: 0.55),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
+                child: Column(
+                  children: [
+                    if (currentUser.isGuest)
+                      _DrawerTile(
+                        icon: Icons.login_rounded,
+                        label: l10n.signInGoogleOrApple,
+                        accentColor: colorScheme.primary,
+                        onTap: () => _closeAndRun(context, onSignOut),
+                      )
+                    else ...[
+                      _DrawerTile(
+                        icon: Icons.logout_rounded,
+                        label: l10n.signOut,
+                        onTap: () => _closeAndRun(context, onSignOut),
+                      ),
+                      _DrawerTile(
+                        icon: Icons.delete_outline_rounded,
+                        label: l10n.deleteAccount,
+                        accentColor: colorScheme.error,
+                        onTap: () => _confirmDeleteAccount(context),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            ],
+          ),
         ),
-      ),
-        ],
       ),
     );
   }

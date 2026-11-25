@@ -122,6 +122,7 @@ void main() {
       await tester.tap(find.text('ZK'));
       await tester.pumpAndSettle();
 
+      expect(find.byKey(const ValueKey<String>('drawer_bg_light')), findsOneWidget);
       expect(find.text('Zeynep Kaya'), findsOneWidget);
       expect(find.text('Apple Hesabı'), findsOneWidget);
       expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
@@ -157,6 +158,7 @@ void main() {
       await tester.tap(find.text('Koyu'));
       await tester.pumpAndSettle();
       expect(themeController.value, ThemeMode.dark);
+      expect(find.byKey(const ValueKey<String>('drawer_bg_dark')), findsOneWidget);
 
       // Sign out returns to LoginScreen.
       await tester.ensureVisible(find.text('Çıkış Yap'));
