@@ -1196,4 +1196,162 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'قرأت وأوافق';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'الأطلس المصور ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'علامات عاجلة ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'اختبارات سريرية منزلية ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle => 'علامات تتطلب تقييماً طبياً عاجلاً';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'اضغط على أي بطاقة لتكبيرها جنباً إلى جنب مع المرجع السليم.';
+
+  @override
+  String get atlasVisualCueLabel => 'العلامة البصرية';
+
+  @override
+  String get atlasClinicalContextLabel => 'السياق السريري المحتمل';
+
+  @override
+  String get atlasPossibleContextShort => 'السياق المحتمل';
+
+  @override
+  String get atlasWarningPrefix => 'تنبيه';
+
+  @override
+  String get atlasCloseBtn => 'إغلاق';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'أفضل بروتوكول للتصوير';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'اختبارات فحص سريرية أولية يمكنك إجراؤها في المنزل';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'طبيعي';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'انتباه';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'أنماط بشرة فيتزباتريك ومقياس معايرة ITA°';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'يقيس التطبيق زاوية ITA° للبشرة السليمة المحيطة لموازنة عتبات التحليل وفقاً لنمط بشرتك.';
+
+  @override
+  String get resultVisualCompareTitle => 'مقارنة المرجع السريري المصور';
+
+  @override
+  String get resultHealthyShort => 'سليم';
+
+  @override
+  String get resultMatchedShort => 'متطابق';
+
+  @override
+  String get resultViewFullAtlasBtn => 'عرض الأطلس المصور الكامل';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'اختبارات سريرية منزلية';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'القياسات السريرية الكمية';
+
+  @override
+  String get cameraEyeModeSclera => 'الوضع: بياض العين (اليرقان)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'الجفن السفلي (فقر الدم)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'الاختبارات والأطلس';
+
+  @override
+  String get bristolScaleTitle =>
+      'مقياس بريستول لقوام البراز (اختياري • الأنواع 1–7)';
+
+  @override
+  String get bristolType1Title => 'النوع 1 • كتل صلبة';
+
+  @override
+  String get bristolType2Title => 'النوع 2 • متكتل';
+
+  @override
+  String get bristolType3Title => 'النوع 3 • متشقق السطح';
+
+  @override
+  String get bristolType4Title => 'النوع 4 • ناعم (مثالي)';
+
+  @override
+  String get bristolType5Title => 'النوع 5 • قطع لينة';
+
+  @override
+  String get bristolType6Title => 'النوع 6 • طري / مفكك';
+
+  @override
+  String get bristolType7Title => 'النوع 7 • سائل تماماً';
+
+  @override
+  String get metricFitzpatrickPhototype => 'نمط فيتزباتريك للبشرة';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — عدم التماثل';
+
+  @override
+  String get metricAbcdeBorder => 'B — عدم انتظام الحواف';
+
+  @override
+  String get metricAbcdeColors => 'C — الألوان الجلدية';
+
+  @override
+  String get metricErythemaDelta => 'فرق مؤشر الحمامى Δ';
+
+  @override
+  String get metricAnnularClearing => 'تفتح المركز الحلقي';
+
+  @override
+  String get metricErythemaIndex => 'مؤشر الحمامى (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'مؤشر بيليروبين الصلبة';
+
+  @override
+  String get metricHemorrhagePatch => 'منطقة النزف الموضعي';
+
+  @override
+  String get metricNailErythema => 'مؤشر حمامى سرير الظفر';
+
+  @override
+  String get metricBeauGroove => 'أخدود بو العرضي';
+
+  @override
+  String get metricTerryLindsaySplit => 'الانقسام القريب/البعيد';
+
+  @override
+  String get metricSplinterStreak => 'نسبة خطوط النزف الشظوي';
+
+  @override
+  String get metricGeographicTongue => 'مؤشر اللسان الجغرافي';
+
+  @override
+  String get metricYellowCoating => 'نسبة الطبقة الصفراء';
+
+  @override
+  String get metricBristolScale => 'مقياس بريستول';
 }

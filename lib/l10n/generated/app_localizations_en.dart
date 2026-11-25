@@ -1210,4 +1210,165 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'I Have Read & Accept';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'Illustrated Atlas ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'Urgent Signs ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'Home Clinical Tests ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'Signs Requiring Prompt Doctor Evaluation';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'Tap any card to enlarge side-by-side with the healthy reference.';
+
+  @override
+  String get atlasVisualCueLabel => 'Visual Cue';
+
+  @override
+  String get atlasClinicalContextLabel => 'Possible Clinical Context';
+
+  @override
+  String get atlasPossibleContextShort => 'Possible Context';
+
+  @override
+  String get atlasWarningPrefix => 'Warning';
+
+  @override
+  String get atlasCloseBtn => 'Close';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'Best Capture Protocol';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'Clinical Pre-Screening Tests You Can Do at Home';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'Normal';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'Attention';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'Fitzpatrick Skin Phototypes & ITA° Calibration Scale';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'The app measures the ITA° angle of surrounding healthy skin to balance analysis thresholds for your skin phototype.';
+
+  @override
+  String get resultVisualCompareTitle =>
+      'Illustrated Clinical Reference Comparison';
+
+  @override
+  String get resultHealthyShort => 'Healthy';
+
+  @override
+  String get resultMatchedShort => 'Matched';
+
+  @override
+  String get resultViewFullAtlasBtn => 'View Full Illustrated Atlas';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'Home Clinical Tests';
+
+  @override
+  String get resultClinicalBiomarkersTitle =>
+      'Quantitative Clinical Measurements';
+
+  @override
+  String get cameraEyeModeSclera => 'Mode: Sclera (Jaundice)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'Lower Eyelid (Anemia)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'Clinical Tests & Atlas';
+
+  @override
+  String get bristolScaleTitle =>
+      'Bristol Stool Consistency Scale (Optional • Types 1–7)';
+
+  @override
+  String get bristolType1Title => 'Type 1 • Hard lumps';
+
+  @override
+  String get bristolType2Title => 'Type 2 • Lumpy sausage';
+
+  @override
+  String get bristolType3Title => 'Type 3 • Cracked sausage';
+
+  @override
+  String get bristolType4Title => 'Type 4 • Smooth (Ideal)';
+
+  @override
+  String get bristolType5Title => 'Type 5 • Soft blobs';
+
+  @override
+  String get bristolType6Title => 'Type 6 • Mushy / Loose';
+
+  @override
+  String get bristolType7Title => 'Type 7 • Entirely liquid';
+
+  @override
+  String get metricFitzpatrickPhototype => 'Fitzpatrick Phototype';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — Asymmetry';
+
+  @override
+  String get metricAbcdeBorder => 'B — Border Irregularity';
+
+  @override
+  String get metricAbcdeColors => 'C — Dermoscopic Colors';
+
+  @override
+  String get metricErythemaDelta => 'Erythema Index Δ';
+
+  @override
+  String get metricAnnularClearing => 'Annular Central Clearing';
+
+  @override
+  String get metricErythemaIndex => 'Erythema Index (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'Scleral Bilirubin Index';
+
+  @override
+  String get metricHemorrhagePatch => 'Compact Hemorrhage Area';
+
+  @override
+  String get metricNailErythema => 'Nailbed Erythema Index';
+
+  @override
+  String get metricBeauGroove => 'Beau Transverse Groove';
+
+  @override
+  String get metricTerryLindsaySplit => 'Proximal/Distal Split';
+
+  @override
+  String get metricSplinterStreak => 'Splinter Streak Ratio';
+
+  @override
+  String get metricGeographicTongue => 'Geographic Tongue Score';
+
+  @override
+  String get metricYellowCoating => 'Yellow Coating Ratio';
+
+  @override
+  String get metricBristolScale => 'Bristol Scale';
 }

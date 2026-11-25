@@ -1209,4 +1209,164 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'J’ai lu et j’accepte';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'Atlas Illustré ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'Signes Urgents ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'Tests Cliniques Maison ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'Signes Nécessitant un Avis Médical Rapide';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'Appuyez sur une carte pour l’agrandir côte à côte avec la référence saine.';
+
+  @override
+  String get atlasVisualCueLabel => 'Indice Visuel';
+
+  @override
+  String get atlasClinicalContextLabel => 'Contexte Clinique Possible';
+
+  @override
+  String get atlasPossibleContextShort => 'Contexte Possible';
+
+  @override
+  String get atlasWarningPrefix => 'Alerte';
+
+  @override
+  String get atlasCloseBtn => 'Fermer';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'Protocole Optimal de Prise de Vue';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'Tests Cliniques Préliminaires à Domicile';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'Normal';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'Attention';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'Phototypes de Fitzpatrick & Échelle ITA°';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'L’application mesure l’angle ITA° de la peau saine environnante pour ajuster les seuils à votre phototype.';
+
+  @override
+  String get resultVisualCompareTitle =>
+      'Comparaison de Référence Clinique Illustrée';
+
+  @override
+  String get resultHealthyShort => 'Sain';
+
+  @override
+  String get resultMatchedShort => 'Correspondant';
+
+  @override
+  String get resultViewFullAtlasBtn => 'Voir l’Atlas Illustré Complet';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'Tests Cliniques Maison';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'Mesures Cliniques Quantitatives';
+
+  @override
+  String get cameraEyeModeSclera => 'Mode : Sclère (Ictère)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'Paupière Inférieure (Anémie)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'Tests & Atlas';
+
+  @override
+  String get bristolScaleTitle =>
+      'Échelle de Bristol des Selles (Optionnel • Types 1–7)';
+
+  @override
+  String get bristolType1Title => 'Type 1 • Billes dures';
+
+  @override
+  String get bristolType2Title => 'Type 2 • Saucisse grumeleuse';
+
+  @override
+  String get bristolType3Title => 'Type 3 • Craquelée';
+
+  @override
+  String get bristolType4Title => 'Type 4 • Lisse (Idéal)';
+
+  @override
+  String get bristolType5Title => 'Type 5 • Morceaux mous';
+
+  @override
+  String get bristolType6Title => 'Type 6 • Pâteuse / Molle';
+
+  @override
+  String get bristolType7Title => 'Type 7 • Entièrement liquide';
+
+  @override
+  String get metricFitzpatrickPhototype => 'Phototype Fitzpatrick';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — Asymétrie';
+
+  @override
+  String get metricAbcdeBorder => 'B — Irrégularité des Bords';
+
+  @override
+  String get metricAbcdeColors => 'C — Couleurs Dermoscopiques';
+
+  @override
+  String get metricErythemaDelta => 'Indice d’Érythème Δ';
+
+  @override
+  String get metricAnnularClearing => 'Éclaircissement Central Annulaire';
+
+  @override
+  String get metricErythemaIndex => 'Indice d’Érythème (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'Indice Bilirubine Sclérale';
+
+  @override
+  String get metricHemorrhagePatch => 'Zone d’Hémorragie Compacte';
+
+  @override
+  String get metricNailErythema => 'Indice d’Érythème Unguéal';
+
+  @override
+  String get metricBeauGroove => 'Sillon Transversal de Beau';
+
+  @override
+  String get metricTerryLindsaySplit => 'Division Proximale/Distale';
+
+  @override
+  String get metricSplinterStreak => 'Ratio d’Hémorragie en Écharde';
+
+  @override
+  String get metricGeographicTongue => 'Score Langue Géographique';
+
+  @override
+  String get metricYellowCoating => 'Ratio d’Enduit Jaune';
+
+  @override
+  String get metricBristolScale => 'Échelle de Bristol';
 }

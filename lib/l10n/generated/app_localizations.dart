@@ -2269,6 +2269,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I Have Read & Accept'**
   String get loginTermsAcceptBtn;
+
+  /// No description provided for @atlasFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Illustrated Atlas ({count})'**
+  String atlasFilterAll(int count);
+
+  /// No description provided for @atlasFilterUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent Signs ({count})'**
+  String atlasFilterUrgent(int count);
+
+  /// No description provided for @atlasFilterSelfTests.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Clinical Tests ({count})'**
+  String atlasFilterSelfTests(int count);
+
+  /// No description provided for @atlasUrgentSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Signs Requiring Prompt Doctor Evaluation'**
+  String get atlasUrgentSectionTitle;
+
+  /// No description provided for @atlasTapToCompareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any card to enlarge side-by-side with the healthy reference.'**
+  String get atlasTapToCompareHint;
+
+  /// No description provided for @atlasVisualCueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual Cue'**
+  String get atlasVisualCueLabel;
+
+  /// No description provided for @atlasClinicalContextLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible Clinical Context'**
+  String get atlasClinicalContextLabel;
+
+  /// No description provided for @atlasPossibleContextShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible Context'**
+  String get atlasPossibleContextShort;
+
+  /// No description provided for @atlasWarningPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get atlasWarningPrefix;
+
+  /// No description provided for @atlasCloseBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get atlasCloseBtn;
+
+  /// No description provided for @atlasCaptureProtocolTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Capture Protocol'**
+  String get atlasCaptureProtocolTitle;
+
+  /// No description provided for @atlasHomeSelfTestsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Pre-Screening Tests You Can Do at Home'**
+  String get atlasHomeSelfTestsSectionTitle;
+
+  /// No description provided for @atlasSelfTestNormalPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get atlasSelfTestNormalPrefix;
+
+  /// No description provided for @atlasSelfTestWarningPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention'**
+  String get atlasSelfTestWarningPrefix;
+
+  /// No description provided for @fitzpatrickScaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fitzpatrick Skin Phototypes & ITA° Calibration Scale'**
+  String get fitzpatrickScaleTitle;
+
+  /// No description provided for @fitzpatrickScaleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The app measures the ITA° angle of surrounding healthy skin to balance analysis thresholds for your skin phototype.'**
+  String get fitzpatrickScaleSubtitle;
+
+  /// No description provided for @resultVisualCompareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Illustrated Clinical Reference Comparison'**
+  String get resultVisualCompareTitle;
+
+  /// No description provided for @resultHealthyShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get resultHealthyShort;
+
+  /// No description provided for @resultMatchedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Matched'**
+  String get resultMatchedShort;
+
+  /// No description provided for @resultViewFullAtlasBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'View Full Illustrated Atlas'**
+  String get resultViewFullAtlasBtn;
+
+  /// No description provided for @resultHomeSelfTestsBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Clinical Tests'**
+  String get resultHomeSelfTestsBtn;
+
+  /// No description provided for @resultClinicalBiomarkersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantitative Clinical Measurements'**
+  String get resultClinicalBiomarkersTitle;
+
+  /// No description provided for @cameraEyeModeSclera.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode: Sclera (Jaundice)'**
+  String get cameraEyeModeSclera;
+
+  /// No description provided for @cameraEyeModeConjunctiva.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower Eyelid (Anemia)'**
+  String get cameraEyeModeConjunctiva;
+
+  /// No description provided for @cameraClinicalAtlasChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinical Tests & Atlas'**
+  String get cameraClinicalAtlasChip;
+
+  /// No description provided for @bristolScaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bristol Stool Consistency Scale (Optional • Types 1–7)'**
+  String get bristolScaleTitle;
+
+  /// No description provided for @bristolType1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 1 • Hard lumps'**
+  String get bristolType1Title;
+
+  /// No description provided for @bristolType2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 2 • Lumpy sausage'**
+  String get bristolType2Title;
+
+  /// No description provided for @bristolType3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 3 • Cracked sausage'**
+  String get bristolType3Title;
+
+  /// No description provided for @bristolType4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 4 • Smooth (Ideal)'**
+  String get bristolType4Title;
+
+  /// No description provided for @bristolType5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 5 • Soft blobs'**
+  String get bristolType5Title;
+
+  /// No description provided for @bristolType6Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 6 • Mushy / Loose'**
+  String get bristolType6Title;
+
+  /// No description provided for @bristolType7Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 7 • Entirely liquid'**
+  String get bristolType7Title;
+
+  /// No description provided for @metricFitzpatrickPhototype.
+  ///
+  /// In en, this message translates to:
+  /// **'Fitzpatrick Phototype'**
+  String get metricFitzpatrickPhototype;
+
+  /// No description provided for @metricAbcdeAsymmetry.
+  ///
+  /// In en, this message translates to:
+  /// **'A — Asymmetry'**
+  String get metricAbcdeAsymmetry;
+
+  /// No description provided for @metricAbcdeBorder.
+  ///
+  /// In en, this message translates to:
+  /// **'B — Border Irregularity'**
+  String get metricAbcdeBorder;
+
+  /// No description provided for @metricAbcdeColors.
+  ///
+  /// In en, this message translates to:
+  /// **'C — Dermoscopic Colors'**
+  String get metricAbcdeColors;
+
+  /// No description provided for @metricErythemaDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'Erythema Index Δ'**
+  String get metricErythemaDelta;
+
+  /// No description provided for @metricAnnularClearing.
+  ///
+  /// In en, this message translates to:
+  /// **'Annular Central Clearing'**
+  String get metricAnnularClearing;
+
+  /// No description provided for @metricErythemaIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Erythema Index (EI)'**
+  String get metricErythemaIndex;
+
+  /// No description provided for @metricScleraBilirubin.
+  ///
+  /// In en, this message translates to:
+  /// **'Scleral Bilirubin Index'**
+  String get metricScleraBilirubin;
+
+  /// No description provided for @metricHemorrhagePatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact Hemorrhage Area'**
+  String get metricHemorrhagePatch;
+
+  /// No description provided for @metricNailErythema.
+  ///
+  /// In en, this message translates to:
+  /// **'Nailbed Erythema Index'**
+  String get metricNailErythema;
+
+  /// No description provided for @metricBeauGroove.
+  ///
+  /// In en, this message translates to:
+  /// **'Beau Transverse Groove'**
+  String get metricBeauGroove;
+
+  /// No description provided for @metricTerryLindsaySplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Proximal/Distal Split'**
+  String get metricTerryLindsaySplit;
+
+  /// No description provided for @metricSplinterStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Splinter Streak Ratio'**
+  String get metricSplinterStreak;
+
+  /// No description provided for @metricGeographicTongue.
+  ///
+  /// In en, this message translates to:
+  /// **'Geographic Tongue Score'**
+  String get metricGeographicTongue;
+
+  /// No description provided for @metricYellowCoating.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Coating Ratio'**
+  String get metricYellowCoating;
+
+  /// No description provided for @metricBristolScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Bristol Scale'**
+  String get metricBristolScale;
 }
 
 class _AppLocalizationsDelegate

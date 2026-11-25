@@ -1217,4 +1217,163 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'Okudum, Onaylıyorum';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'Resimli Atlas ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'Acil İşaretler ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'Evde Klinik Testler ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'Acil Hekim Değerlendirmesi Gerektiren İşaretler';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'Sağlıklı referansla yan yana büyütmek için herhangi bir karta dokunun.';
+
+  @override
+  String get atlasVisualCueLabel => 'Görsel İşaret';
+
+  @override
+  String get atlasClinicalContextLabel => 'Olası Klinik Bağlam';
+
+  @override
+  String get atlasPossibleContextShort => 'Olası Bağlam';
+
+  @override
+  String get atlasWarningPrefix => 'Uyarı';
+
+  @override
+  String get atlasCloseBtn => 'Kapat';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'En Doğru Çekim Protokolü';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'Evde Uygulayabileceğiniz Klinik Ön Testler';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'Olağan';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'Dikkat';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'Fitzpatrick Cilt Fototipleri & ITA° Kalibrasyon Skalası';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'Uygulama çevre sağlıklı derinin ITA° açısını ölçerek analiz eşiklerini cilt fototipinize göre dengeler.';
+
+  @override
+  String get resultVisualCompareTitle => 'Resimli Klinik Referans Kıyaslaması';
+
+  @override
+  String get resultHealthyShort => 'Sağlıklı';
+
+  @override
+  String get resultMatchedShort => 'Eşleşen';
+
+  @override
+  String get resultViewFullAtlasBtn => 'Tüm Resimli Atlası Gör';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'Evde Klinik Testler';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'Kantitatif Klinik Ölçümler';
+
+  @override
+  String get cameraEyeModeSclera => 'Mod: Sklera (Sarılık)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'Alt Göz Kapağı (Anemi)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'Klinik Test & Atlas';
+
+  @override
+  String get bristolScaleTitle =>
+      'Bristol Dışkı Kıvam Skalası (Opsiyonel • Tip 1–7)';
+
+  @override
+  String get bristolType1Title => 'Tip 1 • Sert topaklar';
+
+  @override
+  String get bristolType2Title => 'Tip 2 • Topaklı sucuk';
+
+  @override
+  String get bristolType3Title => 'Tip 3 • Çatlaklı sucuk';
+
+  @override
+  String get bristolType4Title => 'Tip 4 • Pürüzsüz (İdeal)';
+
+  @override
+  String get bristolType5Title => 'Tip 5 • Yumuşak parçalar';
+
+  @override
+  String get bristolType6Title => 'Tip 6 • Püremsi / Gevşek';
+
+  @override
+  String get bristolType7Title => 'Tip 7 • Tamamen sıvı';
+
+  @override
+  String get metricFitzpatrickPhototype => 'Fitzpatrick Fototip';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — Asimetri';
+
+  @override
+  String get metricAbcdeBorder => 'B — Sınır Düzensizliği';
+
+  @override
+  String get metricAbcdeColors => 'C — Dermoskopik Renk';
+
+  @override
+  String get metricErythemaDelta => 'Eritem İndeksi Δ';
+
+  @override
+  String get metricAnnularClearing => 'Halka Merkez Açılması';
+
+  @override
+  String get metricErythemaIndex => 'Eritem İndeksi (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'Sklera Bilirubin İndeksi';
+
+  @override
+  String get metricHemorrhagePatch => 'Kompakt Kanama Alanı';
+
+  @override
+  String get metricNailErythema => 'Tırnak Yatağı Eritem İndeksi';
+
+  @override
+  String get metricBeauGroove => 'Beau Yatay Oluk Skoru';
+
+  @override
+  String get metricTerryLindsaySplit => 'Proksimal/Distal Ayrım';
+
+  @override
+  String get metricSplinterStreak => 'Kıymık Çizgisi Oranı';
+
+  @override
+  String get metricGeographicTongue => 'Harita Dil Skoru';
+
+  @override
+  String get metricYellowCoating => 'Sarı Pas Oranı';
+
+  @override
+  String get metricBristolScale => 'Bristol Skalası';
 }

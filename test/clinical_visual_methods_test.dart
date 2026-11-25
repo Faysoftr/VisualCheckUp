@@ -449,5 +449,63 @@ void main() {
       expect(find.text('Kantitatif Klinik Ölçümler'), findsOneWidget);
       expect(find.text('Tip II (Açık) (ITA 46°)'), findsOneWidget);
     });
+
+    testWidgets('Visual Atlas and ResultScreen clinical cards localize cleanly into English and Arabic', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(
+        const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: ModuleReferenceSheet(category: CheckCategory.nail),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Illustrated Atlas'), findsOneWidget);
+      expect(find.textContaining('Home Clinical Tests'), findsOneWidget);
+
+      final res = AnalysisResult(
+        id: 'skin_i18n_en',
+        category: CheckCategory.skinCondition,
+        riskLevel: RiskLevel.urgent,
+        summaryTitle: 'Suspicious Mole',
+        summaryDetail: 'ABCDE finding.',
+        dominantColorValue: const Color(0xFF47302A).toARGB32(),
+        observations: const ['Variegated pigment'],
+        recommendations: const ['See dermatologist'],
+        warningFlags: const [],
+        confidence: 0.72,
+        createdAt: DateTime(2026, 11, 25, 12, 0),
+        matchedFindingIds: const ['skin_abcde_suspicious_mole'],
+        clinicalMetrics: const {
+          'Fitzpatrick Fototip': 'Type II (ITA 46°)',
+          'A — Asimetri': '32%',
+        },
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ar'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ResultScreen(result: res),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('مقارنة المرجع السريري المصور'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('القياسات السريرية الكمية'),
+        220,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('القياسات السريرية الكمية'), findsOneWidget);
+      expect(find.text('نمط فيتزباتريك للبشرة'), findsOneWidget);
+      expect(find.text('A — عدم التماثل'), findsOneWidget);
+    });
   });
 }

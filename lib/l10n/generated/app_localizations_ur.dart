@@ -1200,4 +1200,160 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'میں نے پڑھ لیا اور متفق ہوں';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'تصویری اٹلس ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'فوری علامات ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'گھریلو کلینیکل ٹیسٹ ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle => 'فوری طبی معائنے کی متقاضی علامات';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'صحت مند حوالہ کے ساتھ بڑا کر کے موازنہ کرنے کے لیے کسی بھی کارڈ پر ٹیپ کریں۔';
+
+  @override
+  String get atlasVisualCueLabel => 'بصری اشارہ';
+
+  @override
+  String get atlasClinicalContextLabel => 'ممکنہ کلینیکل پس منظر';
+
+  @override
+  String get atlasPossibleContextShort => 'ممکنہ پس منظر';
+
+  @override
+  String get atlasWarningPrefix => 'انتباہ';
+
+  @override
+  String get atlasCloseBtn => 'بند کریں';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'تصویر لینے کا بہترین طریقہ';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'گھر پر کیے جانے والے ابتدائی کلینیکل ٹیسٹ';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'معمول کے مطابق';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'توجہ طلب';
+
+  @override
+  String get fitzpatrickScaleTitle => 'فٹز پیٹرک جلد کی اقسام اور ITA° پیمانہ';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'ایپ آس پاس کی صحت مند جلد کا ITA° زاویہ ناپ کر آپ کی جلد کی رنگت کے مطابق تجزیے کی حد متوازن کرتی ہے۔';
+
+  @override
+  String get resultVisualCompareTitle => 'تصویری کلینیکل حوالہ کا موازنہ';
+
+  @override
+  String get resultHealthyShort => 'صحت مند';
+
+  @override
+  String get resultMatchedShort => 'مماثل';
+
+  @override
+  String get resultViewFullAtlasBtn => 'مکمل تصویری اٹلس دیکھیں';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'گھریلو کلینیکل ٹیسٹ';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'مقداری کلینیکل پیمائشیں';
+
+  @override
+  String get cameraEyeModeSclera => 'موڈ: آنکھ کی سفیدی (یرقان)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'نچلی پلک (خون کی کمی)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'کلینیکل ٹیسٹ اور اٹلس';
+
+  @override
+  String get bristolScaleTitle => 'برسٹل پاخانہ پیمانہ (اختیاری • اقسام 1–7)';
+
+  @override
+  String get bristolType1Title => 'قسم 1 • سخت گانٹھیں';
+
+  @override
+  String get bristolType2Title => 'قسم 2 • گانٹھ دار لمبا';
+
+  @override
+  String get bristolType3Title => 'قسم 3 • دراڑوں والا';
+
+  @override
+  String get bristolType4Title => 'قسم 4 • ہموار (مثالی)';
+
+  @override
+  String get bristolType5Title => 'قسم 5 • نرم ٹکڑے';
+
+  @override
+  String get bristolType6Title => 'قسم 6 • نرم / ڈھیلا';
+
+  @override
+  String get bristolType7Title => 'قسم 7 • مکمل مائع';
+
+  @override
+  String get metricFitzpatrickPhototype => 'فٹز پیٹرک فوٹو ٹائپ';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — عدم توازن';
+
+  @override
+  String get metricAbcdeBorder => 'B — کناروں کی بے قاعدگی';
+
+  @override
+  String get metricAbcdeColors => 'C — ڈرموسکوپک رنگ';
+
+  @override
+  String get metricErythemaDelta => 'ایریتھیما انڈیکس Δ';
+
+  @override
+  String get metricAnnularClearing => 'حلقہ نما مرکزی صفائی';
+
+  @override
+  String get metricErythemaIndex => 'ایریتھیما انڈیکس (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'اسکلیرا بلیروبن انڈیکس';
+
+  @override
+  String get metricHemorrhagePatch => 'مرتکز خون بہنے کا حصہ';
+
+  @override
+  String get metricNailErythema => 'ناخن بستر ایریتھیما انڈیکس';
+
+  @override
+  String get metricBeauGroove => 'بو افقی لکیر اسکور';
+
+  @override
+  String get metricTerryLindsaySplit => 'پراکسیمل/ڈسٹل فرق';
+
+  @override
+  String get metricSplinterStreak => 'اسپلنٹر لکیروں کا تناسب';
+
+  @override
+  String get metricGeographicTongue => 'جغرافیائی زبان اسکور';
+
+  @override
+  String get metricYellowCoating => 'زرد تہہ کا تناسب';
+
+  @override
+  String get metricBristolScale => 'برسٹل پیمانہ';
 }

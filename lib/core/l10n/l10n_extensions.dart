@@ -4,6 +4,7 @@ import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 import 'package:visualcheckup/features/checkup/domain/follow_up_plan.dart';
+import 'package:visualcheckup/features/checkup/domain/quick_color_swatch.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
@@ -481,5 +482,69 @@ class LanguagePickerSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+extension BristolStoolTypeL10n on BristolStoolType {
+  String localizedTitle(AppLocalizations l10n) {
+    switch (typeNumber) {
+      case 1:
+        return l10n.bristolType1Title;
+      case 2:
+        return l10n.bristolType2Title;
+      case 3:
+        return l10n.bristolType3Title;
+      case 4:
+        return l10n.bristolType4Title;
+      case 5:
+        return l10n.bristolType5Title;
+      case 6:
+        return l10n.bristolType6Title;
+      case 7:
+        return l10n.bristolType7Title;
+      default:
+        return title;
+    }
+  }
+}
+
+/// Maps canonical clinical biomarker keys emitted by on-device analyzers to
+/// localized labels across all 11 supported languages.
+String localizedClinicalMetricKey(String rawKey, AppLocalizations l10n) {
+  switch (rawKey) {
+    case 'Fitzpatrick Fototip':
+      return l10n.metricFitzpatrickPhototype;
+    case 'A — Asimetri':
+      return l10n.metricAbcdeAsymmetry;
+    case 'B — Sınır Düzensizliği':
+      return l10n.metricAbcdeBorder;
+    case 'C — Dermoskopik Renk':
+      return l10n.metricAbcdeColors;
+    case 'Eritem İndeksi Δ':
+      return l10n.metricErythemaDelta;
+    case 'Halka Merkez Açılması':
+      return l10n.metricAnnularClearing;
+    case 'Eritem İndeksi (EI)':
+      return l10n.metricErythemaIndex;
+    case 'Sklera Bilirubin İndeksi':
+      return l10n.metricScleraBilirubin;
+    case 'Kompakt Kanama Alanı':
+      return l10n.metricHemorrhagePatch;
+    case 'Tırnak Yatağı Eritem İndeksi':
+      return l10n.metricNailErythema;
+    case 'Beau Yatay Oluk Skoru':
+      return l10n.metricBeauGroove;
+    case 'Proksimal/Distal Ayrım':
+      return l10n.metricTerryLindsaySplit;
+    case 'Kıymık Çizgisi Oranı':
+      return l10n.metricSplinterStreak;
+    case 'Harita Dil Skoru':
+      return l10n.metricGeographicTongue;
+    case 'Sarı Pas Oranı':
+      return l10n.metricYellowCoating;
+    case 'Bristol Skalası':
+      return l10n.metricBristolScale;
+    default:
+      return rawKey;
   }
 }

@@ -646,5 +646,75 @@
   "loginTermsRequiredMsg": "Please accept the Terms of Use & Medical Notice before signing in.",
   "loginTermsReadMore": "Read Terms",
   "loginTermsModalBody": "• Not a Medical Diagnosis: VisualCheckUp is not a medical device and does not diagnose, treat, or replace a licensed physician.\n\n• Awareness & Preparation Only: Visual checks, lab summaries, and growth/BMI scales are informational tools to help you prepare for doctor visits.\n\n• Emergency Warning: If you experience severe pain, chest pain, shortness of breath, sudden vision loss, or urgent symptoms, seek emergency medical care immediately.\n\n• Privacy: Your health records stay on your device by default and are never sold or shared with third parties.",
-  "loginTermsAcceptBtn": "I Have Read & Accept"
+  "loginTermsAcceptBtn": "I Have Read & Accept",
+  "atlasFilterAll": "Illustrated Atlas ({count})",
+  "@atlasFilterAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "atlasFilterUrgent": "Urgent Signs ({count})",
+  "@atlasFilterUrgent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "atlasFilterSelfTests": "Home Clinical Tests ({count})",
+  "@atlasFilterSelfTests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "atlasUrgentSectionTitle": "Signs Requiring Prompt Doctor Evaluation",
+  "atlasTapToCompareHint": "Tap any card to enlarge side-by-side with the healthy reference.",
+  "atlasVisualCueLabel": "Visual Cue",
+  "atlasClinicalContextLabel": "Possible Clinical Context",
+  "atlasPossibleContextShort": "Possible Context",
+  "atlasWarningPrefix": "Warning",
+  "atlasCloseBtn": "Close",
+  "atlasCaptureProtocolTitle": "Best Capture Protocol",
+  "atlasHomeSelfTestsSectionTitle": "Clinical Pre-Screening Tests You Can Do at Home",
+  "atlasSelfTestNormalPrefix": "Normal",
+  "atlasSelfTestWarningPrefix": "Attention",
+  "fitzpatrickScaleTitle": "Fitzpatrick Skin Phototypes & ITA° Calibration Scale",
+  "fitzpatrickScaleSubtitle": "The app measures the ITA° angle of surrounding healthy skin to balance analysis thresholds for your skin phototype.",
+  "resultVisualCompareTitle": "Illustrated Clinical Reference Comparison",
+  "resultHealthyShort": "Healthy",
+  "resultMatchedShort": "Matched",
+  "resultViewFullAtlasBtn": "View Full Illustrated Atlas",
+  "resultHomeSelfTestsBtn": "Home Clinical Tests",
+  "resultClinicalBiomarkersTitle": "Quantitative Clinical Measurements",
+  "cameraEyeModeSclera": "Mode: Sclera (Jaundice)",
+  "cameraEyeModeConjunctiva": "Lower Eyelid (Anemia)",
+  "cameraClinicalAtlasChip": "Clinical Tests & Atlas",
+  "bristolScaleTitle": "Bristol Stool Consistency Scale (Optional • Types 1–7)",
+  "bristolType1Title": "Type 1 • Hard lumps",
+  "bristolType2Title": "Type 2 • Lumpy sausage",
+  "bristolType3Title": "Type 3 • Cracked sausage",
+  "bristolType4Title": "Type 4 • Smooth (Ideal)",
+  "bristolType5Title": "Type 5 • Soft blobs",
+  "bristolType6Title": "Type 6 • Mushy / Loose",
+  "bristolType7Title": "Type 7 • Entirely liquid",
+  "metricFitzpatrickPhototype": "Fitzpatrick Phototype",
+  "metricAbcdeAsymmetry": "A — Asymmetry",
+  "metricAbcdeBorder": "B — Border Irregularity",
+  "metricAbcdeColors": "C — Dermoscopic Colors",
+  "metricErythemaDelta": "Erythema Index Δ",
+  "metricAnnularClearing": "Annular Central Clearing",
+  "metricErythemaIndex": "Erythema Index (EI)",
+  "metricScleraBilirubin": "Scleral Bilirubin Index",
+  "metricHemorrhagePatch": "Compact Hemorrhage Area",
+  "metricNailErythema": "Nailbed Erythema Index",
+  "metricBeauGroove": "Beau Transverse Groove",
+  "metricTerryLindsaySplit": "Proximal/Distal Split",
+  "metricSplinterStreak": "Splinter Streak Ratio",
+  "metricGeographicTongue": "Geographic Tongue Score",
+  "metricYellowCoating": "Yellow Coating Ratio",
+  "metricBristolScale": "Bristol Scale"
 }

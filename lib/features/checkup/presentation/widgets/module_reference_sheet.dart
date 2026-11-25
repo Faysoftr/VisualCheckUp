@@ -86,6 +86,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
     ReferenceFinding? healthyRef,
   ) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -114,9 +115,9 @@ class _ReferenceContentState extends State<_ReferenceContent> {
                           borderRadius: 18,
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Sağlıklı Referans',
-                          style: TextStyle(
+                        Text(
+                          l10n.healthyReferenceLabel,
+                          style: const TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1B8A5A),
@@ -136,8 +137,8 @@ class _ReferenceContentState extends State<_ReferenceContent> {
                       const SizedBox(height: 6),
                       Text(
                         finding.isHealthyReference
-                            ? 'Sağlıklı Referans'
-                            : finding.riskLevel.label,
+                            ? l10n.healthyReferenceLabel
+                            : finding.riskLevel.localizedLabel(l10n),
                         style: TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
@@ -150,7 +151,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
               ),
               const SizedBox(height: 14),
               Text(
-                'Görsel İşaret',
+                l10n.atlasVisualCueLabel,
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -162,7 +163,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Olası Klinik Bağlam',
+                l10n.atlasClinicalContextLabel,
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -184,7 +185,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Uyarı: ${finding.redFlagNote}',
+                    '${l10n.atlasWarningPrefix}: ${finding.redFlagNote}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFFC93B3B),
                       fontWeight: FontWeight.w700,
@@ -199,7 +200,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Kapat'),
+            child: Text(l10n.atlasCloseBtn),
           ),
         ],
       ),
@@ -249,20 +250,20 @@ class _ReferenceContentState extends State<_ReferenceContent> {
           runSpacing: 6,
           children: [
             ChoiceChip(
-              label: Text('Resimli Atlas (${spec.findings.length})'),
+              label: Text(l10n.atlasFilterAll(spec.findings.length)),
               selected: _filter == _AtlasFilter.all,
               onSelected: (_) => setState(() => _filter = _AtlasFilter.all),
             ),
             if (urgentFindings.isNotEmpty)
               ChoiceChip(
-                label: Text('Acil İşaretler (${urgentFindings.length})'),
+                label: Text(l10n.atlasFilterUrgent(urgentFindings.length)),
                 selected: _filter == _AtlasFilter.urgentOnly,
                 onSelected: (_) =>
                     setState(() => _filter = _AtlasFilter.urgentOnly),
               ),
             if (spec.selfTests.isNotEmpty)
               ChoiceChip(
-                label: Text('Evde Klinik Testler (${spec.selfTests.length})'),
+                label: Text(l10n.atlasFilterSelfTests(spec.selfTests.length)),
                 selected: _filter == _AtlasFilter.selfTests,
                 onSelected: (_) =>
                     setState(() => _filter = _AtlasFilter.selfTests),
@@ -305,7 +306,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
           // Abnormal / warning findings section
           Text(
             _filter == _AtlasFilter.urgentOnly
-                ? 'Acil Hekim Değerlendirmesi Gerektiren İşaretler'
+                ? l10n.atlasUrgentSectionTitle
                 : l10n.abnormalFindingsTitle,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
@@ -314,7 +315,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Sağlıklı referansla yan yana büyütmek için herhangi bir karta dokunun.',
+            l10n.atlasTapToCompareHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontSize: 11.5,
@@ -383,7 +384,7 @@ class _ReferenceContentState extends State<_ReferenceContent> {
           if (spec.selfTests.isNotEmpty && _filter == _AtlasFilter.all) ...[
             const SizedBox(height: 4),
             Text(
-              'Evde Uygulayabileceğiniz Klinik Ön Testler',
+              l10n.atlasHomeSelfTestsSectionTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -408,6 +409,7 @@ class _CaptureProtocolCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -423,7 +425,7 @@ class _CaptureProtocolCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'En Doğru Çekim Protokolü',
+                  l10n.atlasCaptureProtocolTitle,
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -465,6 +467,7 @@ class _SelfTestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -535,7 +538,7 @@ class _SelfTestCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                'Olağan: ${test.normalResult}',
+                '${l10n.atlasSelfTestNormalPrefix}: ${test.normalResult}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: const Color(0xFF166B46),
                   fontWeight: FontWeight.w600,
@@ -552,7 +555,7 @@ class _SelfTestCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                'Dikkat: ${test.warningResult}',
+                '${l10n.atlasSelfTestWarningPrefix}: ${test.warningResult}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: const Color(0xFFA62626),
                   fontWeight: FontWeight.w600,
@@ -652,12 +655,12 @@ class _FindingCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Görsel İşaret: ${finding.visualSignature}',
+                '${l10n.atlasVisualCueLabel}: ${finding.visualSignature}',
                 style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
               ),
               const SizedBox(height: 4),
               Text(
-                'Olası Bağlam: ${finding.possibleAssociations}',
+                '${l10n.atlasPossibleContextShort}: ${finding.possibleAssociations}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   height: 1.4,
@@ -666,7 +669,7 @@ class _FindingCard extends StatelessWidget {
               if (finding.redFlagNote != null) ...[
                 const SizedBox(height: 6),
                 Text(
-                  'Uyarı: ${finding.redFlagNote}',
+                  '${l10n.atlasWarningPrefix}: ${finding.redFlagNote}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: const Color(0xFFC93B3B),
                     fontWeight: FontWeight.w600,

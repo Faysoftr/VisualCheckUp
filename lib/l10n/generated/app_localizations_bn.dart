@@ -1202,4 +1202,163 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'পড়েছি এবং সম্মত';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'চিত্রিত অ্যাটলাস ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'জরুরি লক্ষণ ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'ঘরোয়া ক্লিনিক্যাল পরীক্ষা ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'দ্রুত চিকিৎসকের মূল্যায়ন প্রয়োজন এমন লক্ষণ';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'সুস্থ রেফারেন্সের সাথে পাশাপাশি বড় করে দেখতে যেকোনো কার্ডে ট্যাপ করুন।';
+
+  @override
+  String get atlasVisualCueLabel => 'দৃশ্যমান সংকেত';
+
+  @override
+  String get atlasClinicalContextLabel => 'সম্ভাব্য ক্লিনিক্যাল প্রেক্ষাপট';
+
+  @override
+  String get atlasPossibleContextShort => 'সম্ভাব্য প্রেক্ষাপট';
+
+  @override
+  String get atlasWarningPrefix => 'সতর্কতা';
+
+  @override
+  String get atlasCloseBtn => 'বন্ধ করুন';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'সঠিক ছবি তোলার নিয়ম';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'বাড়িতে করা যায় এমন প্রাথমিক ক্লিনিক্যাল পরীক্ষা';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'স্বাভাবিক';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'মনোযোগ দিন';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'ফিটজপ্যাট্রিক ত্বকের ধরন ও ITA° ক্যালিব্রেশন স্কেল';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'অ্যাপটি আশেপাশের সুস্থ ত্বকের ITA° কোণ পরিমাপ করে আপনার ত্বকের ধরন অনুযায়ী বিশ্লেষণের সীমা সামঞ্জস্য করে।';
+
+  @override
+  String get resultVisualCompareTitle => 'চিত্রিত ক্লিনিক্যাল রেফারেন্স তুলনা';
+
+  @override
+  String get resultHealthyShort => 'সুস্থ';
+
+  @override
+  String get resultMatchedShort => 'মিলেছে';
+
+  @override
+  String get resultViewFullAtlasBtn => 'সম্পূর্ণ চিত্রিত অ্যাটলাস দেখুন';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'ঘরোয়া ক্লিনিক্যাল পরীক্ষা';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'পরিমাণগত ক্লিনিক্যাল পরিমাপ';
+
+  @override
+  String get cameraEyeModeSclera => 'মোড: স্ক্লেরা (জন্ডিস)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'নিচের চোখের পাতা (রক্তস্বল্পতা)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'ক্লিনিক্যাল পরীক্ষা ও অ্যাটলাস';
+
+  @override
+  String get bristolScaleTitle =>
+      'ব্রিস্টল মলের ঘনত্ব স্কেল (ঐচ্ছিক • ধরন ১–৭)';
+
+  @override
+  String get bristolType1Title => 'ধরন ১ • শক্ত দলা';
+
+  @override
+  String get bristolType2Title => 'ধরন ২ • দলাযুক্ত লম্বাটে';
+
+  @override
+  String get bristolType3Title => 'ধরন ৩ • ফাটলযুক্ত লম্বাটে';
+
+  @override
+  String get bristolType4Title => 'ধরন ৪ • মসৃণ (আদর্শ)';
+
+  @override
+  String get bristolType5Title => 'ধরন ৫ • নরম টুকরো';
+
+  @override
+  String get bristolType6Title => 'ধরন ৬ • নরম / আলগা';
+
+  @override
+  String get bristolType7Title => 'ধরন ৭ • সম্পূর্ণ তরল';
+
+  @override
+  String get metricFitzpatrickPhototype => 'ফিটজপ্যাট্রিক ফটোটাইপ';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — অসামঞ্জস্যতা';
+
+  @override
+  String get metricAbcdeBorder => 'B — প্রান্তের অনিয়ম';
+
+  @override
+  String get metricAbcdeColors => 'C — ডার্মোস্কোপিক রঙ';
+
+  @override
+  String get metricErythemaDelta => 'এরিথেমা সূচক Δ';
+
+  @override
+  String get metricAnnularClearing => 'বলয়াকার কেন্দ্র পরিষ্কারতা';
+
+  @override
+  String get metricErythemaIndex => 'এরিথেমা সূচক (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'স্ক্লেরাল বিলিরুবিন সূচক';
+
+  @override
+  String get metricHemorrhagePatch => 'ঘন রক্তক্ষরণ এলাকা';
+
+  @override
+  String get metricNailErythema => 'নখের তলার এরিথেমা সূচক';
+
+  @override
+  String get metricBeauGroove => 'বো আড়াআড়ি খাঁজ';
+
+  @override
+  String get metricTerryLindsaySplit => 'প্রক্সিমাল/ডিস্টাল বিভাজন';
+
+  @override
+  String get metricSplinterStreak => 'স্প্লিন্টার রেখার অনুপাত';
+
+  @override
+  String get metricGeographicTongue => 'জিওগ্রাফিক জিহ্বা স্কোর';
+
+  @override
+  String get metricYellowCoating => 'হলুদ প্রলেপের অনুপাত';
+
+  @override
+  String get metricBristolScale => 'ব্রিস্টল স্কেল';
 }

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 /// Offline vector medical illustration widget rendering clinically recognizable
@@ -1085,6 +1086,7 @@ class FitzpatrickScaleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -1101,7 +1103,7 @@ class FitzpatrickScaleCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Fitzpatrick Cilt Fototipleri & ITA° Kalibrasyon Skalası',
+                    l10n.fitzpatrickScaleTitle,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -1111,7 +1113,7 @@ class FitzpatrickScaleCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Uygulama çevre sağlıklı derinin ITA° açısını ölçerek analiz eşiklerini cilt fototipinize göre dengeler.',
+              l10n.fitzpatrickScaleSubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 height: 1.35,

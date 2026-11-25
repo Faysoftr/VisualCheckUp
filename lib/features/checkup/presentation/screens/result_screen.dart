@@ -985,6 +985,7 @@ class _MatchedVisualReferenceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final spec = ModuleReferenceCatalog.forCategory(result.category);
     final healthyRef = spec.healthyReferences.firstOrNull;
     final matchedFindings = <ReferenceFinding>[];
@@ -1014,7 +1015,7 @@ class _MatchedVisualReferenceCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Resimli Klinik Referans Kıyaslaması',
+                    l10n.resultVisualCompareTitle,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -1037,9 +1038,9 @@ class _MatchedVisualReferenceCard extends StatelessWidget {
                         borderRadius: 14,
                       ),
                       const SizedBox(height: 5),
-                      const Text(
-                        'Sağlıklı',
-                        style: TextStyle(
+                      Text(
+                        l10n.resultHealthyShort,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF1B8A5A),
@@ -1063,7 +1064,9 @@ class _MatchedVisualReferenceCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      primary.isHealthyReference ? 'Sağlıklı' : 'Eşleşen',
+                      primary.isHealthyReference
+                          ? l10n.resultHealthyShort
+                          : l10n.resultMatchedShort,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -1104,13 +1107,13 @@ class _MatchedVisualReferenceCard extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: onOpenAtlas,
                   icon: const Icon(Icons.menu_book_outlined, size: 16),
-                  label: const Text('Tüm Resimli Atlası Gör'),
+                  label: Text(l10n.resultViewFullAtlasBtn),
                 ),
                 if (spec.selfTests.isNotEmpty)
                   TextButton.icon(
                     onPressed: onOpenSelfTests,
                     icon: const Icon(Icons.fact_check_outlined, size: 16),
-                    label: const Text('Evde Klinik Testler'),
+                    label: Text(l10n.resultHomeSelfTestsBtn),
                   ),
               ],
             ),
@@ -1130,6 +1133,7 @@ class _ClinicalBiomarkersCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1146,7 +1150,7 @@ class _ClinicalBiomarkersCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Kantitatif Klinik Ölçümler',
+                    l10n.resultClinicalBiomarkersTitle,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -1177,7 +1181,7 @@ class _ClinicalBiomarkersCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        entry.key,
+                        localizedClinicalMetricKey(entry.key, l10n),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 10.5,

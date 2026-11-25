@@ -227,7 +227,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
           if (widget.category == CheckCategory.stool) ...[
             const SizedBox(height: 20),
             Text(
-              'Bristol Dışkı Kıvam Skalası (Opsiyonel • Tip 1–7)',
+              l10n.bristolScaleTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -241,7 +241,7 @@ class _QuickColorCardScreenState extends State<QuickColorCardScreen> {
                     _selectedBristol?.typeNumber == item.typeNumber;
                 return ChoiceChip(
                   selected: selected,
-                  label: Text(item.title),
+                  label: Text(item.localizedTitle(l10n)),
                   onSelected: (val) {
                     setState(() {
                       _selectedBristol = val ? item : null;

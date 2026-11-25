@@ -1163,4 +1163,158 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => '我已阅读并同意';
+
+  @override
+  String atlasFilterAll(int count) {
+    return '临床图谱 ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return '紧急警示 ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return '居家临床自测 ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle => '需尽快就医评估的警示征象';
+
+  @override
+  String get atlasTapToCompareHint => '点击任意卡片即可与健康参考图并排放大对比。';
+
+  @override
+  String get atlasVisualCueLabel => '视觉特征';
+
+  @override
+  String get atlasClinicalContextLabel => '可能临床背景';
+
+  @override
+  String get atlasPossibleContextShort => '可能背景';
+
+  @override
+  String get atlasWarningPrefix => '警示';
+
+  @override
+  String get atlasCloseBtn => '关闭';
+
+  @override
+  String get atlasCaptureProtocolTitle => '最佳拍摄规范';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle => '可居家完成的临床初筛自测';
+
+  @override
+  String get atlasSelfTestNormalPrefix => '正常';
+
+  @override
+  String get atlasSelfTestWarningPrefix => '注意';
+
+  @override
+  String get fitzpatrickScaleTitle => 'Fitzpatrick 皮肤光型与 ITA° 校准量表';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      '应用通过测量周围健康皮肤的 ITA° 角度，按您的肤色光型自适应校准分析阈值。';
+
+  @override
+  String get resultVisualCompareTitle => '临床参考图谱并排对比';
+
+  @override
+  String get resultHealthyShort => '健康参考';
+
+  @override
+  String get resultMatchedShort => '匹配特征';
+
+  @override
+  String get resultViewFullAtlasBtn => '查看完整临床图谱';
+
+  @override
+  String get resultHomeSelfTestsBtn => '居家临床自测';
+
+  @override
+  String get resultClinicalBiomarkersTitle => '定量临床测量指标';
+
+  @override
+  String get cameraEyeModeSclera => '模式：巩膜（黄疸）';
+
+  @override
+  String get cameraEyeModeConjunctiva => '下眼睑结膜（贫血）';
+
+  @override
+  String get cameraClinicalAtlasChip => '自测与图谱';
+
+  @override
+  String get bristolScaleTitle => '布里斯托大便性状量表（可选 • 1–7型）';
+
+  @override
+  String get bristolType1Title => '1型 • 硬块颗粒';
+
+  @override
+  String get bristolType2Title => '2型 • 块状条形';
+
+  @override
+  String get bristolType3Title => '3型 • 表面裂纹';
+
+  @override
+  String get bristolType4Title => '4型 • 光滑柔软（理想）';
+
+  @override
+  String get bristolType5Title => '5型 • 软团块';
+
+  @override
+  String get bristolType6Title => '6型 • 糊状松散';
+
+  @override
+  String get bristolType7Title => '7型 • 完全水样';
+
+  @override
+  String get metricFitzpatrickPhototype => 'Fitzpatrick 光型';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — 不对称性';
+
+  @override
+  String get metricAbcdeBorder => 'B — 边缘不规则度';
+
+  @override
+  String get metricAbcdeColors => 'C — 皮肤镜颜色数';
+
+  @override
+  String get metricErythemaDelta => '红斑指数 Δ';
+
+  @override
+  String get metricAnnularClearing => '环状中心消退';
+
+  @override
+  String get metricErythemaIndex => '红斑指数 (EI)';
+
+  @override
+  String get metricScleraBilirubin => '巩膜胆红素指数';
+
+  @override
+  String get metricHemorrhagePatch => '致密出血区面积';
+
+  @override
+  String get metricNailErythema => '甲床红斑指数';
+
+  @override
+  String get metricBeauGroove => '博氏横向凹槽';
+
+  @override
+  String get metricTerryLindsaySplit => '近端/远端色差分割';
+
+  @override
+  String get metricSplinterStreak => '裂片状出血比例';
+
+  @override
+  String get metricGeographicTongue => '地图舌评分';
+
+  @override
+  String get metricYellowCoating => '黄苔比例';
+
+  @override
+  String get metricBristolScale => '布里斯托量表';
 }

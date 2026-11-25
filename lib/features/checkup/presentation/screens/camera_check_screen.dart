@@ -579,8 +579,8 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                               const SizedBox(width: 6),
                               Text(
                                 _eyeScanMode == EyeScanMode.palpebralConjunctiva
-                                    ? 'Alt Göz Kapağı (Anemi)'
-                                    : 'Mod: Sklera (Sarılık)',
+                                    ? l10n.cameraEyeModeConjunctiva
+                                    : l10n.cameraEyeModeSclera,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -608,18 +608,18 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white24),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.fact_check_outlined,
                               size: 14,
                               color: Color(0xFF5CE1D6),
                             ),
-                            SizedBox(width: 5),
+                            const SizedBox(width: 5),
                             Text(
-                              'Klinik Test & Atlas',
-                              style: TextStyle(
+                              l10n.cameraClinicalAtlasChip,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

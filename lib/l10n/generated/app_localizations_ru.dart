@@ -1200,4 +1200,164 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'Прочитал(а) и принимаю';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'Иллюстрированный атлас ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'Срочные признаки ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'Домашние тесты ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'Признаки, требующие скорой оценки врача';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'Нажмите на любую карточку, чтобы увеличить и сравнить со здоровым эталоном.';
+
+  @override
+  String get atlasVisualCueLabel => 'Визуальный признак';
+
+  @override
+  String get atlasClinicalContextLabel => 'Возможный клинический контекст';
+
+  @override
+  String get atlasPossibleContextShort => 'Возможный контекст';
+
+  @override
+  String get atlasWarningPrefix => 'Внимание';
+
+  @override
+  String get atlasCloseBtn => 'Закрыть';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'Оптимальный протокол съёмки';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'Предварительные клинические тесты дома';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'Норма';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'Внимание';
+
+  @override
+  String get fitzpatrickScaleTitle => 'Фототипы кожи Фитцпатрика и шкала ITA°';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'Приложение измеряет угол ITA° окружающей здоровой кожи и адаптирует пороги анализа под ваш фототип.';
+
+  @override
+  String get resultVisualCompareTitle =>
+      'Сравнение с иллюстрированным клиническим эталоном';
+
+  @override
+  String get resultHealthyShort => 'Здоровый';
+
+  @override
+  String get resultMatchedShort => 'Совпадение';
+
+  @override
+  String get resultViewFullAtlasBtn => 'Открыть весь атлас';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'Домашние тесты';
+
+  @override
+  String get resultClinicalBiomarkersTitle =>
+      'Количественные клинические измерения';
+
+  @override
+  String get cameraEyeModeSclera => 'Режим: Склера (Желтуха)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'Нижнее веко (Анемия)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'Тесты и Атлас';
+
+  @override
+  String get bristolScaleTitle =>
+      'Бристольская шкала стула (необязательно • Типы 1–7)';
+
+  @override
+  String get bristolType1Title => 'Тип 1 • Твёрдые комки';
+
+  @override
+  String get bristolType2Title => 'Тип 2 • Комковатая форма';
+
+  @override
+  String get bristolType3Title => 'Тип 3 • С трещинами';
+
+  @override
+  String get bristolType4Title => 'Тип 4 • Гладкий (Идеал)';
+
+  @override
+  String get bristolType5Title => 'Тип 5 • Мягкие кусочки';
+
+  @override
+  String get bristolType6Title => 'Тип 6 • Кашицеобразный';
+
+  @override
+  String get bristolType7Title => 'Тип 7 • Полностью жидкий';
+
+  @override
+  String get metricFitzpatrickPhototype => 'Фототип Фитцпатрика';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — Асимметрия';
+
+  @override
+  String get metricAbcdeBorder => 'B — Неровность границ';
+
+  @override
+  String get metricAbcdeColors => 'C — Дерматоскопические цвета';
+
+  @override
+  String get metricErythemaDelta => 'Индекс эритемы Δ';
+
+  @override
+  String get metricAnnularClearing => 'Кольцевидное просветление центра';
+
+  @override
+  String get metricErythemaIndex => 'Индекс эритемы (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'Индекс билирубина склеры';
+
+  @override
+  String get metricHemorrhagePatch => 'Зона плотного кровоизлияния';
+
+  @override
+  String get metricNailErythema => 'Индекс эритемы ногтевого ложа';
+
+  @override
+  String get metricBeauGroove => 'Поперечная борозда Бо';
+
+  @override
+  String get metricTerryLindsaySplit => 'Проксимально-дистальный контраст';
+
+  @override
+  String get metricSplinterStreak => 'Доля подногтевых полосок';
+
+  @override
+  String get metricGeographicTongue => 'Индекс географического языка';
+
+  @override
+  String get metricYellowCoating => 'Доля жёлтого налёта';
+
+  @override
+  String get metricBristolScale => 'Шкала Бристоля';
 }

@@ -1199,4 +1199,163 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get loginTermsAcceptBtn => 'मैंने पढ़ा और स्वीकार किया';
+
+  @override
+  String atlasFilterAll(int count) {
+    return 'सचित्र एटलस ($count)';
+  }
+
+  @override
+  String atlasFilterUrgent(int count) {
+    return 'तत्काल संकेत ($count)';
+  }
+
+  @override
+  String atlasFilterSelfTests(int count) {
+    return 'घरेलू क्लिनिकल जांच ($count)';
+  }
+
+  @override
+  String get atlasUrgentSectionTitle =>
+      'शीघ्र डॉक्टर मूल्यांकन की आवश्यकता वाले संकेत';
+
+  @override
+  String get atlasTapToCompareHint =>
+      'स्वस्थ संदर्भ के साथ बड़ा करके तुलना करने के लिए किसी भी कार्ड पर टैप करें।';
+
+  @override
+  String get atlasVisualCueLabel => 'दृश्य संकेत';
+
+  @override
+  String get atlasClinicalContextLabel => 'संभावित क्लिनिकल संदर्भ';
+
+  @override
+  String get atlasPossibleContextShort => 'संभावित संदर्भ';
+
+  @override
+  String get atlasWarningPrefix => 'चेतावनी';
+
+  @override
+  String get atlasCloseBtn => 'बंद करें';
+
+  @override
+  String get atlasCaptureProtocolTitle => 'सर्वोत्तम फोटो प्रोटोकॉल';
+
+  @override
+  String get atlasHomeSelfTestsSectionTitle =>
+      'घर पर करने योग्य प्रारंभिक क्लिनिकल परीक्षण';
+
+  @override
+  String get atlasSelfTestNormalPrefix => 'सामान्य';
+
+  @override
+  String get atlasSelfTestWarningPrefix => 'ध्यान दें';
+
+  @override
+  String get fitzpatrickScaleTitle =>
+      'फिट्ज़पैट्रिक त्वचा फोटोटाइप और ITA° कैलिब्रेशन स्केल';
+
+  @override
+  String get fitzpatrickScaleSubtitle =>
+      'ऐप आसपास की स्वस्थ त्वचा के ITA° कोण को मापकर आपके त्वचा प्रकार के अनुसार विश्लेषण सीमा को संतुलित करता है।';
+
+  @override
+  String get resultVisualCompareTitle => 'सचित्र क्लिनिकल संदर्भ तुलना';
+
+  @override
+  String get resultHealthyShort => 'स्वस्थ';
+
+  @override
+  String get resultMatchedShort => 'मिलान';
+
+  @override
+  String get resultViewFullAtlasBtn => 'पूरा सचित्र एटलस देखें';
+
+  @override
+  String get resultHomeSelfTestsBtn => 'घरेलू क्लिनिकल जांच';
+
+  @override
+  String get resultClinicalBiomarkersTitle => 'मात्रात्मक क्लिनिकल माप';
+
+  @override
+  String get cameraEyeModeSclera => 'मोड: श्वेतपटल (पीलिया)';
+
+  @override
+  String get cameraEyeModeConjunctiva => 'निचली पलक (एनीमिया)';
+
+  @override
+  String get cameraClinicalAtlasChip => 'क्लिनिकल जांच और एटलस';
+
+  @override
+  String get bristolScaleTitle =>
+      'ब्रिस्टल मल स्थिरता स्केल (वैकल्पिक • प्रकार 1–7)';
+
+  @override
+  String get bristolType1Title => 'प्रकार 1 • सख्त गांठें';
+
+  @override
+  String get bristolType2Title => 'प्रकार 2 • गांठदार लंबा';
+
+  @override
+  String get bristolType3Title => 'प्रकार 3 • दरारों वाला';
+
+  @override
+  String get bristolType4Title => 'प्रकार 4 • चिकना (आदर्श)';
+
+  @override
+  String get bristolType5Title => 'प्रकार 5 • नरम टुकड़े';
+
+  @override
+  String get bristolType6Title => 'प्रकार 6 • मुलायम / ढीला';
+
+  @override
+  String get bristolType7Title => 'प्रकार 7 • पूरी तरह तरल';
+
+  @override
+  String get metricFitzpatrickPhototype => 'फिट्ज़पैट्रिक फोटोटाइप';
+
+  @override
+  String get metricAbcdeAsymmetry => 'A — विषमता';
+
+  @override
+  String get metricAbcdeBorder => 'B — किनारे की अनियमितता';
+
+  @override
+  String get metricAbcdeColors => 'C — डर्मोस्कोपिक रंग';
+
+  @override
+  String get metricErythemaDelta => 'एरिथेमा सूचकांक Δ';
+
+  @override
+  String get metricAnnularClearing => 'वलयाकार केंद्रीय स्पष्टता';
+
+  @override
+  String get metricErythemaIndex => 'एरिथेमा सूचकांक (EI)';
+
+  @override
+  String get metricScleraBilirubin => 'श्वेतपटल बिलीरुबिन सूचकांक';
+
+  @override
+  String get metricHemorrhagePatch => 'सघन रक्तस्राव क्षेत्र';
+
+  @override
+  String get metricNailErythema => 'नाखून तल एरिथेमा सूचकांक';
+
+  @override
+  String get metricBeauGroove => 'बो अनुप्रस्थ खांचा';
+
+  @override
+  String get metricTerryLindsaySplit => 'प्रॉक्सिमल/डिस्टल विभाजन';
+
+  @override
+  String get metricSplinterStreak => 'स्प्लिंटर रेखा अनुपात';
+
+  @override
+  String get metricGeographicTongue => 'भौगोलिक जीभ स्कोर';
+
+  @override
+  String get metricYellowCoating => 'पीली परत का अनुपात';
+
+  @override
+  String get metricBristolScale => 'ब्रिस्टल स्केल';
 }
