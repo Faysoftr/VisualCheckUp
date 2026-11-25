@@ -2073,4 +2073,77 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'Plantillas de Dieta Listas';
+
+  @override
+  String get donateTooltip => 'Apoyar / Donar';
+
+  @override
+  String get donateMenuLabel => 'Apoyar a VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle =>
+      'Un café, comida o regalo para apoyar herramientas de salud';
+
+  @override
+  String get donatePopupTitle => 'Apoya a VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle =>
+      'Tu apoyo voluntario nos ayuda a mantener gratuitas y mejorar las herramientas de salud, análisis, alarmas y dieta.';
+
+  @override
+  String get donateTierCoffeeTitle => 'Invitar un Café';
+
+  @override
+  String get donateTierCoffeeDesc => 'Un café calentito para el desarrollo';
+
+  @override
+  String get donateTierMealTitle => 'Invitar una Comida';
+
+  @override
+  String get donateTierMealDesc => 'Gran apoyo para nuevas funciones de salud';
+
+  @override
+  String get donateTierGiftTitle => 'Enviar un Regalo';
+
+  @override
+  String get donateTierGiftDesc => 'Ayuda a cubrir costos de IA y servidores';
+
+  @override
+  String get donateTierGoldTitle => 'Gran Apoyo';
+
+  @override
+  String get donateTierGoldDesc => 'Impulsa nuevos módulos médicos e idiomas';
+
+  @override
+  String get donateTierHeroTitle => 'Héroe de la Salud';
+
+  @override
+  String get donateTierHeroDesc =>
+      'Apoya el seguimiento gratuito para todas las familias';
+
+  @override
+  String get donatePopularBadge => 'Popular';
+
+  @override
+  String donateConfirmButton(String price) {
+    return 'Donar $price';
+  }
+
+  @override
+  String get donateLaterButton => 'Más Tarde';
+
+  @override
+  String get donateThanksTitle => '¡Gracias por tu Apoyo!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'Tu aporte de $tier ($price) significa muchísimo para nosotros. ¡Gracias por hacer crecer VisualCheckUp!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'Colaborador • ¡Gracias!';
+
+  @override
+  String get donateStoreNotice => 'Apoyo voluntario único • Sin suscripción';
 }

@@ -37,6 +37,7 @@ import 'package:visualcheckup/features/medications/presentation/screens/medicati
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
+import 'package:visualcheckup/features/support/presentation/widgets/donation_support_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -478,6 +479,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenMedicationReminders: _openMedicationReminders,
         onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
+        onOpenDonate: () => DonationSupportDialog.show(context),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenQuickColorCard: _openQuickColorCardPicker,
@@ -499,19 +501,43 @@ class _HomeScreenState extends State<HomeScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leadingWidth: 96,
+        titleSpacing: 6,
         leading: Padding(
           padding: const EdgeInsetsDirectional.only(start: 10),
-          child: Center(
-            child: _FrostedCircleAction(
-              isDark: isDark,
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 38, height: 38),
-                icon: const Icon(Icons.menu_rounded, size: 21),
-                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _FrostedCircleAction(
+                isDark: isDark,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints.tightFor(width: 38, height: 38),
+                  icon: const Icon(Icons.menu_rounded, size: 21),
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
               ),
-            ),
+              const SizedBox(width: 6),
+              _FrostedCircleAction(
+                isDark: isDark,
+                child: IconButton(
+                  key: const Key('home_donate_appbar_button'),
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints.tightFor(width: 38, height: 38),
+                  icon: const Icon(
+                    Icons.volunteer_activism_rounded,
+                    size: 20,
+                    color: Color(0xFFE11D48),
+                  ),
+                  tooltip: l10n.donateTooltip,
+                  onPressed: () => DonationSupportDialog.show(context),
+                ),
+              ),
+            ],
           ),
         ),
         title: Row(
@@ -532,20 +558,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: Image.asset(
                   'assets/images/app_logo.jpg',
-                  width: 30,
-                  height: 30,
+                  width: 28,
+                  height: 28,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(width: 9),
-            Text(
-              l10n.appTitle,
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-                color: isDark ? Colors.white : const Color(0xFF0E2929),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                l10n.appTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: isDark ? Colors.white : const Color(0xFF0E2929),
+                ),
               ),
             ),
           ],
@@ -1335,42 +1365,48 @@ class _FollowUpModernCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryTeal.withValues(
-                      alpha: isDark ? 0.25 : 0.10,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.event_repeat_rounded,
-                        size: 14,
-                        color: isDark
-                            ? const Color(0xFF6CE5DC)
-                            : AppTheme.primaryTeal,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryTeal.withValues(
+                        alpha: isDark ? 0.25 : 0.10,
                       ),
-                      const SizedBox(width: 5),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.event_repeat_rounded,
+                          size: 14,
                           color: isDark
                               ? const Color(0xFF6CE5DC)
                               : AppTheme.primaryTeal,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? const Color(0xFF6CE5DC)
+                                  : AppTheme.primaryTeal,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: onEdit,
@@ -1588,11 +1624,15 @@ class _SectionHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
             if (badgeText != null) ...[

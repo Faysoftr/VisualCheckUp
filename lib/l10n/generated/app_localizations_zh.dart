@@ -2000,4 +2000,74 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => '现成饮食模板';
+
+  @override
+  String get donateTooltip => '赞助与支持';
+
+  @override
+  String get donateMenuLabel => '支持 VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle => '请喝咖啡、吃饭或送份心意，支持免费健康工具';
+
+  @override
+  String get donatePopupTitle => '支持 VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle => '您的自愿支持帮助我们持续免费改进视觉健康筛查、化验单解读、用药闹钟和饮食计划功能。';
+
+  @override
+  String get donateTierCoffeeTitle => '请喝咖啡';
+
+  @override
+  String get donateTierCoffeeDesc => '为开发团队送上一杯热咖啡';
+
+  @override
+  String get donateTierMealTitle => '请吃一顿饭';
+
+  @override
+  String get donateTierMealDesc => '大力支持更多健康新功能';
+
+  @override
+  String get donateTierGiftTitle => '送出一份礼物';
+
+  @override
+  String get donateTierGiftDesc => '帮助承担 AI 与服务器维护费用';
+
+  @override
+  String get donateTierGoldTitle => '重磅支持';
+
+  @override
+  String get donateTierGoldDesc => '加速推出更多医学模块与语言支持';
+
+  @override
+  String get donateTierHeroTitle => '健康守护者';
+
+  @override
+  String get donateTierHeroDesc => '助力更多家庭免费使用健康追踪工具';
+
+  @override
+  String get donatePopularBadge => '最受欢迎';
+
+  @override
+  String donateConfirmButton(String price) {
+    return '支持 $price';
+  }
+
+  @override
+  String get donateLaterButton => '以后再说';
+
+  @override
+  String get donateThanksTitle => '衷心感谢您的支持！';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return '您的「$tier」（$price）支持意义非凡，感谢您与我们一起让 VisualCheckUp 变得更好！';
+  }
+
+  @override
+  String get donateSupporterBadge => '支持者 • 感谢您！';
+
+  @override
+  String get donateStoreNotice => '一次性自愿支持 • 非自动续费订阅';
 }

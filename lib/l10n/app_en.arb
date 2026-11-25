@@ -1078,5 +1078,44 @@
   "dietCustomMealCaloriesHint": "kcal (optional)",
   "dietCustomAtLeastOneMeal": "Please enter at least one meal.",
   "dietCustomTemplatesTitle": "My Custom Diet Plans",
-  "dietReadyTemplatesTitle": "Ready-Made Diet Templates"
+  "dietReadyTemplatesTitle": "Ready-Made Diet Templates",
+  "donateTooltip": "Support & Donate",
+  "donateMenuLabel": "Support VisualCheckUp",
+  "donateMenuSubtitle": "Coffee, meal or gift to support free health tools",
+  "donatePopupTitle": "Support VisualCheckUp",
+  "donatePopupSubtitle": "Your voluntary support helps us keep health screening, lab reading, medication alarms, and diet tools free and improving.",
+  "donateTierCoffeeTitle": "Buy a Coffee",
+  "donateTierCoffeeDesc": "A warm cup of coffee for development",
+  "donateTierMealTitle": "Treat to a Meal",
+  "donateTierMealDesc": "Great support for new health features",
+  "donateTierGiftTitle": "Send a Gift",
+  "donateTierGiftDesc": "Helps cover AI & server maintenance costs",
+  "donateTierGoldTitle": "Big Support",
+  "donateTierGoldDesc": "Powers upcoming medical modules & languages",
+  "donateTierHeroTitle": "Health Hero",
+  "donateTierHeroDesc": "Supports free health tracking for all families",
+  "donatePopularBadge": "Popular",
+  "donateConfirmButton": "Donate {price}",
+  "@donateConfirmButton": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "donateLaterButton": "Maybe Later",
+  "donateThanksTitle": "Thank You for Your Support!",
+  "donateThanksBody": "Your {tier} ({price}) support means a lot to us. Thank you for helping keep VisualCheckUp growing!",
+  "@donateThanksBody": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "donateSupporterBadge": "Supporter • Thank you!",
+  "donateStoreNotice": "Voluntary one-time support • No subscription"
 }

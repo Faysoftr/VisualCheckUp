@@ -32,6 +32,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenMedicationReminders,
     this.onOpenDietMenu,
     this.onOpenAiCalorieScanner,
+    this.onOpenDonate,
     this.onOpenGrowthBmi,
     this.onOpenChildrenGrowth,
   });
@@ -56,6 +57,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenMedicationReminders;
   final VoidCallback? onOpenDietMenu;
   final VoidCallback? onOpenAiCalorieScanner;
+  final VoidCallback? onOpenDonate;
   final VoidCallback? onOpenGrowthBmi;
   final VoidCallback? onOpenChildrenGrowth;
 
@@ -234,6 +236,92 @@ class AppDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 children: [
+                  if (onOpenDonate != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFFE11D48), Color(0xFFF59E0B)],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFE11D48)
+                                  .withValues(alpha: 0.25),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                          child: InkWell(
+                            key: const Key('drawer_donate_button'),
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => _closeAndRun(context, onOpenDonate!),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 11,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.22),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.volunteer_activism_rounded,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 11),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          l10n.donateMenuLabel,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 13.5,
+                                          ),
+                                        ),
+                                        Text(
+                                          l10n.donateMenuSubtitle,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.9),
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   _DrawerTile(
                     icon: Icons.grid_view_rounded,
                     label: l10n.menuHome,

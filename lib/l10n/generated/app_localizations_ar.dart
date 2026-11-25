@@ -2049,4 +2049,77 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'خطط الرجيم الجاهزة';
+
+  @override
+  String get donateTooltip => 'دعم وتبرع';
+
+  @override
+  String get donateMenuLabel => 'ادعم VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle =>
+      'قهوة أو وجبة أو هدية لدعم الأدوات الصحية المجانية';
+
+  @override
+  String get donatePopupTitle => 'ادعم VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle =>
+      'يساعدنا دعمك التطوعي في إبقاء أدوات الفحص الصحي وقراءة التحاليل ومنبهات الأدوية والرجيم مجانية ومتطورة.';
+
+  @override
+  String get donateTierCoffeeTitle => 'كوب قهوة';
+
+  @override
+  String get donateTierCoffeeDesc => 'دعم لطيف لفريق التطوير';
+
+  @override
+  String get donateTierMealTitle => 'وجبة غداء';
+
+  @override
+  String get donateTierMealDesc => 'دعم رائع لإضافة ميزات صحية جديدة';
+
+  @override
+  String get donateTierGiftTitle => 'إرسال هدية';
+
+  @override
+  String get donateTierGiftDesc =>
+      'يساهم في تغطية تكاليف الذكاء الاصطناعي والخوادم';
+
+  @override
+  String get donateTierGoldTitle => 'دعم كبير';
+
+  @override
+  String get donateTierGoldDesc => 'يدعم تطوير الوحدات الطبية واللغات القادمة';
+
+  @override
+  String get donateTierHeroTitle => 'بطل الصحة';
+
+  @override
+  String get donateTierHeroDesc => 'دعم سخي لتتبع الصحة المجاني لجميع العائلات';
+
+  @override
+  String get donatePopularBadge => 'الأكثر اختياراً';
+
+  @override
+  String donateConfirmButton(String price) {
+    return 'تبرع $price';
+  }
+
+  @override
+  String get donateLaterButton => 'ليس الآن';
+
+  @override
+  String get donateThanksTitle => 'شكراً جزيلاً لدعمك!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'دعمك ($tier - $price) يعني لنا الكثير. شكراً لمساهمتك في تطوير VisualCheckUp!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'داعم • شكراً لك!';
+
+  @override
+  String get donateStoreNotice => 'دعم تطوعي لمرة واحدة • ليس اشتراكاً';
 }

@@ -2068,4 +2068,77 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'Modelos de Dieta Prontos';
+
+  @override
+  String get donateTooltip => 'Apoiar / Doar';
+
+  @override
+  String get donateMenuLabel => 'Apoiar o VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle =>
+      'Café, refeição ou presente para apoiar recursos de saúde';
+
+  @override
+  String get donatePopupTitle => 'Apoie o VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle =>
+      'Seu apoio voluntário nos ajuda a manter gratuitos e evoluir os exames visuais, laudos, alarmes e dietas.';
+
+  @override
+  String get donateTierCoffeeTitle => 'Pagar um Café';
+
+  @override
+  String get donateTierCoffeeDesc => 'Um café quentinho para o desenvolvimento';
+
+  @override
+  String get donateTierMealTitle => 'Oferecer uma Refeição';
+
+  @override
+  String get donateTierMealDesc => 'Ótimo apoio para novos recursos de saúde';
+
+  @override
+  String get donateTierGiftTitle => 'Enviar um Presente';
+
+  @override
+  String get donateTierGiftDesc => 'Ajuda a cobrir custos de IA e servidores';
+
+  @override
+  String get donateTierGoldTitle => 'Grande Apoio';
+
+  @override
+  String get donateTierGoldDesc => 'Impulsiona novos módulos médicos e idiomas';
+
+  @override
+  String get donateTierHeroTitle => 'Herói da Saúde';
+
+  @override
+  String get donateTierHeroDesc =>
+      'Apoia o acompanhamento gratuito para todas as famílias';
+
+  @override
+  String get donatePopularBadge => 'Popular';
+
+  @override
+  String donateConfirmButton(String price) {
+    return 'Doar $price';
+  }
+
+  @override
+  String get donateLaterButton => 'Mais Tarde';
+
+  @override
+  String get donateThanksTitle => 'Obrigado pelo seu Apoio!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'Sua contribuição $tier ($price) significa muito para nós. Obrigado por fazer o VisualCheckUp crescer!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'Apoiador • Obrigado!';
+
+  @override
+  String get donateStoreNotice => 'Apoio único voluntário • Sem assinatura';
 }

@@ -2071,4 +2071,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'Ready-Made Diet Templates';
+
+  @override
+  String get donateTooltip => 'Support & Donate';
+
+  @override
+  String get donateMenuLabel => 'Support VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle =>
+      'Coffee, meal or gift to support free health tools';
+
+  @override
+  String get donatePopupTitle => 'Support VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle =>
+      'Your voluntary support helps us keep health screening, lab reading, medication alarms, and diet tools free and improving.';
+
+  @override
+  String get donateTierCoffeeTitle => 'Buy a Coffee';
+
+  @override
+  String get donateTierCoffeeDesc => 'A warm cup of coffee for development';
+
+  @override
+  String get donateTierMealTitle => 'Treat to a Meal';
+
+  @override
+  String get donateTierMealDesc => 'Great support for new health features';
+
+  @override
+  String get donateTierGiftTitle => 'Send a Gift';
+
+  @override
+  String get donateTierGiftDesc => 'Helps cover AI & server maintenance costs';
+
+  @override
+  String get donateTierGoldTitle => 'Big Support';
+
+  @override
+  String get donateTierGoldDesc =>
+      'Powers upcoming medical modules & languages';
+
+  @override
+  String get donateTierHeroTitle => 'Health Hero';
+
+  @override
+  String get donateTierHeroDesc =>
+      'Supports free health tracking for all families';
+
+  @override
+  String get donatePopularBadge => 'Popular';
+
+  @override
+  String donateConfirmButton(String price) {
+    return 'Donate $price';
+  }
+
+  @override
+  String get donateLaterButton => 'Maybe Later';
+
+  @override
+  String get donateThanksTitle => 'Thank You for Your Support!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'Your $tier ($price) support means a lot to us. Thank you for helping keep VisualCheckUp growing!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'Supporter • Thank you!';
+
+  @override
+  String get donateStoreNotice =>
+      'Voluntary one-time support • No subscription';
 }

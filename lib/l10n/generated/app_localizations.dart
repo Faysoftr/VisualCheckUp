@@ -3847,6 +3847,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ready-Made Diet Templates'**
   String get dietReadyTemplatesTitle;
+
+  /// No description provided for @donateTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Support & Donate'**
+  String get donateTooltip;
+
+  /// No description provided for @donateMenuLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Support VisualCheckUp'**
+  String get donateMenuLabel;
+
+  /// No description provided for @donateMenuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coffee, meal or gift to support free health tools'**
+  String get donateMenuSubtitle;
+
+  /// No description provided for @donatePopupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support VisualCheckUp'**
+  String get donatePopupTitle;
+
+  /// No description provided for @donatePopupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your voluntary support helps us keep health screening, lab reading, medication alarms, and diet tools free and improving.'**
+  String get donatePopupSubtitle;
+
+  /// No description provided for @donateTierCoffeeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy a Coffee'**
+  String get donateTierCoffeeTitle;
+
+  /// No description provided for @donateTierCoffeeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A warm cup of coffee for development'**
+  String get donateTierCoffeeDesc;
+
+  /// No description provided for @donateTierMealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Treat to a Meal'**
+  String get donateTierMealTitle;
+
+  /// No description provided for @donateTierMealDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Great support for new health features'**
+  String get donateTierMealDesc;
+
+  /// No description provided for @donateTierGiftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a Gift'**
+  String get donateTierGiftTitle;
+
+  /// No description provided for @donateTierGiftDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Helps cover AI & server maintenance costs'**
+  String get donateTierGiftDesc;
+
+  /// No description provided for @donateTierGoldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Big Support'**
+  String get donateTierGoldTitle;
+
+  /// No description provided for @donateTierGoldDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Powers upcoming medical modules & languages'**
+  String get donateTierGoldDesc;
+
+  /// No description provided for @donateTierHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Hero'**
+  String get donateTierHeroTitle;
+
+  /// No description provided for @donateTierHeroDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports free health tracking for all families'**
+  String get donateTierHeroDesc;
+
+  /// No description provided for @donatePopularBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get donatePopularBadge;
+
+  /// No description provided for @donateConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate {price}'**
+  String donateConfirmButton(String price);
+
+  /// No description provided for @donateLaterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get donateLaterButton;
+
+  /// No description provided for @donateThanksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank You for Your Support!'**
+  String get donateThanksTitle;
+
+  /// No description provided for @donateThanksBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {tier} ({price}) support means a lot to us. Thank you for helping keep VisualCheckUp growing!'**
+  String donateThanksBody(String tier, String price);
+
+  /// No description provided for @donateSupporterBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Supporter • Thank you!'**
+  String get donateSupporterBadge;
+
+  /// No description provided for @donateStoreNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voluntary one-time support • No subscription'**
+  String get donateStoreNotice;
 }
 
 class _AppLocalizationsDelegate

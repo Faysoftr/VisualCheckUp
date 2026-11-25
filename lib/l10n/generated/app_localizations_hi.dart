@@ -2055,4 +2055,79 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'तैयार डाइट टेम्प्लेट';
+
+  @override
+  String get donateTooltip => 'सहयोग / दान करें';
+
+  @override
+  String get donateMenuLabel => 'VisualCheckUp का समर्थन करें';
+
+  @override
+  String get donateMenuSubtitle =>
+      'कॉफ़ी, भोजन या उपहार देकर मुफ़्त स्वास्थ्य ऐप का समर्थन करें';
+
+  @override
+  String get donatePopupTitle => 'VisualCheckUp का समर्थन करें';
+
+  @override
+  String get donatePopupSubtitle =>
+      'आपका स्वैच्छिक सहयोग हमें स्वास्थ्य जाँच, लैब रिपोर्ट, दवा अलार्म और डाइट फ़ीचर बेहतर बनाने में मदद करता है।';
+
+  @override
+  String get donateTierCoffeeTitle => 'कॉफ़ी पिलाएँ';
+
+  @override
+  String get donateTierCoffeeDesc => 'डेवलपमेंट के लिए एक गर्म कप कॉफ़ी';
+
+  @override
+  String get donateTierMealTitle => 'भोजन उपहार';
+
+  @override
+  String get donateTierMealDesc => 'नए स्वास्थ्य फ़ीचर्स के लिए बेहतरीन सहयोग';
+
+  @override
+  String get donateTierGiftTitle => 'उपहार भेजें';
+
+  @override
+  String get donateTierGiftDesc => 'AI और सर्वर खर्च में योगदान';
+
+  @override
+  String get donateTierGoldTitle => 'बड़ा सहयोग';
+
+  @override
+  String get donateTierGoldDesc =>
+      'आगामी हेल्थ मॉड्यूल और भाषाओं के लिए समर्थन';
+
+  @override
+  String get donateTierHeroTitle => 'हेल्थ हीरो';
+
+  @override
+  String get donateTierHeroDesc =>
+      'सभी परिवारों के मुफ़्त स्वास्थ्य ट्रैकिंग में योगदान';
+
+  @override
+  String get donatePopularBadge => 'लोकप्रिय';
+
+  @override
+  String donateConfirmButton(String price) {
+    return '$price सहयोग करें';
+  }
+
+  @override
+  String get donateLaterButton => 'बाद में';
+
+  @override
+  String get donateThanksTitle => 'आपके सहयोग के लिए धन्यवाद!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'आपका $tier ($price) सहयोग हमारे लिए बहुत मायने रखता है। धन्यवाद!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'समर्थक • धन्यवाद!';
+
+  @override
+  String get donateStoreNotice =>
+      'एकमुश्त स्वैच्छिक सहयोग • कोई सब्सक्रिप्शन नहीं';
 }

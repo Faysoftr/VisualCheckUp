@@ -2063,4 +2063,79 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'Готовые шаблоны диет';
+
+  @override
+  String get donateTooltip => 'Поддержать / Донат';
+
+  @override
+  String get donateMenuLabel => 'Поддержать VisualCheckUp';
+
+  @override
+  String get donateMenuSubtitle =>
+      'Кофе, обед или подарок в поддержку приложения';
+
+  @override
+  String get donatePopupTitle => 'Поддержать VisualCheckUp';
+
+  @override
+  String get donatePopupSubtitle =>
+      'Ваша добровольная поддержка помогает бесплатно развивать проверки, чтение анализов, напоминания о лекарствах и диету.';
+
+  @override
+  String get donateTierCoffeeTitle => 'Угостить кофе';
+
+  @override
+  String get donateTierCoffeeDesc => 'Чашка горячего кофе для разработки';
+
+  @override
+  String get donateTierMealTitle => 'Угостить обедом';
+
+  @override
+  String get donateTierMealDesc => 'Отличная поддержка новых функций здоровья';
+
+  @override
+  String get donateTierGiftTitle => 'Отправить подарок';
+
+  @override
+  String get donateTierGiftDesc => 'Помогает покрыть расходы на ИИ и серверы';
+
+  @override
+  String get donateTierGoldTitle => 'Большая поддержка';
+
+  @override
+  String get donateTierGoldDesc =>
+      'Ускоряет создание новых медицинских модулей';
+
+  @override
+  String get donateTierHeroTitle => 'Герой здоровья';
+
+  @override
+  String get donateTierHeroDesc =>
+      'Вклад в бесплатный контроль здоровья для семей';
+
+  @override
+  String get donatePopularBadge => 'Популярное';
+
+  @override
+  String donateConfirmButton(String price) {
+    return 'Поддержать $price';
+  }
+
+  @override
+  String get donateLaterButton => 'Позже';
+
+  @override
+  String get donateThanksTitle => 'Спасибо за поддержку!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'Ваша поддержка «$tier» ($price) очень важна для нас. Спасибо, что помогаете развивать VisualCheckUp!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'Поддержал(а) • Спасибо!';
+
+  @override
+  String get donateStoreNotice =>
+      'Разовая добровольная поддержка • Без подписки';
 }

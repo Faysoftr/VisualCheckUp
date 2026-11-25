@@ -2054,4 +2054,78 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'تیار ڈائٹ ٹیمپلیٹس';
+
+  @override
+  String get donateTooltip => 'تعاون / عطیہ';
+
+  @override
+  String get donateMenuLabel => 'VisualCheckUp کی حمایت کریں';
+
+  @override
+  String get donateMenuSubtitle =>
+      'کافی، کھانا یا تحفہ دے کر مفت صحت ایپ کی حمایت کریں';
+
+  @override
+  String get donatePopupTitle => 'VisualCheckUp کی حمایت کریں';
+
+  @override
+  String get donatePopupSubtitle =>
+      'آپ کا رضاکارانہ تعاون ہمیں مفت صحت چیک اپ، لیب ریڈر، دوا الارم اور ڈائٹ فیچرز بہتر بنانے میں مدد دیتا ہے۔';
+
+  @override
+  String get donateTierCoffeeTitle => 'کافی پلائیں';
+
+  @override
+  String get donateTierCoffeeDesc => 'ڈویلپمنٹ کے لیے ایک گرم کپ کافی';
+
+  @override
+  String get donateTierMealTitle => 'کھانے کی دعوت';
+
+  @override
+  String get donateTierMealDesc => 'نئے ہیلتھ فیچرز کے لیے شاندار تعاون';
+
+  @override
+  String get donateTierGiftTitle => 'تحفہ بھیجیں';
+
+  @override
+  String get donateTierGiftDesc => 'AI اور سرور اخراجات میں مددگار';
+
+  @override
+  String get donateTierGoldTitle => 'بڑا تعاون';
+
+  @override
+  String get donateTierGoldDesc => 'آئندہ میڈیکل ماڈیولز کی تیاری میں مدد';
+
+  @override
+  String get donateTierHeroTitle => 'ہیلتھ ہیرو';
+
+  @override
+  String get donateTierHeroDesc =>
+      'تمام خاندانوں کے لیے مفت صحت ٹریکنگ میں حصہ';
+
+  @override
+  String get donatePopularBadge => 'مقبول';
+
+  @override
+  String donateConfirmButton(String price) {
+    return '$price تعاون کریں';
+  }
+
+  @override
+  String get donateLaterButton => 'بعد میں';
+
+  @override
+  String get donateThanksTitle => 'آپ کے تعاون کا شکریہ!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'آپ کا $tier ($price) تعاون ہمارے لیے بہت قیمتی ہے۔ VisualCheckUp کو آگے بڑھانے کا شکریہ!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'حمایت کنندہ • شکریہ!';
+
+  @override
+  String get donateStoreNotice =>
+      'ایک بار کا رضاکارانہ تعاون • کوئی سبسکرپشن نہیں';
 }

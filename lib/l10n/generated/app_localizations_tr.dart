@@ -2079,4 +2079,80 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'Hazır Diyet Şablonları';
+
+  @override
+  String get donateTooltip => 'Destek Ol / Bağış';
+
+  @override
+  String get donateMenuLabel => 'Bağış Yap & Destek Ol';
+
+  @override
+  String get donateMenuSubtitle =>
+      'Kahve, yemek veya hediye ile uygulamamıza destek olun';
+
+  @override
+  String get donatePopupTitle => 'VisualCheckUp\'a Destek Ol';
+
+  @override
+  String get donatePopupSubtitle =>
+      'Gönüllü desteğiniz; göz, dil, tahlil okuma, ilaç alarmı ve diyet özelliklerini ücretsiz geliştirmeye devam etmemizi sağlar.';
+
+  @override
+  String get donateTierCoffeeTitle => 'Kahve Ismarla';
+
+  @override
+  String get donateTierCoffeeDesc => 'Geliştirme ekibine sıcak bir kahve';
+
+  @override
+  String get donateTierMealTitle => 'Yemek Ismarla';
+
+  @override
+  String get donateTierMealDesc =>
+      'Yeni sağlık özellikleri için güzel bir destek';
+
+  @override
+  String get donateTierGiftTitle => 'Hediye Gönder';
+
+  @override
+  String get donateTierGiftDesc => 'Yapay zeka ve sunucu giderlerine katkı';
+
+  @override
+  String get donateTierGoldTitle => 'Büyük Destek';
+
+  @override
+  String get donateTierGoldDesc =>
+      'Yeni sağlık modüllerinin geliştirilmesine destek';
+
+  @override
+  String get donateTierHeroTitle => 'Sağlık Kahramanı';
+
+  @override
+  String get donateTierHeroDesc =>
+      'Tüm aileler için ücretsiz sağlık takibine büyük katkı';
+
+  @override
+  String get donatePopularBadge => 'Popüler';
+
+  @override
+  String donateConfirmButton(String price) {
+    return '$price Destek Ol';
+  }
+
+  @override
+  String get donateLaterButton => 'Şimdi Değil';
+
+  @override
+  String get donateThanksTitle => 'Desteğiniz İçin Teşekkürler!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return '$tier ($price) desteğiniz bizim için çok değerli. VisualCheckUp\'ı birlikte büyüttüğünüz için teşekkür ederiz!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'Destekçimiz • Teşekkürler!';
+
+  @override
+  String get donateStoreNotice =>
+      'Tek seferlik gönüllü destek • Abonelik değildir';
 }

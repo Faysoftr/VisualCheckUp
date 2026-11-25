@@ -2059,4 +2059,78 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get dietReadyTemplatesTitle => 'রেডি ডায়েট টেমপ্লেট';
+
+  @override
+  String get donateTooltip => 'সহায়তা ও ডোনেশন';
+
+  @override
+  String get donateMenuLabel => 'VisualCheckUp-কে সহায়তা করুন';
+
+  @override
+  String get donateMenuSubtitle =>
+      'কফি, খাবার বা উপহার দিয়ে বিনামূল্যের স্বাস্থ্যসেবায় সহায়তা করুন';
+
+  @override
+  String get donatePopupTitle => 'VisualCheckUp-কে সহায়তা করুন';
+
+  @override
+  String get donatePopupSubtitle =>
+      'আপনার স্বেচ্ছামূলক সহায়তা আমাদের স্বাস্থ্য পরীক্ষা, ল্যাব রিপোর্ট, ওষুধ অ্যালার্ম ও ডায়েট ফিচার উন্নত রাখতে সাহায্য করে।';
+
+  @override
+  String get donateTierCoffeeTitle => 'এক কাপ কফি';
+
+  @override
+  String get donateTierCoffeeDesc => 'ডেভেলপমেন্টের জন্য উষ্ণ কফি';
+
+  @override
+  String get donateTierMealTitle => 'এক বেলা খাবার';
+
+  @override
+  String get donateTierMealDesc => 'নতুন স্বাস্থ্য ফিচারের জন্য চমৎকার সহায়তা';
+
+  @override
+  String get donateTierGiftTitle => 'উপহার পাঠান';
+
+  @override
+  String get donateTierGiftDesc => 'AI ও সার্ভার খরচে সহায়তা করে';
+
+  @override
+  String get donateTierGoldTitle => 'বড় সহায়তা';
+
+  @override
+  String get donateTierGoldDesc => 'আগামী মেডিকেল মডিউল তৈরিতে শক্তি জোগায়';
+
+  @override
+  String get donateTierHeroTitle => 'হেলথ হিরো';
+
+  @override
+  String get donateTierHeroDesc =>
+      'সব পরিবারের বিনামূল্যের স্বাস্থ্য ট্র্যাকিংয়ে অবদান';
+
+  @override
+  String get donatePopularBadge => 'জনপ্রিয়';
+
+  @override
+  String donateConfirmButton(String price) {
+    return '$price সহায়তা করুন';
+  }
+
+  @override
+  String get donateLaterButton => 'পরে';
+
+  @override
+  String get donateThanksTitle => 'আপনার সহায়তার জন্য ধন্যবাদ!';
+
+  @override
+  String donateThanksBody(String tier, String price) {
+    return 'আপনার $tier ($price) সহায়তা আমাদের জন্য অনেক মূল্যবান!';
+  }
+
+  @override
+  String get donateSupporterBadge => 'সহায়তাকারী • ধন্যবাদ!';
+
+  @override
+  String get donateStoreNotice =>
+      'এককালীন স্বেচ্ছামূলক সহায়তা • কোনো সাবস্ক্রিপশন নয়';
 }
