@@ -1277,5 +1277,45 @@
   "adminReportDismiss": "Dismiss",
   "adminNoReports": "No safety reports yet.",
   "adminNoAnnouncements": "No announcements yet.",
-  "adminNoPromotions": "No ads or banners yet."
+  "adminNoPromotions": "No ads or banners yet.",
+  "commMusicSectionTitle": "Concentration & Calm Music",
+  "commMusicTitleField": "Track / Playlist Name (optional)",
+  "commMusicUrlField": "Music Link (YouTube, Spotify, SoundCloud)",
+  "commMusicInvalidUrl": "Please enter a valid YouTube, YouTube Music, Spotify, Apple Music, or SoundCloud link.",
+  "commMusicEmpty": "No concentration music added yet.",
+  "commMusicListenAction": "Listen",
+  "commMusicLikeAction": "Like Music",
+  "commMusicListenersTitle": "Who Listened?",
+  "commMusicListenersEmpty": "No one has listened to this track yet.",
+  "commMusicUniqueListeners": "{count} Listeners",
+  "@commMusicUniqueListeners": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commMusicTotalPlays": "{count} Plays",
+  "@commMusicTotalPlays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commMusicPlayCountBadge": "{count}x",
+  "@commMusicPlayCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commProfileLikersTitle": "Profile Likes",
+  "commProfileLikersEmpty": "No profile likes yet.",
+  "commSocialsSectionTitle": "Social Media Accounts",
+  "commToggleShowSocials": "Show my social media accounts",
+  "commSocialsHiddenHint": "Hidden from other members",
+  "commSocialsEmpty": "No social accounts added yet.",
+  "commPreviewMyProfile": "Preview My Profile"
 }

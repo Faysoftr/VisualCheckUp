@@ -2626,4 +2626,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'No ads or banners yet.';
+
+  @override
+  String get commMusicSectionTitle => 'Concentration & Calm Music';
+
+  @override
+  String get commMusicTitleField => 'Track / Playlist Name (optional)';
+
+  @override
+  String get commMusicUrlField => 'Music Link (YouTube, Spotify, SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'Please enter a valid YouTube, YouTube Music, Spotify, Apple Music, or SoundCloud link.';
+
+  @override
+  String get commMusicEmpty => 'No concentration music added yet.';
+
+  @override
+  String get commMusicListenAction => 'Listen';
+
+  @override
+  String get commMusicLikeAction => 'Like Music';
+
+  @override
+  String get commMusicListenersTitle => 'Who Listened?';
+
+  @override
+  String get commMusicListenersEmpty =>
+      'No one has listened to this track yet.';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count Listeners';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count Plays';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'Profile Likes';
+
+  @override
+  String get commProfileLikersEmpty => 'No profile likes yet.';
+
+  @override
+  String get commSocialsSectionTitle => 'Social Media Accounts';
+
+  @override
+  String get commToggleShowSocials => 'Show my social media accounts';
+
+  @override
+  String get commSocialsHiddenHint => 'Hidden from other members';
+
+  @override
+  String get commSocialsEmpty => 'No social accounts added yet.';
+
+  @override
+  String get commPreviewMyProfile => 'Preview My Profile';
 }

@@ -2532,4 +2532,68 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adminNoPromotions => '暂无广告横幅。';
+
+  @override
+  String get commMusicSectionTitle => '专注与舒缓音乐';
+
+  @override
+  String get commMusicTitleField => '曲目 / 歌单名称（可选）';
+
+  @override
+  String get commMusicUrlField => '音乐链接（YouTube、Spotify、SoundCloud）';
+
+  @override
+  String get commMusicInvalidUrl =>
+      '请输入有效的 YouTube、Spotify、Apple Music 或 SoundCloud 链接。';
+
+  @override
+  String get commMusicEmpty => '暂未添加专注音乐。';
+
+  @override
+  String get commMusicListenAction => '收听';
+
+  @override
+  String get commMusicLikeAction => '喜欢音乐';
+
+  @override
+  String get commMusicListenersTitle => '听过的人';
+
+  @override
+  String get commMusicListenersEmpty => '还没有人收听这首音乐。';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count 位听众';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '播放 $count 次';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '$count次';
+  }
+
+  @override
+  String get commProfileLikersTitle => '主页点赞';
+
+  @override
+  String get commProfileLikersEmpty => '暂无主页点赞。';
+
+  @override
+  String get commSocialsSectionTitle => '社交媒体账号';
+
+  @override
+  String get commToggleShowSocials => '显示我的社交媒体账号';
+
+  @override
+  String get commSocialsHiddenHint => '对其他成员隐藏';
+
+  @override
+  String get commSocialsEmpty => '暂未添加社交媒体账号。';
+
+  @override
+  String get commPreviewMyProfile => '预览我的主页';
 }

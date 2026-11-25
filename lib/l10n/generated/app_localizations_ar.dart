@@ -2593,4 +2593,69 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'لا توجد إعلانات ترويجية حالياً.';
+
+  @override
+  String get commMusicSectionTitle => 'موسيقى التركيز والهدوء';
+
+  @override
+  String get commMusicTitleField => 'اسم المقطع / القائمة (اختياري)';
+
+  @override
+  String get commMusicUrlField =>
+      'رابط الموسيقى (YouTube، Spotify، SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'يرجى إدخال رابط صالح من YouTube أو Spotify أو Apple Music أو SoundCloud.';
+
+  @override
+  String get commMusicEmpty => 'لم تتم إضافة موسيقى تركيز بعد.';
+
+  @override
+  String get commMusicListenAction => 'استماع';
+
+  @override
+  String get commMusicLikeAction => 'إعجاب بالموسيقى';
+
+  @override
+  String get commMusicListenersTitle => 'المستمعون للموسيقى';
+
+  @override
+  String get commMusicListenersEmpty => 'لم يستمع أحد لهذا المقطع بعد.';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count مستمع';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count مرة استماع';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '$count×';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'المعجبون بالملف';
+
+  @override
+  String get commProfileLikersEmpty => 'لا توجد إعجابات بالملف بعد.';
+
+  @override
+  String get commSocialsSectionTitle => 'حسابات التواصل الاجتماعي';
+
+  @override
+  String get commToggleShowSocials => 'إظهار حسابات التواصل الاجتماعي';
+
+  @override
+  String get commSocialsHiddenHint => 'مخفي عن الأعضاء الآخرين';
+
+  @override
+  String get commSocialsEmpty => 'لم تتم إضافة حسابات تواصل بعد.';
+
+  @override
+  String get commPreviewMyProfile => 'معاينة ملفي';
 }

@@ -393,6 +393,16 @@ service cloud.firestore {
           'chronicConditions',
           'customChronicCondition',
           'showChronicConditions',
+          'currentMusicUrl',
+          'currentMusicTitle',
+          'musicLikedBy',
+          'musicLikesCount',
+          'showSocials',
+          'instagram',
+          'twitterX',
+          'tiktok',
+          'facebook',
+          'snapchat',
           'isOnline',
           'showOnlineStatus',
           'lastActiveAt',
@@ -422,6 +432,13 @@ service cloud.firestore {
         isValidOptionalList(data, 'healthGoals', 12) &&
         isValidOptionalList(data, 'chronicConditions', 15) &&
         isValidOptionalString(data, 'customChronicCondition', 0, 120) &&
+        isValidOptionalString(data, 'currentMusicUrl', 0, 500) &&
+        isValidOptionalString(data, 'currentMusicTitle', 0, 140) &&
+        isValidOptionalString(data, 'instagram', 0, 120) &&
+        isValidOptionalString(data, 'twitterX', 0, 120) &&
+        isValidOptionalString(data, 'tiktok', 0, 120) &&
+        isValidOptionalString(data, 'facebook', 0, 120) &&
+        isValidOptionalString(data, 'snapchat', 0, 120) &&
         isValidOptionalString(data, 'bio', 0, 500) &&
         isValidOptionalString(data, 'dailyFocus', 0, 180) &&
         isValidOptionalTimestampOrDateString(data, 'lastActiveAt') &&
@@ -430,11 +447,16 @@ service cloud.firestore {
     }
 
     function isLikeOnlyUpdate() {
-      return isAuthenticated() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'likesCount']) &&
-        request.resource.data.likedBy is list &&
-        request.resource.data.likesCount is int &&
-        request.resource.data.likesCount >= 0;
+      return isAuthenticated() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'likesCount']) &&
+          request.resource.data.likedBy is list &&
+          request.resource.data.likesCount is int &&
+          request.resource.data.likesCount >= 0) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['musicLikedBy', 'musicLikesCount']) &&
+          request.resource.data.musicLikedBy is list &&
+          request.resource.data.musicLikesCount is int &&
+          request.resource.data.musicLikesCount >= 0)
+      );
     }
 
     match /community_profiles/{userId} {
@@ -450,6 +472,17 @@ service cloud.firestore {
           areImmutableFieldsUnchanged(['uid', 'isVerified', 'isSuspended'])) ||
         isLikeOnlyUpdate();
       allow delete: if isOwner(userId) || isAdmin();
+
+      match /musicListeners/{listenerUid} {
+        allow read: if isAuthenticated();
+        allow create, update: if isOwner(listenerUid) &&
+          request.resource.data.userId == request.auth.uid &&
+          isValidString(request.resource.data.userName, 1, 80) &&
+          request.resource.data.listenCount is int &&
+          request.resource.data.listenCount >= 1 &&
+          isValidOptionalString(request.resource.data, 'musicUrl', 0, 500);
+        allow delete: if isOwner(userId) || isOwner(listenerUid) || isAdmin();
+      }
     }
 
     match /community_safety/{userId} {

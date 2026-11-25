@@ -12,6 +12,7 @@ import 'package:visualcheckup/features/community/data/community_image_upload_ser
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_community_hub_screen.dart';
+import 'package:visualcheckup/features/community/presentation/screens/health_profile_detail_screen.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
 Widget _wrapApp(Widget child, {Locale locale = const Locale('tr')}) {
@@ -438,6 +439,8 @@ void main() {
         300,
         scrollable: listScrollable,
       );
+      await tester.ensureVisible(saveBtn);
+      await tester.pumpAndSettle();
       await tester.tap(saveBtn);
       await tester.pumpAndSettle();
 
@@ -519,4 +522,179 @@ void main() {
       expect(find.byKey(const Key('drawer_admin_panel_tile')), findsNothing);
     });
   });
+
+  group('Concentration Music, Listeners & Social Media Show/Hide', () {
+    test('MusicLinkHelper, SocialLinksHelper, music likes, listeners tracking & showSocials toggle', () async {
+      expect(
+        MusicLinkHelper.isSupportedMusicUrl(
+          'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+        ),
+        isTrue,
+      );
+      expect(
+        MusicLinkHelper.isSupportedMusicUrl(
+          'https://open.spotify.com/track/123',
+        ),
+        isTrue,
+      );
+      expect(
+        MusicLinkHelper.isSupportedMusicUrl('https://evil.example.com/file'),
+        isFalse,
+      );
+      expect(
+        SocialLinksHelper.buildProfileUrl('instagram', '@ayse_saglik'),
+        'https://instagram.com/ayse_saglik',
+      );
+      expect(
+        SocialLinksHelper.buildProfileUrl('tiktok', 'mehmet_fit'),
+        'https://www.tiktok.com/@mehmet_fit',
+      );
+
+      final repo = HealthCommunityRepository(useFirebase: false);
+      final now = DateTime(2026, 11, 25, 16, 0);
+      final saved = await repo.saveMyProfile(
+        HealthCommunityProfile(
+          uid: 'u_music_owner',
+          displayName: 'Zeynep Ak',
+          nickname: 'zeynep_ak',
+          currentMusicUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+          currentMusicTitle: 'Lofi Focus',
+          showSocials: true,
+          instagram: 'zeynep_health',
+          twitterX: 'zeynep_x',
+          updatedAt: now,
+        ),
+      );
+      expect(saved.hasMusic, isTrue);
+      expect(saved.visibleSocialHandles.keys, containsAll(['instagram', 'x']));
+
+      // Toggle showSocials OFF -> visibleSocialHandles becomes empty while allSocialHandles persists
+      final hidden = await repo.setShowSocials('u_music_owner', false);
+      expect(hidden!.showSocials, isFalse);
+      expect(hidden.visibleSocialHandles, isEmpty);
+      expect(hidden.allSocialHandles['instagram'], 'zeynep_health');
+
+      // Record music listen twice -> listenCount increments to 2
+      await repo.recordMusicListen(
+        targetUid: 'u_music_owner',
+        listenerUid: 'u_listener_1',
+        listenerName: 'Can Demir',
+        listenerNickname: 'can_d',
+        musicUrl: saved.currentMusicUrl,
+      );
+      await repo.recordMusicListen(
+        targetUid: 'u_music_owner',
+        listenerUid: 'u_listener_1',
+        listenerName: 'Can Demir',
+        listenerNickname: 'can_d',
+        musicUrl: saved.currentMusicUrl,
+      );
+      final listeners = await repo.loadMusicListeners('u_music_owner');
+      expect(listeners.length, 1);
+      expect(listeners.first.listenCount, 2);
+
+      // Toggle music like
+      final musicLiked = await repo.toggleMusicLike(
+        targetUid: 'u_music_owner',
+        myUid: 'u_listener_1',
+      );
+      expect(musicLiked!.musicLikesCount, 1);
+      expect(musicLiked.isMusicLikedBy('u_listener_1'), isTrue);
+    });
+
+    testWidgets('HealthProfileDetailScreen plays music, records listener, likes music, opens listeners sheet & respects showSocials', (tester) async {
+      final repo = HealthCommunityRepository(useFirebase: false);
+      final launchedUrls = <Uri>[];
+      final target = await repo.getProfile('sample_tr_ayse');
+      expect(target, isNotNull);
+
+      await tester.pumpWidget(
+        _wrapApp(
+          HealthProfileDetailScreen(
+            profile: target!,
+            myUid: _regularUser.id,
+            myDisplayName: _regularUser.displayName,
+            myNickname: 'mehmet_k',
+            repository: repo,
+            urlLauncher: (uri) async => launchedUrls.add(uri),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 1. Tap Listen on Concentration Music card
+      final listenBtn = find.byKey(const Key('comm_music_listen_button'));
+      await tester.ensureVisible(listenBtn);
+      await tester.pumpAndSettle();
+      await tester.tap(listenBtn);
+      await tester.pumpAndSettle();
+      expect(launchedUrls.length, 1);
+      expect(launchedUrls.first.toString(), target.currentMusicUrl);
+
+      // 2. Tap Music Like button
+      final beforeMusicLikes = target.musicLikesCount;
+      final musicLikeBtn = find.byKey(const Key('comm_music_like_button'));
+      await tester.ensureVisible(musicLikeBtn);
+      await tester.pumpAndSettle();
+      await tester.tap(musicLikeBtn);
+      await tester.pumpAndSettle();
+      final afterProfile = await repo.getProfile('sample_tr_ayse');
+      expect(afterProfile!.musicLikesCount, beforeMusicLikes + 1);
+
+      // 3. Open Who Listened sheet -> shows our user as listener!
+      final listenersBtn = find.byKey(const Key('comm_music_listeners_button'));
+      await tester.ensureVisible(listenersBtn);
+      await tester.pumpAndSettle();
+      await tester.tap(listenersBtn);
+      await tester.pumpAndSettle();
+      expect(find.text(_regularUser.displayName), findsOneWidget);
+      Navigator.of(tester.element(find.text(_regularUser.displayName))).pop();
+      await tester.pumpAndSettle();
+
+      // 4. Tap Instagram social chip -> launches Instagram URL
+      final instaChip = find.byKey(const Key('comm_social_chip_instagram'));
+      await tester.ensureVisible(instaChip);
+      await tester.pumpAndSettle();
+      await tester.tap(instaChip);
+      await tester.pumpAndSettle();
+      expect(
+        launchedUrls.last.toString(),
+        'https://instagram.com/ayse_saglikli_yasam',
+      );
+
+      // 5. When showSocials is false, another user does NOT see the socials card
+      await tester.pumpWidget(
+        _wrapApp(
+          HealthProfileDetailScreen(
+            profile: target.copyWith(showSocials: false),
+            myUid: _regularUser.id,
+            myDisplayName: _regularUser.displayName,
+            repository: repo,
+            urlLauncher: (uri) async => launchedUrls.add(uri),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('comm_detail_socials_card')), findsNothing);
+
+      // 6. When viewing OWN profile, showSocials toggle switch is visible
+      await tester.pumpWidget(
+        _wrapApp(
+          HealthProfileDetailScreen(
+            profile: target.copyWith(showSocials: false),
+            myUid: target.uid,
+            myDisplayName: target.displayName,
+            repository: repo,
+            urlLauncher: (uri) async => launchedUrls.add(uri),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('comm_detail_toggle_socials')),
+        findsOneWidget,
+      );
+    });
+  });
 }
+

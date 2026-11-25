@@ -2610,4 +2610,70 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'Рекламных баннеров пока нет.';
+
+  @override
+  String get commMusicSectionTitle => 'Музыка для концентрации';
+
+  @override
+  String get commMusicTitleField =>
+      'Название трека / плейлиста (необязательно)';
+
+  @override
+  String get commMusicUrlField =>
+      'Ссылка на музыку (YouTube, Spotify, SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'Введите корректную ссылку YouTube, Spotify, Apple Music или SoundCloud.';
+
+  @override
+  String get commMusicEmpty => 'Музыка для концентрации еще не добавлена.';
+
+  @override
+  String get commMusicListenAction => 'Слушать';
+
+  @override
+  String get commMusicLikeAction => 'Нравится музыка';
+
+  @override
+  String get commMusicListenersTitle => 'Кто слушал';
+
+  @override
+  String get commMusicListenersEmpty => 'Этот трек еще никто не слушал.';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count слушателей';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count прослушиваний';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'Лайки профиля';
+
+  @override
+  String get commProfileLikersEmpty => 'Пока нет лайков профиля.';
+
+  @override
+  String get commSocialsSectionTitle => 'Социальные сети';
+
+  @override
+  String get commToggleShowSocials => 'Показывать мои соцсети';
+
+  @override
+  String get commSocialsHiddenHint => 'Скрыто от других участников';
+
+  @override
+  String get commSocialsEmpty => 'Социальные сети еще не добавлены.';
+
+  @override
+  String get commPreviewMyProfile => 'Предпросмотр профиля';
 }

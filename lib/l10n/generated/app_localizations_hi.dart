@@ -2604,4 +2604,68 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'अभी कोई विज्ञापन नहीं।';
+
+  @override
+  String get commMusicSectionTitle => 'एकाग्रता और शांति संगीत';
+
+  @override
+  String get commMusicTitleField => 'ट्रैक / प्लेलिस्ट का नाम (वैकल्पिक)';
+
+  @override
+  String get commMusicUrlField => 'संगीत लिंक (YouTube, Spotify, SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'कृपया एक मान्य YouTube, Spotify, Apple Music या SoundCloud लिंक दर्ज करें।';
+
+  @override
+  String get commMusicEmpty => 'अभी तक कोई एकाग्रता संगीत नहीं जोड़ा गया है।';
+
+  @override
+  String get commMusicListenAction => 'सुनें';
+
+  @override
+  String get commMusicLikeAction => 'संगीत पसंद करें';
+
+  @override
+  String get commMusicListenersTitle => 'संगीत सुनने वाले';
+
+  @override
+  String get commMusicListenersEmpty => 'अभी तक किसी ने यह संगीत नहीं सुना है।';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count श्रोता';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count बार सुना गया';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'प्रोफ़ाइल लाइक';
+
+  @override
+  String get commProfileLikersEmpty => 'अभी तक कोई प्रोफ़ाइल लाइक नहीं है।';
+
+  @override
+  String get commSocialsSectionTitle => 'सोशल मीडिया खाते';
+
+  @override
+  String get commToggleShowSocials => 'मेरे सोशल मीडिया खाते दिखाएं';
+
+  @override
+  String get commSocialsHiddenHint => 'अन्य सदस्यों से छिपा हुआ';
+
+  @override
+  String get commSocialsEmpty => 'अभी तक कोई सोशल खाता नहीं जोड़ा गया है।';
+
+  @override
+  String get commPreviewMyProfile => 'मेरा प्रोफ़ाइल पूर्वावलोकन';
 }

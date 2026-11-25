@@ -2632,4 +2632,68 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'Henüz reklam veya banner eklenmedi.';
+
+  @override
+  String get commMusicSectionTitle => 'Konsantrasyon Müziği';
+
+  @override
+  String get commMusicTitleField => 'Parça / Liste Adı (isteğe bağlı)';
+
+  @override
+  String get commMusicUrlField => 'Müzik Linki (YouTube, Spotify, SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'Lütfen geçerli bir YouTube, YouTube Music, Spotify, Apple Music veya SoundCloud linki girin.';
+
+  @override
+  String get commMusicEmpty => 'Henüz konsantrasyon müziği eklenmedi.';
+
+  @override
+  String get commMusicListenAction => 'Dinle';
+
+  @override
+  String get commMusicLikeAction => 'Müziği Beğen';
+
+  @override
+  String get commMusicListenersTitle => 'Müziği Dinleyenler';
+
+  @override
+  String get commMusicListenersEmpty => 'Bu müziği henüz kimse dinlemedi.';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count Kişi Dinledi';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count Kez Dinlendi';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '$count kez';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'Profili Beğenenler';
+
+  @override
+  String get commProfileLikersEmpty => 'Henüz profil beğenisi yok.';
+
+  @override
+  String get commSocialsSectionTitle => 'Sosyal Medya Hesapları';
+
+  @override
+  String get commToggleShowSocials => 'Sosyal medya hesaplarımı göster';
+
+  @override
+  String get commSocialsHiddenHint => 'Diğer üyelere gizli';
+
+  @override
+  String get commSocialsEmpty => 'Henüz sosyal medya hesabı eklenmedi.';
+
+  @override
+  String get commPreviewMyProfile => 'Profilimi Önizle';
 }

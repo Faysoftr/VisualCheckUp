@@ -2619,4 +2619,69 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adminNoPromotions => 'Aucune publicité.';
+
+  @override
+  String get commMusicSectionTitle => 'Musique de Concentration';
+
+  @override
+  String get commMusicTitleField => 'Nom du titre / playlist (facultatif)';
+
+  @override
+  String get commMusicUrlField => 'Lien musical (YouTube, Spotify, SoundCloud)';
+
+  @override
+  String get commMusicInvalidUrl =>
+      'Veuillez saisir un lien YouTube, Spotify, Apple Music ou SoundCloud valide.';
+
+  @override
+  String get commMusicEmpty => 'Aucune musique de concentration ajoutée.';
+
+  @override
+  String get commMusicListenAction => 'Écouter';
+
+  @override
+  String get commMusicLikeAction => 'Aimer la musique';
+
+  @override
+  String get commMusicListenersTitle => 'Auditeurs';
+
+  @override
+  String get commMusicListenersEmpty => 'Personne n\'a encore écouté ce titre.';
+
+  @override
+  String commMusicUniqueListeners(int count) {
+    return '$count auditeurs';
+  }
+
+  @override
+  String commMusicTotalPlays(int count) {
+    return '$count écoutes';
+  }
+
+  @override
+  String commMusicPlayCountBadge(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String get commProfileLikersTitle => 'Mentions J\'aime du profil';
+
+  @override
+  String get commProfileLikersEmpty =>
+      'Aucun J\'aime sur le profil pour le moment.';
+
+  @override
+  String get commSocialsSectionTitle => 'Réseaux Sociaux';
+
+  @override
+  String get commToggleShowSocials => 'Afficher mes réseaux sociaux';
+
+  @override
+  String get commSocialsHiddenHint => 'Masqué aux autres membres';
+
+  @override
+  String get commSocialsEmpty => 'Aucun réseau social ajouté.';
+
+  @override
+  String get commPreviewMyProfile => 'Aperçu de mon profil';
 }

@@ -35,6 +35,7 @@ class HealthCommunityHubScreen extends StatefulWidget {
     this.adminRepository,
     this.uploadService,
     this.photoPicker,
+    this.urlLauncher,
     this.initialTabIndex = 0,
   });
 
@@ -43,6 +44,7 @@ class HealthCommunityHubScreen extends StatefulWidget {
   final AdminRepository? adminRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
+  final CommunityUrlLauncher? urlLauncher;
   final int initialTabIndex;
 
   @override
@@ -63,12 +65,20 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _customConditionController =
       TextEditingController();
+  final TextEditingController _musicTitleController = TextEditingController();
+  final TextEditingController _musicUrlController = TextEditingController();
+  final TextEditingController _instagramController = TextEditingController();
+  final TextEditingController _twitterXController = TextEditingController();
+  final TextEditingController _tiktokController = TextEditingController();
+  final TextEditingController _facebookController = TextEditingController();
+  final TextEditingController _snapchatController = TextEditingController();
 
   bool _loading = true;
   bool _savingProfile = false;
   bool _uploadingAvatar = false;
 
   HealthCommunityProfile? _myProfile;
+  List<MusicListenerRecord> _myMusicListeners = const [];
   List<HealthCommunityProfile> _discoverList = const [];
   List<CommunityConversation> _conversations = const [];
 
@@ -88,6 +98,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   Set<ChronicCondition> _selectedConditions = {};
   bool _showChronicConditions = true;
   bool _showOnlineStatus = true;
+  bool _showSocials = true;
   bool _discoverable = true;
   bool _hideRealName = false;
   bool _hidePhoto = false;
@@ -121,6 +132,13 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     _dailyFocusController.dispose();
     _bioController.dispose();
     _customConditionController.dispose();
+    _musicTitleController.dispose();
+    _musicUrlController.dispose();
+    _instagramController.dispose();
+    _twitterXController.dispose();
+    _tiktokController.dispose();
+    _facebookController.dispose();
+    _snapchatController.dispose();
     super.dispose();
   }
 
@@ -134,6 +152,13 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       _dailyFocusController.text = '';
       _bioController.text = '';
       _customConditionController.text = '';
+      _musicTitleController.text = '';
+      _musicUrlController.text = '';
+      _instagramController.text = '';
+      _twitterXController.text = '';
+      _tiktokController.text = '';
+      _facebookController.text = '';
+      _snapchatController.text = '';
       _photoUrl = null;
       _photoKey = null;
       _countryCode = 'TR';
@@ -142,6 +167,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       _selectedConditions = {};
       _showChronicConditions = true;
       _showOnlineStatus = true;
+      _showSocials = true;
       _discoverable = true;
       _hideRealName = false;
       _hidePhoto = false;
@@ -155,6 +181,13 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     _dailyFocusController.text = profile.dailyFocus;
     _bioController.text = profile.bio;
     _customConditionController.text = profile.customChronicCondition;
+    _musicTitleController.text = profile.currentMusicTitle;
+    _musicUrlController.text = profile.currentMusicUrl;
+    _instagramController.text = profile.instagram;
+    _twitterXController.text = profile.twitterX;
+    _tiktokController.text = profile.tiktok;
+    _facebookController.text = profile.facebook;
+    _snapchatController.text = profile.snapchat;
     _photoUrl = profile.photoUrl;
     _photoKey = profile.photoKey;
     _countryCode = profile.countryCode;
@@ -163,6 +196,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     _selectedConditions = Set<ChronicCondition>.from(profile.chronicConditions);
     _showChronicConditions = profile.showChronicConditions;
     _showOnlineStatus = profile.showOnlineStatus;
+    _showSocials = profile.showSocials;
     _discoverable = profile.discoverable;
     _hideRealName = profile.hideRealName;
     _hidePhoto = profile.hidePhoto;
@@ -172,6 +206,9 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
 
   Future<void> _loadAll() async {
     final myProfile = await widget.repository.loadMyProfile(_myUid);
+    final myListeners = myProfile != null
+        ? await widget.repository.loadMusicListeners(_myUid)
+        : const <MusicListenerRecord>[];
     final discover = await widget.repository.discoverProfiles(
       myUid: _myUid,
       goalFilter: _goalFilter,
@@ -185,6 +222,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     if (!mounted) return;
     setState(() {
       _myProfile = myProfile;
+      _myMusicListeners = myListeners;
       if (myProfile != null) {
         _creatingProfile = false;
       }
@@ -229,14 +267,33 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
           profile: target,
           myUid: _myUid,
           myDisplayName: _myProfile?.visibleName ?? widget.currentUser.displayName,
+          myNickname: _myProfile?.nickname ?? '',
           myPhotoUrl: _myProfile?.visiblePhotoUrl,
           repository: widget.repository,
           uploadService: _uploadService,
           photoPicker: widget.photoPicker,
+          urlLauncher: widget.urlLauncher,
         ),
       ),
     );
     await _loadAll();
+  }
+
+  Future<void> _openMyMusicListenersSheet() async {
+    final listeners = await widget.repository.loadMusicListeners(_myUid);
+    if (!mounted) return;
+    setState(() => _myMusicListeners = listeners);
+    await showMusicListenersSheet(
+      context: context,
+      listeners: listeners,
+      musicLikedBy: _myProfile?.musicLikedBy ?? const [],
+    );
+  }
+
+  Future<void> _openMyProfileLikersSheet() async {
+    final likers = await widget.repository.loadProfileLikers(_myUid);
+    if (!mounted) return;
+    await showProfileLikersSheet(context: context, likers: likers);
   }
 
   Future<void> _openConversation(CommunityConversation convo) async {
@@ -313,6 +370,14 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
     final name = _displayNameController.text.trim();
     if (name.isEmpty) return;
 
+    final musicUrl = _musicUrlController.text.trim();
+    if (!MusicLinkHelper.isSupportedMusicUrl(musicUrl)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.commMusicInvalidUrl)),
+      );
+      return;
+    }
+
     setState(() => _savingProfile = true);
     final now = DateTime.now();
     final profile = HealthCommunityProfile(
@@ -330,6 +395,15 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
       chronicConditions: _selectedConditions.toList(),
       customChronicCondition: _customConditionController.text.trim(),
       showChronicConditions: _showChronicConditions,
+      currentMusicUrl: musicUrl,
+      currentMusicTitle: _musicTitleController.text.trim(),
+      musicLikedBy: _myProfile?.musicLikedBy ?? const [],
+      showSocials: _showSocials,
+      instagram: _instagramController.text.trim(),
+      twitterX: _twitterXController.text.trim(),
+      tiktok: _tiktokController.text.trim(),
+      facebook: _facebookController.text.trim(),
+      snapchat: _snapchatController.text.trim(),
       isOnline: true,
       showOnlineStatus: _showOnlineStatus,
       lastActiveAt: now,
@@ -821,6 +895,16 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                                 ),
                               ),
                             ],
+                            if (profile.hasMusic) ...[
+                              const SizedBox(width: 5),
+                              Icon(
+                                Icons.music_note_rounded,
+                                size: 14,
+                                color: MusicLinkHelper.detectPlatformColor(
+                                  profile.currentMusicUrl,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -1191,13 +1275,58 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                     children: [
                       if (_myProfile != null)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(
-                            '❤️ ${l10n.commLikesCount(_myProfile!.likesCount)}',
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              color: const Color(0xFFE11D48),
-                              fontWeight: FontWeight.w800,
-                            ),
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              InkWell(
+                                key: const Key('comm_my_profile_likers_btn'),
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: _openMyProfileLikersSheet,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 9,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE11D48)
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '❤️ ${l10n.commLikesCount(_myProfile!.likesCount)}',
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: const Color(0xFFE11D48),
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                key: const Key('comm_my_profile_listeners_btn'),
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: _openMyMusicListenersSheet,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 9,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '🎧 ${l10n.commMusicListenersTitle} (${_myMusicListeners.length})',
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       Wrap(
@@ -1220,6 +1349,16 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                                     size: 18),
                             label: Text(l10n.commUploadPhoto),
                           ),
+                          if (_myProfile != null)
+                            OutlinedButton.icon(
+                              key: const Key('comm_preview_my_profile_btn'),
+                              onPressed: () => _openProfileDetail(_myProfile!),
+                              icon: const Icon(
+                                Icons.visibility_outlined,
+                                size: 17,
+                              ),
+                              label: Text(l10n.commPreviewMyProfile),
+                            ),
                           if (_photoUrl != null && _photoUrl!.isNotEmpty)
                             TextButton(
                               onPressed: () => setState(() {
@@ -1421,6 +1560,182 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
             alignLabelWithHint: true,
             prefixIcon: const Icon(Icons.format_quote_rounded),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Concentration & Calm Music Section
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.music_note_rounded,
+                      size: 19,
+                      color: Color(0xFFE11D48),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.commMusicSectionTitle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFFE11D48),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  key: const Key('comm_profile_music_title_field'),
+                  controller: _musicTitleController,
+                  maxLength: 100,
+                  decoration: InputDecoration(
+                    labelText: l10n.commMusicTitleField,
+                    prefixIcon: const Icon(Icons.queue_music_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  key: const Key('comm_profile_music_url_field'),
+                  controller: _musicUrlController,
+                  keyboardType: TextInputType.url,
+                  decoration: InputDecoration(
+                    labelText: l10n.commMusicUrlField,
+                    hintText: 'https://www.youtube.com/watch?v=...',
+                    prefixIcon: const Icon(Icons.link_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Social Media Accounts & Show/Hide Toggle
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SwitchListTile(
+                  key: const Key('comm_toggle_show_socials'),
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    l10n.commToggleShowSocials,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primaryTeal,
+                    ),
+                  ),
+                  subtitle: !_showSocials
+                      ? Text(
+                          l10n.commSocialsHiddenHint,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.error,
+                          ),
+                        )
+                      : null,
+                  value: _showSocials,
+                  onChanged: (v) => setState(() => _showSocials = v),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  key: const Key('comm_profile_instagram_field'),
+                  controller: _instagramController,
+                  decoration: InputDecoration(
+                    labelText: 'Instagram',
+                    prefixText: '@',
+                    prefixIcon: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Color(0xFFE4405F),
+                    ),
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        key: const Key('comm_profile_x_field'),
+                        controller: _twitterXController,
+                        decoration: InputDecoration(
+                          labelText: 'X (Twitter)',
+                          prefixText: '@',
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        key: const Key('comm_profile_tiktok_field'),
+                        controller: _tiktokController,
+                        decoration: InputDecoration(
+                          labelText: 'TikTok',
+                          prefixText: '@',
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        key: const Key('comm_profile_facebook_field'),
+                        controller: _facebookController,
+                        decoration: InputDecoration(
+                          labelText: 'Facebook',
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        key: const Key('comm_profile_snapchat_field'),
+                        controller: _snapchatController,
+                        decoration: InputDecoration(
+                          labelText: 'Snapchat',
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 10),

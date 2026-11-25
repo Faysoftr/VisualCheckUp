@@ -197,6 +197,167 @@ extension ChronicConditionX on ChronicCondition {
   }
 }
 
+/// Supported social media platforms on Health Community profiles.
+class SocialLinksHelper {
+  SocialLinksHelper._();
+
+  static String? buildProfileUrl(String platform, String rawHandle) {
+    final trimmed = rawHandle.trim();
+    if (trimmed.isEmpty) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    final clean = trimmed.startsWith('@') ? trimmed.substring(1).trim() : trimmed;
+    if (clean.isEmpty) return null;
+    switch (platform.toLowerCase()) {
+      case 'instagram':
+        return 'https://instagram.com/$clean';
+      case 'x':
+      case 'twitter':
+        return 'https://x.com/$clean';
+      case 'tiktok':
+        return 'https://www.tiktok.com/@$clean';
+      case 'facebook':
+        return 'https://facebook.com/$clean';
+      case 'snapchat':
+        return 'https://snapchat.com/add/$clean';
+      default:
+        return null;
+    }
+  }
+}
+
+/// Validates and parses concentration/relaxation music links (YouTube,
+/// YouTube Music, Spotify, Apple Music, SoundCloud).
+class MusicLinkHelper {
+  MusicLinkHelper._();
+
+  static bool isSupportedMusicUrl(String raw) {
+    final trimmed = raw.trim().toLowerCase();
+    if (trimmed.isEmpty) return true; // Optional field
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      return false;
+    }
+    return trimmed.contains('youtube.com') ||
+        trimmed.contains('youtu.be') ||
+        trimmed.contains('music.youtube.com') ||
+        trimmed.contains('spotify.com') ||
+        trimmed.contains('soundcloud.com') ||
+        trimmed.contains('music.apple.com');
+  }
+
+  static String detectPlatformName(String raw) {
+    final lower = raw.trim().toLowerCase();
+    if (lower.contains('music.youtube.com')) return 'YouTube Music';
+    if (lower.contains('youtube.com') || lower.contains('youtu.be')) {
+      return 'YouTube';
+    }
+    if (lower.contains('spotify.com')) return 'Spotify';
+    if (lower.contains('music.apple.com')) return 'Apple Music';
+    if (lower.contains('soundcloud.com')) return 'SoundCloud';
+    return 'Music';
+  }
+
+  static Color detectPlatformColor(String raw) {
+    final lower = raw.trim().toLowerCase();
+    if (lower.contains('spotify.com')) return const Color(0xFF1DB954);
+    if (lower.contains('youtube.com') || lower.contains('youtu.be')) {
+      return const Color(0xFFFF0033);
+    }
+    if (lower.contains('soundcloud.com')) return const Color(0xFFFF5500);
+    if (lower.contains('music.apple.com')) return const Color(0xFFFA243C);
+    return const Color(0xFF7C3AED);
+  }
+
+  static String? extractYoutubeVideoId(String raw) {
+    final uri = Uri.tryParse(raw.trim());
+    if (uri == null) return null;
+    final host = uri.host.toLowerCase();
+    if (host.contains('youtu.be') && uri.pathSegments.isNotEmpty) {
+      return uri.pathSegments.first;
+    }
+    if (host.contains('youtube.com')) {
+      final v = uri.queryParameters['v'];
+      if (v != null && v.isNotEmpty) return v;
+      if (uri.pathSegments.length >= 2 &&
+          (uri.pathSegments.first == 'embed' ||
+              uri.pathSegments.first == 'shorts')) {
+        return uri.pathSegments[1];
+      }
+    }
+    return null;
+  }
+}
+
+/// Record of a community member who listened to another member's concentration
+/// or relaxation music (`community_profiles/{targetUid}/musicListeners/{uid}`).
+class MusicListenerRecord {
+  const MusicListenerRecord({
+    required this.userId,
+    required this.userName,
+    this.nickname = '',
+    this.photoUrl,
+    this.musicUrl = '',
+    this.listenCount = 1,
+    required this.listenedAt,
+  });
+
+  final String userId;
+  final String userName;
+  final String nickname;
+  final String? photoUrl;
+  final String musicUrl;
+  final int listenCount;
+  final DateTime listenedAt;
+
+  String get initials {
+    final clean = userName.replaceFirst('@', '').trim();
+    if (clean.isEmpty) return 'M';
+    final parts = clean.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.length == 1) {
+      return parts.first.substring(0, parts.first.length >= 2 ? 2 : 1).toUpperCase();
+    }
+    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+  }
+
+  Map<String, dynamic> toJson() => {
+        'userId': userId,
+        'userName': userName,
+        if (nickname.trim().isNotEmpty) 'nickname': nickname.trim(),
+        if (photoUrl != null && photoUrl!.trim().isNotEmpty)
+          'photoUrl': photoUrl!.trim(),
+        if (musicUrl.trim().isNotEmpty) 'musicUrl': musicUrl.trim(),
+        'listenCount': listenCount,
+        'listenedAt': listenedAt.toIso8601String(),
+      };
+
+  factory MusicListenerRecord.fromJson(
+    Map<String, dynamic> json, {
+    String? fallbackUid,
+  }) {
+    DateTime parsedAt = DateTime.now();
+    final rawTs = json['listenedAt'];
+    if (rawTs is String) {
+      parsedAt = DateTime.tryParse(rawTs) ?? parsedAt;
+    } else if (rawTs != null) {
+      try {
+        // Supports Firestore Timestamp via dynamic .toDate() without importing cloud_firestore.
+        parsedAt = (rawTs as dynamic).toDate() as DateTime;
+      } catch (_) {}
+    }
+
+    return MusicListenerRecord(
+      userId: (json['userId'] as String?) ?? fallbackUid ?? '',
+      userName: (json['userName'] as String?) ?? 'Member',
+      nickname: (json['nickname'] as String?) ?? '',
+      photoUrl: json['photoUrl'] as String?,
+      musicUrl: (json['musicUrl'] as String?) ?? '',
+      listenCount: (json['listenCount'] as num?)?.toInt() ?? 1,
+      listenedAt: parsedAt,
+    );
+  }
+}
+
 /// Public opt-in Health Community profile stored separately from private
 /// medical backup collections (`community_profiles/{uid}`).
 class HealthCommunityProfile {
@@ -213,6 +374,15 @@ class HealthCommunityProfile {
     this.chronicConditions = const [],
     this.customChronicCondition = '',
     this.showChronicConditions = true,
+    this.currentMusicUrl = '',
+    this.currentMusicTitle = '',
+    this.musicLikedBy = const [],
+    this.showSocials = true,
+    this.instagram = '',
+    this.twitterX = '',
+    this.tiktok = '',
+    this.facebook = '',
+    this.snapchat = '',
     this.bio = '',
     this.dailyFocus = '',
     this.hideRealName = false,
@@ -243,6 +413,15 @@ class HealthCommunityProfile {
   final List<ChronicCondition> chronicConditions;
   final String customChronicCondition;
   final bool showChronicConditions;
+  final String currentMusicUrl;
+  final String currentMusicTitle;
+  final List<String> musicLikedBy;
+  final bool showSocials;
+  final String instagram;
+  final String twitterX;
+  final String tiktok;
+  final String facebook;
+  final String snapchat;
   final String bio;
   final String dailyFocus;
   final bool hideRealName;
@@ -263,6 +442,26 @@ class HealthCommunityProfile {
   int get likesCount => likedBy.length;
 
   bool isLikedBy(String userId) => userId.isNotEmpty && likedBy.contains(userId);
+
+  int get musicLikesCount => musicLikedBy.length;
+
+  bool isMusicLikedBy(String userId) =>
+      userId.isNotEmpty && musicLikedBy.contains(userId);
+
+  bool get hasMusic => currentMusicUrl.trim().isNotEmpty;
+
+  Map<String, String> get allSocialHandles => {
+        if (instagram.trim().isNotEmpty) 'instagram': instagram.trim(),
+        if (twitterX.trim().isNotEmpty) 'x': twitterX.trim(),
+        if (tiktok.trim().isNotEmpty) 'tiktok': tiktok.trim(),
+        if (facebook.trim().isNotEmpty) 'facebook': facebook.trim(),
+        if (snapchat.trim().isNotEmpty) 'snapchat': snapchat.trim(),
+      };
+
+  Map<String, String> get visibleSocialHandles =>
+      showSocials ? allSocialHandles : const {};
+
+  bool get hasAnySocial => allSocialHandles.isNotEmpty;
 
   bool get hasAnyChronicCondition =>
       chronicConditions.isNotEmpty || customChronicCondition.trim().isNotEmpty;
@@ -370,6 +569,15 @@ class HealthCommunityProfile {
     List<ChronicCondition>? chronicConditions,
     String? customChronicCondition,
     bool? showChronicConditions,
+    String? currentMusicUrl,
+    String? currentMusicTitle,
+    List<String>? musicLikedBy,
+    bool? showSocials,
+    String? instagram,
+    String? twitterX,
+    String? tiktok,
+    String? facebook,
+    String? snapchat,
     String? bio,
     String? dailyFocus,
     bool? hideRealName,
@@ -402,6 +610,15 @@ class HealthCommunityProfile {
           customChronicCondition ?? this.customChronicCondition,
       showChronicConditions:
           showChronicConditions ?? this.showChronicConditions,
+      currentMusicUrl: currentMusicUrl ?? this.currentMusicUrl,
+      currentMusicTitle: currentMusicTitle ?? this.currentMusicTitle,
+      musicLikedBy: musicLikedBy ?? this.musicLikedBy,
+      showSocials: showSocials ?? this.showSocials,
+      instagram: instagram ?? this.instagram,
+      twitterX: twitterX ?? this.twitterX,
+      tiktok: tiktok ?? this.tiktok,
+      facebook: facebook ?? this.facebook,
+      snapchat: snapchat ?? this.snapchat,
       bio: bio ?? this.bio,
       dailyFocus: dailyFocus ?? this.dailyFocus,
       hideRealName: hideRealName ?? this.hideRealName,
@@ -439,6 +656,18 @@ class HealthCommunityProfile {
       if (customChronicCondition.trim().isNotEmpty)
         'customChronicCondition': customChronicCondition.trim(),
       'showChronicConditions': showChronicConditions,
+      if (currentMusicUrl.trim().isNotEmpty)
+        'currentMusicUrl': currentMusicUrl.trim(),
+      if (currentMusicTitle.trim().isNotEmpty)
+        'currentMusicTitle': currentMusicTitle.trim(),
+      'musicLikedBy': musicLikedBy,
+      'musicLikesCount': musicLikedBy.length,
+      'showSocials': showSocials,
+      if (instagram.trim().isNotEmpty) 'instagram': instagram.trim(),
+      if (twitterX.trim().isNotEmpty) 'twitterX': twitterX.trim(),
+      if (tiktok.trim().isNotEmpty) 'tiktok': tiktok.trim(),
+      if (facebook.trim().isNotEmpty) 'facebook': facebook.trim(),
+      if (snapchat.trim().isNotEmpty) 'snapchat': snapchat.trim(),
       'bio': bio.trim(),
       'dailyFocus': dailyFocus.trim(),
       'hideRealName': hideRealName,
@@ -479,6 +708,11 @@ class HealthCommunityProfile {
             .toList() ??
         const <String>[];
 
+    final rawMusicLikedBy = (json['musicLikedBy'] as List<dynamic>?)
+            ?.whereType<String>()
+            .toList() ??
+        const <String>[];
+
     DateTime parsedUpdated = DateTime.now();
     final rawUpdated = json['updatedAt'];
     if (rawUpdated is String) {
@@ -506,6 +740,15 @@ class HealthCommunityProfile {
       customChronicCondition:
           (json['customChronicCondition'] as String?) ?? '',
       showChronicConditions: (json['showChronicConditions'] as bool?) ?? true,
+      currentMusicUrl: (json['currentMusicUrl'] as String?) ?? '',
+      currentMusicTitle: (json['currentMusicTitle'] as String?) ?? '',
+      musicLikedBy: rawMusicLikedBy,
+      showSocials: (json['showSocials'] as bool?) ?? true,
+      instagram: (json['instagram'] as String?) ?? '',
+      twitterX: (json['twitterX'] as String?) ?? '',
+      tiktok: (json['tiktok'] as String?) ?? '',
+      facebook: (json['facebook'] as String?) ?? '',
+      snapchat: (json['snapchat'] as String?) ?? '',
       bio: (json['bio'] as String?) ?? '',
       dailyFocus: (json['dailyFocus'] as String?) ?? '',
       hideRealName: (json['hideRealName'] as bool?) ?? false,

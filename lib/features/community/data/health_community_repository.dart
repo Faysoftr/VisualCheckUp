@@ -38,6 +38,8 @@ class HealthCommunityRepository {
   static const String _messagesKeyPrefix = 'visualcheckup_comm_msgs_v1_';
   static const String _reportsKey = 'visualcheckup_comm_reports_v1';
   static const String _rateKeyPrefix = 'visualcheckup_comm_rate_v1_';
+  static const String _musicListenersKeyPrefix =
+      'visualcheckup_comm_music_listeners_v1_';
 
   bool get _canUseFirestore {
     if (!useFirebase) return false;
@@ -72,6 +74,12 @@ class HealthCommunityRepository {
           ChronicCondition.type2Diabetes,
           ChronicCondition.thyroidHashimoto,
         ],
+        currentMusicUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+        currentMusicTitle: 'Lofi & Doğa Sesleri — Sabah Yürüyüşü & Odak',
+        musicLikedBy: const ['u_demo_1', 'u_demo_2', 'u_demo_3'],
+        showSocials: true,
+        instagram: 'ayse_saglikli_yasam',
+        twitterX: 'ayse_saglik',
         bio:
             'Tip 2 diyabet sürecinde dengeli beslenme ve günlük 8.000 adım hedefiyle ilerliyorum. Motivasyon paylaşmak isterim.',
         dailyFocus: 'Sabah yürüyüşü + şekersiz bitki çayı',
@@ -98,6 +106,11 @@ class HealthCommunityRepository {
           ChronicCondition.hypertension,
           ChronicCondition.heartCondition,
         ],
+        currentMusicUrl: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadgRdKQ',
+        currentMusicTitle: 'Deep Focus & Calm Breathing Playlist',
+        musicLikedBy: const ['u_demo_1', 'u_demo_5'],
+        showSocials: true,
+        instagram: 'lukas_heart_health',
         bio:
             'Tracking daily blood pressure and Mediterranean meals. Always happy to exchange low-sodium recipe ideas!',
         dailyFocus: 'DASH diet + evening stretching',
@@ -640,6 +653,246 @@ class HealthCommunityRepository {
     }
 
     return updated;
+  }
+
+  /// Toggles the current user's like on a profile's concentration music.
+  Future<HealthCommunityProfile?> toggleMusicLike({
+    required String targetUid,
+    required String myUid,
+  }) async {
+    if (targetUid.isEmpty || myUid.isEmpty) return null;
+
+    final local = await _loadLocalProfileMap();
+    final existing = local[targetUid] ?? await getProfile(targetUid);
+    if (existing == null) return null;
+
+    final alreadyLiked = existing.isMusicLikedBy(myUid);
+    final updatedLikedBy = List<String>.from(existing.musicLikedBy);
+    if (alreadyLiked) {
+      updatedLikedBy.remove(myUid);
+    } else {
+      updatedLikedBy.add(myUid);
+    }
+
+    final updated = existing.copyWith(musicLikedBy: updatedLikedBy);
+    local[targetUid] = updated;
+    await _saveLocalProfileMap(local);
+
+    if (_canUseFirestore && !existing.isSampleProfile) {
+      try {
+        await _db.collection('community_profiles').doc(targetUid).update({
+          'musicLikedBy': alreadyLiked
+              ? FieldValue.arrayRemove([myUid])
+              : FieldValue.arrayUnion([myUid]),
+          'musicLikesCount': FieldValue.increment(alreadyLiked ? -1 : 1),
+        });
+      } catch (_) {}
+    }
+    return updated;
+  }
+
+  /// Quickly toggles whether a user's social media handles are publicly visible.
+  Future<HealthCommunityProfile?> setShowSocials(
+    String uid,
+    bool showSocials,
+  ) async {
+    if (uid.isEmpty) return null;
+    final local = await _loadLocalProfileMap();
+    final existing = local[uid] ?? await loadMyProfile(uid);
+    if (existing == null) return null;
+
+    final updated = existing.copyWith(
+      showSocials: showSocials,
+      updatedAt: _clock(),
+    );
+    local[uid] = updated;
+    await _saveLocalProfileMap(local);
+
+    if (_canUseFirestore && !existing.isSampleProfile) {
+      try {
+        await _db.collection('community_profiles').doc(uid).update({
+          'showSocials': showSocials,
+          'updatedAt': updated.updatedAt.toIso8601String(),
+        });
+      } catch (_) {}
+    }
+    return updated;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Concentration Music Listeners (`community_profiles/{uid}/musicListeners`)
+  // ---------------------------------------------------------------------------
+
+  Future<List<MusicListenerRecord>> _loadLocalListeners(String targetUid) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('$_musicListenersKeyPrefix$targetUid');
+    if (raw == null || raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw) as List<dynamic>;
+      return decoded
+          .whereType<Map<String, dynamic>>()
+          .map(MusicListenerRecord.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> _saveLocalListeners(
+    String targetUid,
+    List<MusicListenerRecord> list,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      '$_musicListenersKeyPrefix$targetUid',
+      jsonEncode(list.map((e) => e.toJson()).toList()),
+    );
+  }
+
+  Future<List<MusicListenerRecord>> loadMusicListeners(String targetUid) async {
+    if (targetUid.isEmpty) return const [];
+    final byUser = <String, MusicListenerRecord>{};
+
+    // Seed sample listeners for curated starter profiles so demo cards feel alive.
+    if (targetUid == 'sample_tr_ayse') {
+      final t = _clock();
+      byUser['sample_tr_mehmet'] = MusicListenerRecord(
+        userId: 'sample_tr_mehmet',
+        userName: 'Mehmet Yılmaz',
+        nickname: 'mehmet_tansiyon',
+        musicUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+        listenCount: 3,
+        listenedAt: t.subtract(const Duration(minutes: 18)),
+      );
+      byUser['sample_de_lukas'] = MusicListenerRecord(
+        userId: 'sample_de_lukas',
+        userName: 'Lukas Weber',
+        nickname: 'lukas_heart',
+        musicUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk',
+        listenCount: 1,
+        listenedAt: t.subtract(const Duration(hours: 2)),
+      );
+    } else if (targetUid == 'sample_de_lukas') {
+      final t = _clock();
+      byUser['sample_tr_ayse'] = MusicListenerRecord(
+        userId: 'sample_tr_ayse',
+        userName: 'Ayşe Demir',
+        nickname: 'ayse_saglik',
+        musicUrl: 'https://open.spotify.com/playlist/37i9dQZF1DWZeKCadgRdKQ',
+        listenCount: 2,
+        listenedAt: t.subtract(const Duration(minutes: 45)),
+      );
+    }
+
+    for (final rec in await _loadLocalListeners(targetUid)) {
+      byUser[rec.userId] = rec;
+    }
+
+    if (_canUseFirestore) {
+      try {
+        final snap = await _db
+            .collection('community_profiles')
+            .doc(targetUid)
+            .collection('musicListeners')
+            .limit(100)
+            .get();
+        for (final doc in snap.docs) {
+          final rec = MusicListenerRecord.fromJson(
+            doc.data(),
+            fallbackUid: doc.id,
+          );
+          byUser[rec.userId] = rec;
+        }
+      } catch (_) {}
+    }
+
+    final list = byUser.values.toList()
+      ..sort((a, b) => b.listenedAt.compareTo(a.listenedAt));
+    return list;
+  }
+
+  Future<MusicListenerRecord> recordMusicListen({
+    required String targetUid,
+    required String listenerUid,
+    required String listenerName,
+    String listenerNickname = '',
+    String? listenerPhotoUrl,
+    required String musicUrl,
+  }) async {
+    final now = _clock();
+    final existingList = await _loadLocalListeners(targetUid);
+    final idx = existingList.indexWhere((e) => e.userId == listenerUid);
+    final prevCount = idx >= 0 ? existingList[idx].listenCount : 0;
+
+    final record = MusicListenerRecord(
+      userId: listenerUid,
+      userName: listenerName.trim().isEmpty ? 'VisualCheckUp Member' : listenerName.trim(),
+      nickname: listenerNickname.trim(),
+      photoUrl: listenerPhotoUrl,
+      musicUrl: musicUrl.trim(),
+      listenCount: prevCount + 1,
+      listenedAt: now,
+    );
+
+    final updatedList = List<MusicListenerRecord>.from(existingList);
+    if (idx >= 0) {
+      updatedList[idx] = record;
+    } else {
+      updatedList.insert(0, record);
+    }
+    await _saveLocalListeners(targetUid, updatedList);
+
+    if (_canUseFirestore) {
+      try {
+        final ref = _db
+            .collection('community_profiles')
+            .doc(targetUid)
+            .collection('musicListeners')
+            .doc(listenerUid);
+        final remoteSnap = await ref.get();
+        final remotePrev = remoteSnap.exists
+            ? ((remoteSnap.data()?['listenCount'] as num?)?.toInt() ?? 0)
+            : prevCount;
+        await ref.set({
+          'userId': listenerUid,
+          'userName': record.userName,
+          if (record.nickname.isNotEmpty) 'nickname': record.nickname,
+          if (record.photoUrl != null && record.photoUrl!.isNotEmpty)
+            'photoUrl': record.photoUrl,
+          'musicUrl': record.musicUrl,
+          'listenCount': remotePrev + 1,
+          'listenedAt': now.toIso8601String(),
+        }, SetOptions(merge: true));
+      } catch (_) {}
+    }
+    return record;
+  }
+
+  /// Resolves profiles of members who liked [targetUid]'s profile.
+  Future<List<HealthCommunityProfile>> loadProfileLikers(
+    String targetUid,
+  ) async {
+    final target = await getProfile(targetUid);
+    if (target == null || target.likedBy.isEmpty) return const [];
+    final all = await _loadLocalProfileMap();
+    final result = <HealthCommunityProfile>[];
+    for (final uid in target.likedBy) {
+      final found = all[uid] ?? await getProfile(uid);
+      if (found != null) {
+        result.add(found);
+      } else {
+        result.add(
+          HealthCommunityProfile(
+            uid: uid,
+            displayName: uid.startsWith('u_demo_')
+                ? 'Sağlık Üyesi #${uid.replaceFirst('u_demo_', '')}'
+                : uid,
+            updatedAt: _clock(),
+          ),
+        );
+      }
+    }
+    return result;
   }
 
   // ---------------------------------------------------------------------------

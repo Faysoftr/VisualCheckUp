@@ -4897,6 +4897,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No ads or banners yet.'**
   String get adminNoPromotions;
+
+  /// No description provided for @commMusicSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Concentration & Calm Music'**
+  String get commMusicSectionTitle;
+
+  /// No description provided for @commMusicTitleField.
+  ///
+  /// In en, this message translates to:
+  /// **'Track / Playlist Name (optional)'**
+  String get commMusicTitleField;
+
+  /// No description provided for @commMusicUrlField.
+  ///
+  /// In en, this message translates to:
+  /// **'Music Link (YouTube, Spotify, SoundCloud)'**
+  String get commMusicUrlField;
+
+  /// No description provided for @commMusicInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid YouTube, YouTube Music, Spotify, Apple Music, or SoundCloud link.'**
+  String get commMusicInvalidUrl;
+
+  /// No description provided for @commMusicEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No concentration music added yet.'**
+  String get commMusicEmpty;
+
+  /// No description provided for @commMusicListenAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get commMusicListenAction;
+
+  /// No description provided for @commMusicLikeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Like Music'**
+  String get commMusicLikeAction;
+
+  /// No description provided for @commMusicListenersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who Listened?'**
+  String get commMusicListenersTitle;
+
+  /// No description provided for @commMusicListenersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has listened to this track yet.'**
+  String get commMusicListenersEmpty;
+
+  /// No description provided for @commMusicUniqueListeners.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Listeners'**
+  String commMusicUniqueListeners(int count);
+
+  /// No description provided for @commMusicTotalPlays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Plays'**
+  String commMusicTotalPlays(int count);
+
+  /// No description provided for @commMusicPlayCountBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}x'**
+  String commMusicPlayCountBadge(int count);
+
+  /// No description provided for @commProfileLikersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Likes'**
+  String get commProfileLikersTitle;
+
+  /// No description provided for @commProfileLikersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile likes yet.'**
+  String get commProfileLikersEmpty;
+
+  /// No description provided for @commSocialsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Social Media Accounts'**
+  String get commSocialsSectionTitle;
+
+  /// No description provided for @commToggleShowSocials.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my social media accounts'**
+  String get commToggleShowSocials;
+
+  /// No description provided for @commSocialsHiddenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden from other members'**
+  String get commSocialsHiddenHint;
+
+  /// No description provided for @commSocialsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No social accounts added yet.'**
+  String get commSocialsEmpty;
+
+  /// No description provided for @commPreviewMyProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview My Profile'**
+  String get commPreviewMyProfile;
 }
 
 class _AppLocalizationsDelegate
