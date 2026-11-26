@@ -342,6 +342,29 @@ class DoctorRepository {
     return null;
   }
 
+  Future<void> markApplicationPaid(
+    String uid, {
+    String? purchasedPackage,
+  }) async {
+    final apps = await loadApplicationsForAdmin();
+    final index = apps.indexWhere((a) => a.uid == uid);
+    if (index != -1) {
+      apps[index] = apps[index].copyWith(
+        isPaid: true,
+        purchasedPackage: purchasedPackage ?? apps[index].purchasedPackage,
+      );
+      await _saveLocalApplications(apps);
+      if (_canUseFirestore) {
+        try {
+          await _db.collection('doctor_applications').doc(uid).set({
+            'isPaid': true,
+            'purchasedPackage': purchasedPackage ?? apps[index].purchasedPackage,
+          }, SetOptions(merge: true));
+        } catch (_) {}
+      }
+    }
+  }
+
   Future<void> reviewApplication({
     required String doctorUid,
     required bool approve,

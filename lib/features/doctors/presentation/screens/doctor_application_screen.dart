@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:visualcheckup/core/iap/in_app_purchase_service.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/safety/content_safety_service.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
@@ -527,17 +529,26 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
           ),
           const SizedBox(height: 14),
 
-          // Google Play In-App Purchase action (Like Teacher applications in Social Formul Bank)
+          // In-App Purchase action for verified Doctor Package (iOS StoreKit & Android Google Play)
           OutlinedButton.icon(
             key: const Key('doctor_play_purchase_button'),
-            onPressed: () {
-              setState(() => _isPaid = true);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('✓ Google Play Hekim Paketi Onaylandı.'),
-                  backgroundColor: Color(0xFF16A34A),
-                ),
+            onPressed: () async {
+              final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+              final success = await HealthInAppPurchaseService.instance.buyDoctorPackage(
+                doctorUserId: widget.currentUser.id,
+                onCompleted: (ok) {
+                  if (ok && mounted) setState(() => _isPaid = true);
+                },
               );
+              if (success && mounted) {
+                setState(() => _isPaid = true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('✓ $storeName Hekim Paketi Onaylandı.'),
+                    backgroundColor: const Color(0xFF16A34A),
+                  ),
+                );
+              }
             },
             icon: Icon(
               _isPaid ? Icons.check_circle_rounded : Icons.shopping_bag_outlined,
@@ -545,8 +556,8 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
             ),
             label: Text(
               _isPaid
-                  ? '✓ Google Play ile Satın Alındı (${_selectedPlan.localizedPrice(langCode)})'
-                  : 'Google Play ile Satın Al (${_selectedPlan.localizedPrice(langCode)})',
+                  ? '✓ ${Platform.isIOS ? "App Store" : "Google Play"} ile Satın Alındı (${_selectedPlan.localizedPrice(langCode)})'
+                  : '${Platform.isIOS ? "App Store" : "Google Play"} ile Satın Al (${_selectedPlan.localizedPrice(langCode)})',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: _isPaid ? const Color(0xFF16A34A) : null,

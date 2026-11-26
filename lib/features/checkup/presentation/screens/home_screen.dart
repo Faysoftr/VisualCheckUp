@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
@@ -662,7 +665,9 @@ class _HomeScreenState extends State<HomeScreen> {
         )
             ? _openAdminPanel
             : null,
-        onOpenDonate: () => DonationSupportDialog.show(context),
+        onOpenDonate: (!kIsWeb && Platform.isIOS)
+            ? null
+            : () => DonationSupportDialog.show(context),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenQuickColorCard: _openQuickColorCardPicker,
@@ -704,23 +709,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                 ),
               ),
-              const SizedBox(width: 6),
-              _FrostedCircleAction(
-                isDark: isDark,
-                child: IconButton(
-                  key: const Key('home_donate_appbar_button'),
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints.tightFor(width: 38, height: 38),
-                  icon: const Icon(
-                    Icons.volunteer_activism_rounded,
-                    size: 20,
-                    color: Color(0xFFE11D48),
+              if (!kIsWeb && !Platform.isIOS) ...[
+                const SizedBox(width: 6),
+                _FrostedCircleAction(
+                  isDark: isDark,
+                  child: IconButton(
+                    key: const Key('home_donate_appbar_button'),
+                    padding: EdgeInsets.zero,
+                    constraints:
+                        const BoxConstraints.tightFor(width: 38, height: 38),
+                    icon: const Icon(
+                      Icons.volunteer_activism_rounded,
+                      size: 20,
+                      color: Color(0xFFE11D48),
+                    ),
+                    tooltip: l10n.donateTooltip,
+                    onPressed: () => DonationSupportDialog.show(context),
                   ),
-                  tooltip: l10n.donateTooltip,
-                  onPressed: () => DonationSupportDialog.show(context),
                 ),
-              ),
+              ],
             ],
           ),
         ),

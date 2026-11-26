@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:visualcheckup/core/iap/in_app_purchase_service.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/settings/presentation/screens/privacy_policy_screen.dart';
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 import 'package:visualcheckup/features/subscription/domain/subscription_models.dart';
 
@@ -49,23 +51,39 @@ class _ProPaywallScreenState extends State<ProPaywallScreen> {
   Future<void> _activate() async {
     if (_submitting) return;
     setState(() => _submitting = true);
-    final updated = await widget.repository.activatePlan(
-      uid: widget.userId,
-      tier: _selectedTier,
+
+    final productId = _selectedTier == SubscriptionTier.proYearly
+        ? HealthInAppPurchaseService.proYearly
+        : HealthInAppPurchaseService.proMonthly;
+
+    final success = await HealthInAppPurchaseService.instance.buySubscription(
+      productId,
+      userId: widget.userId,
     );
+
     if (!mounted) return;
-    setState(() {
-      _current = updated;
-      _submitting = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.proActivatedToast)),
-    );
-    Navigator.of(context).pop(true);
+
+    if (success) {
+      final updated = await widget.repository.activatePlan(
+        uid: widget.userId,
+        tier: _selectedTier,
+      );
+      setState(() {
+        _current = updated;
+        _submitting = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.proActivatedToast)),
+      );
+      Navigator.of(context).pop(true);
+    } else {
+      setState(() => _submitting = false);
+    }
   }
 
   Future<void> _restore() async {
     setState(() => _submitting = true);
+    await HealthInAppPurchaseService.instance.restorePurchases(userId: widget.userId);
     final restored =
         await widget.repository.loadSubscription(uid: widget.userId);
     if (!mounted) return;
@@ -78,6 +96,10 @@ class _ProPaywallScreenState extends State<ProPaywallScreen> {
         SnackBar(content: Text(context.l10n.proActiveBadge)),
       );
       Navigator.of(context).pop(true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aktif bir abonelik bulunamadı.')),
+      );
     }
   }
 
@@ -268,6 +290,62 @@ class _ProPaywallScreenState extends State<ProPaywallScreen> {
                   child: Text(
                     l10n.proRestoreButton,
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      key: const Key('pro_privacy_policy_link'),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PrivacyPolicyScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Gizlilik Politikası',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colorScheme.onSurfaceVariant,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    Text(' • ', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    TextButton(
+                      key: const Key('pro_terms_eula_link'),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PrivacyPolicyScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Kullanım Koşulları (EULA)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colorScheme.onSurfaceVariant,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Ödeme, satın alma onayının ardından Apple Kimliği (App Store) veya Google Play hesabınızdan tahsil edilir. Abonelik, geçerli dönemin bitiminden en az 24 saat önce iptal edilmediği sürece otomatik yenilenir. Aboneliğinizi dilediğiniz zaman App Store / Google Play hesap ayarlarınızdan yönetebilir veya iptal edebilirsiniz.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                      height: 1.35,
+                    ),
                   ),
                 ),
               ],

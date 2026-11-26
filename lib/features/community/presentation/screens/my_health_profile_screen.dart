@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
@@ -97,15 +100,16 @@ class MyHealthProfileScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
-            tooltip: l10n.donateTooltip,
-            onPressed: () => DonationSupportDialog.show(context),
-            icon: const Icon(
-              Icons.volunteer_activism_rounded,
-              color: Color(0xFFE11D48),
-              size: 21,
+          if (!kIsWeb && !Platform.isIOS)
+            IconButton(
+              tooltip: l10n.donateTooltip,
+              onPressed: () => DonationSupportDialog.show(context),
+              icon: const Icon(
+                Icons.volunteer_activism_rounded,
+                color: Color(0xFFE11D48),
+                size: 21,
+              ),
             ),
-          ),
           IconButton(
             key: const Key('my_profile_messages_btn'),
             tooltip: l10n.sfbMyMessages,
