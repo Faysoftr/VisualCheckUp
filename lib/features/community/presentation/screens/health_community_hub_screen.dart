@@ -16,6 +16,7 @@ import 'package:visualcheckup/features/community/presentation/screens/health_pro
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_wall_and_groups_tabs.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/social_profile_view.dart';
+import 'package:visualcheckup/features/safety/presentation/screens/banned_screen.dart';
 
 /// Main Global Health Community hub for VisualCheckUp (Social Formula Bank style).
 ///
@@ -249,6 +250,27 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
+    if (_myProfile != null && _myProfile!.isSuspended) {
+      return BannedScreen(
+        key: const Key('community_banned_screen'),
+        reason: _myProfile!.suspensionReason,
+        initialHasAppealed: _myProfile!.hasAppealed,
+        initialAppealText: _myProfile!.appealText,
+        onSubmitAppeal: (text) async {
+          await widget.repository.saveMyProfile(
+            _myProfile!.copyWith(
+              hasAppealed: true,
+              appealText: text,
+              appealTimestamp: DateTime.now(),
+            ),
+          );
+          await _loadAll();
+          return true;
+        },
+        onSignOut: () => Navigator.of(context).pop(),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

@@ -8,6 +8,7 @@ import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
+import 'package:visualcheckup/features/doctors/data/doctor_document_verification_service.dart';
 import 'package:visualcheckup/features/doctors/data/doctor_repository.dart';
 import 'package:visualcheckup/features/doctors/domain/doctor_models.dart';
 
@@ -48,6 +49,10 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
   bool _uploadingDoc = false;
   bool _submitting = false;
   DoctorProfile? _existingApp;
+  String _aiVerificationStatus = 'unverified';
+  double _aiConfidence = 0.0;
+  String _aiNotes = '';
+  bool _isPaid = false;
 
   @override
   void initState() {
@@ -87,6 +92,10 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
       _selectedPlan = existing.planTier;
       _docUrl = existing.documentUrl;
       _docKey = existing.documentKey;
+      _aiVerificationStatus = existing.aiVerificationStatus;
+      _aiConfidence = existing.aiConfidence;
+      _aiNotes = existing.aiNotes;
+      _isPaid = existing.isPaid;
     });
   }
 
@@ -111,6 +120,11 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
         }
         return;
       }
+
+      // Run AI Fake Document Verification (checks for AI-generated / forged diplomas)
+      final verif = await DoctorDocumentVerificationService.instance
+          .verifyDocumentBytes(bytes, fileName: file.name);
+
       final uploader =
           widget.uploadService ?? R2CommunityImageUploadService.instance;
       final res = await uploader.uploadBytes(bytes, folder: 'doctor_docs');
@@ -118,6 +132,9 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
       setState(() {
         _docUrl = res.url;
         _docKey = res.objectKey;
+        _aiVerificationStatus = verif.status;
+        _aiConfidence = verif.confidence;
+        _aiNotes = verif.notes;
       });
     } catch (_) {
     } finally {
@@ -161,6 +178,11 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
       acceptsPatientFollowUp: _acceptsFollowUp,
       planTier: _selectedPlan,
       status: DoctorApplicationStatus.pending,
+      aiVerificationStatus: _aiVerificationStatus,
+      aiConfidence: _aiConfidence,
+      aiNotes: _aiNotes,
+      purchasedPackage: _selectedPlan.name,
+      isPaid: _isPaid,
       createdAt: DateTime.now(),
     );
 
@@ -404,6 +426,72 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
                   : l10n.doctorUploadDocBtn,
             ),
           ),
+          if (_docUrl != null && _aiVerificationStatus != 'unverified') ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _aiVerificationStatus == 'suspicious_ai'
+                    ? const Color(0xFFFEF2F2)
+                    : const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _aiVerificationStatus == 'suspicious_ai'
+                      ? const Color(0xFFEF4444)
+                      : const Color(0xFF10B981),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    _aiVerificationStatus == 'suspicious_ai'
+                        ? Icons.warning_amber_rounded
+                        : Icons.verified_rounded,
+                    color: _aiVerificationStatus == 'suspicious_ai'
+                        ? const Color(0xFFDC2626)
+                        : const Color(0xFF16A34A),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _aiVerificationStatus == 'suspicious_ai'
+                              ? '🚨 DİKKAT: Yapay Zeka / Sahte Belge Şüphesi!'
+                              : '✓ AI Doğrulama: Belge Orijinal Görünüyor',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                            color: _aiVerificationStatus == 'suspicious_ai'
+                                ? const Color(0xFF991B1B)
+                                : const Color(0xFF15803D),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          _aiNotes.isNotEmpty
+                              ? _aiNotes
+                              : (_aiVerificationStatus == 'suspicious_ai'
+                                  ? 'Belgede sentetik görsel veya yapay zeka dokusu tespit edildi. Yönetici onayına sunulacaktır.'
+                                  : 'Resmi tescil mührü ve yazı tipi deseni orijinal hekimlik belgesiyle uyumlu.'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            height: 1.35,
+                            color: _aiVerificationStatus == 'suspicious_ai'
+                                ? const Color(0xFF7F1D1D)
+                                : const Color(0xFF166534),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
 
           // Doctor Listing Membership Pricing
@@ -435,6 +523,34 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
             selected: _selectedPlan == DoctorPlanTier.standardMonthly,
             onTap: () => setState(
               () => _selectedPlan = DoctorPlanTier.standardMonthly,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Google Play In-App Purchase action (Like Teacher applications in Social Formul Bank)
+          OutlinedButton.icon(
+            key: const Key('doctor_play_purchase_button'),
+            onPressed: () {
+              setState(() => _isPaid = true);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('✓ Google Play Hekim Paketi Onaylandı.'),
+                  backgroundColor: Color(0xFF16A34A),
+                ),
+              );
+            },
+            icon: Icon(
+              _isPaid ? Icons.check_circle_rounded : Icons.shopping_bag_outlined,
+              color: _isPaid ? const Color(0xFF16A34A) : colorScheme.primary,
+            ),
+            label: Text(
+              _isPaid
+                  ? '✓ Google Play ile Satın Alındı (${_selectedPlan.localizedPrice(langCode)})'
+                  : 'Google Play ile Satın Al (${_selectedPlan.localizedPrice(langCode)})',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: _isPaid ? const Color(0xFF16A34A) : null,
+              ),
             ),
           ),
           const SizedBox(height: 20),

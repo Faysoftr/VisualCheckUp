@@ -10,6 +10,7 @@ import 'package:visualcheckup/features/community/data/community_image_upload_ser
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/core/ads/app_open_ad_manager.dart';
 import 'package:visualcheckup/features/doctors/data/doctor_repository.dart';
 import 'package:visualcheckup/features/doctors/domain/doctor_models.dart';
 
@@ -255,6 +256,133 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     doc.hospitalOrClinic,
                     style: theme.textTheme.labelSmall,
                   ),
+
+                // AI Document Verification Result
+                if (doc.aiVerificationStatus == 'suspicious_ai')
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF2F2),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFEF4444)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.warning_amber_rounded,
+                                color: Color(0xFFEF4444), size: 18),
+                            const SizedBox(width: 6),
+                            Text(
+                              '🚨 DİKKAT: Yapay Zeka / Sahte Belge Şüphesi! (%${(doc.aiConfidence * 100).round()} Risk)',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFB91C1C),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          doc.aiNotes.isNotEmpty
+                              ? doc.aiNotes
+                              : 'Belgede yapay zeka difüzyon modeli veya sentetik doku tespit edildi. Manuel inceleme önerilir.',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF7F1D1D),
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (doc.aiVerificationStatus == 'original')
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF10B981)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.verified_rounded,
+                            color: Color(0xFF10B981), size: 18),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '✓ AI Doğrulama: Belge Orijinal Görünüyor (%${(doc.aiConfidence * 100).round()} Güven)',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF047857),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Payment / Document links
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (doc.isPaid)
+                      Chip(
+                        visualDensity: VisualDensity.compact,
+                        avatar: const Icon(Icons.check_circle_rounded,
+                            size: 14, color: Color(0xFF16A34A)),
+                        label: const Text('Google Play ile Ödendi',
+                            style: TextStyle(fontSize: 11)),
+                      ),
+                    if (doc.documentUrl != null && doc.documentUrl!.isNotEmpty)
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (dlgCtx) => Dialog(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Yüklenen Hekimlik Belgesi',
+                                        style: theme.textTheme.titleMedium),
+                                    const SizedBox(height: 12),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        doc.documentUrl!,
+                                        errorBuilder: (_, __, ___) =>
+                                            const Text('Belge görseli açılamadı.'),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(dlgCtx).pop(),
+                                      child: const Text('Kapat'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.description_outlined, size: 15),
+                        label: const Text('Belgeyi İncele',
+                            style: TextStyle(fontSize: 11.5)),
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -495,11 +623,131 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   Widget _buildPromotionsTab(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final adManager = AppOpenAdManager();
 
     return Column(
       children: [
+        // App Open Ad Global Switch & Interval Card (Synchronized from Social Formul Bank)
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.ad_units_rounded,
+                        color: AppTheme.primaryTeal, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Açılış Reklamı (App Open Ad)',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      key: const Key('admin_app_open_ad_switch'),
+                      value: adManager.isEnabled,
+                      onChanged: (val) async {
+                        await adManager.setEnabled(val);
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(val
+                                ? '✓ Uygulama açılış reklamı aktif edildi.'
+                                : 'Açılış reklamı kapatıldı.'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Text(
+                  'Uygulama açılırken ve arka plandan dönüldüğünde tam sayfa reklam gösterimi.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      'Sıklık Sınırı:',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    DropdownButton<int>(
+                      value: adManager.intervalMinutes,
+                      isDense: true,
+                      items: const [
+                        DropdownMenuItem(value: 5, child: Text('5 Dakika')),
+                        DropdownMenuItem(value: 15, child: Text('15 Dakika (Varsayılan)')),
+                        DropdownMenuItem(value: 30, child: Text('30 Dakika')),
+                        DropdownMenuItem(value: 60, child: Text('60 Dakika')),
+                      ],
+                      onChanged: (newVal) async {
+                        if (newVal != null) {
+                          await adManager.setIntervalMinutes(newVal);
+                          setState(() {});
+                        }
+                      },
+                    ),
+                    const Spacer(),
+                    TextButton.icon(
+                      key: const Key('admin_test_app_open_ad_btn'),
+                      onPressed: () {
+                        final shown = adManager.showAdIfAvailable(ignoreCooldown: true);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(shown
+                                ? '✓ Açılış reklamı tetiklendi (Test Başarılı).'
+                                : 'Reklam tetiklenemedi.'),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.play_arrow_rounded, size: 16),
+                      label: const Text('Test Et', style: TextStyle(fontSize: 12)),
+                    ),
+                  ],
+                ),
+                const Divider(height: 14),
+                Row(
+                  children: [
+                    const Icon(Icons.verified_user_outlined,
+                        size: 14, color: Color(0xFF16A34A)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '🛡️ PRO Üyeler ve Admin için tüm reklamlar (%100) otomatik engellenir.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF16A34A),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
           child: SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
@@ -687,6 +935,85 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                 ),
                               ),
                           ],
+                        ),
+                      ],
+                      if (u.hasAppealed &&
+                          u.appealText != null &&
+                          u.appealText!.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFF59E0B)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Row(
+                                children: [
+                                  Icon(Icons.gavel_rounded,
+                                      size: 16, color: Color(0xFFB45309)),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    '⚖️ Kullanıcı Ban İtirazı:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFB45309),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                u.appealText!,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF78350F),
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  FilledButton.tonal(
+                                    key: Key('admin_accept_appeal_${u.uid}'),
+                                    style: FilledButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                    onPressed: () async {
+                                      await widget.repository.communityRepository
+                                          .saveMyProfile(
+                                        u.copyWith(
+                                          isSuspended: false,
+                                          hasAppealed: false,
+                                        ),
+                                      );
+                                      await _refreshAll();
+                                    },
+                                    child: const Text('İtirazı Onayla (Banı Kaldır)'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  OutlinedButton(
+                                    key: Key('admin_reject_appeal_${u.uid}'),
+                                    style: OutlinedButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                    onPressed: () async {
+                                      await widget.repository.communityRepository
+                                          .saveMyProfile(
+                                        u.copyWith(hasAppealed: false),
+                                      );
+                                      await _refreshAll();
+                                    },
+                                    child: const Text('İtirazı Reddet'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                       const SizedBox(height: 8),

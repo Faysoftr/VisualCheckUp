@@ -8,6 +8,7 @@ import 'package:visualcheckup/features/community/data/community_image_upload_ser
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/core/notifications/health_notification_service.dart';
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 
@@ -64,6 +65,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
   @override
   void initState() {
     super.initState();
+    HealthNotificationService.instance.currentlyActiveChatId = _chatId;
     _uploadService =
         widget.uploadService ?? R2CommunityImageUploadService.instance;
     _loadChat();
@@ -71,6 +73,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
 
   @override
   void dispose() {
+    HealthNotificationService.instance.currentlyActiveChatId = null;
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();

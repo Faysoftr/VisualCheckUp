@@ -2628,6 +2628,27 @@ class _CalorieScanHistoryTile extends StatelessWidget {
         File(photoPath).existsSync();
     final timeStr = DateFormat('dd.MM HH:mm').format(scan.createdAt);
 
+    final totalGrams = scan.proteinG + scan.carbsG + scan.fatG;
+    final proteinPct = totalGrams > 0 ? (scan.proteinG / totalGrams * 100).round() : 0;
+    final carbsPct = totalGrams > 0 ? (scan.carbsG / totalGrams * 100).round() : 0;
+    final fatPct = totalGrams > 0 ? (scan.fatG / totalGrams * 100).round() : 0;
+
+    final String healthBadge;
+    final Color healthBadgeColor;
+    if (carbsPct <= 35 && proteinPct >= 25) {
+      healthBadge = '🌾 Düşük Glisemik • Diyabet Dostu ✓';
+      healthBadgeColor = const Color(0xFF10B981);
+    } else if (carbsPct >= 65) {
+      healthBadge = '⚠️ Yüksek Karbonhidrat • Şeker Uyarısı';
+      healthBadgeColor = const Color(0xFFEA580C);
+    } else if (fatPct >= 50) {
+      healthBadge = '🧈 Yüksek Yağ • Kolesterol & Kalp Uyarısı';
+      healthBadgeColor = const Color(0xFFD97706);
+    } else {
+      healthBadge = '✓ Dengeli Sağlık Tabağı';
+      healthBadgeColor = const Color(0xFF0F766E);
+    }
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
@@ -2676,11 +2697,36 @@ class _CalorieScanHistoryTile extends StatelessWidget {
               '${scan.mealSlot.localizedLabel(l10n)} • $timeStr',
               style: theme.textTheme.bodySmall,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
             Text(
-              'P:${scan.proteinG.round()}g  K:${scan.carbsG.round()}g  Y:${scan.fatG.round()}g',
+              'P:${scan.proteinG.round()}g (%$proteinPct) • K:${scan.carbsG.round()}g (%$carbsPct) • Y:${scan.fatG.round()}g (%$fatPct)',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
                 color: colorScheme.onSurfaceVariant,
+                fontSize: 11.5,
+              ),
+            ),
+            const SizedBox(height: 3),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: healthBadgeColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: healthBadgeColor.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  healthBadge,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: healthBadgeColor,
+                  ),
+                ),
               ),
             ),
             if (scan.items.isNotEmpty) ...[
