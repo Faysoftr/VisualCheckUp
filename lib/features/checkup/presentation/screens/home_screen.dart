@@ -905,6 +905,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 12),
 
+                      // 1b. Glowing Daily Health Quote / Tip of the Day Card
+                      const SfbDailyHealthTipCard(),
+                      const SizedBox(height: 12),
+
                       // 2. Elevated Modern Follow-Up Plan Card
                       _FollowUpModernCard(
                         title: l10n.followUpCardTitle,
@@ -978,7 +982,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 5a. Birthday & Glowing Daily Health Tip Card (SFB "Tarihte Bugün" style)
+                      // 5a. Birthday Showcase Section
                       BirthdayCelebrationCard(
                         displayName: widget.currentUser.displayName,
                       ),
@@ -986,8 +990,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         profiles: _communityMembers,
                         onOpenProfile: _openMemberProfile,
                       ),
-                      const SfbDailyHealthTipCard(),
-                      const SizedBox(height: 12),
 
                       // 5b. VisualCheckUp Pro Quick Banner
                       Card(

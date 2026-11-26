@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
@@ -148,7 +149,7 @@ class SfbGradientRingAvatar extends StatelessWidget {
   }
 }
 
-/// Glowing cyan Daily Health Tip card (modeled after SFB "Tarihte Bugün" card).
+/// Glowing cyan Daily Health Tip & Quote of the Day card (modeled after SFB "Günün Sözü / Tarihte Bugün").
 class SfbDailyHealthTipCard extends StatelessWidget {
   const SfbDailyHealthTipCard({super.key});
 
@@ -156,8 +157,9 @@ class SfbDailyHealthTipCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final langCode = Localizations.localeOf(context).languageCode;
-    final tip = DailyWellnessExtras.dailyTipForLocale(langCode);
+    final tipItem = DailyWellnessExtras.dailyTipItemForLocale(langCode);
 
     return SfbGradientBorderCard(
       key: const Key('home_sfb_daily_tip_card'),
@@ -167,46 +169,149 @@ class SfbDailyHealthTipCard extends StatelessWidget {
         Color(0xFF38BDF8),
       ],
       glowColor: const Color(0xFF06B6D4),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFF06B6D4).withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.campaign_rounded,
-              color: Color(0xFF0891B2),
-              size: 22,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF06B6D4), Color(0xFF0D9488)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF06B6D4).withValues(alpha: 0.28),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.format_quote_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.dailyHealthTipTitle,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: const Color(0xFF0891B2),
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF06B6D4).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFF06B6D4).withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Text(
+                            tipItem.category,
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0891B2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.copy_rounded, size: 18),
+                color: const Color(0xFF0891B2),
+                tooltip: 'Kopyala',
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  Clipboard.setData(ClipboardData(
+                    text: '“${tipItem.quote}”\n— ${tipItem.category} (${tipItem.source ?? 'Visual CheckUp'})',
+                  ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${tipItem.category} bilgisi panoya kopyalandı 📋',
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: const Color(0xFF0D9488),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              '“${tipItem.quote}”',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.45,
+                fontWeight: FontWeight.w600,
+                fontStyle: FontStyle.italic,
+                letterSpacing: 0.1,
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (tipItem.source != null) ...[
+            const SizedBox(height: 8),
+            Row(
               children: [
-                Text(
-                  l10n.dailyHealthTipTitle,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: const Color(0xFF0891B2),
-                    fontWeight: FontWeight.w800,
-                  ),
+                const Spacer(),
+                const Icon(
+                  Icons.verified_rounded,
+                  size: 13,
+                  color: Color(0xFF0D9488),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(width: 4),
                 Text(
-                  tip,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.38,
-                    fontWeight: FontWeight.w600,
+                  tipItem.source!,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white60 : Colors.black54,
                   ),
                 ),
               ],
             ),
-          ),
+          ],
         ],
       ),
     );
