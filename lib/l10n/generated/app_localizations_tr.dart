@@ -2634,20 +2634,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get adminNoPromotions => 'Henüz reklam veya banner eklenmedi.';
 
   @override
-  String get commMusicSectionTitle => 'Konsantrasyon Müziği';
+  String get commMusicSectionTitle => 'Motivasyon Müziği';
 
   @override
-  String get commMusicTitleField => 'Parça / Liste Adı (isteğe bağlı)';
+  String get commMusicTitleField =>
+      'Motivasyon Parçası / Liste Adı (isteğe bağlı)';
 
   @override
-  String get commMusicUrlField => 'Müzik Linki (YouTube, Spotify, SoundCloud)';
+  String get commMusicUrlField =>
+      'Motivasyon Müziği Linki (YouTube, Spotify, SoundCloud)';
 
   @override
   String get commMusicInvalidUrl =>
       'Lütfen geçerli bir YouTube, YouTube Music, Spotify, Apple Music veya SoundCloud linki girin.';
 
   @override
-  String get commMusicEmpty => 'Henüz konsantrasyon müziği eklenmedi.';
+  String get commMusicEmpty => 'Henüz bir motivasyon müziği eklenmedi.';
 
   @override
   String get commMusicListenAction => 'Dinle';

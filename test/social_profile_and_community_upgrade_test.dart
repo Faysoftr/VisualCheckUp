@@ -154,12 +154,23 @@ void main() {
         final updated = await repo.loadMyProfile(_testUser.id);
         expect(updated?.mood, HealthMood.energetic);
 
-        // Tap Edit Profile -> switches cleanly into edit form
+        // Verify Motivasyon Müziği and Arkadaşlarım cards are present
+        expect(find.byKey(const Key('profile_motivation_music_card')), findsOneWidget);
+
+        final friendsCard = find.byKey(const Key('profile_friends_card'));
+        await tester.scrollUntilVisible(
+          friendsCard,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(friendsCard, findsOneWidget);
+
+        // Tap Edit Profile (now at the very bottom) -> switches cleanly into edit form
         final editBtn = find.byKey(const Key('comm_edit_profile_toggle_btn'));
         await tester.scrollUntilVisible(
           editBtn,
-          -200,
-          scrollable: showcaseScrollable,
+          300,
+          scrollable: find.byType(Scrollable).first,
         );
         await tester.ensureVisible(editBtn);
         await tester.pumpAndSettle();
