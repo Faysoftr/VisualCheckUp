@@ -167,9 +167,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!accepted && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
-        final ok = await DisclaimerDialog.show(context);
+        final ok = await DisclaimerDialog.show(context, initiallyAgreed: false);
         if (ok) {
           await widget.historyRepository.setDisclaimerAccepted();
+        } else {
+          widget.onSignOut();
         }
       });
     }
@@ -646,7 +648,8 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           historyRepository: widget.historyRepository,
         ),
-        onOpenDisclaimer: () => DisclaimerDialog.show(context),
+        onOpenDisclaimer: () =>
+            DisclaimerDialog.show(context, initiallyAgreed: true),
         onSignOut: widget.onSignOut,
         onDeleteAccount: widget.onDeleteAccount,
       ),

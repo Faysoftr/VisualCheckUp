@@ -5,6 +5,7 @@ import 'package:visualcheckup/core/theme/visual_announcement_effect_service.dart
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/admin/presentation/widgets/global_announcement_and_promo_banners.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_profile_detail_screen.dart';
@@ -189,4 +190,90 @@ void main() {
       expect(find.text('Bugün Lukas Weber\'in Doğum Günü! 🎉'), findsOneWidget);
     });
   });
+
+  group('Admin Visibility & Mandatory Onboarding Legal Disclaimer', () {
+    test('AdminUtils strictly checks admin email f.s.yuksek@gmail.com', () {
+      expect(AdminUtils.adminEmail, 'f.s.yuksek@gmail.com');
+      expect(AdminUtils.isAdmin(email: 'f.s.yuksek@gmail.com'), isTrue);
+      expect(AdminUtils.isAdmin(email: 'F.S.YUKSEK@GMAIL.COM'), isTrue);
+      expect(AdminUtils.isAdmin(email: 'other@example.com'), isFalse);
+      expect(AdminUtils.isAdmin(email: null), isFalse);
+    });
+
+    testWidgets('DisclaimerDialog displays 4 pillars and enforces mandatory consent', (tester) async {
+      bool? dialogResult;
+
+      await tester.pumpWidget(
+        _wrap(
+          Builder(
+            builder: (ctx) => ElevatedButton(
+              onPressed: () async {
+                dialogResult = await DisclaimerDialog.show(ctx, initiallyAgreed: false);
+              },
+              child: const Text('Open Disclaimer'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Open dialog
+      await tester.tap(find.text('Open Disclaimer'));
+      await tester.pumpAndSettle();
+
+      // Verify header and 4 core legal pillars
+      expect(find.text('Tıbbi Bilgilendirme & Kullanım'), findsOneWidget);
+      expect(find.text('Gizlilik, Güvenlik ve Yasal Sorumluluk'), findsOneWidget);
+      expect(find.text('1. Tıbbi Sorumluluk Reddi'), findsOneWidget);
+      expect(find.text('2. Gizlilik & KVKK / GDPR (Cihaz İçi Saklama)'), findsOneWidget);
+      expect(find.text('3. Güvenlik & Veri Kontrolü'), findsOneWidget);
+      expect(find.text('4. Kullanım Şartları ve Üye Sorumluluğu'), findsOneWidget);
+
+      // Verify Accept button is disabled initially
+      final acceptBtn = tester.widget<FilledButton>(find.byKey(const Key('disclaimer_accept_button')));
+      expect(acceptBtn.onPressed, isNull);
+
+      // Toggle consent checkbox
+      await tester.tap(find.byKey(const Key('disclaimer_consent_checkbox')));
+      await tester.pumpAndSettle();
+
+      // Accept button is now enabled
+      final acceptBtnEnabled = tester.widget<FilledButton>(find.byKey(const Key('disclaimer_accept_button')));
+      expect(acceptBtnEnabled.onPressed, isNotNull);
+
+      // Tap Accept
+      await tester.tap(find.byKey(const Key('disclaimer_accept_button')));
+      await tester.pumpAndSettle();
+
+      expect(dialogResult, isTrue);
+    });
+
+    testWidgets('DisclaimerDialog reject button returns false', (tester) async {
+      bool? dialogResult;
+
+      await tester.pumpWidget(
+        _wrap(
+          Builder(
+            builder: (ctx) => ElevatedButton(
+              onPressed: () async {
+                dialogResult = await DisclaimerDialog.show(ctx, initiallyAgreed: false);
+              },
+              child: const Text('Open Disclaimer'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Disclaimer'));
+      await tester.pumpAndSettle();
+
+      // Tap Reject / Cancel button
+      await tester.tap(find.byKey(const Key('disclaimer_reject_button')));
+      await tester.pumpAndSettle();
+
+      expect(dialogResult, isFalse);
+    });
+  });
 }
+
