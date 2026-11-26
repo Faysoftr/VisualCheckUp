@@ -9,9 +9,9 @@
 	<key>CFBundleDisplayName</key>
 	<string>VisualCheckUp</string>
 	<key>NSCameraUsageDescription</key>
-	<string>VisualCheckUp, göz, tırnak, dil, yüz, idrar ve dışkı renk ön değerlendirmesi yapabilmek için kameranıza erişim ister. Görüntüler cihazınızda işlenir.</string>
+	<string>VisualCheckUp, göz, tırnak, dil, yüz, cilt lezyonları, idrar ve dışkı renk ön değerlendirmesi yapabilmek için kameranıza erişim ister. Görüntüler yalnızca cihazınızda işlenir.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>VisualCheckUp, galerinizden seçtiğiniz fotoğraf üzerinde ön değerlendirme yapabilmek için fotoğraf arşivinize erişim ister.</string>
+	<string>VisualCheckUp, galerinizden seçtiğiniz fotoğraf üzerinde görsel ve cilt ön değerlendirmesi yapabilmek için fotoğraf arşivinize erişim ister.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

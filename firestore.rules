@@ -1,0 +1,689 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model (VisualCheckUp Opt-In Personal Cloud Backup)
+// ===============================================================
+//
+// Strictly per-user private cloud backup. NO public reads or writes,
+// NO cross-user access. All collections are scoped under `users/{userId}`
+// and require Firebase Authentication with `request.auth.uid == userId`.
+//
+// 1. Collection: users/{userId}
+//    Document ID: Firebase Auth UID
+//    Fields:
+//      - cloudBackupEnabled: bool (required) - opt-in backup toggle
+//      - updatedAt: timestamp | string (required, ISO-8601 <= 40 chars if string)
+//      - appVersion: string (optional, 1..64 chars)
+//
+// 2. Collection: users/{userId}/labReports/{reportId}
+//    Document ID: LabReportRecord.id
+//    Fields:
+//      - id: string (required, immutable, == reportId, 1..128 chars)
+//      - title: string (required, 1..200 chars)
+//      - reportDate: string (required, ISO-8601 date string, <= 40 chars)
+//      - source: string (required, enum: manual | pastedText | photoScan | pdfUpload)
+//      - items: list (required, max 120 lab test item maps)
+//      - overallSummary: string (required, <= 5000 chars)
+//      - suggestedSpecialty: string (required, <= 300 chars)
+//      - rawReportText: string (optional, <= 50000 chars)
+//      - notes: string (optional, <= 5000 chars)
+//      - hospitalDiagnosis: string (optional, <= 5000 chars)
+//      - userComplaintNote: string (optional, <= 5000 chars)
+//      - attachmentFileName: string (optional, <= 255 chars)
+//      - attachmentMimeType: string (optional, <= 128 chars)
+//      - contextualInterpretation: string (optional, <= 10000 chars)
+//      - followUpQuestions: list (optional, max 30 items)
+//      - updatedAt: timestamp | string (optional, ISO-8601 <= 40 chars if string)
+//
+// 3. Collection: users/{userId}/bloodPressure/{readingId}
+//    Document ID: BloodPressureReading.id
+//    Fields:
+//      - id: string (required, immutable, == readingId, 1..128 chars)
+//      - recordedAt: string (required, ISO-8601 date string, <= 40 chars)
+//      - systolic: number (required, 40..300)
+//      - diastolic: number (required, 20..200)
+//      - pulse: number (optional, 25..250)
+//      - note: string (optional, <= 500 chars)
+//      - updatedAt: timestamp | string (optional, ISO-8601 <= 40 chars if string)
+//
+// 4. Collection: users/{userId}/bloodSugar/{readingId}
+//    Document ID: BloodSugarReading.id
+//    Fields:
+//      - id: string (required, immutable, == readingId, 1..128 chars)
+//      - recordedAt: string (required, ISO-8601 date string, <= 40 chars)
+//      - valueMgDl: number (required, 20..1000)
+//      - measurementType: string (required, enum: fasting | postMeal | random)
+//      - note: string (optional, <= 500 chars)
+//      - updatedAt: timestamp | string (optional, ISO-8601 <= 40 chars if string)
+//
+// 5. Collection: users/{userId}/visualChecks/{checkId}
+//    Document ID: AnalysisResult.id
+//    Fields:
+//      - id: string (required, immutable, == checkId, 1..128 chars)
+//      - category: string (required, enum: eye | nail | tongue | face | skinCondition | urine | stool)
+//      - riskLevel: string (required, enum: normal | attention | urgent)
+//      - summaryTitle: string (required, 1..300 chars)
+//      - summaryDetail: string (required, <= 5000 chars)
+//      - dominantColorValue: int (required, 0..4294967295)
+//      - observations: list (required, max 30 items)
+//      - recommendations: list (required, max 30 items)
+//      - warningFlags: list (required, max 20 items)
+//      - confidence: number (required, 0..1)
+//      - createdAt: string (required, immutable, ISO-8601 date string, <= 40 chars)
+//      - whiteBalanceCalibrated: bool (required)
+//      - lightingNote: string (optional, <= 500 chars)
+//      - baselineDeltaE: number (optional, 0..500)
+//      - baselineComparisonNote: string (optional, <= 1000 chars)
+//      - updatedAt: timestamp | string (optional, ISO-8601 <= 40 chars if string)
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == resource.data.uid;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    function isValidString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isValidOptionalString(data, field, minLen, maxLen) {
+      return !(field in data) ||
+        data[field] == null ||
+        isValidString(data[field], minLen, maxLen);
+    }
+
+    function isValidNumberInRange(val, minVal, maxVal) {
+      return val is number && val >= minVal && val <= maxVal;
+    }
+
+    function isValidOptionalNumberInRange(data, field, minVal, maxVal) {
+      return !(field in data) ||
+        data[field] == null ||
+        isValidNumberInRange(data[field], minVal, maxVal);
+    }
+
+    function isValidList(listVal, maxSize) {
+      return listVal is list && listVal.size() <= maxSize;
+    }
+
+    function isValidOptionalList(data, field, maxSize) {
+      return !(field in data) ||
+        data[field] == null ||
+        isValidList(data[field], maxSize);
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string &&
+        dateStr.size() <= 40 &&
+        dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    function isValidTimestampOrDateString(val) {
+      return val is timestamp || isValidDateString(val);
+    }
+
+    function isValidOptionalTimestampOrDateString(data, field) {
+      return !(field in data) ||
+        data[field] == null ||
+        isValidTimestampOrDateString(data[field]);
+    }
+
+    // ===============================================================
+    // Domain Validators (Called in BOTH create and update rules)
+    // ===============================================================
+
+    function isValidUserBackupMeta(data) {
+      return hasOnlyAllowedFields(['cloudBackupEnabled', 'updatedAt', 'appVersion']) &&
+        hasRequiredFields(['cloudBackupEnabled', 'updatedAt']) &&
+        data.cloudBackupEnabled is bool &&
+        isValidTimestampOrDateString(data.updatedAt) &&
+        isValidOptionalString(data, 'appVersion', 1, 64);
+    }
+
+    function isValidLabReport(data, reportId) {
+      return hasOnlyAllowedFields([
+          'id',
+          'title',
+          'reportDate',
+          'source',
+          'items',
+          'overallSummary',
+          'suggestedSpecialty',
+          'rawReportText',
+          'notes',
+          'hospitalDiagnosis',
+          'userComplaintNote',
+          'attachmentFileName',
+          'attachmentMimeType',
+          'contextualInterpretation',
+          'followUpQuestions',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields([
+          'id',
+          'title',
+          'reportDate',
+          'source',
+          'items',
+          'overallSummary',
+          'suggestedSpecialty'
+        ]) &&
+        isValidString(data.id, 1, 128) &&
+        data.id == reportId &&
+        isValidString(data.title, 1, 200) &&
+        isValidDateString(data.reportDate) &&
+        data.source in ['manual', 'pastedText', 'photoScan', 'pdfUpload'] &&
+        isValidList(data.items, 120) &&
+        isValidString(data.overallSummary, 0, 5000) &&
+        isValidString(data.suggestedSpecialty, 0, 300) &&
+        isValidOptionalString(data, 'rawReportText', 0, 50000) &&
+        isValidOptionalString(data, 'notes', 0, 5000) &&
+        isValidOptionalString(data, 'hospitalDiagnosis', 0, 5000) &&
+        isValidOptionalString(data, 'userComplaintNote', 0, 5000) &&
+        isValidOptionalString(data, 'attachmentFileName', 0, 255) &&
+        isValidOptionalString(data, 'attachmentMimeType', 0, 128) &&
+        isValidOptionalString(data, 'contextualInterpretation', 0, 10000) &&
+        isValidOptionalList(data, 'followUpQuestions', 30) &&
+        isValidOptionalTimestampOrDateString(data, 'updatedAt');
+    }
+
+    function isValidBloodPressure(data, readingId) {
+      return hasOnlyAllowedFields([
+          'id',
+          'recordedAt',
+          'systolic',
+          'diastolic',
+          'pulse',
+          'note',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields(['id', 'recordedAt', 'systolic', 'diastolic']) &&
+        isValidString(data.id, 1, 128) &&
+        data.id == readingId &&
+        isValidDateString(data.recordedAt) &&
+        isValidNumberInRange(data.systolic, 40, 300) &&
+        isValidNumberInRange(data.diastolic, 20, 200) &&
+        isValidOptionalNumberInRange(data, 'pulse', 25, 250) &&
+        isValidOptionalString(data, 'note', 0, 500) &&
+        isValidOptionalTimestampOrDateString(data, 'updatedAt');
+    }
+
+    function isValidBloodSugar(data, readingId) {
+      return hasOnlyAllowedFields([
+          'id',
+          'recordedAt',
+          'valueMgDl',
+          'measurementType',
+          'note',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields(['id', 'recordedAt', 'valueMgDl', 'measurementType']) &&
+        isValidString(data.id, 1, 128) &&
+        data.id == readingId &&
+        isValidDateString(data.recordedAt) &&
+        isValidNumberInRange(data.valueMgDl, 20, 1000) &&
+        data.measurementType in ['fasting', 'postMeal', 'random'] &&
+        isValidOptionalString(data, 'note', 0, 500) &&
+        isValidOptionalTimestampOrDateString(data, 'updatedAt');
+    }
+
+    function isValidVisualCheck(data, checkId) {
+      return hasOnlyAllowedFields([
+          'id',
+          'category',
+          'riskLevel',
+          'summaryTitle',
+          'summaryDetail',
+          'dominantColorValue',
+          'observations',
+          'recommendations',
+          'warningFlags',
+          'confidence',
+          'createdAt',
+          'whiteBalanceCalibrated',
+          'lightingNote',
+          'baselineDeltaE',
+          'baselineComparisonNote',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields([
+          'id',
+          'category',
+          'riskLevel',
+          'summaryTitle',
+          'summaryDetail',
+          'dominantColorValue',
+          'observations',
+          'recommendations',
+          'warningFlags',
+          'confidence',
+          'createdAt',
+          'whiteBalanceCalibrated'
+        ]) &&
+        isValidString(data.id, 1, 128) &&
+        data.id == checkId &&
+        data.category in ['eye', 'nail', 'tongue', 'face', 'skinCondition', 'urine', 'stool'] &&
+        data.riskLevel in ['normal', 'attention', 'urgent'] &&
+        isValidString(data.summaryTitle, 1, 300) &&
+        isValidString(data.summaryDetail, 0, 5000) &&
+        data.dominantColorValue is int &&
+        data.dominantColorValue >= 0 &&
+        data.dominantColorValue <= 4294967295 &&
+        isValidList(data.observations, 30) &&
+        isValidList(data.recommendations, 30) &&
+        isValidList(data.warningFlags, 20) &&
+        isValidNumberInRange(data.confidence, 0, 1) &&
+        isValidDateString(data.createdAt) &&
+        data.whiteBalanceCalibrated is bool &&
+        isValidOptionalString(data, 'lightingNote', 0, 500) &&
+        isValidOptionalNumberInRange(data, 'baselineDeltaE', 0, 500) &&
+        isValidOptionalString(data, 'baselineComparisonNote', 0, 1000) &&
+        isValidOptionalTimestampOrDateString(data, 'updatedAt');
+    }
+
+    // ===============================================================
+    // Per-User Private Backup Collections
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) &&
+        uidUnchanged() &&
+        isValidUserBackupMeta(request.resource.data);
+      allow update: if isOwner(userId) &&
+        uidNotModified() &&
+        isValidUserBackupMeta(request.resource.data);
+      allow delete: if isOwner(userId);
+
+      match /labReports/{reportId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidLabReport(request.resource.data, reportId);
+        allow update: if isOwner(userId) &&
+          isValidLabReport(request.resource.data, reportId) &&
+          areImmutableFieldsUnchanged(['id']);
+        allow delete: if isOwner(userId);
+      }
+
+      match /bloodPressure/{readingId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidBloodPressure(request.resource.data, readingId);
+        allow update: if isOwner(userId) &&
+          isValidBloodPressure(request.resource.data, readingId) &&
+          areImmutableFieldsUnchanged(['id']);
+        allow delete: if isOwner(userId);
+      }
+
+      match /bloodSugar/{readingId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidBloodSugar(request.resource.data, readingId);
+        allow update: if isOwner(userId) &&
+          isValidBloodSugar(request.resource.data, readingId) &&
+          areImmutableFieldsUnchanged(['id']);
+        allow delete: if isOwner(userId);
+      }
+
+      match /visualChecks/{checkId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+          isValidVisualCheck(request.resource.data, checkId);
+        allow update: if isOwner(userId) &&
+          isValidVisualCheck(request.resource.data, checkId) &&
+          areImmutableFieldsUnchanged(['id', 'createdAt']);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ===============================================================
+    // Opt-In Global Health Community Collections
+    // Strictly isolated from private medical backup (`users/{userId}`).
+    // ===============================================================
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.email == 'f.s.yuksek@gmail.com';
+    }
+
+    function isValidCommunityProfile(data, userId) {
+      return hasOnlyAllowedFields([
+          'uid',
+          'displayName',
+          'nickname',
+          'photoUrl',
+          'photoKey',
+          'countryCode',
+          'city',
+          'languageCode',
+          'healthGoals',
+          'chronicConditions',
+          'customChronicCondition',
+          'showChronicConditions',
+          'currentMusicUrl',
+          'currentMusicTitle',
+          'musicLikedBy',
+          'musicLikesCount',
+          'showSocials',
+          'instagram',
+          'twitterX',
+          'tiktok',
+          'facebook',
+          'snapchat',
+          'isOnline',
+          'showOnlineStatus',
+          'lastActiveAt',
+          'isVerified',
+          'isSuspended',
+          'moderationStatus',
+          'bio',
+          'dailyFocus',
+          'hideRealName',
+          'hidePhoto',
+          'showBio',
+          'discoverable',
+          'allowMessages',
+          'requireMessageApproval',
+          'onlyFriendsCanMessage',
+          'suspensionReason',
+          'mood',
+          'streakDays',
+          'birthMonth',
+          'birthDay',
+          'likedBy',
+          'likesCount',
+          'updatedAt'
+        ]) &&
+        hasRequiredFields(['uid', 'displayName', 'discoverable', 'allowMessages']) &&
+        data.uid == userId &&
+        isValidString(data.displayName, 1, 80) &&
+        isValidOptionalString(data, 'nickname', 0, 40) &&
+        isValidOptionalString(data, 'photoUrl', 0, 1000) &&
+        isValidOptionalString(data, 'photoKey', 0, 300) &&
+        isValidOptionalString(data, 'countryCode', 2, 10) &&
+        isValidOptionalString(data, 'city', 0, 80) &&
+        isValidOptionalString(data, 'languageCode', 2, 10) &&
+        isValidOptionalList(data, 'healthGoals', 12) &&
+        isValidOptionalList(data, 'chronicConditions', 15) &&
+        isValidOptionalString(data, 'customChronicCondition', 0, 120) &&
+        isValidOptionalString(data, 'currentMusicUrl', 0, 500) &&
+        isValidOptionalString(data, 'currentMusicTitle', 0, 140) &&
+        isValidOptionalString(data, 'instagram', 0, 120) &&
+        isValidOptionalString(data, 'twitterX', 0, 120) &&
+        isValidOptionalString(data, 'tiktok', 0, 120) &&
+        isValidOptionalString(data, 'facebook', 0, 120) &&
+        isValidOptionalString(data, 'snapchat', 0, 120) &&
+        isValidOptionalString(data, 'moderationStatus', 0, 64) &&
+        isValidOptionalString(data, 'bio', 0, 500) &&
+        isValidOptionalString(data, 'dailyFocus', 0, 180) &&
+        isValidOptionalTimestampOrDateString(data, 'lastActiveAt') &&
+        data.discoverable is bool &&
+        data.allowMessages is bool;
+    }
+
+    function isLikeOnlyUpdate() {
+      return isAuthenticated() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'likesCount']) &&
+          request.resource.data.likedBy is list &&
+          request.resource.data.likesCount is int &&
+          request.resource.data.likesCount >= 0) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['musicLikedBy', 'musicLikesCount']) &&
+          request.resource.data.musicLikedBy is list &&
+          request.resource.data.musicLikesCount is int &&
+          request.resource.data.musicLikesCount >= 0)
+      );
+    }
+
+    match /community_profiles/{userId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        (resource.data.discoverable == true || isOwner(userId)));
+      allow create: if isOwner(userId) &&
+        isValidCommunityProfile(request.resource.data, userId) &&
+        !('isVerified' in request.resource.data && request.resource.data.isVerified == true) &&
+        !('isSuspended' in request.resource.data && request.resource.data.isSuspended == true) &&
+        !('moderationStatus' in request.resource.data);
+      allow update: if isAdmin() ||
+        (isOwner(userId) &&
+          isValidCommunityProfile(request.resource.data, userId) &&
+          areImmutableFieldsUnchanged(['uid', 'isVerified', 'isSuspended', 'moderationStatus'])) ||
+        isLikeOnlyUpdate();
+      allow delete: if isOwner(userId) || isAdmin();
+
+      match /musicListeners/{listenerUid} {
+        allow read: if isAuthenticated();
+        allow create, update: if isOwner(listenerUid) &&
+          request.resource.data.userId == request.auth.uid &&
+          isValidString(request.resource.data.userName, 1, 80) &&
+          request.resource.data.listenCount is int &&
+          request.resource.data.listenCount >= 1 &&
+          isValidOptionalString(request.resource.data, 'musicUrl', 0, 500);
+        allow delete: if isOwner(userId) || isOwner(listenerUid) || isAdmin();
+      }
+    }
+
+    match /community_safety/{userId} {
+      allow read, write: if isOwner(userId);
+      match /upload_events/{eventId} {
+        allow read, write: if false; // Managed exclusively by Cloud Functions
+      }
+    }
+
+    match /community_conversations/{chatId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        request.auth.uid in resource.data.members);
+      allow create: if isAuthenticated() &&
+        request.auth.uid in request.resource.data.members &&
+        request.resource.data.members is list &&
+        request.resource.data.members.size() == 2;
+      allow update: if isAuthenticated() &&
+        request.auth.uid in resource.data.members &&
+        areImmutableFieldsUnchanged(['chatId', 'members', 'requesterId']);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members;
+        allow create: if isAuthenticated() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members &&
+          isValidOptionalString(request.resource.data, 'text', 0, 2000) &&
+          isValidOptionalString(request.resource.data, 'imageUrl', 0, 1000) &&
+          isValidOptionalString(request.resource.data, 'imageKey', 0, 300);
+        allow update: if isAuthenticated() &&
+          request.auth.uid in get(/databases/$(database)/documents/community_conversations/$(chatId)).data.members &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'deletedFor']);
+        allow delete: if isAuthenticated() &&
+          resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    match /community_reports/{reportId} {
+      allow create: if isAuthenticated() &&
+        request.resource.data.reporterId == request.auth.uid &&
+        isValidString(request.resource.data.targetType, 1, 32) &&
+        isValidString(request.resource.data.targetId, 1, 200) &&
+        isValidString(request.resource.data.reason, 1, 64) &&
+        isValidOptionalString(request.resource.data, 'note', 0, 1000);
+      allow read, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ===============================================================
+    // Admin-Managed Global Announcements & Health Promotions
+    // ===============================================================
+
+    match /app_announcements/{announcementId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /app_promotions/{promotionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ===============================================================
+    // VisualCheckUp Pro Subscriptions & Verified Doctors Directory
+    // ===============================================================
+
+    match /subscriptions/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      // Subscriptions must only be granted/updated server-side (verified IAP / Admin),
+      // never directly by the client to prevent self-granting isPro = true.
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /doctor_profiles/{doctorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /doctor_applications/{doctorId} {
+      allow read: if isOwner(doctorId) || isAdmin();
+      allow create, update: if isOwner(doctorId) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.isVerified == false &&
+        request.resource.data.status == 'pending';
+      allow update, delete: if isAdmin();
+    }
+
+    match /doctor_followups/{requestId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        (resource.data.patientUid == request.auth.uid ||
+         resource.data.doctorUid == request.auth.uid));
+      allow create: if isAuthenticated() &&
+        request.resource.data.patientUid == request.auth.uid &&
+        isValidString(request.resource.data.doctorUid, 1, 128);
+      allow update: if isAdmin() || (isAuthenticated() &&
+        (resource.data.doctorUid == request.auth.uid ||
+         resource.data.patientUid == request.auth.uid));
+      allow delete: if isAdmin();
+    }
+
+    // ===============================================================
+    // Social Extras: Friends, Support Groups, Wellness Wall, Appeals,
+    // Admin Popups & Push Queue
+    // ===============================================================
+
+    match /community_friendships/{pairId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        request.auth.uid in resource.data.members);
+      allow create: if isAuthenticated() &&
+        request.resource.data.requesterId == request.auth.uid &&
+        request.resource.data.members is list &&
+        request.resource.data.members.size() == 2 &&
+        request.auth.uid in request.resource.data.members;
+      allow update: if isAuthenticated() &&
+        request.auth.uid in resource.data.members &&
+        areImmutableFieldsUnchanged(['pairId', 'members', 'requesterId']);
+      allow delete: if isAdmin() || (isAuthenticated() &&
+        request.auth.uid in resource.data.members);
+    }
+
+    match /support_groups/{groupId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        request.resource.data.creatorUid == request.auth.uid &&
+        isValidString(request.resource.data.name, 1, 120) &&
+        isValidOptionalString(request.resource.data, 'description', 0, 500);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        resource.data.creatorUid == request.auth.uid ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberUids'])
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() &&
+        resource.data.creatorUid == request.auth.uid);
+      match /messages/{msgId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() &&
+          request.resource.data.senderUid == request.auth.uid &&
+          isValidString(request.resource.data.text, 1, 2000);
+        allow update: if false;
+        allow delete: if isAdmin() || (isAuthenticated() &&
+          resource.data.senderUid == request.auth.uid);
+      }
+    }
+
+    match /wellness_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        request.resource.data.authorUid == request.auth.uid &&
+        isValidString(request.resource.data.title, 1, 180) &&
+        isValidString(request.resource.data.body, 1, 3000);
+      allow update: if isAdmin() || (isAuthenticated() && (
+        resource.data.authorUid == request.auth.uid ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likedBy', 'commentCount', 'hasDoctorReply'])
+      ));
+      allow delete: if isAdmin() || (isAuthenticated() &&
+        resource.data.authorUid == request.auth.uid);
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() &&
+          request.resource.data.authorUid == request.auth.uid &&
+          isValidString(request.resource.data.text, 1, 1500);
+        allow update: if false;
+        allow delete: if isAdmin() || (isAuthenticated() &&
+          resource.data.authorUid == request.auth.uid);
+      }
+    }
+
+    match /moderation_appeals/{appealId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.status == 'pending';
+      allow update, delete: if isAdmin();
+    }
+
+    match /app_popups/{popupId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /admin_push_queue/{pushId} {
+      allow read, write: if isAdmin();
+    }
+
+    // ===============================================================
+    // Default Deny Everything Else
+    // ===============================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
