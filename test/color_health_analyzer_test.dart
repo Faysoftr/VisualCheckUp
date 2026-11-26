@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:healthcheck/features/checkup/data/color_health_analyzer.dart';
-import 'package:healthcheck/features/checkup/domain/analysis_result.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/data/color_health_analyzer.dart';
+import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 void main() {
   final analyzer = ColorHealthAnalyzer();

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "913513035294",
+    "project_id": "visualcheckup",
+    "storage_bucket": "visualcheckup.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913513035294:android:b8c187ca7545b84f76200f",
+        "android_client_info": {
+          "package_name": "com.faysoft.visualcheckup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "913513035294-lkrrtqqbjiekhc6ed8mllcdpegu89bcq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faysoft.visualcheckup",
+            "certificate_hash": "d1a63909360e52d2d058e33446b28f282da9a3ae"
+          }
+        },
+        {
+          "client_id": "913513035294-j15rpm5rsldng6rm60gse2cf660ighmb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIPHqE6-Te1q9x4MuOCaL0rxSslfqDgjE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "913513035294-j15rpm5rsldng6rm60gse2cf660ighmb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "913513035294-j8khu3gljmh61fe5kbup2b1jkbt2u9ab.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.faysoft.visualcheckup"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

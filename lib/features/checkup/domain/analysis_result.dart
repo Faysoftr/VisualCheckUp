@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthcheck/features/checkup/domain/check_category.dart';
+import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 enum RiskLevel {
   normal,
@@ -62,6 +62,13 @@ class AnalysisResult {
     required this.warningFlags,
     required this.confidence,
     required this.createdAt,
+    this.whiteBalanceCalibrated = false,
+    this.lightingNote,
+    this.baselineDeltaE,
+    this.baselineComparisonNote,
+    this.imagePath,
+    this.matchedFindingIds = const [],
+    this.clinicalMetrics = const {},
   });
 
   final String id;
@@ -75,8 +82,63 @@ class AnalysisResult {
   final List<String> warningFlags;
   final double confidence;
   final DateTime createdAt;
+  final bool whiteBalanceCalibrated;
+  final String? lightingNote;
+  final double? baselineDeltaE;
+  final String? baselineComparisonNote;
+  final String? imagePath;
+
+  /// Reference finding IDs from [ModuleReferenceCatalog] matched by either
+  /// on-device CV/colorimetry or Vision AI, enabling side-by-side visual
+  /// reference comparison on [ResultScreen].
+  final List<String> matchedFindingIds;
+
+  /// Objective quantitative biomarkers (e.g. Fitzpatrick ITA°, Erythema Index,
+  /// ABCDE scores, fissure ratio, capillary ratio) shown on [ResultScreen]
+  /// and exported to Doctor Visit Reports.
+  final Map<String, String> clinicalMetrics;
 
   Color get dominantColor => Color(dominantColorValue);
+
+  AnalysisResult copyWith({
+    RiskLevel? riskLevel,
+    String? summaryTitle,
+    String? summaryDetail,
+    List<String>? observations,
+    List<String>? recommendations,
+    List<String>? warningFlags,
+    double? confidence,
+    bool? whiteBalanceCalibrated,
+    String? lightingNote,
+    double? baselineDeltaE,
+    String? baselineComparisonNote,
+    String? imagePath,
+    List<String>? matchedFindingIds,
+    Map<String, String>? clinicalMetrics,
+  }) {
+    return AnalysisResult(
+      id: id,
+      category: category,
+      riskLevel: riskLevel ?? this.riskLevel,
+      summaryTitle: summaryTitle ?? this.summaryTitle,
+      summaryDetail: summaryDetail ?? this.summaryDetail,
+      dominantColorValue: dominantColorValue,
+      observations: observations ?? this.observations,
+      recommendations: recommendations ?? this.recommendations,
+      warningFlags: warningFlags ?? this.warningFlags,
+      confidence: confidence ?? this.confidence,
+      createdAt: createdAt,
+      whiteBalanceCalibrated:
+          whiteBalanceCalibrated ?? this.whiteBalanceCalibrated,
+      lightingNote: lightingNote ?? this.lightingNote,
+      baselineDeltaE: baselineDeltaE ?? this.baselineDeltaE,
+      baselineComparisonNote:
+          baselineComparisonNote ?? this.baselineComparisonNote,
+      imagePath: imagePath ?? this.imagePath,
+      matchedFindingIds: matchedFindingIds ?? this.matchedFindingIds,
+      clinicalMetrics: clinicalMetrics ?? this.clinicalMetrics,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -91,10 +153,25 @@ class AnalysisResult {
       'warningFlags': warningFlags,
       'confidence': confidence,
       'createdAt': createdAt.toIso8601String(),
+      'whiteBalanceCalibrated': whiteBalanceCalibrated,
+      if (lightingNote != null) 'lightingNote': lightingNote,
+      if (baselineDeltaE != null) 'baselineDeltaE': baselineDeltaE,
+      if (baselineComparisonNote != null)
+        'baselineComparisonNote': baselineComparisonNote,
+      if (imagePath != null) 'imagePath': imagePath,
+      if (matchedFindingIds.isNotEmpty) 'matchedFindingIds': matchedFindingIds,
+      if (clinicalMetrics.isNotEmpty) 'clinicalMetrics': clinicalMetrics,
     };
   }
 
   factory AnalysisResult.fromJson(Map<String, dynamic> json) {
+    final rawMetrics = json['clinicalMetrics'];
+    final metrics = <String, String>{};
+    if (rawMetrics is Map) {
+      for (final entry in rawMetrics.entries) {
+        metrics[entry.key.toString()] = entry.value.toString();
+      }
+    }
     return AnalysisResult(
       id: json['id'] as String,
       category: CheckCategoryX.fromId(json['category'] as String),
@@ -108,6 +185,17 @@ class AnalysisResult {
       warningFlags: (json['warningFlags'] as List<dynamic>).cast<String>(),
       confidence: (json['confidence'] as num).toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      whiteBalanceCalibrated:
+          (json['whiteBalanceCalibrated'] as bool?) ?? false,
+      lightingNote: json['lightingNote'] as String?,
+      baselineDeltaE: (json['baselineDeltaE'] as num?)?.toDouble(),
+      baselineComparisonNote: json['baselineComparisonNote'] as String?,
+      imagePath: json['imagePath'] as String?,
+      matchedFindingIds: (json['matchedFindingIds'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      clinicalMetrics: metrics,
     );
   }
 }
