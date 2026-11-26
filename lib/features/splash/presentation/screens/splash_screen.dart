@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 
 /// Animated launch splash screen with a sunlit green park background
-/// (healthy elderly couple) and the centered VisualCheckUp logo glowing
+/// (healthy middle-aged couple in their 40s) and the centered VisualCheckUp logo glowing
 /// with a pulsing neon emerald/mint aura.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -71,8 +71,8 @@ class _SplashScreenState extends State<SplashScreen>
               alignment: Alignment.bottomCenter,
             ),
             // Soft cinematic gradient scrim: darker around the neon logo for
-            // crisp contrast, gentler at the bottom so the happy elderly couple
-            // in the sunlit green park remains clearly visible.
+            // crisp contrast, gentler at the bottom so the happy middle-aged couple
+            // in their 40s in the sunlit green park remains clearly visible.
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
