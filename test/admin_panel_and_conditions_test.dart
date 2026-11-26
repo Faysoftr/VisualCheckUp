@@ -492,6 +492,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      final settingsAccordion = find.byKey(const Key('drawer_group_settings'));
+      if (settingsAccordion.evaluate().isNotEmpty) {
+        await tester.scrollUntilVisible(
+          settingsAccordion,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(settingsAccordion);
+        await tester.pumpAndSettle();
+      }
       final adminTile = find.byKey(const Key('drawer_admin_panel_tile'));
       await tester.scrollUntilVisible(
         adminTile,

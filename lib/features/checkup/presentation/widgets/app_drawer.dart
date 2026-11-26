@@ -146,7 +146,7 @@ class AppDrawer extends StatelessWidget {
           ).nativeName;
 
     return Drawer(
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.none,
       child: HealthDrawerBackground(
         child: SafeArea(
           child: Column(
@@ -463,7 +463,7 @@ class AppDrawer extends StatelessWidget {
                       icon: Icons.visibility_outlined,
                       accentColor: AppTheme.primaryTeal,
                       badgeText: '${nonSkinCategories.length + 1}',
-                      initiallyExpanded: true,
+                      initiallyExpanded: false,
                       children: [
                         for (final category in nonSkinCategories)
                           if (onOpenCategory != null)
@@ -709,7 +709,7 @@ class AppDrawer extends StatelessWidget {
                       icon: Icons.settings_outlined,
                       accentColor: const Color(0xFF8B5CF6),
                       badgeText: (isAdmin && onOpenAdminPanel != null) ? '6' : '5',
-                      initiallyExpanded: isAdmin && onOpenAdminPanel != null,
+                      initiallyExpanded: false,
                       children: [
                         if (isAdmin && onOpenAdminPanel != null)
                           _DrawerTile(

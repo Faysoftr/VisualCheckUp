@@ -4,6 +4,7 @@ import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/health_drawer_background.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
@@ -151,6 +152,13 @@ class _HomeScreenState extends State<HomeScreen> {
         widget.medicationRepository ?? MedicationReminderRepository();
     _dietRepository = widget.dietRepository ?? DietRepository();
     _bootstrap();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(const AssetImage(HealthDrawerBackground.lightAssetPath), context);
+    precacheImage(const AssetImage(HealthDrawerBackground.darkAssetPath), context);
   }
 
   Future<void> _bootstrap() async {

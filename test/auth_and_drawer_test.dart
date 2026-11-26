@@ -125,6 +125,12 @@ void main() {
       expect(find.byKey(const ValueKey<String>('drawer_bg_light')), findsOneWidget);
       expect(find.text('Zeynep Kaya'), findsOneWidget);
       expect(find.text('Apple Hesabı'), findsOneWidget);
+
+      // Expand Visual Checks group (starts closed by default)
+      final visualAccordion = find.byKey(const Key('drawer_group_visual'));
+      await tester.tap(visualAccordion);
+      await tester.pumpAndSettle();
+
       expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
       expect(find.text('Dil'), findsAtLeastNWidgets(1));
       expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
