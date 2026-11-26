@@ -932,5 +932,16 @@
   "commGroupsDescHint": "Groepsbeschrijving en onderwerp",
   "commGroupsEmpty": "Geen steungroepen gevonden voor dit filter.",
   "commToggleOnlyFriendsMsg": "Alleen vrienden kunnen mij berichten sturen",
-  "commOpenCommunityCta": "Community"
+  "commOpenCommunityCta": "Community",
+  "sfbGoToProfile": "Naar profiel",
+  "sfbMyMessages": "Mijn berichten",
+  "sfbMyFriends": "Mijn vrienden",
+  "sfbSeeAll": "Alles bekijken",
+  "sfbNewMembersTitle": "Nieuwe leden",
+  "sfbActiveMembersTitle": "Meest actieve leden",
+  "sfbLatestPostsTitle": "Laatste berichten",
+  "sfbViewDetails": "Details bekijken",
+  "sfbAdminBadge": "ADMIN",
+  "sfbAdminConsoleTitle": "SNELLE ADMINCONSOLE",
+  "sfbAdminFounderBanner": "PLATFORMOPRICHTER & SYSTEEMBEHEERDER"
 }

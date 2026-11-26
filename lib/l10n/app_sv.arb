@@ -932,5 +932,16 @@
   "commGroupsDescHint": "Gruppbeskrivning och fokus",
   "commGroupsEmpty": "Inga stödgrupper hittades för detta filter.",
   "commToggleOnlyFriendsMsg": "Endast vänner kan skicka meddelanden till mig",
-  "commOpenCommunityCta": "Gemenskap"
+  "commOpenCommunityCta": "Gemenskap",
+  "sfbGoToProfile": "Gå till profil",
+  "sfbMyMessages": "Mina meddelanden",
+  "sfbMyFriends": "Mina vänner",
+  "sfbSeeAll": "Visa alla",
+  "sfbNewMembersTitle": "Nya medlemmar",
+  "sfbActiveMembersTitle": "Mest aktiva medlemmar",
+  "sfbLatestPostsTitle": "Senaste inläggen",
+  "sfbViewDetails": "Visa detaljer",
+  "sfbAdminBadge": "ADMIN",
+  "sfbAdminConsoleTitle": "SNABB ADMINKONSOL",
+  "sfbAdminFounderBanner": "PLATTFORMSGRUNDARE & SYSTEMADMIN"
 }

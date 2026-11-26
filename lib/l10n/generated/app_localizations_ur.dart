@@ -3045,4 +3045,37 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'کمیونٹی';
+
+  @override
+  String get sfbGoToProfile => 'پروفائل دیکھیں';
+
+  @override
+  String get sfbMyMessages => 'میرے پیغامات';
+
+  @override
+  String get sfbMyFriends => 'میرے دوست';
+
+  @override
+  String get sfbSeeAll => 'سب دیکھیں';
+
+  @override
+  String get sfbNewMembersTitle => 'نئے اراکین';
+
+  @override
+  String get sfbActiveMembersTitle => 'سب سے فعال اراکین';
+
+  @override
+  String get sfbLatestPostsTitle => 'تازہ ترین پوسٹس';
+
+  @override
+  String get sfbViewDetails => 'تفصیل دیکھیں';
+
+  @override
+  String get sfbAdminBadge => 'ایڈمن';
+
+  @override
+  String get sfbAdminConsoleTitle => 'فوری ایڈمن کنسول';
+
+  @override
+  String get sfbAdminFounderBanner => 'پلیٹ فارم بانی اور سسٹم ایڈمن';
 }

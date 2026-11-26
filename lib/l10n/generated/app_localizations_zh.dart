@@ -2974,4 +2974,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => '社区';
+
+  @override
+  String get sfbGoToProfile => '前往个人主页';
+
+  @override
+  String get sfbMyMessages => '我的消息';
+
+  @override
+  String get sfbMyFriends => '我的好友';
+
+  @override
+  String get sfbSeeAll => '查看全部';
+
+  @override
+  String get sfbNewMembersTitle => '最新成员';
+
+  @override
+  String get sfbActiveMembersTitle => '最活跃成员';
+
+  @override
+  String get sfbLatestPostsTitle => '最新动态';
+
+  @override
+  String get sfbViewDetails => '查看详情';
+
+  @override
+  String get sfbAdminBadge => '管理员';
+
+  @override
+  String get sfbAdminConsoleTitle => '快速管理控制台';
+
+  @override
+  String get sfbAdminFounderBanner => '平台创始人与系统管理员';
 }

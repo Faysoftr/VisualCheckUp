@@ -7,7 +7,9 @@ import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/safety/content_safety_service.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/home_social_showcase.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
@@ -28,6 +30,7 @@ class SocialProfileView extends StatefulWidget {
     this.photoPicker,
     this.urlLauncher,
     this.onProfileChanged,
+    this.onOpenAdminPanel,
   });
 
   final AuthUser currentUser;
@@ -36,6 +39,7 @@ class SocialProfileView extends StatefulWidget {
   final CommunityPhotoPicker? photoPicker;
   final CommunityUrlLauncher? urlLauncher;
   final VoidCallback? onProfileChanged;
+  final VoidCallback? onOpenAdminPanel;
 
   @override
   State<SocialProfileView> createState() => _SocialProfileViewState();
@@ -772,6 +776,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final isAdmin = AdminUtils.isAdmin(
+      email: widget.currentUser.email,
+      uid: widget.currentUser.id,
+    );
     final acceptedFriendsCount = _friendships
         .where((f) => f.status == FriendshipStatus.accepted)
         .length;
@@ -786,301 +794,440 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       key: const Key('comm_my_profile_showcase_list'),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 36),
       children: [
-        // 1. Social Cover + Overlapping Avatar Card (Social Formula Bank Style!)
-        Card(
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
+        // 1. Social Formula Bank Top Identity Card (Glowing Gradient Border!)
+        SfbGradientBorderCard(
+          gradientColors: const [
+            Color(0xFFFACC15),
+            Color(0xFF14B8A6),
+            Color(0xFF38BDF8),
+          ],
+          glowColor: const Color(0xFF14B8A6),
+          borderRadius: 24,
+          padding: const EdgeInsets.all(16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 108,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: isDark
-                            ? const [Color(0xFF0E3B3B), Color(0xFF0B6E6E)]
-                            : const [
-                                AppTheme.primaryTeal,
-                                AppTheme.secondaryMint,
-                              ],
-                      ),
-                    ),
-                    child: Align(
-                      alignment: AlignmentDirectional.topEnd,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF4ADE80),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                l10n.commOnlineNow,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -40,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.14),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: CommunityAvatar(
+                  // Left: Gradient-ring avatar + quick preview & online pills
+                  Column(
+                    children: [
+                      SfbGradientRingAvatar(
                         initials: profile.initials,
                         photoUrl: profile.visiblePhotoUrl,
-                        radius: 40,
+                        radius: 36,
+                        ringWidth: 3,
+                        ringColors: const [
+                          Color(0xFFF59E0B),
+                          Color(0xFF10B981),
+                          Color(0xFF06B6D4),
+                        ],
+                        isOnline: profile.isVisibleOnline,
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 48),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            profile.visibleName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            key: const Key('comm_preview_my_profile_btn'),
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: _openPreview,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainerHighest
+                                    .withValues(alpha: 0.75),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.visibility_outlined,
+                                size: 15,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ),
-                        ),
-                        if (profile.isVerified) ...[
-                          const SizedBox(width: 5),
-                          const Icon(
-                            Icons.verified_rounded,
-                            color: Color(0xFF0284C7),
-                            size: 20,
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF22C55E)
+                                  .withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFF22C55E)
+                                    .withValues(alpha: 0.45),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.circle,
+                              size: 10,
+                              color: Color(0xFF22C55E),
+                            ),
                           ),
                         ],
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      [
-                        if (profile.nickname.isNotEmpty) '@${profile.nickname}',
-                        '${profile.country.flag} ${profile.city.isNotEmpty ? '${profile.city} • ' : ''}${profile.country.label}',
-                      ].join('  •  '),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (profile.mood != null) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              profile.mood!.accentColor.withValues(alpha: 0.13),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${profile.mood!.emoji} ${profile.mood!.localizedLabel(l10n)}',
-                          style: TextStyle(
-                            color: profile.mood!.accentColor,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                          ),
-                        ),
                       ),
                     ],
-                    if (profile.bio.trim().isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        profile.bio.trim(),
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                    if (profile.dailyFocus.trim().isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer
-                              .withValues(alpha: 0.42),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                  ),
+                  const SizedBox(width: 14),
+                  // Right: Name, @nickname, ADMIN badge, Mood pill & Stats pills
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Icon(
-                              Icons.wb_sunny_outlined,
-                              size: 16,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                profile.dailyFocus.trim(),
-                                style: theme.textTheme.labelMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
+                                profile.visibleName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ),
+                            if (profile.isVerified) ...[
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.verified_rounded,
+                                color: Color(0xFF0284C7),
+                                size: 18,
+                              ),
+                            ],
+                          ],
+                        ),
+                        Text(
+                          [
+                            if (profile.nickname.isNotEmpty)
+                              '(@${profile.nickname})',
+                            '${profile.country.flag} ${profile.city.isNotEmpty ? profile.city : profile.country.label}',
+                          ].join(' • '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        if (isAdmin) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF59E0B),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.verified_user_rounded,
+                                  size: 13,
+                                  color: Colors.black87,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n.sfbAdminBadge,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                        ],
+                        if (profile.mood != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: profile.mood!.accentColor
+                                    .withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Text(
+                              '${profile.mood!.emoji} ${profile.mood!.localizedLabel(l10n)}',
+                              style: TextStyle(
+                                color: profile.mood!.accentColor,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 11.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                        // Compact Stat Pills (Likes, Friends, Listeners)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            InkWell(
+                              key: const Key('comm_my_profile_likers_btn'),
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: _openLikersSheet,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE11D48)
+                                      .withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: const Color(0xFFE11D48)
+                                        .withValues(alpha: 0.25),
+                                  ),
+                                ),
+                                child: Text(
+                                  '❤️ ${l10n.commLikesCount(profile.likesCount)}',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              key: const Key('comm_my_profile_friends_btn'),
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: _openFriendsSheet,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryTeal
+                                      .withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppTheme.primaryTeal
+                                        .withValues(alpha: 0.25),
+                                  ),
+                                ),
+                                child: Text(
+                                  pendingIncomingCount > 0
+                                      ? '👥 $acceptedFriendsCount (+$pendingIncomingCount)'
+                                      : '👥 $acceptedFriendsCount ${l10n.commFriendsStat}',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              key: const Key('comm_my_profile_listeners_btn'),
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: _openListenersSheet,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF7C3AED)
+                                      .withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: const Color(0xFF7C3AED)
+                                        .withValues(alpha: 0.25),
+                                  ),
+                                ),
+                                child: Text(
+                                  '🎧 ${_myMusicListeners.length}',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-
-                    // 2. 3-Column Interactive Social Stats Strip
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest
-                            .withValues(alpha: 0.42),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _ProfileStatItem(
-                              key: const Key('comm_my_profile_likers_btn'),
-                              icon: Icons.favorite_rounded,
-                              iconColor: const Color(0xFFE11D48),
-                              value: '${profile.likesCount}',
-                              label: l10n.commProfileLikersTitle
-                                  .split(' ')
-                                  .last,
-                              onTap: _openLikersSheet,
-                            ),
-                          ),
-                          Container(
-                            width: 1,
-                            height: 30,
-                            color: colorScheme.outlineVariant,
-                          ),
-                          Expanded(
-                            child: _ProfileStatItem(
-                              key: const Key('comm_my_profile_friends_btn'),
-                              icon: Icons.people_alt_rounded,
-                              iconColor: AppTheme.primaryTeal,
-                              value: pendingIncomingCount > 0
-                                  ? '$acceptedFriendsCount (+$pendingIncomingCount)'
-                                  : '$acceptedFriendsCount',
-                              label: l10n.commFriendsStat,
-                              onTap: _openFriendsSheet,
-                            ),
-                          ),
-                          Container(
-                            width: 1,
-                            height: 30,
-                            color: colorScheme.outlineVariant,
-                          ),
-                          Expanded(
-                            child: _ProfileStatItem(
-                              key: const Key('comm_my_profile_listeners_btn'),
-                              icon: Icons.headphones_rounded,
-                              iconColor: const Color(0xFF7C3AED),
-                              value: '${_myMusicListeners.length}',
-                              label: l10n.commMusicListenersTitle
-                                  .split(' ')
-                                  .last,
-                              onTap: _openListenersSheet,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // 3. Edit Profile + Preview Action Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton.icon(
-                            key: const Key('comm_edit_profile_toggle_btn'),
-                            onPressed: () =>
-                                setState(() => _editingProfile = true),
-                            icon: const Icon(Icons.edit_outlined, size: 18),
-                            label: Text(l10n.commEditProfile),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            key: const Key('comm_preview_my_profile_btn'),
-                            onPressed: _openPreview,
-                            icon: const Icon(
-                              Icons.visibility_outlined,
-                              size: 18,
-                            ),
-                            label: Text(l10n.commPreviewMyProfile),
-                          ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
+                ],
+              ),
+              if (profile.bio.trim().isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  profile.bio.trim(),
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+                ),
+              ],
+              if (profile.dailyFocus.trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.wb_sunny_outlined,
+                        size: 15,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          profile.dailyFocus.trim(),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.tonalIcon(
+                  key: const Key('comm_edit_profile_toggle_btn'),
+                  onPressed: () => setState(() => _editingProfile = true),
+                  icon: const Icon(Icons.edit_rounded, size: 17),
+                  label: Text(l10n.commEditProfile),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
+
+        // 2. Admin Official Identity & Quick Management Console (SFB Style!)
+        if (isAdmin && widget.onOpenAdminPanel != null) ...[
+          SfbGradientBorderCard(
+            key: const Key('profile_admin_console_card'),
+            gradientColors: const [
+              Color(0xFFFACC15),
+              Color(0xFFFB923C),
+              Color(0xFFEC4899),
+            ],
+            glowColor: const Color(0xFFFB923C),
+            borderRadius: 24,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7)
+                        .withValues(alpha: isDark ? 0.16 : 0.9),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.verified_user_rounded,
+                        size: 16,
+                        color: Color(0xFFD97706),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          l10n.sfbAdminFounderBanner,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFFB45309),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  '⚡ ${l10n.sfbAdminConsoleTitle}',
+                  style: const TextStyle(
+                    color: Color(0xFFB45309),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _AdminConsoleShortcut(
+                        icon: Icons.dashboard_rounded,
+                        label: l10n.adminPanelTitle.split(' ').first,
+                        color: const Color(0xFFEC4899),
+                        onTap: widget.onOpenAdminPanel!,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _AdminConsoleShortcut(
+                        icon: Icons.people_alt_rounded,
+                        label: l10n.adminTabUsers,
+                        color: const Color(0xFF06B6D4),
+                        onTap: widget.onOpenAdminPanel!,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _AdminConsoleShortcut(
+                        icon: Icons.campaign_rounded,
+                        label: l10n.adminTabPromotions,
+                        color: const Color(0xFFF59E0B),
+                        onTap: widget.onOpenAdminPanel!,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
 
         // 4. Today's Mood 1-Tap Selector
         Card(
@@ -1825,61 +1972,53 @@ class _SocialProfileViewState extends State<SocialProfileView> {
   }
 }
 
-class _ProfileStatItem extends StatelessWidget {
-  const _ProfileStatItem({
-    super.key,
+class _AdminConsoleShortcut extends StatelessWidget {
+  const _AdminConsoleShortcut({
     required this.icon,
-    required this.iconColor,
-    required this.value,
     required this.label,
+    required this.color,
     required this.onTap,
   });
 
   final IconData icon;
-  final Color iconColor;
-  final String value;
   final String label;
+  final Color color;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 16, color: iconColor),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: color.withValues(alpha: isDark ? 0.18 : 0.1),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: color.withValues(alpha: isDark ? 0.35 : 0.28),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 22, color: color),
+              const SizedBox(height: 5),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
                 ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

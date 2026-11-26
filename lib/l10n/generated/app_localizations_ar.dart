@@ -3038,4 +3038,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'المجتمع';
+
+  @override
+  String get sfbGoToProfile => 'الذهاب للملف الشخصي';
+
+  @override
+  String get sfbMyMessages => 'رسائلي';
+
+  @override
+  String get sfbMyFriends => 'أصدقائي';
+
+  @override
+  String get sfbSeeAll => 'عرض الكل';
+
+  @override
+  String get sfbNewMembersTitle => 'أعضاؤنا الجدد';
+
+  @override
+  String get sfbActiveMembersTitle => 'الأعضاء الأكثر نشاطاً';
+
+  @override
+  String get sfbLatestPostsTitle => 'أحدث المنشورات';
+
+  @override
+  String get sfbViewDetails => 'عرض التفاصيل';
+
+  @override
+  String get sfbAdminBadge => 'مشرف';
+
+  @override
+  String get sfbAdminConsoleTitle => 'لوحة التحكم السريعة';
+
+  @override
+  String get sfbAdminFounderBanner => 'مؤسس المنصة ومدير النظام';
 }

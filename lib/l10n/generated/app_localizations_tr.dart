@@ -3078,4 +3078,37 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'Topluluk';
+
+  @override
+  String get sfbGoToProfile => 'Profile Git';
+
+  @override
+  String get sfbMyMessages => 'Mesajlarım';
+
+  @override
+  String get sfbMyFriends => 'Arkadaşlarım';
+
+  @override
+  String get sfbSeeAll => 'Tümünü Gör';
+
+  @override
+  String get sfbNewMembersTitle => 'Yeni Üyelerimiz';
+
+  @override
+  String get sfbActiveMembersTitle => 'En Aktif Üyeler';
+
+  @override
+  String get sfbLatestPostsTitle => 'Son Paylaşımlar';
+
+  @override
+  String get sfbViewDetails => 'Detayı Gör';
+
+  @override
+  String get sfbAdminBadge => 'ADMİN';
+
+  @override
+  String get sfbAdminConsoleTitle => 'HIZLI YÖNETİM KONSOLU';
+
+  @override
+  String get sfbAdminFounderBanner => 'PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ';
 }

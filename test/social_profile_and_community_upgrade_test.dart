@@ -237,5 +237,95 @@ void main() {
         expect(find.text('Herkese sağlıklı günler!'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'HomeScreen displays Social Formula Bank showcase cards (Daily Tip, Doctors, New Members, Active Members, Latest Posts)',
+      (tester) async {
+        final themeController = ThemeController();
+        addTearDown(themeController.dispose);
+        final historyRepo = HistoryRepository(profileId: 'home_sfb_test');
+        await historyRepo.setDisclaimerAccepted();
+
+        await tester.pumpWidget(
+          _wrapApp(
+            HomeScreen(
+              analyzer: ColorHealthAnalyzer(),
+              historyRepository: historyRepo,
+              alarmScheduler: const NoopMedicationAlarmScheduler(),
+              currentUser: _testUser,
+              themeController: themeController,
+              onSignOut: () {},
+              onDeleteAccount: () {},
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('home_messages_appbar_button')),
+          findsOneWidget,
+        );
+
+        final homeScrollable = find.byType(Scrollable).first;
+        for (final cardKey in const [
+          Key('home_sfb_daily_tip_card'),
+          Key('home_sfb_doctors_card'),
+          Key('home_sfb_new_members_card'),
+          Key('home_sfb_active_members_card'),
+          Key('home_sfb_latest_posts_section'),
+        ]) {
+          await tester.scrollUntilVisible(
+            find.byKey(cardKey),
+            300,
+            scrollable: homeScrollable,
+          );
+          expect(find.byKey(cardKey), findsOneWidget);
+        }
+      },
+    );
+
+    testWidgets(
+      'MyHealthProfileScreen shows ADMIN badge and Quick Management Console for admin accounts',
+      (tester) async {
+        const adminUser = AuthUser(
+          id: 'admin_uid_sfb',
+          displayName: 'Fatih Yüksek',
+          email: 'f.s.yuksek@gmail.com',
+          provider: AuthProviderType.google,
+        );
+        final repo = HealthCommunityRepository(useFirebase: false);
+        await repo.saveMyProfile(
+          HealthCommunityProfile(
+            uid: adminUser.id,
+            displayName: adminUser.displayName,
+            nickname: 'faysoft',
+            countryCode: 'TR',
+            city: 'İstanbul',
+            updatedAt: DateTime(2026, 11, 26),
+          ),
+        );
+
+        var adminOpened = false;
+        await tester.pumpWidget(
+          _wrapApp(
+            MyHealthProfileScreen(
+              currentUser: adminUser,
+              repository: repo,
+              onOpenAdminPanel: () => adminOpened = true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('ADMİN'), findsOneWidget);
+        expect(
+          find.byKey(const Key('profile_admin_console_card')),
+          findsOneWidget,
+        );
+        await tester.tap(find.text('Kullanıcılar'));
+        await tester.pumpAndSettle();
+        expect(adminOpened, isTrue);
+      },
+    );
   });
 }

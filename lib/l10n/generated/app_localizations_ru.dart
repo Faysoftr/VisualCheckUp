@@ -3057,4 +3057,37 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'Сообщество';
+
+  @override
+  String get sfbGoToProfile => 'Перейти в профиль';
+
+  @override
+  String get sfbMyMessages => 'Мои сообщения';
+
+  @override
+  String get sfbMyFriends => 'Мои друзья';
+
+  @override
+  String get sfbSeeAll => 'Показать все';
+
+  @override
+  String get sfbNewMembersTitle => 'Новые участники';
+
+  @override
+  String get sfbActiveMembersTitle => 'Самые активные';
+
+  @override
+  String get sfbLatestPostsTitle => 'Последние записи';
+
+  @override
+  String get sfbViewDetails => 'Подробнее';
+
+  @override
+  String get sfbAdminBadge => 'АДМИН';
+
+  @override
+  String get sfbAdminConsoleTitle => 'БЫСТРАЯ ПАНЕЛЬ АДМИНА';
+
+  @override
+  String get sfbAdminFounderBanner => 'ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР';
 }

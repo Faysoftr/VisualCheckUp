@@ -3049,4 +3049,37 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'समुदाय';
+
+  @override
+  String get sfbGoToProfile => 'प्रोफ़ाइल देखें';
+
+  @override
+  String get sfbMyMessages => 'मेरे संदेश';
+
+  @override
+  String get sfbMyFriends => 'मेरे दोस्त';
+
+  @override
+  String get sfbSeeAll => 'सभी देखें';
+
+  @override
+  String get sfbNewMembersTitle => 'नए सदस्य';
+
+  @override
+  String get sfbActiveMembersTitle => 'सबसे सक्रिय सदस्य';
+
+  @override
+  String get sfbLatestPostsTitle => 'नवीनतम पोस्ट';
+
+  @override
+  String get sfbViewDetails => 'विवरण देखें';
+
+  @override
+  String get sfbAdminBadge => 'एडमिन';
+
+  @override
+  String get sfbAdminConsoleTitle => 'त्वरित एडमिन कंसोल';
+
+  @override
+  String get sfbAdminFounderBanner => 'प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन';
 }

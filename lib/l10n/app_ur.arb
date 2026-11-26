@@ -932,5 +932,16 @@
   "commGroupsDescHint": "گروپ کی تفصیل اور موضوع",
   "commGroupsEmpty": "اس فلٹر کے لیے کوئی گروپ نہیں ملا۔",
   "commToggleOnlyFriendsMsg": "صرف دوست مجھے پیغام بھیج سکیں",
-  "commOpenCommunityCta": "کمیونٹی"
+  "commOpenCommunityCta": "کمیونٹی",
+  "sfbGoToProfile": "پروفائل دیکھیں",
+  "sfbMyMessages": "میرے پیغامات",
+  "sfbMyFriends": "میرے دوست",
+  "sfbSeeAll": "سب دیکھیں",
+  "sfbNewMembersTitle": "نئے اراکین",
+  "sfbActiveMembersTitle": "سب سے فعال اراکین",
+  "sfbLatestPostsTitle": "تازہ ترین پوسٹس",
+  "sfbViewDetails": "تفصیل دیکھیں",
+  "sfbAdminBadge": "ایڈمن",
+  "sfbAdminConsoleTitle": "فوری ایڈمن کنسول",
+  "sfbAdminFounderBanner": "پلیٹ فارم بانی اور سسٹم ایڈمن"
 }

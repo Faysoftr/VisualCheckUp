@@ -3074,4 +3074,37 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'Community';
+
+  @override
+  String get sfbGoToProfile => 'Naar profiel';
+
+  @override
+  String get sfbMyMessages => 'Mijn berichten';
+
+  @override
+  String get sfbMyFriends => 'Mijn vrienden';
+
+  @override
+  String get sfbSeeAll => 'Alles bekijken';
+
+  @override
+  String get sfbNewMembersTitle => 'Nieuwe leden';
+
+  @override
+  String get sfbActiveMembersTitle => 'Meest actieve leden';
+
+  @override
+  String get sfbLatestPostsTitle => 'Laatste berichten';
+
+  @override
+  String get sfbViewDetails => 'Details bekijken';
+
+  @override
+  String get sfbAdminBadge => 'ADMIN';
+
+  @override
+  String get sfbAdminConsoleTitle => 'SNELLE ADMINCONSOLE';
+
+  @override
+  String get sfbAdminFounderBanner => 'PLATFORMOPRICHTER & SYSTEEMBEHEERDER';
 }

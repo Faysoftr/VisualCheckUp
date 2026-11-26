@@ -932,5 +932,16 @@
   "commGroupsDescHint": "وصف المجموعة وموضوعها",
   "commGroupsEmpty": "لا توجد مجموعات لهذا الفلتر.",
   "commToggleOnlyFriendsMsg": "الأصدقاء فقط يمكنهم مراسلتي",
-  "commOpenCommunityCta": "المجتمع"
+  "commOpenCommunityCta": "المجتمع",
+  "sfbGoToProfile": "الذهاب للملف الشخصي",
+  "sfbMyMessages": "رسائلي",
+  "sfbMyFriends": "أصدقائي",
+  "sfbSeeAll": "عرض الكل",
+  "sfbNewMembersTitle": "أعضاؤنا الجدد",
+  "sfbActiveMembersTitle": "الأعضاء الأكثر نشاطاً",
+  "sfbLatestPostsTitle": "أحدث المنشورات",
+  "sfbViewDetails": "عرض التفاصيل",
+  "sfbAdminBadge": "مشرف",
+  "sfbAdminConsoleTitle": "لوحة التحكم السريعة",
+  "sfbAdminFounderBanner": "مؤسس المنصة ومدير النظام"
 }

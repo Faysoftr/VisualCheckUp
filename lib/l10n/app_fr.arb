@@ -932,5 +932,16 @@
   "commGroupsDescHint": "Description et thème du groupe",
   "commGroupsEmpty": "Aucun groupe trouvé pour ce filtre.",
   "commToggleOnlyFriendsMsg": "Seuls mes amis peuvent m'envoyer des messages",
-  "commOpenCommunityCta": "Communauté"
+  "commOpenCommunityCta": "Communauté",
+  "sfbGoToProfile": "Voir le profil",
+  "sfbMyMessages": "Mes messages",
+  "sfbMyFriends": "Mes amis",
+  "sfbSeeAll": "Tout voir",
+  "sfbNewMembersTitle": "Nouveaux membres",
+  "sfbActiveMembersTitle": "Membres les plus actifs",
+  "sfbLatestPostsTitle": "Dernières publications",
+  "sfbViewDetails": "Voir les détails",
+  "sfbAdminBadge": "ADMIN",
+  "sfbAdminConsoleTitle": "CONSOLE ADMIN RAPIDE",
+  "sfbAdminFounderBanner": "FONDATEUR & ADMINISTRATEUR SYSTÈME"
 }

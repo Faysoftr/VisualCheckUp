@@ -1465,5 +1465,16 @@
   "commGroupsDescHint": "Group description and focus topic",
   "commGroupsEmpty": "No support groups found for this filter.",
   "commToggleOnlyFriendsMsg": "Only friends can send me messages",
-  "commOpenCommunityCta": "Community"
+  "commOpenCommunityCta": "Community",
+  "sfbGoToProfile": "Go to Profile",
+  "sfbMyMessages": "My Messages",
+  "sfbMyFriends": "My Friends",
+  "sfbSeeAll": "See All",
+  "sfbNewMembersTitle": "New Members",
+  "sfbActiveMembersTitle": "Most Active Members",
+  "sfbLatestPostsTitle": "Latest Posts",
+  "sfbViewDetails": "View Details",
+  "sfbAdminBadge": "ADMIN",
+  "sfbAdminConsoleTitle": "QUICK ADMIN CONSOLE",
+  "sfbAdminFounderBanner": "PLATFORM FOUNDER & SYSTEM ADMIN"
 }

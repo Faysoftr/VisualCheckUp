@@ -24,16 +24,23 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/app_drawer.d
 import 'package:visualcheckup/features/checkup/presentation/widgets/category_card.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/disclaimer_dialog.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sheet.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/home_social_showcase.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
+import 'package:visualcheckup/features/community/data/wellness_wall_repository.dart';
+import 'package:visualcheckup/features/community/domain/health_community_models.dart';
+import 'package:visualcheckup/features/community/domain/wellness_wall_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_community_hub_screen.dart';
+import 'package:visualcheckup/features/community/presentation/screens/health_profile_detail_screen.dart';
 import 'package:visualcheckup/features/community/presentation/screens/my_health_profile_screen.dart';
 import 'package:visualcheckup/features/diet/data/diet_repository.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/diet/presentation/screens/diet_hub_screen.dart';
 import 'package:visualcheckup/features/doctors/data/doctor_repository.dart';
+import 'package:visualcheckup/features/doctors/domain/doctor_models.dart';
 import 'package:visualcheckup/features/doctors/presentation/screens/doctor_application_screen.dart';
 import 'package:visualcheckup/features/doctors/presentation/screens/doctor_search_screen.dart';
+import 'package:visualcheckup/features/wellness_extras/daily_health_tip_and_birthday.dart';
 import 'package:visualcheckup/features/growth/presentation/screens/growth_bmi_screen.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
@@ -129,6 +136,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<AnalysisResult> get _recent => _allHistory.take(3).toList();
 
+  List<DoctorProfile> _featuredDoctors =
+      DoctorRepository.starterVerifiedDoctors();
+  List<HealthCommunityProfile> _communityMembers =
+      HealthCommunityRepository.starterGlobalProfiles();
+  List<WellnessWallPost> _latestWallPosts = WellnessWallRepository.starterPosts();
+
   @override
   void initState() {
     super.initState();
@@ -166,6 +179,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final dietSummary = activeDiet != null
         ? await _dietRepository.getComplianceSummary(activeDiet.id)
         : const DietComplianceSummary(followedCount: 0, notFollowedCount: 0);
+    final doctorRepo = widget.doctorRepository ?? DoctorRepository();
+    final doctors = await doctorRepo.searchDoctors();
+    final commRepo = HealthCommunityRepository();
+    final members = await commRepo.discoverProfiles(myUid: widget.currentUser.id);
+    final wallPosts = await WellnessWallRepository().loadPosts();
     if (!mounted) return;
     setState(() {
       _allHistory = history;
@@ -177,6 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _todayMedStatuses = medStatuses;
       _activeDietPlan = activeDiet;
       _dietCompliance = dietSummary;
+      if (doctors.isNotEmpty) _featuredDoctors = doctors;
+      if (members.isNotEmpty) _communityMembers = members;
+      if (wallPosts.isNotEmpty) _latestWallPosts = wallPosts;
     });
   }
 
@@ -205,15 +226,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openMyProfile() async {
+    final isAdmin = AdminUtils.isAdmin(
+      email: widget.currentUser.email,
+      uid: widget.currentUser.id,
+    );
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => MyHealthProfileScreen(
           currentUser: widget.currentUser,
           repository: HealthCommunityRepository(),
           adminRepository: widget.adminRepository,
+          onOpenAdminPanel: isAdmin ? _openAdminPanel : null,
         ),
       ),
     );
+  }
+
+  Future<void> _openMemberProfile(HealthCommunityProfile member) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => HealthProfileDetailScreen(
+          profile: member,
+          myUid: widget.currentUser.id,
+          myDisplayName: widget.currentUser.displayName,
+          repository: HealthCommunityRepository(),
+        ),
+      ),
+    );
+    await _loadDashboardData();
   }
 
   Future<void> _openHealthCommunity({int initialTabIndex = 0}) async {
@@ -227,6 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+    await _loadDashboardData();
   }
 
   Future<void> _openAdminPanel() async {
@@ -574,6 +615,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
         onOpenMyProfile: _openMyProfile,
         onOpenHealthCommunity: () => _openHealthCommunity(initialTabIndex: 0),
+        onOpenCommunityMessages: () => _openHealthCommunity(initialTabIndex: 3),
+        onOpenCommunityWall: () => _openHealthCommunity(initialTabIndex: 1),
+        onOpenCommunityGroups: () => _openHealthCommunity(initialTabIndex: 2),
         onOpenDoctorSearch: () => _openDoctorSearch(),
         onOpenDoctorApplication: _openDoctorApplication,
         onOpenProSubscription: _openProSubscription,
@@ -700,18 +744,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           _FrostedCircleAction(
             isDark: isDark,
             child: IconButton(
+              key: const Key('home_messages_appbar_button'),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints.tightFor(width: 38, height: 38),
-              onPressed: _openHistory,
-              tooltip: l10n.tooltipHistory,
-              icon: const Icon(Icons.history_rounded, size: 20),
+              onPressed: () => _openHealthCommunity(initialTabIndex: 3),
+              tooltip: l10n.sfbMyMessages,
+              icon: const Icon(Icons.mail_outline_rounded, size: 20),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Padding(
             padding: const EdgeInsetsDirectional.only(end: 14),
             child: Tooltip(
@@ -889,16 +934,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 5a. Country-Based Verified Doctor Search & Patient Follow-Up Card
-                      _HomeDoctorSearchCard(
-                        title: l10n.doctorSearchTitle,
-                        subtitle: l10n.doctorSearchSubtitle,
-                        searchCta: l10n.doctorSearchHomeCta,
-                        applyCta: l10n.doctorApplyCta,
-                        onSearchCountry: (code) =>
-                            _openDoctorSearch(initialCountryCode: code),
-                        onApplyDoctor: _openDoctorApplication,
+                      // 5a. Birthday & Glowing Daily Health Tip Card (SFB "Tarihte Bugün" style)
+                      BirthdayCelebrationCard(
+                        displayName: widget.currentUser.displayName,
                       ),
+                      const SfbDailyHealthTipCard(),
                       const SizedBox(height: 12),
 
                       // 5b. VisualCheckUp Pro Quick Banner
@@ -1154,7 +1194,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ] else
-                const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+              // 7. Social Formula Bank Community & Doctors Live Showcase Feed
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SfbVerifiedDoctorsSection(
+                        doctors: _featuredDoctors,
+                        onSeeAll: () => _openDoctorSearch(),
+                        onApplyDoctor: _openDoctorApplication,
+                        onTapCountry: (code) =>
+                            _openDoctorSearch(initialCountryCode: code),
+                      ),
+                      const SizedBox(height: 14),
+                      SfbNewMembersSection(
+                        members: _communityMembers,
+                        onTapMember: _openMemberProfile,
+                        onSeeAll: () => _openHealthCommunity(initialTabIndex: 0),
+                      ),
+                      const SizedBox(height: 14),
+                      SfbActiveMembersSection(
+                        members: _communityMembers,
+                        onTapMember: _openMemberProfile,
+                      ),
+                      const SizedBox(height: 14),
+                      SfbLatestPostsSection(
+                        posts: _latestWallPosts,
+                        onOpenWall: () =>
+                            _openHealthCommunity(initialTabIndex: 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -2125,155 +2201,5 @@ class _MedicationQuickBanner extends StatelessWidget {
   }
 }
 
-class _HomeDoctorSearchCard extends StatelessWidget {
-  const _HomeDoctorSearchCard({
-    required this.title,
-    required this.subtitle,
-    required this.searchCta,
-    required this.applyCta,
-    required this.onSearchCountry,
-    required this.onApplyDoctor,
-  });
-
-  final String title;
-  final String subtitle;
-  final String searchCta;
-  final String applyCta;
-  final ValueChanged<String> onSearchCountry;
-  final VoidCallback onApplyDoctor;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    const accent = Color(0xFF0284C7);
-
-    const quickCountries = [
-      ('TR', '🇹🇷 TR'),
-      ('DE', '🇩🇪 DE'),
-      ('SE', '🇸🇪 SE'),
-      ('ES', '🇪🇸 ES'),
-      ('US', '🇺🇸 US'),
-    ];
-
-    return Container(
-      key: const Key('home_doctor_search_card'),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF102028) : Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: accent.withValues(alpha: 0.28)),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: isDark ? 0.16 : 0.10),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  Icons.medical_services_rounded,
-                  color: accent,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final (code, label) in quickCountries)
-                ActionChip(
-                  key: Key('home_doctor_country_$code'),
-                  visualDensity: VisualDensity.compact,
-                  label: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  onPressed: () => onSearchCountry(code),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  key: const Key('home_doctor_search_btn'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: accent,
-                    minimumSize: const Size(0, 44),
-                  ),
-                  onPressed: () => onSearchCountry('ALL'),
-                  icon: const Icon(Icons.search_rounded, size: 18),
-                  label: Text(
-                    searchCta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton.tonalIcon(
-                  key: const Key('home_doctor_apply_btn'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(0, 44),
-                  ),
-                  onPressed: onApplyDoctor,
-                  icon: const Icon(Icons.verified_user_outlined, size: 17),
-                  label: Text(
-                    applyCta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 

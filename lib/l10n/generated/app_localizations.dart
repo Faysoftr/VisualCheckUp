@@ -5721,6 +5721,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Community'**
   String get commOpenCommunityCta;
+
+  /// No description provided for @sfbGoToProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Profile'**
+  String get sfbGoToProfile;
+
+  /// No description provided for @sfbMyMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'My Messages'**
+  String get sfbMyMessages;
+
+  /// No description provided for @sfbMyFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'My Friends'**
+  String get sfbMyFriends;
+
+  /// No description provided for @sfbSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See All'**
+  String get sfbSeeAll;
+
+  /// No description provided for @sfbNewMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Members'**
+  String get sfbNewMembersTitle;
+
+  /// No description provided for @sfbActiveMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Active Members'**
+  String get sfbActiveMembersTitle;
+
+  /// No description provided for @sfbLatestPostsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Posts'**
+  String get sfbLatestPostsTitle;
+
+  /// No description provided for @sfbViewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get sfbViewDetails;
+
+  /// No description provided for @sfbAdminBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMIN'**
+  String get sfbAdminBadge;
+
+  /// No description provided for @sfbAdminConsoleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'QUICK ADMIN CONSOLE'**
+  String get sfbAdminConsoleTitle;
+
+  /// No description provided for @sfbAdminFounderBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'PLATFORM FOUNDER & SYSTEM ADMIN'**
+  String get sfbAdminFounderBanner;
 }
 
 class _AppLocalizationsDelegate

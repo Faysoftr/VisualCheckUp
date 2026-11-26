@@ -932,5 +932,16 @@
   "commGroupsDescHint": "Описание и тема группы",
   "commGroupsEmpty": "Группы по этому фильтру не найдены.",
   "commToggleOnlyFriendsMsg": "Писать мне могут только друзья",
-  "commOpenCommunityCta": "Сообщество"
+  "commOpenCommunityCta": "Сообщество",
+  "sfbGoToProfile": "Перейти в профиль",
+  "sfbMyMessages": "Мои сообщения",
+  "sfbMyFriends": "Мои друзья",
+  "sfbSeeAll": "Показать все",
+  "sfbNewMembersTitle": "Новые участники",
+  "sfbActiveMembersTitle": "Самые активные",
+  "sfbLatestPostsTitle": "Последние записи",
+  "sfbViewDetails": "Подробнее",
+  "sfbAdminBadge": "АДМИН",
+  "sfbAdminConsoleTitle": "БЫСТРАЯ ПАНЕЛЬ АДМИНА",
+  "sfbAdminFounderBanner": "ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР"
 }

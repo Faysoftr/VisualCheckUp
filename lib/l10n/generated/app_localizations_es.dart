@@ -3071,4 +3071,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'Comunidad';
+
+  @override
+  String get sfbGoToProfile => 'Ir al perfil';
+
+  @override
+  String get sfbMyMessages => 'Mis mensajes';
+
+  @override
+  String get sfbMyFriends => 'Mis amigos';
+
+  @override
+  String get sfbSeeAll => 'Ver todo';
+
+  @override
+  String get sfbNewMembersTitle => 'Nuevos miembros';
+
+  @override
+  String get sfbActiveMembersTitle => 'Miembros más activos';
+
+  @override
+  String get sfbLatestPostsTitle => 'Últimas publicaciones';
+
+  @override
+  String get sfbViewDetails => 'Ver detalles';
+
+  @override
+  String get sfbAdminBadge => 'ADMIN';
+
+  @override
+  String get sfbAdminConsoleTitle => 'CONSOLA RÁPIDA DE ADMIN';
+
+  @override
+  String get sfbAdminFounderBanner => 'FUNDADOR Y ADMINISTRADOR DEL SISTEMA';
 }

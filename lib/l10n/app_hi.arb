@@ -932,5 +932,16 @@
   "commGroupsDescHint": "समूह विवरण और विषय",
   "commGroupsEmpty": "इस फ़िल्टर के लिए कोई समूह नहीं मिला।",
   "commToggleOnlyFriendsMsg": "केवल दोस्त मुझे संदेश भेज सकें",
-  "commOpenCommunityCta": "समुदाय"
+  "commOpenCommunityCta": "समुदाय",
+  "sfbGoToProfile": "प्रोफ़ाइल देखें",
+  "sfbMyMessages": "मेरे संदेश",
+  "sfbMyFriends": "मेरे दोस्त",
+  "sfbSeeAll": "सभी देखें",
+  "sfbNewMembersTitle": "नए सदस्य",
+  "sfbActiveMembersTitle": "सबसे सक्रिय सदस्य",
+  "sfbLatestPostsTitle": "नवीनतम पोस्ट",
+  "sfbViewDetails": "विवरण देखें",
+  "sfbAdminBadge": "एडमिन",
+  "sfbAdminConsoleTitle": "त्वरित एडमिन कंसोल",
+  "sfbAdminFounderBanner": "प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन"
 }

@@ -932,5 +932,16 @@
   "commGroupsDescHint": "Grup açıklaması ve odak konusu",
   "commGroupsEmpty": "Bu filtrede henüz destek grubu yok.",
   "commToggleOnlyFriendsMsg": "Sadece arkadaşlarım mesaj gönderebilsin",
-  "commOpenCommunityCta": "Topluluk"
+  "commOpenCommunityCta": "Topluluk",
+  "sfbGoToProfile": "Profile Git",
+  "sfbMyMessages": "Mesajlarım",
+  "sfbMyFriends": "Arkadaşlarım",
+  "sfbSeeAll": "Tümünü Gör",
+  "sfbNewMembersTitle": "Yeni Üyelerimiz",
+  "sfbActiveMembersTitle": "En Aktif Üyeler",
+  "sfbLatestPostsTitle": "Son Paylaşımlar",
+  "sfbViewDetails": "Detayı Gör",
+  "sfbAdminBadge": "ADMİN",
+  "sfbAdminConsoleTitle": "HIZLI YÖNETİM KONSOLU",
+  "sfbAdminFounderBanner": "PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ"
 }

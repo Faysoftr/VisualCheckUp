@@ -3075,4 +3075,37 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get commOpenCommunityCta => 'Gemenskap';
+
+  @override
+  String get sfbGoToProfile => 'Gå till profil';
+
+  @override
+  String get sfbMyMessages => 'Mina meddelanden';
+
+  @override
+  String get sfbMyFriends => 'Mina vänner';
+
+  @override
+  String get sfbSeeAll => 'Visa alla';
+
+  @override
+  String get sfbNewMembersTitle => 'Nya medlemmar';
+
+  @override
+  String get sfbActiveMembersTitle => 'Mest aktiva medlemmar';
+
+  @override
+  String get sfbLatestPostsTitle => 'Senaste inläggen';
+
+  @override
+  String get sfbViewDetails => 'Visa detaljer';
+
+  @override
+  String get sfbAdminBadge => 'ADMIN';
+
+  @override
+  String get sfbAdminConsoleTitle => 'SNABB ADMINKONSOL';
+
+  @override
+  String get sfbAdminFounderBanner => 'PLATTFORMSGRUNDARE & SYSTEMADMIN';
 }
