@@ -423,6 +423,185 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     );
   }
 
+  void _showLightingAndColorGuide(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF141A1E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.65,
+        minChildSize: 0.45,
+        maxChildSize: 0.90,
+        expand: false,
+        builder: (context, scrollCtrl) => ListView(
+          controller: scrollCtrl,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.wb_sunny_rounded,
+                    color: Color(0xFF34D399),
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Işık & Renk Kalibrasyon Rehberi',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'En doğru klinik renk ve analiz sonucu için ipuçları',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildGuideCard(
+              icon: Icons.light_mode_outlined,
+              iconColor: const Color(0xFF10B981),
+              title: '1. Doğal Gün Işığı (Altın Standart)',
+              desc:
+                  'Mümkünse bir pencere kenarında, doğrudan gözü/cildi yakmayan aydınlık difüz gün ışığında çekim yapın. Bu, yapay ampul renk sapmalarını tamamen sıfırlar.',
+            ),
+            const SizedBox(height: 12),
+            _buildGuideCard(
+              icon: Icons.wb_auto_rounded,
+              iconColor: const Color(0xFF38BDF8),
+              title: '2. Beyaz Referans Kağıdı',
+              desc:
+                  'Sarı akkor veya sıcak ampul bulunan ortamlarda ekranın üzerindeki [Beyaz Referans] butonunu açın. Kadrajın altındaki işaretli kutuya küçük temiz bir beyaz kağıt yerleştirin. Uygulama Von Kries algoritmasıyla renkleri otomatik D65 nötr seviyesine çeker.',
+            ),
+            const SizedBox(height: 12),
+            _buildGuideCard(
+              icon: Icons.filter_tilt_shift_rounded,
+              iconColor: const Color(0xFFF59E0B),
+              title: '3. Parlama & Gölge Önleme',
+              desc:
+                  'Tırnak, göz veya nemli cilt yüzeylerinde doğrudan flaş açmak aşırı parlamaya yol açabilir. Kamerayı 45 derecelik hafif bir açıyla tutun. Algoritmamız %15 aşırı yansımayı otomatik filtreler.',
+            ),
+            const SizedBox(height: 12),
+            _buildGuideCard(
+              icon: Icons.verified_user_outlined,
+              iconColor: const Color(0xFFA78BFA),
+              title: '4. Yüksek Güvenilirlik Puanı',
+              desc:
+                  'Doğru ışık ve renk dengesi sağlandığında, görsel analiz ve CIE L*a*b* renk hassasiyeti maksimum güvenilirlikle (%92) çalışır.',
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text(
+                  'Anladım, Hazırım',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuideCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String desc,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  desc,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12.5,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -496,6 +675,42 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                   spacing: 8,
                   runSpacing: 6,
                   children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => _showLightingAndColorGuide(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.20),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFF34D399).withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.lightbulb_circle_outlined,
+                              size: 14,
+                              color: Color(0xFF34D399),
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              'Işık & Renk',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () => setState(

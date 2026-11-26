@@ -637,6 +637,108 @@ class LabReportAnalyzer {
           'Vücutta iltihabi veya romatizmal süreçlere eşlik edebilir; CRP ile birlikte hekim tarafından değerlendirilir.',
       specialtyHint: 'Dahiliye',
     ),
+    LabParameterSpec(
+      code: 'ZN',
+      name: 'Çinko (Zn)',
+      aliases: ['çinko', 'cinko', 'zinc', 'serum zinc', 'zn'],
+      unit: 'µg/dL',
+      minNormal: 70,
+      maxNormal: 120,
+      criticalLow: 45,
+      criticalHigh: 200,
+      lowNote:
+          'Çinko düşüklüğü bağışıklık fonksiyonunda zayıflama, yaraların geç iyileşmesi, saç dökülmesi veya tat/koku duyusunda azalma ile ilişkili olabilir; hekime danışınız.',
+      highNote:
+          'Yüksek çinko düzeyi aşırı takviye kullanımı veya maruziyet açısından hekim tarafından değerlendirilmelidir.',
+      specialtyHint: 'Dahiliye veya Dermatoloji',
+    ),
+    LabParameterSpec(
+      code: 'MG',
+      name: 'Magnezyum (Mg)',
+      aliases: ['magnezyum', 'magnesium', 'mg'],
+      unit: 'mg/dL',
+      minNormal: 1.7,
+      maxNormal: 2.5,
+      criticalLow: 1.2,
+      criticalHigh: 4.0,
+      lowNote:
+          'Düşük magnezyum kas krampları, yorgunluk, uyku düzensizliği, çarpıntı ve elektrolit dengesizliğine yol açabilir; hekiminize danışınız.',
+      highNote:
+          'Yüksek magnezyum genellikle böbrek fonksiyonları veya aşırı magnezyum içeren takviye/antiasit kullanımı ile ilişkili olabilir.',
+      specialtyHint: 'Dahiliye veya Nefroloji',
+    ),
+    LabParameterSpec(
+      code: 'CL',
+      name: 'Klor (Cl)',
+      aliases: ['klor', 'klorür', 'chloride', 'chlorid', 'cl'],
+      unit: 'mEq/L',
+      minNormal: 96,
+      maxNormal: 106,
+      criticalLow: 80,
+      criticalHigh: 125,
+      lowNote:
+          'Düşük klorür sıvı-elektrolit kaybı, kusma veya asit-baz dengesizliği durumlarında görülebilir; doktor değerlendirmesi önerilir.',
+      highNote:
+          'Yüksek klorür dehidratasyon (sıvı kaybı) veya böbrek asidozu durumlarında görülebilir.',
+      specialtyHint: 'Dahiliye veya Nefroloji',
+    ),
+    LabParameterSpec(
+      code: 'P',
+      name: 'Fosfor (P / İnorganik Fosfat)',
+      aliases: [
+        'fosfor',
+        'inorganik fosfor',
+        'phosphorus',
+        'phosphate',
+        'po4',
+        'p',
+      ],
+      unit: 'mg/dL',
+      minNormal: 2.5,
+      maxNormal: 4.5,
+      criticalLow: 1.5,
+      criticalHigh: 6.0,
+      lowNote:
+          'Düşük fosfor kemik metabolizması, D vitamini yetersizliği veya yetersiz beslenme açısından değerlendirilmelidir.',
+      highNote:
+          'Yüksek fosfor böbrek süzme fonksiyonu veya kalsiyum-paratiroid dengesi ile ilişkili olabilir; hekim değerlendirmesi gerekir.',
+      specialtyHint: 'Dahiliye veya Nefroloji',
+    ),
+    LabParameterSpec(
+      code: 'DBIL',
+      name: 'Direkt Bilirubin',
+      aliases: [
+        'direkt bilirubin',
+        'direk bilirubin',
+        'direct bilirubin',
+        'conjugated bilirubin',
+        'dbil',
+        'd. bili',
+      ],
+      unit: 'mg/dL',
+      minNormal: 0.0,
+      maxNormal: 0.3,
+      criticalHigh: 1.0,
+      lowNote: 'Normal referans aralığında.',
+      highNote:
+          'Direkt bilirubin yüksekliği karaciğer içi veya dışı safra yolları akışında kısıtlanma açısından hekim değerlendirmesi gerektirir.',
+      specialtyHint: 'Dahiliye veya Gastroenteroloji',
+    ),
+    LabParameterSpec(
+      code: 'TP',
+      name: 'Total Protein',
+      aliases: ['total protein', 'toplam protein', 'serum total protein', 'tp'],
+      unit: 'g/dL',
+      minNormal: 6.4,
+      maxNormal: 8.3,
+      criticalLow: 4.5,
+      criticalHigh: 10.0,
+      lowNote:
+          'Düşük total protein beslenme yetersizliği, karaciğer sentez kapasitesi veya böbrek/bağırsak protein kaybı açısından değerlendirilir.',
+      highNote:
+          'Yüksek total protein vücutta sıvı kaybı (dehidratasyon) veya bağışıklık sistemi aktivitesi kaynaklı olabilir; hekim kontrolü önerilir.',
+      specialtyHint: 'Dahiliye',
+    ),
   ];
 
   static LabParameterSpec? specByCode(String code) {
@@ -1877,7 +1979,39 @@ class LabReportAnalyzer {
       specialtyHint ??= 'Dahiliye veya Nefroloji';
     }
 
-    // 8. Positive summary of normal major panels so the user sees the full picture
+    // 8. Biliary / Liver correlation (DBIL + TBIL / ALP / GGT)
+    if (isHigh('DBIL') || (isHigh('TBIL') && (isHigh('ALP') || isHigh('GGT')))) {
+      insights.add(
+        '• Safra Akışı ve Karaciğer İçi Değerlendirme: Bilirubin (özellikle Direkt Bilirubin) veya ALP/GGT yüksekliği safra yolları veya karaciğer atılım fonksiyonuna işaret edebilir; hekim muayenesi ve ultrason değerlendirmesi önerilir.',
+      );
+      specialtyHint ??= 'Gastroenteroloji veya Dahiliye';
+    }
+
+    // 9. Minerals & Electrolyte balance (Zinc, Magnesium, Potassium, Calcium)
+    if (isLow('ZN')) {
+      insights.add(
+        '• Çinko Düzeyi Düşük: Çinko (${byCode['ZN']!.formattedValue}) bağışıklık direnci, hücresel yenilenme ve tat/koku fonksiyonları için temel mineraldir. Yorgunluk, saç dökülmesi veya enfeksiyonlara yatkınlık durumunda hekim kontrolünde takviye değerlendirilebilir.',
+      );
+      questions.add('Çinko eksikliğim için beslenme düzenlemesi veya takviye gerekli mi?');
+    }
+    if (isLow('MG') && (isLow('K') || isLow('CA'))) {
+      insights.add(
+        '• Magnezyum ve Elektrolit Dengesizliği: Magnezyum düşüklüğüne potasyum veya kalsiyum düşüklüğü eşlik ediyor. Kas krampları, yorgunluk, uyku bozukluğu ve ritim hassasiyeti açısından hekim değerlendirmesi önerilir.',
+      );
+      specialtyHint ??= 'Dahiliye veya Kardiyoloji';
+    } else if (isLow('MG')) {
+      insights.add(
+        '• Magnezyum Düşüklüğü: Magnezyum (${byCode['MG']!.formattedValue}) kas gevşemesi, hücresel enerji ve sinir iletimi için gereklidir; kramp ve halsizlik şikayetleriniz varsa hekiminizle görüşünüz.',
+      );
+    }
+    if (isLow('TP') || (byCode['ALB'] != null && isLow('ALB'))) {
+      insights.add(
+        '• Protein Sentez / Beslenme Dengesi: Total Protein (${byCode['TP']?.formattedValue ?? ''}) veya Albümin düşüklüğü beslenme durumu, karaciğer veya böbrek protein dengesi açısından hekim kontrolü gerektirir.',
+      );
+      specialtyHint ??= 'Dahiliye';
+    }
+
+    // 10. Positive summary of normal major panels so the user sees the full picture
     final normalPanels = <String>[];
     if (isNormal('HGB') && (byCode['HCT'] == null || isNormal('HCT'))) {
       normalPanels.add('kan sayımı (HGB/HCT)');
@@ -1898,6 +2032,16 @@ class LabReportAnalyzer {
     }
     if (isNormal('CREA') && (byCode['EGFR'] == null || isNormal('EGFR'))) {
       normalPanels.add('böbrek fonksiyonları (Kreatinin/eGFR)');
+    }
+    if (byCode['ZN'] != null && isNormal('ZN')) {
+      normalPanels.add('çinko');
+    }
+    if (byCode['MG'] != null && isNormal('MG')) {
+      normalPanels.add('magnezyum');
+    }
+    if ((byCode['TP'] != null && isNormal('TP')) &&
+        (byCode['ALB'] == null || isNormal('ALB'))) {
+      normalPanels.add('protein dengesi (TP/Albümin)');
     }
 
     if (normalPanels.isNotEmpty) {

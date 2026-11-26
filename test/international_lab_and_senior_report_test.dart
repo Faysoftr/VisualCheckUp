@@ -160,6 +160,59 @@ Glukose 5,2 mmol/L [3,9 - 5,5]
       expect(byCode['TOTAL_CHOL']!.value, closeTo(193.4, 1.0));
     });
 
+    test('parses and normalizes newly added mineral and biochemistry parameters (Zn, Mg, Cl, P, DBIL, TP)', () {
+      const panelText = '''
+Zinc 12.5 umol/L 10.7-18.4
+Serum Magnesium 0.85 mmol/L 0.70-1.05
+Chloride 102 mEq/L 96-106
+Inorganic Phosphorus 1.15 mmol/L 0.81-1.45
+Direct Bilirubin 0.2 mg/dL 0.0-0.3
+Total Protein 72 g/L 64-83
+''';
+      final parsed = LabReportAnalyzer.parseReportText(panelText);
+      final byCode = {for (final i in parsed.items) i.code: i};
+
+      // Zn: 12.5 umol/L * 6.538 = 81.7 ug/dL (Normal)
+      expect(byCode['ZN']?.value, closeTo(81.7, 0.5));
+      expect(byCode['ZN']?.status, LabStatus.normal);
+
+      // Mg: 0.85 mmol/L * 2.4305 = 2.07 -> 2.1 mg/dL (Normal)
+      expect(byCode['MG']?.value, closeTo(2.1, 0.2));
+      expect(byCode['MG']?.status, LabStatus.normal);
+
+      // Cl: 102 mEq/L (Normal)
+      expect(byCode['CL']?.value, 102.0);
+      expect(byCode['CL']?.status, LabStatus.normal);
+
+      // P: 1.15 mmol/L * 3.097 = 3.6 mg/dL (Normal)
+      expect(byCode['P']?.value, closeTo(3.6, 0.2));
+      expect(byCode['P']?.status, LabStatus.normal);
+
+      // DBIL: 0.2 mg/dL (Normal)
+      expect(byCode['DBIL']?.value, 0.2);
+      expect(byCode['DBIL']?.status, LabStatus.normal);
+
+      // TP: 72 g/L * 0.1 = 7.2 g/dL (Normal)
+      expect(byCode['TP']?.value, closeTo(7.2, 0.1));
+      expect(byCode['TP']?.status, LabStatus.normal);
+    });
+
+    test('evaluates syndromic correlations for Zinc deficiency and Magnesium electrolyte imbalance', () {
+      final items = [
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'Çinko', value: 48, unit: 'µg/dL'),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'Magnezyum', value: 1.3, unit: 'mg/dL'),
+        LabReportAnalyzer.evaluateExtractedItem(rawName: 'Potasyum', value: 3.1, unit: 'mmol/L'),
+      ];
+      final report = LabReportAnalyzer.buildReport(
+        title: 'Tahlil',
+        reportDate: DateTime.now(),
+        source: LabReportSource.photoScan,
+        items: items,
+      );
+      expect(report.contextualInterpretation, contains('Çinko Düzeyi Düşük'));
+      expect(report.contextualInterpretation, contains('Magnezyum ve Elektrolit Dengesizliği'));
+    });
+
     test('identifies missing core blood tests accurately', () {
       final partialItems = [
         LabReportAnalyzer.evaluateExtractedItem(rawName: 'HGB', value: 13.5),

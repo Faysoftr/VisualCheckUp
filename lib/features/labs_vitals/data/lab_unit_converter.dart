@@ -374,6 +374,79 @@ class LabUnitConverter {
       'соэ',
       '血沉',
     ],
+    'ZN': [
+      'zinc',
+      'zink',
+      'serum zinc',
+      'cinko',
+      'çinko',
+      'цинковый',
+      'цинк',
+      'الزنك',
+      '锌',
+    ],
+    'MG': [
+      'magnesium',
+      'magnésium',
+      'magnesio',
+      'magnezyum',
+      'serum magnesium',
+      'магний',
+      'المغنيسيوم',
+      '镁',
+    ],
+    'CL': [
+      'chloride',
+      'chlorure',
+      'cloruro',
+      'klor',
+      'klorür',
+      'chlorid',
+      'хлор',
+      'хлорид',
+      'الكلوريد',
+      '氯',
+    ],
+    'P': [
+      'phosphorus',
+      'phosphate',
+      'phosphor',
+      'inorganic phosphorus',
+      'inorganik fosfor',
+      'fosfor',
+      'phosphate inorganique',
+      'фосфор',
+      'الفوسفور',
+      '磷',
+    ],
+    'DBIL': [
+      'direct bilirubin',
+      'conjugated bilirubin',
+      'bilirubin direct',
+      'bilirubin, direct',
+      'direkt bilirubin',
+      'direk bilirubin',
+      'bilirubine directe',
+      'bilirrubina directa',
+      'd. bili',
+      'dbil',
+      'прямой билирубин',
+      'البيليروبين المباشر',
+      '直接胆红素',
+    ],
+    'TP': [
+      'total protein',
+      'total proteins',
+      'serum total protein',
+      'toplam protein',
+      'gesamteiweiß',
+      'gesamteiweiss',
+      'protéines totales',
+      'proteínas totales',
+      'общий белок',
+      'البروتين الكلي',
+      '总蛋白',
+    ],
   };
 
   /// Normalizes a measurement from international SI or alternate units to the
@@ -437,11 +510,22 @@ class LabUnitConverter {
         if (u == 'umol/l') return linear(1 / 88.4);
       case 'TBIL':
         if (u == 'umol/l') return linear(1 / 17.104);
+      case 'DBIL':
+        if (u == 'umol/l') return linear(1 / 17.104);
       case 'URIC_ACID':
         if (u == 'umol/l') return linear(1 / 59.48);
         if (u == 'mmol/l') return linear(16.81);
       case 'IRON':
         if (u == 'umol/l') return linear(5.585, oneDecimal: true);
+      case 'ZN':
+        if (u == 'umol/l') return linear(6.538, oneDecimal: true);
+      case 'MG':
+        if (u == 'mmol/l') return linear(2.4305, oneDecimal: true);
+        if (u == 'meq/l') return linear(1.215, oneDecimal: true);
+      case 'P':
+        if (u == 'mmol/l') return linear(3.097, oneDecimal: true);
+      case 'TP':
+        if (u == 'g/l') return linear(0.1, oneDecimal: true);
       case 'VITD':
         if (u == 'nmol/l') return linear(1 / 2.496, oneDecimal: true);
       case 'B12':
@@ -519,7 +603,16 @@ class LabUnitConverter {
       case 'AST':
       case 'GGT':
       case 'TBIL':
+      case 'DBIL':
         return 'Kullandığınız ilaçlar ve bitkisel takviyeleri listeleyerek doktorunuzla değerlendirin.';
+      case 'ZN':
+      case 'MG':
+      case 'CL':
+      case 'P':
+        return 'Mineral ve elektrolit dengesi açısından doktorunuza danışınız; hekim reçetesi olmadan mineral takviyesi almayınız.';
+      case 'TP':
+      case 'ALB':
+        return 'Beslenme durumu ve protein dengesi açısından doktorunuzla değerlendiriniz.';
       case 'CRP':
       case 'WBC':
       case 'ESR':

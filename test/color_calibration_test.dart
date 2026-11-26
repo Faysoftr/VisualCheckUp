@@ -111,6 +111,29 @@ void main() {
       expect((sample.rawColor.g * 255).round(), closeTo(120, 4));
       expect((sample.rawColor.b * 255).round(), closeTo(120, 4));
     });
+
+    test('evaluates ambient lighting quality accurately (ideal, dark, and warm yellow)', () {
+      // 1. Ideal neutral daylight
+      final idealImg = img.Image(width: 100, height: 100);
+      img.fill(idealImg, color: img.ColorRgb8(210, 205, 200));
+      final idealReport = ColorCalibrator.evaluateLightingQuality(idealImg);
+      expect(idealReport.isOptimal, isTrue);
+      expect(idealReport.status, LightingQualityStatus.ideal);
+
+      // 2. Insufficient / underexposed dark lighting
+      final darkImg = img.Image(width: 100, height: 100);
+      img.fill(darkImg, color: img.ColorRgb8(20, 20, 22));
+      final darkReport = ColorCalibrator.evaluateLightingQuality(darkImg);
+      expect(darkReport.isOptimal, isFalse);
+      expect(darkReport.status, LightingQualityStatus.insufficientLight);
+
+      // 3. Warm incandescent / yellow bulb
+      final warmImg = img.Image(width: 100, height: 100);
+      img.fill(warmImg, color: img.ColorRgb8(235, 175, 95));
+      final warmReport = ColorCalibrator.evaluateLightingQuality(warmImg);
+      expect(warmReport.isOptimal, isFalse);
+      expect(warmReport.status, LightingQualityStatus.warmYellow);
+    });
   });
 
   group('Personal CategoryBaseline persistence & comparison', () {

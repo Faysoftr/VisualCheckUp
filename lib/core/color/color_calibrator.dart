@@ -139,6 +139,34 @@ enum LightingCast {
   tooDark,
 }
 
+enum LightingQualityStatus {
+  ideal,
+  warmYellow,
+  coolBlue,
+  insufficientLight,
+  excessiveGlare,
+}
+
+class LightingQualityReport {
+  const LightingQualityReport({
+    required this.status,
+    required this.title,
+    required this.guidance,
+    required this.luminance,
+    required this.colorTempRatio,
+    required this.isOptimal,
+    required this.colorIndicator,
+  });
+
+  final LightingQualityStatus status;
+  final String title;
+  final String guidance;
+  final double luminance;
+  final double colorTempRatio;
+  final bool isOptimal;
+  final Color colorIndicator;
+}
+
 class WhiteBalanceGains {
   const WhiteBalanceGains({
     required this.rGain,
@@ -484,5 +512,70 @@ class ColorCalibrator {
       }
     }
     return out;
+  }
+
+  /// Evaluates ambient lighting quality, color temperature balance, and glare.
+  static LightingQualityReport evaluateLightingQuality(img.Image image) {
+    final bright = _sampleBrightestHighlights(image);
+    final targetStats = _sampleTrimmedBox(image, mainTargetBox);
+    final lum = 0.2126 * targetStats.r + 0.7152 * targetStats.g + 0.0722 * targetStats.b;
+    final rBratio = (math.max(1, bright.$1)) / (math.max(1, bright.$3)).toDouble();
+
+    if (lum < 42) {
+      return LightingQualityReport(
+        status: LightingQualityStatus.insufficientLight,
+        title: 'Işık Yetersiz',
+        guidance: 'Daha aydınlık bir ortama geçin veya oda ışığını açın.',
+        luminance: lum,
+        colorTempRatio: rBratio,
+        isOptimal: false,
+        colorIndicator: const Color(0xFFEF4444),
+      );
+    }
+
+    if (targetStats.glareRatio > 0.35) {
+      return LightingQualityReport(
+        status: LightingQualityStatus.excessiveGlare,
+        title: 'Parlama / Yansıma Yüksek',
+        guidance: 'Açıyı hafifçe değiştirerek parlak yüzey yansımasını azaltın.',
+        luminance: lum,
+        colorTempRatio: rBratio,
+        isOptimal: false,
+        colorIndicator: const Color(0xFFF59E0B),
+      );
+    }
+
+    final cast = _detectCastFromWhiteRgb(bright.$1, bright.$2, bright.$3);
+    if (cast == LightingCast.warmYellow) {
+      return LightingQualityReport(
+        status: LightingQualityStatus.warmYellow,
+        title: 'Sıcak / Sarı Işık Algılandı',
+        guidance: 'Doğal gün ışığına geçin veya alttaki beyaz referans kutusunu kullanın.',
+        luminance: lum,
+        colorTempRatio: rBratio,
+        isOptimal: false,
+        colorIndicator: const Color(0xFFEAB308),
+      );
+    } else if (cast == LightingCast.coolBlue) {
+      return LightingQualityReport(
+        status: LightingQualityStatus.coolBlue,
+        title: 'Soğuk / Mavi Işık',
+        guidance: 'Beyaz referans kutusu kullanarak renk dengesini kalibre edin.',
+        luminance: lum,
+        colorTempRatio: rBratio,
+        isOptimal: false,
+        colorIndicator: const Color(0xFF38BDF8),
+      );
+    }
+
+    return LightingQualityReport(
+      status: LightingQualityStatus.ideal,
+      title: 'İdeal Işık ve Renk Dengesi',
+      guidance: 'Aydınlatma ve renk dengesi muayene için uygun.',
+      luminance: lum,
+      colorTempRatio: rBratio,
+      isOptimal: true,
+      colorIndicator: const Color(0xFF10B981),
+    );
   }
 }
