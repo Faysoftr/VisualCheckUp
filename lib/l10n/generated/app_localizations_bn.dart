@@ -2929,4 +2929,127 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'সুস্থ ও সুখী একটি বছর কামনা করি।';
+
+  @override
+  String get commDrawerProfileSubtitle =>
+      'আপনার সোশ্যাল কার্ড, মুড ও পরিসংখ্যান';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'খুঁজুন • ওয়াল • গ্রুপ • চ্যাট';
+
+  @override
+  String get commTabWall => 'ওয়াল';
+
+  @override
+  String get commTabGroups => 'গ্রুপ';
+
+  @override
+  String get commEditProfile => 'প্রোফাইল সম্পাদনা';
+
+  @override
+  String get commDoneEditing => 'বাতিল';
+
+  @override
+  String get commFriendsStat => 'বন্ধু';
+
+  @override
+  String get commAddFriend => 'বন্ধু যোগ করুন';
+
+  @override
+  String get commFriendPending => 'অনুরোধ পাঠানো হয়েছে';
+
+  @override
+  String get commFriendsConnected => 'বন্ধু';
+
+  @override
+  String get commFriendsSheetTitle => 'স্বাস্থ্য বন্ধু';
+
+  @override
+  String get commFriendsEmpty =>
+      'এখনো কোনো স্বাস্থ্য বন্ধু নেই। খুঁজুন থেকে যুক্ত হোন!';
+
+  @override
+  String get commMoodSectionTitle => 'আজকের মুড';
+
+  @override
+  String get commMoodEnergetic => 'উদ্যমী';
+
+  @override
+  String get commMoodCalm => 'শান্ত';
+
+  @override
+  String get commMoodGrateful => 'কৃতজ্ঞ';
+
+  @override
+  String get commMoodFocused => 'মনোযোগী';
+
+  @override
+  String get commMoodTired => 'ক্লান্ত';
+
+  @override
+  String get commMoodRecovering => 'সুস্থ হচ্ছি';
+
+  @override
+  String get commWallTitle => 'অভিজ্ঞতা ও প্রশ্ন ওয়াল';
+
+  @override
+  String get commWallNewPost => 'পোস্ট করুন';
+
+  @override
+  String get commWallPostTitleHint =>
+      'শিরোনাম (যেমন: সকালের হাঁটা ও সুগার নিয়ন্ত্রণ)';
+
+  @override
+  String get commWallPostBodyHint => 'আপনার অভিজ্ঞতা বা প্রশ্ন শেয়ার করুন...';
+
+  @override
+  String get commWallPublishBtn => 'প্রকাশ করুন';
+
+  @override
+  String get commWallDoctorReplyBadge => 'ডাক্তারের উত্তর';
+
+  @override
+  String get commWallCommentsTitle => 'মন্তব্য';
+
+  @override
+  String get commWallCommentHint => 'সহায়ক মন্তব্য লিখুন...';
+
+  @override
+  String get commWallEmpty => 'এখনো কোনো পোস্ট নেই। প্রথম শেয়ার করুন!';
+
+  @override
+  String get commGroupsTitle => 'সহায়তা গ্রুপ';
+
+  @override
+  String get commGroupsCreate => 'গ্রুপ তৈরি করুন';
+
+  @override
+  String get commGroupsJoin => 'যোগ দিন';
+
+  @override
+  String get commGroupsJoined => 'যুক্ত আছেন';
+
+  @override
+  String get commGroupsOpenChat => 'গ্রুপ চ্যাট';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count সদস্য';
+  }
+
+  @override
+  String get commGroupsNameHint => 'গ্রুপের নাম';
+
+  @override
+  String get commGroupsDescHint => 'গ্রুপের বিবরণ ও বিষয়';
+
+  @override
+  String get commGroupsEmpty => 'এই ফিল্টারে কোনো গ্রুপ পাওয়া যায়নি।';
+
+  @override
+  String get commToggleOnlyFriendsMsg =>
+      'শুধুমাত্র বন্ধুরা আমাকে বার্তা পাঠাতে পারবে';
+
+  @override
+  String get commOpenCommunityCta => 'কমিউনিটি';
 }

@@ -2952,4 +2952,127 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get birthdayCardSubtitle =>
       'Vi önskar dig ett friskt och lyckligt år.';
+
+  @override
+  String get commDrawerProfileSubtitle => 'Ditt profilkort, humör & statistik';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'Utforska • Vägg • Grupper • Chatt';
+
+  @override
+  String get commTabWall => 'Vägg';
+
+  @override
+  String get commTabGroups => 'Grupper';
+
+  @override
+  String get commEditProfile => 'Redigera profil';
+
+  @override
+  String get commDoneEditing => 'Avbryt';
+
+  @override
+  String get commFriendsStat => 'Vänner';
+
+  @override
+  String get commAddFriend => 'Lägg till vän';
+
+  @override
+  String get commFriendPending => 'Skickad';
+
+  @override
+  String get commFriendsConnected => 'Vänner';
+
+  @override
+  String get commFriendsSheetTitle => 'Hälsovänner';
+
+  @override
+  String get commFriendsEmpty =>
+      'Inga vänner ännu. Utforska medlemmar för att knyta kontakt!';
+
+  @override
+  String get commMoodSectionTitle => 'Dagens humör';
+
+  @override
+  String get commMoodEnergetic => 'Energisk';
+
+  @override
+  String get commMoodCalm => 'Lugn';
+
+  @override
+  String get commMoodGrateful => 'Tacksam';
+
+  @override
+  String get commMoodFocused => 'Fokuserad';
+
+  @override
+  String get commMoodTired => 'Trött';
+
+  @override
+  String get commMoodRecovering => 'Återhämtar';
+
+  @override
+  String get commWallTitle => 'Erfarenhets- & frågevägg';
+
+  @override
+  String get commWallNewPost => 'Dela inlägg';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Titel (t.ex. Morgonpromenad & blodsocker)';
+
+  @override
+  String get commWallPostBodyHint =>
+      'Dela din erfarenhet eller ställ en fråga...';
+
+  @override
+  String get commWallPublishBtn => 'Publicera';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Läkarsvar';
+
+  @override
+  String get commWallCommentsTitle => 'Kommentarer';
+
+  @override
+  String get commWallCommentHint => 'Skriv en stöttande kommentar...';
+
+  @override
+  String get commWallEmpty => 'Inga inlägg ännu. Var först med att dela!';
+
+  @override
+  String get commGroupsTitle => 'Stödgrupper';
+
+  @override
+  String get commGroupsCreate => 'Skapa grupp';
+
+  @override
+  String get commGroupsJoin => 'Gå med';
+
+  @override
+  String get commGroupsJoined => 'Medlem';
+
+  @override
+  String get commGroupsOpenChat => 'Gruppchatt';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count medlemmar';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Gruppnamn';
+
+  @override
+  String get commGroupsDescHint => 'Gruppbeskrivning och fokus';
+
+  @override
+  String get commGroupsEmpty => 'Inga stödgrupper hittades för detta filter.';
+
+  @override
+  String get commToggleOnlyFriendsMsg =>
+      'Endast vänner kan skicka meddelanden till mig';
+
+  @override
+  String get commOpenCommunityCta => 'Gemenskap';
 }

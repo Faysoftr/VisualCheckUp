@@ -5487,6 +5487,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wishing you a healthy and happy year ahead.'**
   String get birthdayCardSubtitle;
+
+  /// No description provided for @commDrawerProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your social card, mood & stats'**
+  String get commDrawerProfileSubtitle;
+
+  /// No description provided for @commDrawerCommunitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover • Wall • Groups • Chat'**
+  String get commDrawerCommunitySubtitle;
+
+  /// No description provided for @commTabWall.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall'**
+  String get commTabWall;
+
+  /// No description provided for @commTabGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get commTabGroups;
+
+  /// No description provided for @commEditProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get commEditProfile;
+
+  /// No description provided for @commDoneEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commDoneEditing;
+
+  /// No description provided for @commFriendsStat.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get commFriendsStat;
+
+  /// No description provided for @commAddFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Friend'**
+  String get commAddFriend;
+
+  /// No description provided for @commFriendPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested'**
+  String get commFriendPending;
+
+  /// No description provided for @commFriendsConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get commFriendsConnected;
+
+  /// No description provided for @commFriendsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Friends'**
+  String get commFriendsSheetTitle;
+
+  /// No description provided for @commFriendsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No health friends yet. Discover peers to connect!'**
+  String get commFriendsEmpty;
+
+  /// No description provided for @commMoodSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Mood'**
+  String get commMoodSectionTitle;
+
+  /// No description provided for @commMoodEnergetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Energetic'**
+  String get commMoodEnergetic;
+
+  /// No description provided for @commMoodCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get commMoodCalm;
+
+  /// No description provided for @commMoodGrateful.
+  ///
+  /// In en, this message translates to:
+  /// **'Grateful'**
+  String get commMoodGrateful;
+
+  /// No description provided for @commMoodFocused.
+  ///
+  /// In en, this message translates to:
+  /// **'Focused'**
+  String get commMoodFocused;
+
+  /// No description provided for @commMoodTired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired'**
+  String get commMoodTired;
+
+  /// No description provided for @commMoodRecovering.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovering'**
+  String get commMoodRecovering;
+
+  /// No description provided for @commWallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Experience & Q&A Wall'**
+  String get commWallTitle;
+
+  /// No description provided for @commWallNewPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Post'**
+  String get commWallNewPost;
+
+  /// No description provided for @commWallPostTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (e.g., Morning walk & glucose balance)'**
+  String get commWallPostTitleHint;
+
+  /// No description provided for @commWallPostBodyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your experience or ask the community...'**
+  String get commWallPostBodyHint;
+
+  /// No description provided for @commWallPublishBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get commWallPublishBtn;
+
+  /// No description provided for @commWallDoctorReplyBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor Reply'**
+  String get commWallDoctorReplyBadge;
+
+  /// No description provided for @commWallCommentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commWallCommentsTitle;
+
+  /// No description provided for @commWallCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a supportive comment...'**
+  String get commWallCommentHint;
+
+  /// No description provided for @commWallEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet. Be the first to share!'**
+  String get commWallEmpty;
+
+  /// No description provided for @commGroupsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Groups'**
+  String get commGroupsTitle;
+
+  /// No description provided for @commGroupsCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Group'**
+  String get commGroupsCreate;
+
+  /// No description provided for @commGroupsJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get commGroupsJoin;
+
+  /// No description provided for @commGroupsJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get commGroupsJoined;
+
+  /// No description provided for @commGroupsOpenChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Chat'**
+  String get commGroupsOpenChat;
+
+  /// No description provided for @commGroupsMembersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} members'**
+  String commGroupsMembersCount(int count);
+
+  /// No description provided for @commGroupsNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get commGroupsNameHint;
+
+  /// No description provided for @commGroupsDescHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Group description and focus topic'**
+  String get commGroupsDescHint;
+
+  /// No description provided for @commGroupsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No support groups found for this filter.'**
+  String get commGroupsEmpty;
+
+  /// No description provided for @commToggleOnlyFriendsMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Only friends can send me messages'**
+  String get commToggleOnlyFriendsMsg;
+
+  /// No description provided for @commOpenCommunityCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get commOpenCommunityCta;
 }
 
 class _AppLocalizationsDelegate

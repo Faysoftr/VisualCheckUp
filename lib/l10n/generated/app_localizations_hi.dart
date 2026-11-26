@@ -2928,4 +2928,125 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get birthdayCardSubtitle =>
       'आपको स्वस्थ और खुशहाल वर्ष की शुभकामनाएँ।';
+
+  @override
+  String get commDrawerProfileSubtitle => 'आपका सोशल कार्ड, मूड और आँकड़े';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'खोजें • वॉल • समूह • चैट';
+
+  @override
+  String get commTabWall => 'वॉल';
+
+  @override
+  String get commTabGroups => 'समूह';
+
+  @override
+  String get commEditProfile => 'प्रोफ़ाइल संपादित करें';
+
+  @override
+  String get commDoneEditing => 'रद्द करें';
+
+  @override
+  String get commFriendsStat => 'दोस्त';
+
+  @override
+  String get commAddFriend => 'दोस्त जोड़ें';
+
+  @override
+  String get commFriendPending => 'अनुरोध भेजा';
+
+  @override
+  String get commFriendsConnected => 'दोस्त';
+
+  @override
+  String get commFriendsSheetTitle => 'स्वास्थ्य मित्र';
+
+  @override
+  String get commFriendsEmpty =>
+      'अभी कोई स्वास्थ्य मित्र नहीं है। खोजें टैब से जुड़ें!';
+
+  @override
+  String get commMoodSectionTitle => 'आज का मूड';
+
+  @override
+  String get commMoodEnergetic => 'ऊर्जावान';
+
+  @override
+  String get commMoodCalm => 'शांत';
+
+  @override
+  String get commMoodGrateful => 'आभारी';
+
+  @override
+  String get commMoodFocused => 'केंद्रित';
+
+  @override
+  String get commMoodTired => 'थका हुआ';
+
+  @override
+  String get commMoodRecovering => 'स्वस्थ हो रहा';
+
+  @override
+  String get commWallTitle => 'अनुभव और प्रश्न वॉल';
+
+  @override
+  String get commWallNewPost => 'पोस्ट करें';
+
+  @override
+  String get commWallPostTitleHint =>
+      'शीर्षक (जैसे: सुबह की सैर और शुगर संतुलन)';
+
+  @override
+  String get commWallPostBodyHint => 'अपना अनुभव या प्रश्न साझा करें...';
+
+  @override
+  String get commWallPublishBtn => 'प्रकाशित करें';
+
+  @override
+  String get commWallDoctorReplyBadge => 'डॉक्टर का उत्तर';
+
+  @override
+  String get commWallCommentsTitle => 'टिप्पणियाँ';
+
+  @override
+  String get commWallCommentHint => 'सहायक टिप्पणी लिखें...';
+
+  @override
+  String get commWallEmpty => 'अभी कोई पोस्ट नहीं। सबसे पहले साझा करें!';
+
+  @override
+  String get commGroupsTitle => 'सहायता समूह';
+
+  @override
+  String get commGroupsCreate => 'समूह बनाएँ';
+
+  @override
+  String get commGroupsJoin => 'जुड़ें';
+
+  @override
+  String get commGroupsJoined => 'जुड़े हुए';
+
+  @override
+  String get commGroupsOpenChat => 'समूह चैट';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count सदस्य';
+  }
+
+  @override
+  String get commGroupsNameHint => 'समूह का नाम';
+
+  @override
+  String get commGroupsDescHint => 'समूह विवरण और विषय';
+
+  @override
+  String get commGroupsEmpty => 'इस फ़िल्टर के लिए कोई समूह नहीं मिला।';
+
+  @override
+  String get commToggleOnlyFriendsMsg => 'केवल दोस्त मुझे संदेश भेज सकें';
+
+  @override
+  String get commOpenCommunityCta => 'समुदाय';
 }

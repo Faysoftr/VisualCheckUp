@@ -2954,4 +2954,128 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'Sağlıklı ve mutlu bir yıl dileriz.';
+
+  @override
+  String get commDrawerProfileSubtitle =>
+      'Sosyal kartın, ruh halin & istatistikler';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'Keşfet • Duvar • Gruplar • Sohbet';
+
+  @override
+  String get commTabWall => 'Duvar';
+
+  @override
+  String get commTabGroups => 'Gruplar';
+
+  @override
+  String get commEditProfile => 'Profili Düzenle';
+
+  @override
+  String get commDoneEditing => 'Vazgeç';
+
+  @override
+  String get commFriendsStat => 'Arkadaşlar';
+
+  @override
+  String get commAddFriend => 'Arkadaş Ekle';
+
+  @override
+  String get commFriendPending => 'İstek Gönderildi';
+
+  @override
+  String get commFriendsConnected => 'Arkadaş';
+
+  @override
+  String get commFriendsSheetTitle => 'Sağlık Arkadaşlarım';
+
+  @override
+  String get commFriendsEmpty =>
+      'Henüz sağlık arkadaşınız yok. Keşfet\'ten yeni kişilerle tanışın!';
+
+  @override
+  String get commMoodSectionTitle => 'Bugünkü Ruh Halim';
+
+  @override
+  String get commMoodEnergetic => 'Enerjik';
+
+  @override
+  String get commMoodCalm => 'Sakin';
+
+  @override
+  String get commMoodGrateful => 'Şükranlı';
+
+  @override
+  String get commMoodFocused => 'Odaklı';
+
+  @override
+  String get commMoodTired => 'Yorgun';
+
+  @override
+  String get commMoodRecovering => 'İyileşiyor';
+
+  @override
+  String get commWallTitle => 'Deneyim & Soru Duvarı';
+
+  @override
+  String get commWallNewPost => 'Paylaşım Yap';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Başlık (örn: Sabah yürüyüşü ve şeker dengesi)';
+
+  @override
+  String get commWallPostBodyHint =>
+      'Deneyiminizi veya sorunuzu toplulukla paylaşın...';
+
+  @override
+  String get commWallPublishBtn => 'Paylaş';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Doktor Yanıtlı';
+
+  @override
+  String get commWallCommentsTitle => 'Yorumlar';
+
+  @override
+  String get commWallCommentHint => 'Destekleyici bir yorum yaz...';
+
+  @override
+  String get commWallEmpty => 'Henüz paylaşım yok. İlk deneyimi sen paylaş!';
+
+  @override
+  String get commGroupsTitle => 'Destek Grupları';
+
+  @override
+  String get commGroupsCreate => 'Grup Oluştur';
+
+  @override
+  String get commGroupsJoin => 'Katıl';
+
+  @override
+  String get commGroupsJoined => 'Katıldın';
+
+  @override
+  String get commGroupsOpenChat => 'Grup Sohbeti';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count üye';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Grup adı';
+
+  @override
+  String get commGroupsDescHint => 'Grup açıklaması ve odak konusu';
+
+  @override
+  String get commGroupsEmpty => 'Bu filtrede henüz destek grubu yok.';
+
+  @override
+  String get commToggleOnlyFriendsMsg =>
+      'Sadece arkadaşlarım mesaj gönderebilsin';
+
+  @override
+  String get commOpenCommunityCta => 'Topluluk';
 }

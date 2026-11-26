@@ -2952,4 +2952,127 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get birthdayCardSubtitle =>
       'Wir wünschen ein gesundes, glückliches Jahr.';
+
+  @override
+  String get commDrawerProfileSubtitle => 'Deine Profilkarte, Stimmung & Stats';
+
+  @override
+  String get commDrawerCommunitySubtitle =>
+      'Entdecken • Pinnwand • Gruppen • Chat';
+
+  @override
+  String get commTabWall => 'Pinnwand';
+
+  @override
+  String get commTabGroups => 'Gruppen';
+
+  @override
+  String get commEditProfile => 'Profil bearbeiten';
+
+  @override
+  String get commDoneEditing => 'Abbrechen';
+
+  @override
+  String get commFriendsStat => 'Freunde';
+
+  @override
+  String get commAddFriend => 'Freund hinzufügen';
+
+  @override
+  String get commFriendPending => 'Angefragt';
+
+  @override
+  String get commFriendsConnected => 'Befreundet';
+
+  @override
+  String get commFriendsSheetTitle => 'Gesundheitsfreunde';
+
+  @override
+  String get commFriendsEmpty =>
+      'Noch keine Freunde. Entdecke Mitglieder zum Vernetzen!';
+
+  @override
+  String get commMoodSectionTitle => 'Heutige Stimmung';
+
+  @override
+  String get commMoodEnergetic => 'Energiegeladen';
+
+  @override
+  String get commMoodCalm => 'Ruhig';
+
+  @override
+  String get commMoodGrateful => 'Dankbar';
+
+  @override
+  String get commMoodFocused => 'Fokussiert';
+
+  @override
+  String get commMoodTired => 'Müde';
+
+  @override
+  String get commMoodRecovering => 'Erholend';
+
+  @override
+  String get commWallTitle => 'Erfahrungs- & Fragepinnwand';
+
+  @override
+  String get commWallNewPost => 'Beitrag teilen';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Titel (z. B. Morgenspaziergang & Blutzucker)';
+
+  @override
+  String get commWallPostBodyHint =>
+      'Teile deine Erfahrung oder stelle eine Frage...';
+
+  @override
+  String get commWallPublishBtn => 'Veröffentlichen';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Arztantwort';
+
+  @override
+  String get commWallCommentsTitle => 'Kommentare';
+
+  @override
+  String get commWallCommentHint => 'Schreibe einen hilfreichen Kommentar...';
+
+  @override
+  String get commWallEmpty => 'Noch keine Beiträge. Teile den ersten!';
+
+  @override
+  String get commGroupsTitle => 'Selbsthilfegruppen';
+
+  @override
+  String get commGroupsCreate => 'Gruppe erstellen';
+
+  @override
+  String get commGroupsJoin => 'Beitreten';
+
+  @override
+  String get commGroupsJoined => 'Beigetreten';
+
+  @override
+  String get commGroupsOpenChat => 'Gruppenchat';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count Mitglieder';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Gruppenname';
+
+  @override
+  String get commGroupsDescHint => 'Gruppenbeschreibung und Schwerpunkt';
+
+  @override
+  String get commGroupsEmpty => 'Keine Gruppen für diesen Filter gefunden.';
+
+  @override
+  String get commToggleOnlyFriendsMsg => 'Nur Freunde können mir schreiben';
+
+  @override
+  String get commOpenCommunityCta => 'Community';
 }

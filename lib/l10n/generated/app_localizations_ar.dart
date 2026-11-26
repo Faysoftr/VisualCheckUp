@@ -2917,4 +2917,125 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'نتمنى لك عامًا صحيًا وسعيدًا.';
+
+  @override
+  String get commDrawerProfileSubtitle => 'بطاقتك الاجتماعية ومزاجك وإحصائياتك';
+
+  @override
+  String get commDrawerCommunitySubtitle =>
+      'استكشاف • الحائط • المجموعات • الدردشة';
+
+  @override
+  String get commTabWall => 'الحائط';
+
+  @override
+  String get commTabGroups => 'المجموعات';
+
+  @override
+  String get commEditProfile => 'تعديل الملف';
+
+  @override
+  String get commDoneEditing => 'إلغاء';
+
+  @override
+  String get commFriendsStat => 'الأصدقاء';
+
+  @override
+  String get commAddFriend => 'إضافة صديق';
+
+  @override
+  String get commFriendPending => 'تم الإرسال';
+
+  @override
+  String get commFriendsConnected => 'أصدقاء';
+
+  @override
+  String get commFriendsSheetTitle => 'أصدقاء الصحة';
+
+  @override
+  String get commFriendsEmpty => 'لا يوجد أصدقاء بعد. استكشف الأعضاء للتواصل!';
+
+  @override
+  String get commMoodSectionTitle => 'مزاج اليوم';
+
+  @override
+  String get commMoodEnergetic => 'نشيط';
+
+  @override
+  String get commMoodCalm => 'هادئ';
+
+  @override
+  String get commMoodGrateful => 'ممتن';
+
+  @override
+  String get commMoodFocused => 'مركز';
+
+  @override
+  String get commMoodTired => 'متعب';
+
+  @override
+  String get commMoodRecovering => 'يتعافى';
+
+  @override
+  String get commWallTitle => 'حائط التجارب والأسئلة';
+
+  @override
+  String get commWallNewPost => 'نشر تجربة';
+
+  @override
+  String get commWallPostTitleHint =>
+      'العنوان (مثال: المشي الصباحي وتوازن السكر)';
+
+  @override
+  String get commWallPostBodyHint => 'شارك تجربتك أو سؤالك مع المجتمع...';
+
+  @override
+  String get commWallPublishBtn => 'نشر';
+
+  @override
+  String get commWallDoctorReplyBadge => 'رد طبيب';
+
+  @override
+  String get commWallCommentsTitle => 'التعليقات';
+
+  @override
+  String get commWallCommentHint => 'اكتب تعليقاً داعماً...';
+
+  @override
+  String get commWallEmpty => 'لا توجد منشورات بعد. كن أول من يشارك!';
+
+  @override
+  String get commGroupsTitle => 'مجموعات الدعم';
+
+  @override
+  String get commGroupsCreate => 'إنشاء مجموعة';
+
+  @override
+  String get commGroupsJoin => 'انضمام';
+
+  @override
+  String get commGroupsJoined => 'منضم';
+
+  @override
+  String get commGroupsOpenChat => 'دردشة المجموعة';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count عضو';
+  }
+
+  @override
+  String get commGroupsNameHint => 'اسم المجموعة';
+
+  @override
+  String get commGroupsDescHint => 'وصف المجموعة وموضوعها';
+
+  @override
+  String get commGroupsEmpty => 'لا توجد مجموعات لهذا الفلتر.';
+
+  @override
+  String get commToggleOnlyFriendsMsg => 'الأصدقاء فقط يمكنهم مراسلتي';
+
+  @override
+  String get commOpenCommunityCta => 'المجتمع';
 }

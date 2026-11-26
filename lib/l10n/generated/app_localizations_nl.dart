@@ -2950,4 +2950,128 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get birthdayCardSubtitle =>
       'Wij wensen je een gezond en gelukkig jaar.';
+
+  @override
+  String get commDrawerProfileSubtitle =>
+      'Je profielkaart, stemming & statistieken';
+
+  @override
+  String get commDrawerCommunitySubtitle =>
+      'Ontdek • Prikbord • Groepen • Chat';
+
+  @override
+  String get commTabWall => 'Prikbord';
+
+  @override
+  String get commTabGroups => 'Groepen';
+
+  @override
+  String get commEditProfile => 'Profiel bewerken';
+
+  @override
+  String get commDoneEditing => 'Annuleren';
+
+  @override
+  String get commFriendsStat => 'Vrienden';
+
+  @override
+  String get commAddFriend => 'Vriend toevoegen';
+
+  @override
+  String get commFriendPending => 'Aangevraagd';
+
+  @override
+  String get commFriendsConnected => 'Vrienden';
+
+  @override
+  String get commFriendsSheetTitle => 'Gezondheidsvrienden';
+
+  @override
+  String get commFriendsEmpty =>
+      'Nog geen vrienden. Ontdek leden om contact te leggen!';
+
+  @override
+  String get commMoodSectionTitle => 'Stemming vandaag';
+
+  @override
+  String get commMoodEnergetic => 'Energiek';
+
+  @override
+  String get commMoodCalm => 'Kalm';
+
+  @override
+  String get commMoodGrateful => 'Dankbaar';
+
+  @override
+  String get commMoodFocused => 'Gefocust';
+
+  @override
+  String get commMoodTired => 'Moe';
+
+  @override
+  String get commMoodRecovering => 'Herstellend';
+
+  @override
+  String get commWallTitle => 'Ervaringen & Vragen';
+
+  @override
+  String get commWallNewPost => 'Bericht delen';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Titel (bijv. Ochtendwandeling & bloedsuiker)';
+
+  @override
+  String get commWallPostBodyHint => 'Deel je ervaring of stel een vraag...';
+
+  @override
+  String get commWallPublishBtn => 'Plaatsen';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Arts-antwoord';
+
+  @override
+  String get commWallCommentsTitle => 'Reacties';
+
+  @override
+  String get commWallCommentHint => 'Schrijf een steunende reactie...';
+
+  @override
+  String get commWallEmpty => 'Nog geen berichten. Deel als eerste!';
+
+  @override
+  String get commGroupsTitle => 'Steungroepen';
+
+  @override
+  String get commGroupsCreate => 'Groep maken';
+
+  @override
+  String get commGroupsJoin => 'Deelnemen';
+
+  @override
+  String get commGroupsJoined => 'Lid';
+
+  @override
+  String get commGroupsOpenChat => 'Groepschat';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count leden';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Groepsnaam';
+
+  @override
+  String get commGroupsDescHint => 'Groepsbeschrijving en onderwerp';
+
+  @override
+  String get commGroupsEmpty => 'Geen steungroepen gevonden voor dit filter.';
+
+  @override
+  String get commToggleOnlyFriendsMsg =>
+      'Alleen vrienden kunnen mij berichten sturen';
+
+  @override
+  String get commOpenCommunityCta => 'Community';
 }

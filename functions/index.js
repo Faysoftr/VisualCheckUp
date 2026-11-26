@@ -160,8 +160,19 @@ exports.moderateCommunityImage = functions
       const violence = annotation.violence || 'UNKNOWN';
       const racy = annotation.racy || 'UNKNOWN';
       if (HIGH_RISK_LEVELS.has(adult) || HIGH_RISK_LEVELS.has(violence) || racy === 'VERY_LIKELY') {
-        if (objectKey) {
+        const callerUid = context.auth.uid;
+        const isOwnedKey =
+          Boolean(objectKey) &&
+          !objectKey.includes('..') &&
+          Array.from(ALLOWED_FOLDERS).some((folder) =>
+            objectKey.startsWith(`${folder}/${callerUid}/`),
+          );
+        if (isOwnedKey) {
           await destroyR2Object(objectKey);
+        } else if (objectKey) {
+          console.warn(
+            `Blocked unauthorized R2 delete attempt by uid=${callerUid} for key=${objectKey}`,
+          );
         }
         return {
           safe: false,

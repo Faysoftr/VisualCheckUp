@@ -2855,4 +2855,123 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => '祝你新的一岁健康快乐。';
+
+  @override
+  String get commDrawerProfileSubtitle => '您的社交名片、心情与统计';
+
+  @override
+  String get commDrawerCommunitySubtitle => '发现 • 动态墙 • 小组 • 聊天';
+
+  @override
+  String get commTabWall => '动态墙';
+
+  @override
+  String get commTabGroups => '小组';
+
+  @override
+  String get commEditProfile => '编辑资料';
+
+  @override
+  String get commDoneEditing => '取消';
+
+  @override
+  String get commFriendsStat => '好友';
+
+  @override
+  String get commAddFriend => '加好友';
+
+  @override
+  String get commFriendPending => '已请求';
+
+  @override
+  String get commFriendsConnected => '好友';
+
+  @override
+  String get commFriendsSheetTitle => '健康好友';
+
+  @override
+  String get commFriendsEmpty => '还没有健康好友，去发现页认识新伙伴吧！';
+
+  @override
+  String get commMoodSectionTitle => '今日心情';
+
+  @override
+  String get commMoodEnergetic => '充满活力';
+
+  @override
+  String get commMoodCalm => '平静';
+
+  @override
+  String get commMoodGrateful => '感恩';
+
+  @override
+  String get commMoodFocused => '专注';
+
+  @override
+  String get commMoodTired => '疲惫';
+
+  @override
+  String get commMoodRecovering => '恢复中';
+
+  @override
+  String get commWallTitle => '经验与问答墙';
+
+  @override
+  String get commWallNewPost => '发布动态';
+
+  @override
+  String get commWallPostTitleHint => '标题（例如：晨走与血糖平衡）';
+
+  @override
+  String get commWallPostBodyHint => '分享您的经验或向社区提问...';
+
+  @override
+  String get commWallPublishBtn => '发布';
+
+  @override
+  String get commWallDoctorReplyBadge => '医生回复';
+
+  @override
+  String get commWallCommentsTitle => '评论';
+
+  @override
+  String get commWallCommentHint => '写下暖心评论...';
+
+  @override
+  String get commWallEmpty => '暂无动态，成为第一个分享的人吧！';
+
+  @override
+  String get commGroupsTitle => '互助小组';
+
+  @override
+  String get commGroupsCreate => '创建小组';
+
+  @override
+  String get commGroupsJoin => '加入';
+
+  @override
+  String get commGroupsJoined => '已加入';
+
+  @override
+  String get commGroupsOpenChat => '小组聊天';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count 位成员';
+  }
+
+  @override
+  String get commGroupsNameHint => '小组名称';
+
+  @override
+  String get commGroupsDescHint => '小组简介与关注主题';
+
+  @override
+  String get commGroupsEmpty => '未找到符合条件的小组。';
+
+  @override
+  String get commToggleOnlyFriendsMsg => '仅允许好友给我发消息';
+
+  @override
+  String get commOpenCommunityCta => '社区';
 }

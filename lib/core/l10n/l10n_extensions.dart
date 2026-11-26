@@ -843,6 +843,25 @@ extension DoctorSpecialtyL10n on DoctorSpecialty {
   }
 }
 
+extension HealthMoodL10n on HealthMood {
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case HealthMood.energetic:
+        return l10n.commMoodEnergetic;
+      case HealthMood.calm:
+        return l10n.commMoodCalm;
+      case HealthMood.grateful:
+        return l10n.commMoodGrateful;
+      case HealthMood.focused:
+        return l10n.commMoodFocused;
+      case HealthMood.tired:
+        return l10n.commMoodTired;
+      case HealthMood.recovering:
+        return l10n.commMoodRecovering;
+    }
+  }
+}
+
 
 
 

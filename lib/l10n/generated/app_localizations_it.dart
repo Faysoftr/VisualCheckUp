@@ -2948,4 +2948,128 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'Ti auguriamo un anno sano e felice.';
+
+  @override
+  String get commDrawerProfileSubtitle =>
+      'La tua scheda social, umore e statistiche';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'Scopri • Bacheca • Gruppi • Chat';
+
+  @override
+  String get commTabWall => 'Bacheca';
+
+  @override
+  String get commTabGroups => 'Gruppi';
+
+  @override
+  String get commEditProfile => 'Modifica profilo';
+
+  @override
+  String get commDoneEditing => 'Annulla';
+
+  @override
+  String get commFriendsStat => 'Amici';
+
+  @override
+  String get commAddFriend => 'Aggiungi amico';
+
+  @override
+  String get commFriendPending => 'Richiesto';
+
+  @override
+  String get commFriendsConnected => 'Amici';
+
+  @override
+  String get commFriendsSheetTitle => 'Amici salute';
+
+  @override
+  String get commFriendsEmpty =>
+      'Nessun amico ancora. Scopri membri con cui connetterti!';
+
+  @override
+  String get commMoodSectionTitle => 'Umore di oggi';
+
+  @override
+  String get commMoodEnergetic => 'Energico';
+
+  @override
+  String get commMoodCalm => 'Calmo';
+
+  @override
+  String get commMoodGrateful => 'Grato';
+
+  @override
+  String get commMoodFocused => 'Concentrato';
+
+  @override
+  String get commMoodTired => 'Stanco';
+
+  @override
+  String get commMoodRecovering => 'In ripresa';
+
+  @override
+  String get commWallTitle => 'Bacheca esperienze e domande';
+
+  @override
+  String get commWallNewPost => 'Condividi';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Titolo (es. Passeggiata mattutina e glicemia)';
+
+  @override
+  String get commWallPostBodyHint =>
+      'Condividi la tua esperienza o fai una domanda...';
+
+  @override
+  String get commWallPublishBtn => 'Pubblica';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Risposta medico';
+
+  @override
+  String get commWallCommentsTitle => 'Commenti';
+
+  @override
+  String get commWallCommentHint => 'Scrivi un commento di supporto...';
+
+  @override
+  String get commWallEmpty => 'Nessun post ancora. Sii il primo a condividere!';
+
+  @override
+  String get commGroupsTitle => 'Gruppi di supporto';
+
+  @override
+  String get commGroupsCreate => 'Crea gruppo';
+
+  @override
+  String get commGroupsJoin => 'Unisciti';
+
+  @override
+  String get commGroupsJoined => 'Iscritto';
+
+  @override
+  String get commGroupsOpenChat => 'Chat gruppo';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count membri';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Nome del gruppo';
+
+  @override
+  String get commGroupsDescHint => 'Descrizione e argomento del gruppo';
+
+  @override
+  String get commGroupsEmpty => 'Nessun gruppo trovato per questo filtro.';
+
+  @override
+  String get commToggleOnlyFriendsMsg =>
+      'Solo gli amici possono inviarmi messaggi';
+
+  @override
+  String get commOpenCommunityCta => 'Community';
 }

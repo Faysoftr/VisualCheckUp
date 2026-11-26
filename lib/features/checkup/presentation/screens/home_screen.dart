@@ -27,6 +27,7 @@ import 'package:visualcheckup/features/checkup/presentation/widgets/follow_up_sh
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_community_hub_screen.dart';
+import 'package:visualcheckup/features/community/presentation/screens/my_health_profile_screen.dart';
 import 'package:visualcheckup/features/diet/data/diet_repository.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/diet/presentation/screens/diet_hub_screen.dart';
@@ -201,6 +202,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     await _loadDashboardData();
+  }
+
+  Future<void> _openMyProfile() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => MyHealthProfileScreen(
+          currentUser: widget.currentUser,
+          repository: HealthCommunityRepository(),
+          adminRepository: widget.adminRepository,
+        ),
+      ),
+    );
   }
 
   Future<void> _openHealthCommunity({int initialTabIndex = 0}) async {
@@ -559,6 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenMedicationReminders: _openMedicationReminders,
         onOpenDietMenu: () => _openDietHub(initialTabIndex: 0),
         onOpenAiCalorieScanner: () => _openDietHub(initialTabIndex: 3),
+        onOpenMyProfile: _openMyProfile,
         onOpenHealthCommunity: () => _openHealthCommunity(initialTabIndex: 0),
         onOpenDoctorSearch: () => _openDoctorSearch(),
         onOpenDoctorApplication: _openDoctorApplication,

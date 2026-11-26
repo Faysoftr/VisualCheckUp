@@ -33,6 +33,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenMedicationReminders,
     this.onOpenDietMenu,
     this.onOpenAiCalorieScanner,
+    this.onOpenMyProfile,
     this.onOpenHealthCommunity,
     this.onOpenDoctorSearch,
     this.onOpenDoctorApplication,
@@ -63,6 +64,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenMedicationReminders;
   final VoidCallback? onOpenDietMenu;
   final VoidCallback? onOpenAiCalorieScanner;
+  final VoidCallback? onOpenMyProfile;
   final VoidCallback? onOpenHealthCommunity;
   final VoidCallback? onOpenDoctorSearch;
   final VoidCallback? onOpenDoctorApplication;
@@ -138,7 +140,6 @@ class AppDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Container(
-                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -165,85 +166,107 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      child: Text(
-                        currentUser.initials,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    key: const Key('drawer_profile_header_card'),
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: onOpenMyProfile != null
+                        ? () => _closeAndRun(context, onOpenMyProfile!)
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
                         children: [
-                          Text(
-                            currentUser.displayName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                          CircleAvatar(
+                            radius: 23,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.2),
+                            child: Text(
+                              currentUser.initials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            currentUser.email ?? l10n.localOnlyLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  _providerIcon(currentUser.provider),
-                                  size: 12,
-                                  color: Colors.white,
+                                Text(
+                                  currentUser.displayName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
                                 ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    l10n.accountTypeLabel(
-                                      currentUser.provider.localizedLabel(l10n),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  currentUser.email ?? l10n.localOnlyLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.85),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.18),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _providerIcon(currentUser.provider),
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          l10n.accountTypeLabel(
+                                            currentUser.provider
+                                                .localizedLabel(l10n),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          if (onOpenMyProfile != null)
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -251,6 +274,148 @@ class AppDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 children: [
+                  // #1 Top Menu Item: Profilim (Social Formula Bank style)
+                  if (onOpenMyProfile != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 2, 4, 6),
+                      child: Material(
+                        color: isDark
+                            ? AppTheme.primaryTeal.withValues(alpha: 0.22)
+                            : AppTheme.primaryTeal.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(15),
+                        child: InkWell(
+                          key: const Key('drawer_my_profile_tile'),
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () => _closeAndRun(context, onOpenMyProfile!),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.primaryTeal,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.person_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 11),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.commTabMyProfile,
+                                        style: theme.textTheme.titleSmall
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: isDark
+                                              ? AppTheme.secondaryMint
+                                              : AppTheme.primaryTeal,
+                                        ),
+                                      ),
+                                      Text(
+                                        l10n.commDrawerProfileSubtitle,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 20,
+                                  color: isDark
+                                      ? AppTheme.secondaryMint
+                                      : AppTheme.primaryTeal,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  // #2 Top Menu Item: Sağlık Topluluğu (directly under Profilim!)
+                  if (onOpenHealthCommunity != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
+                      child: Material(
+                        color: isDark
+                            ? const Color(0xFF0F766E).withValues(alpha: 0.2)
+                            : const Color(0xFF0F766E).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(15),
+                        child: InkWell(
+                          key: const Key('drawer_community_tile'),
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: () =>
+                              _closeAndRun(context, onOpenHealthCommunity!),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF0F766E),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.public_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 11),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.commMenuTitle,
+                                        style: theme.textTheme.titleSmall
+                                            ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      Text(
+                                        l10n.commDrawerCommunitySubtitle,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 20,
+                                  color: Color(0xFF0F766E),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   if (onOpenDonate != null)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(4, 2, 4, 8),
@@ -281,7 +446,7 @@ class AppDrawer extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
-                                vertical: 11,
+                                vertical: 10,
                               ),
                               child: Row(
                                 children: [
@@ -295,7 +460,7 @@ class AppDrawer extends StatelessWidget {
                                     child: const Icon(
                                       Icons.volunteer_activism_rounded,
                                       color: Colors.white,
-                                      size: 20,
+                                      size: 19,
                                     ),
                                   ),
                                   const SizedBox(width: 11),
@@ -430,14 +595,6 @@ class AppDrawer extends StatelessWidget {
                       accentColor: const Color(0xFFD97706),
                       onTap: () =>
                           _closeAndRun(context, onOpenAiCalorieScanner!),
-                    ),
-                  if (onOpenHealthCommunity != null)
-                    _DrawerTile(
-                      icon: Icons.public_rounded,
-                      label: l10n.commMenuTitle,
-                      accentColor: AppTheme.primaryTeal,
-                      onTap: () =>
-                          _closeAndRun(context, onOpenHealthCommunity!),
                     ),
                   if (onOpenDoctorSearch != null)
                     _DrawerTile(

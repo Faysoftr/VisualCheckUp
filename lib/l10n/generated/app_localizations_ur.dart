@@ -2924,4 +2924,125 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'آپ کو صحت مند اور خوشگوار سال مبارک۔';
+
+  @override
+  String get commDrawerProfileSubtitle => 'آپ کا سوشل کارڈ، موڈ اور اعدادوشمار';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'تلاش • وال • گروپس • چیٹ';
+
+  @override
+  String get commTabWall => 'وال';
+
+  @override
+  String get commTabGroups => 'گروپس';
+
+  @override
+  String get commEditProfile => 'پروفائل ترمیم';
+
+  @override
+  String get commDoneEditing => 'منسوخ';
+
+  @override
+  String get commFriendsStat => 'دوست';
+
+  @override
+  String get commAddFriend => 'دوست بنائیں';
+
+  @override
+  String get commFriendPending => 'درخواست بھیجی گئی';
+
+  @override
+  String get commFriendsConnected => 'دوست';
+
+  @override
+  String get commFriendsSheetTitle => 'صحت کے دوست';
+
+  @override
+  String get commFriendsEmpty =>
+      'ابھی کوئی دوست نہیں۔ تلاش سے نئے لوگوں سے جڑیں!';
+
+  @override
+  String get commMoodSectionTitle => 'آج کا موڈ';
+
+  @override
+  String get commMoodEnergetic => 'پرجوش';
+
+  @override
+  String get commMoodCalm => 'پرسکون';
+
+  @override
+  String get commMoodGrateful => 'شکر گزار';
+
+  @override
+  String get commMoodFocused => 'مرکوز';
+
+  @override
+  String get commMoodTired => 'تھکا ہوا';
+
+  @override
+  String get commMoodRecovering => 'صحت یاب';
+
+  @override
+  String get commWallTitle => 'تجربات اور سوالات وال';
+
+  @override
+  String get commWallNewPost => 'پوسٹ کریں';
+
+  @override
+  String get commWallPostTitleHint =>
+      'عنوان (مثلاً: صبح کی سیر اور شوگر کا توازن)';
+
+  @override
+  String get commWallPostBodyHint => 'اپنا تجربہ یا سوال شیئر کریں...';
+
+  @override
+  String get commWallPublishBtn => 'شائع کریں';
+
+  @override
+  String get commWallDoctorReplyBadge => 'ڈاکٹر کا جواب';
+
+  @override
+  String get commWallCommentsTitle => 'تبصرے';
+
+  @override
+  String get commWallCommentHint => 'حوصلہ افزا تبصرہ لکھیں...';
+
+  @override
+  String get commWallEmpty => 'ابھی کوئی پوسٹ نہیں۔ سب سے پہلے شیئر کریں!';
+
+  @override
+  String get commGroupsTitle => 'سپورٹ گروپس';
+
+  @override
+  String get commGroupsCreate => 'گروپ بنائیں';
+
+  @override
+  String get commGroupsJoin => 'شامل ہوں';
+
+  @override
+  String get commGroupsJoined => 'شامل ہیں';
+
+  @override
+  String get commGroupsOpenChat => 'گروپ چیٹ';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count اراکین';
+  }
+
+  @override
+  String get commGroupsNameHint => 'گروپ کا نام';
+
+  @override
+  String get commGroupsDescHint => 'گروپ کی تفصیل اور موضوع';
+
+  @override
+  String get commGroupsEmpty => 'اس فلٹر کے لیے کوئی گروپ نہیں ملا۔';
+
+  @override
+  String get commToggleOnlyFriendsMsg => 'صرف دوست مجھے پیغام بھیج سکیں';
+
+  @override
+  String get commOpenCommunityCta => 'کمیونٹی';
 }

@@ -1419,5 +1419,51 @@
         "type": "String"
       }
     }
-  }
+  },
+  "commDrawerProfileSubtitle": "Your social card, mood & stats",
+  "commDrawerCommunitySubtitle": "Discover • Wall • Groups • Chat",
+  "commTabWall": "Wall",
+  "commTabGroups": "Groups",
+  "commEditProfile": "Edit Profile",
+  "commDoneEditing": "Cancel",
+  "commFriendsStat": "Friends",
+  "commAddFriend": "Add Friend",
+  "commFriendPending": "Requested",
+  "commFriendsConnected": "Friends",
+  "commFriendsSheetTitle": "Health Friends",
+  "commFriendsEmpty": "No health friends yet. Discover peers to connect!",
+  "commMoodSectionTitle": "Today's Mood",
+  "commMoodEnergetic": "Energetic",
+  "commMoodCalm": "Calm",
+  "commMoodGrateful": "Grateful",
+  "commMoodFocused": "Focused",
+  "commMoodTired": "Tired",
+  "commMoodRecovering": "Recovering",
+  "commWallTitle": "Experience & Q&A Wall",
+  "commWallNewPost": "Share Post",
+  "commWallPostTitleHint": "Title (e.g., Morning walk & glucose balance)",
+  "commWallPostBodyHint": "Share your experience or ask the community...",
+  "commWallPublishBtn": "Publish",
+  "commWallDoctorReplyBadge": "Doctor Reply",
+  "commWallCommentsTitle": "Comments",
+  "commWallCommentHint": "Write a supportive comment...",
+  "commWallEmpty": "No posts yet. Be the first to share!",
+  "commGroupsTitle": "Support Groups",
+  "commGroupsCreate": "Create Group",
+  "commGroupsJoin": "Join",
+  "commGroupsJoined": "Joined",
+  "commGroupsOpenChat": "Group Chat",
+  "commGroupsMembersCount": "{count} members",
+  "@commGroupsMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commGroupsNameHint": "Group name",
+  "commGroupsDescHint": "Group description and focus topic",
+  "commGroupsEmpty": "No support groups found for this filter.",
+  "commToggleOnlyFriendsMsg": "Only friends can send me messages",
+  "commOpenCommunityCta": "Community"
 }

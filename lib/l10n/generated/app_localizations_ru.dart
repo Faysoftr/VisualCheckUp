@@ -2935,4 +2935,126 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get birthdayCardSubtitle => 'Желаем здорового и счастливого года.';
+
+  @override
+  String get commDrawerProfileSubtitle =>
+      'Ваша карточка, настроение и статистика';
+
+  @override
+  String get commDrawerCommunitySubtitle => 'Поиск • Стена • Группы • Чат';
+
+  @override
+  String get commTabWall => 'Стена';
+
+  @override
+  String get commTabGroups => 'Группы';
+
+  @override
+  String get commEditProfile => 'Редактировать';
+
+  @override
+  String get commDoneEditing => 'Отмена';
+
+  @override
+  String get commFriendsStat => 'Друзья';
+
+  @override
+  String get commAddFriend => 'В друзья';
+
+  @override
+  String get commFriendPending => 'Запрос отправлен';
+
+  @override
+  String get commFriendsConnected => 'Друзья';
+
+  @override
+  String get commFriendsSheetTitle => 'Друзья по здоровью';
+
+  @override
+  String get commFriendsEmpty =>
+      'Пока нет друзей. Найдите единомышленников в разделе Поиск!';
+
+  @override
+  String get commMoodSectionTitle => 'Настроение сегодня';
+
+  @override
+  String get commMoodEnergetic => 'Бодрый';
+
+  @override
+  String get commMoodCalm => 'Спокойный';
+
+  @override
+  String get commMoodGrateful => 'Благодарный';
+
+  @override
+  String get commMoodFocused => 'Собранный';
+
+  @override
+  String get commMoodTired => 'Уставший';
+
+  @override
+  String get commMoodRecovering => 'Восстанавливаюсь';
+
+  @override
+  String get commWallTitle => 'Стена опыта и вопросов';
+
+  @override
+  String get commWallNewPost => 'Поделиться';
+
+  @override
+  String get commWallPostTitleHint =>
+      'Заголовок (напр., Утренняя прогулка и сахар)';
+
+  @override
+  String get commWallPostBodyHint => 'Поделитесь опытом или задайте вопрос...';
+
+  @override
+  String get commWallPublishBtn => 'Опубликовать';
+
+  @override
+  String get commWallDoctorReplyBadge => 'Ответ врача';
+
+  @override
+  String get commWallCommentsTitle => 'Комментарии';
+
+  @override
+  String get commWallCommentHint => 'Напишите поддерживающий комментарий...';
+
+  @override
+  String get commWallEmpty => 'Записей пока нет. Поделитесь первым!';
+
+  @override
+  String get commGroupsTitle => 'Группы поддержки';
+
+  @override
+  String get commGroupsCreate => 'Создать группу';
+
+  @override
+  String get commGroupsJoin => 'Вступить';
+
+  @override
+  String get commGroupsJoined => 'Участник';
+
+  @override
+  String get commGroupsOpenChat => 'Чат группы';
+
+  @override
+  String commGroupsMembersCount(int count) {
+    return '$count участн.';
+  }
+
+  @override
+  String get commGroupsNameHint => 'Название группы';
+
+  @override
+  String get commGroupsDescHint => 'Описание и тема группы';
+
+  @override
+  String get commGroupsEmpty => 'Группы по этому фильтру не найдены.';
+
+  @override
+  String get commToggleOnlyFriendsMsg => 'Писать мне могут только друзья';
+
+  @override
+  String get commOpenCommunityCta => 'Сообщество';
 }
