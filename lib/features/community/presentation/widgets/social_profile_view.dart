@@ -245,7 +245,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     }
   }
 
-  Future<void> _updateQuickMood(HealthMood mood) async {
+  Future<void> _updateQuickMood(HealthMood? mood) async {
     final nextMood = _myProfile?.mood == mood ? null : mood;
     final updated = await widget.repository.updateMood(_myUid, nextMood);
     if (!mounted || updated == null) return;
@@ -254,6 +254,87 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       _selectedMood = updated.mood;
     });
     widget.onProfileChanged?.call();
+  }
+
+  void _showMoodSelectionModal() {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Nasıl Hissediyorsun?',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: AppTheme.primaryTeal,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ActionChip(
+                          key: const Key('comm_mood_chip_clear'),
+                          label: Text(
+                            'Temizle',
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                          ),
+                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
+                          onPressed: () {
+                            _updateQuickMood(null);
+                            Navigator.pop(ctx);
+                          },
+                        ),
+                        for (final mood in HealthMood.values)
+                          ActionChip(
+                            key: Key('comm_mood_chip_${mood.name}'),
+                            label: Text(
+                              '${mood.emoji} ${mood.localizedLabel(l10n)}',
+                              style: TextStyle(
+                                color: mood.accentColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            backgroundColor:
+                                mood.accentColor.withValues(alpha: 0.12),
+                            side: BorderSide(
+                              color: mood.accentColor.withValues(alpha: 0.35),
+                            ),
+                            onPressed: () {
+                              _updateQuickMood(mood);
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _saveMyProfile() async {
@@ -921,64 +1002,128 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        if (isAdmin) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.verified_user_rounded,
-                                  size: 13,
-                                  color: Colors.black87,
+                        // 2. Row: Role/Admin Badge + Mood (Ruh Hali) - Exactly like Social Formul Bank
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            if (isAdmin)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2.5,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  l10n.sfbAdminBadge,
-                                  style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.verified_user_rounded,
+                                      size: 12.5,
+                                      color: Colors.black87,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      l10n.sfbAdminBadge,
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (profile.mood != null)
+                              GestureDetector(
+                                key: const Key('comm_mood_pill_trigger'),
+                                onTap: _showMoodSelectionModal,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: profile.mood!.accentColor
+                                        .withValues(alpha: 0.10),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: profile.mood!.accentColor
+                                          .withValues(alpha: 0.32),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        profile.mood!.emoji,
+                                        style: const TextStyle(fontSize: 12.5),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          '${profile.mood!.localizedLabel(l10n)} hissediyor',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: colorScheme.onSurface
+                                                .withValues(alpha: 0.85),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                        ],
-                        if (profile.mood != null) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: profile.mood!.accentColor
-                                    .withValues(alpha: 0.35),
+                              )
+                            else
+                              GestureDetector(
+                                key: const Key('comm_mood_pill_trigger'),
+                                onTap: _showMoodSelectionModal,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryTeal
+                                        .withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: AppTheme.primaryTeal
+                                          .withValues(alpha: 0.28),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.add_reaction_outlined,
+                                        size: 13,
+                                        color: AppTheme.primaryTeal,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Mod Seç',
+                                        style: TextStyle(
+                                          color: AppTheme.primaryTeal,
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              '${profile.mood!.emoji} ${profile.mood!.localizedLabel(l10n)}',
-                              style: TextStyle(
-                                color: profile.mood!.accentColor,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         // Compact Stat Pills (Likes, Friends, Listeners)
                         Wrap(
                           spacing: 6,
@@ -1229,44 +1374,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           const SizedBox(height: 12),
         ],
 
-        // 4. Today's Mood 1-Tap Selector
-        Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.commMoodSectionTitle,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final mood in HealthMood.values)
-                      ChoiceChip(
-                        key: Key('comm_mood_chip_${mood.name}'),
-                        label: Text(
-                          '${mood.emoji} ${mood.localizedLabel(l10n)}',
-                        ),
-                        selected: profile.mood == mood,
-                        selectedColor: mood.accentColor.withValues(alpha: 0.2),
-                        onSelected: (_) => _updateQuickMood(mood),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
+
 
         // 5. Chronic Conditions & Health Goals Showcase
         if (profile.hasAnyChronicCondition || profile.healthGoals.isNotEmpty)

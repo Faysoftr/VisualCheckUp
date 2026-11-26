@@ -566,6 +566,11 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   children: [
                     if (_profile.isVisibleOnline)
                       _HeaderPill(text: '🟢 ${l10n.commOnlineNow}'),
+                    if (_profile.mood != null)
+                      _HeaderPill(
+                        text:
+                            '${_profile.mood!.emoji} ${_profile.mood!.localizedLabel(l10n)} hissediyor',
+                      ),
                     _HeaderPill(
                       text:
                           '${_profile.country.flag} ${_profile.city.isNotEmpty ? '${_profile.city}, ' : ''}${_profile.country.label}',

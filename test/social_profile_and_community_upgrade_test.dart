@@ -133,21 +133,21 @@ void main() {
         expect(find.byKey(const Key('comm_my_profile_listeners_btn')), findsOneWidget);
         expect(find.byKey(const Key('comm_profile_name_field')), findsNothing);
 
-        // Tap mood chip -> updates mood live
         final showcaseScrollable = find
             .descendant(
               of: find.byKey(const Key('comm_my_profile_showcase_list')),
               matching: find.byType(Scrollable),
             )
             .first;
-        final energeticChip = find.byKey(const Key('comm_mood_chip_energetic'));
-        await tester.scrollUntilVisible(
-          energeticChip,
-          200,
-          scrollable: showcaseScrollable,
-        );
-        await tester.ensureVisible(energeticChip);
+
+        // Tap mood trigger -> opens bottom sheet modal, selects energetic mood
+        final moodTrigger = find.byKey(const Key('comm_mood_pill_trigger'));
+        expect(moodTrigger, findsOneWidget);
+        await tester.tap(moodTrigger);
         await tester.pumpAndSettle();
+
+        final energeticChip = find.byKey(const Key('comm_mood_chip_energetic'));
+        expect(energeticChip, findsOneWidget);
         await tester.tap(energeticChip);
         await tester.pumpAndSettle();
 
