@@ -338,28 +338,17 @@ class AppDrawer extends StatelessWidget {
                     vertical: 4,
                   ),
                   children: [
-                    // #1 Profilim (Social Formula Bank pastel-icon style)
-                    if (onOpenMyProfile != null)
-                      _DrawerTile(
-                        key: const Key('drawer_my_profile_tile'),
-                        icon: Icons.person_outline_rounded,
-                        label: l10n.commTabMyProfile,
-                        accentColor: const Color(0xFFD946EF),
-                        showDotDivider: true,
-                        onTap: () => _closeAndRun(context, onOpenMyProfile!),
-                      ),
-                    // #2 Sağlık Topluluğu (Keşfet)
-                    if (onOpenHealthCommunity != null)
-                      _DrawerTile(
-                        key: const Key('drawer_community_tile'),
-                        icon: Icons.search_rounded,
-                        label: l10n.commMenuTitle,
-                        accentColor: const Color(0xFF06B6D4),
-                        showDotDivider: true,
-                        onTap: () =>
-                            _closeAndRun(context, onOpenHealthCommunity!),
-                      ),
-                    // Donate banner (above Home for quick supporter access)
+                    // 1. Ana Ekran (En Üstte)
+                    _DrawerTile(
+                      key: const Key('drawer_home_tile'),
+                      icon: Icons.grid_view_rounded,
+                      label: l10n.menuHome,
+                      accentColor: const Color(0xFF3B82F6),
+                      selected: true,
+                      showDotDivider: true,
+                      onTap: () => Navigator.of(context).pop(),
+                    ),
+                    // 2. Bağış Yap Banner
                     if (onOpenDonate != null)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4, 3, 4, 5),
@@ -446,15 +435,27 @@ class AppDrawer extends StatelessWidget {
                           ),
                         ),
                       ),
-                    // Ana Ekran
-                    _DrawerTile(
-                      icon: Icons.grid_view_rounded,
-                      label: l10n.menuHome,
-                      accentColor: const Color(0xFF3B82F6),
-                      selected: true,
-                      showDotDivider: true,
-                      onTap: () => Navigator.of(context).pop(),
-                    ),
+                    // 3. Profilim (Social Formula Bank pastel-icon style)
+                    if (onOpenMyProfile != null)
+                      _DrawerTile(
+                        key: const Key('drawer_my_profile_tile'),
+                        icon: Icons.person_outline_rounded,
+                        label: l10n.commTabMyProfile,
+                        accentColor: const Color(0xFFD946EF),
+                        showDotDivider: true,
+                        onTap: () => _closeAndRun(context, onOpenMyProfile!),
+                      ),
+                    // 4. Sağlık Topluluğu (Keşfet)
+                    if (onOpenHealthCommunity != null)
+                      _DrawerTile(
+                        key: const Key('drawer_community_tile'),
+                        icon: Icons.search_rounded,
+                        label: l10n.commMenuTitle,
+                        accentColor: const Color(0xFF06B6D4),
+                        showDotDivider: true,
+                        onTap: () =>
+                            _closeAndRun(context, onOpenHealthCommunity!),
+                      ),
                     const SizedBox(height: 6),
                     // ──── 1. Grup: Görsel Kontroller (Akordeon) ────
                     _DrawerAccordionGroup(

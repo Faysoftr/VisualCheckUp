@@ -75,15 +75,15 @@ void main() {
         expect(communityTile, findsOneWidget);
         expect(donateBtn, findsOneWidget);
 
-        // Verify exact vertical hierarchy: Profilim -> Sağlık Topluluğu -> Bağış -> Ana Ekran
+        // Verify exact vertical hierarchy: Ana Ekran -> Bağış Yap -> Profilim -> Sağlık Topluluğu
+        final homeY = tester.getTopLeft(homeIcon).dy;
+        final donateY = tester.getTopLeft(donateBtn).dy;
         final profileY = tester.getTopLeft(profileTile).dy;
         final communityY = tester.getTopLeft(communityTile).dy;
-        final donateY = tester.getTopLeft(donateBtn).dy;
-        final homeY = tester.getTopLeft(homeIcon).dy;
 
+        expect(homeY, lessThan(donateY));
+        expect(donateY, lessThan(profileY));
         expect(profileY, lessThan(communityY));
-        expect(communityY, lessThan(donateY));
-        expect(donateY, lessThan(homeY));
 
         // Tap Profilim -> opens dedicated MyHealthProfileScreen
         await tester.tap(profileTile);

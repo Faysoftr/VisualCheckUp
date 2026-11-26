@@ -127,11 +127,11 @@ void main() {
         final drawerDonate = find.byKey(const Key('drawer_donate_button'));
         expect(drawerDonate, findsOneWidget);
 
-        // Verify Donate button appears ABOVE Home menu tile
+        // Verify Donate button appears below Home menu tile
         final donateTop = tester.getTopLeft(drawerDonate).dy;
         final homeTop =
             tester.getTopLeft(find.byIcon(Icons.grid_view_rounded)).dy;
-        expect(donateTop, lessThan(homeTop));
+        expect(homeTop, lessThan(donateTop));
 
         // Tap drawer donate button -> opens popup
         await tester.tap(drawerDonate);
