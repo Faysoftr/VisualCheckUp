@@ -65,6 +65,11 @@ class DailyWellnessExtras {
     return dailyTipItemForLocale(languageCode, now: now).quote;
   }
 
+  static List<HealthDailyTip> allTipsForLocale(String languageCode) {
+    final code = languageCode.toLowerCase();
+    return _catalogByLang[code] ?? _catalogByLang['en']!;
+  }
+
   static const Map<String, List<HealthDailyTip>> _catalogByLang = {
     'tr': [
       HealthDailyTip(category: 'Göz Sağlığı', quote: 'Göz yorgunluğunu azaltmak için 20-20-20 kuralını uygulayın: Her 20 dakikada 20 saniye boyunca 6 metre (20 feet) uzağa bakın.', source: 'Oftalmoloji Kılavuzu'),
@@ -97,6 +102,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Cilt & Kollajen', quote: 'Turunçgiller, kivi ve biberdeki zengin C vitamini, eklemlerin ve cildin ana esneklik proteini olan kollajen üretiminde zorunlu bir koenzimdir.', source: 'Dermatoloji & Biyokimya'),
       HealthDailyTip(category: 'Dolaşım & Hareket Molası', quote: 'Masa başında her 45 dakikada bir 2 dakika ayağa kalkıp esnemek, bacak toplardamarlarında göllenmeyi önler ve zihni tazeler.', source: 'Damar Cerrahisi & Ergonomi'),
       HealthDailyTip(category: 'Zihinsel Dinginlik & Kalp', quote: 'Günde 1 dakika içtenlikle teşekkür etmek veya şükran duymak, kortizol stres hormonunu düşürerek kalp atım değişkenliğini (HRV) yükseltir.', source: 'Pozitif Psikofizyoloji'),
+      HealthDailyTip(category: 'Mineraller & Doğal Tuzlar', quote: 'Rafine sofra tuzu yerine mineralce zengin doğal kaya tuzu kullanmak, vücudun sıvı-elektrolit dengesini destekler ve mide asidi (HCl) üretimini optimize eder.', source: 'Biyokimya & Elektrolit Kılavuzu'),
+      HealthDailyTip(category: 'Mineraller & Kan Sağlığı', quote: 'Demir, kandaki hemoglobinin ve kas miyoglobininin kalbidir; demir emilimini artırmak için bitkisel demir kaynaklarını C vitamini ile birlikte tüketin.', source: 'Hematoloji Standartları'),
+      HealthDailyTip(category: 'Mineraller & İmmünite', quote: 'Çinko, 300\'den fazla enzimin çalışması, T-hücre bağışıklığı, hızlı yara iyileşmesi ve tat-koku reseptörlerinin yenilenmesi için vazgeçilmez bir mineraldir.', source: 'İmmünoloji & Mikronütrientler'),
+      HealthDailyTip(category: 'Vitaminler & Beyin', quote: 'B12 vitamini (metilkobalamin), sinir liflerini saran miyelin kılıfını korur, kırmızı kan hücresi üretimini yönetir ve zihinsel yorgunluğu önler.', source: 'Nöroloji & Biyokimya'),
+      HealthDailyTip(category: 'Vitaminler & Kemik-Damar', quote: 'D3 vitamini kalsiyumun bağırsaktan emilimini sağlarken, K2 vitamini (MK-7) kalsiyumu damarlardan çekip kemiklere yönlendirerek damar kireçlenmesini engeller.', source: 'Kardiyoloji & Kemik Metabolizması'),
+      HealthDailyTip(category: 'Mineraller & Antioksidan', quote: 'Selenyum, vücudun en güçlü hücresel antioksidanı olan glutatyon peroksidaz enziminin yapıtaşıdır; tiroid bezini ve DNA\'yı serbest radikallerden korur.', source: 'Biyokimya & Tiroid'),
+      HealthDailyTip(category: 'Vitaminler & Göz Sağlığı', quote: 'A vitamini (retinol), retinadaki ışığı algılayan rodopsin pigmentini yeniler, gece görüşünü keskinleştirir ve kornea yüzeyini pürüzsüz tutar.', source: 'Oftalmoloji & Beslenme'),
+      HealthDailyTip(category: 'Mineraller & Metabolizma', quote: 'İyot, tiroid hormonları T3 ve T4\'ün ana bileşenidir; bazal metabolizma hızını, vücut sıcaklığını ve hücresel enerji üretimini düzenler.', source: 'Endokrinoloji Kılavuzu'),
+      HealthDailyTip(category: 'Vitaminler & Hücre Koruması', quote: 'E vitamini (alfa-tokoferol), hücre zarlarını ve damar endotelini lipid peroksidasyonuna karşı koruyan en güçlü yağda çözünen antioksidandır.', source: 'Biyofizik & Dermatoloji'),
+      HealthDailyTip(category: 'Vitaminler & Enerji Metabolizması', quote: 'B vitaminleri (B1, B2, B3, B5, B6), yediğimiz besinlerin hücresel enerjiye (ATP) dönüşmesinde ve nörotransmitter sentezinde kilit katalizörlerdir.', source: 'Hücresel Biyokimya'),
+      HealthDailyTip(category: 'Mineraller & Kemik-Eklem', quote: 'Bor minerali, kalsiyum ve magnezyumun idrarla atılımını azaltarak kemik yoğunluğunu korur, D vitamini yarı ömrünü uzatır ve eklem esnekliğini destekler.', source: 'Ortopedi & Osteoloji'),
+      HealthDailyTip(category: 'Mineraller & Şeker Kontrolü', quote: 'Krom, hücre yüzeyindeki insülin reseptörlerinin glukozu içeri almasını kolaylaştırır (GTF); tatlı krizlerini dizginler ve tokluk şekerini dengeler.', source: 'Metabolizma & Diyabetoloji'),
     ],
     'en': [
       HealthDailyTip(category: 'Eye Health', quote: 'Practice the 20-20-20 rule to relieve eye strain: every 20 minutes, focus on an object 20 feet away for 20 seconds.', source: 'Ophthalmology Guidelines'),
@@ -129,6 +146,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Collagen & Vitamin C', quote: 'Vitamin C from citrus, kiwi, and peppers is an indispensable cofactor for enzymatic collagen synthesis, keeping joints and skin resilient.', source: 'Dermatology & Biochemistry'),
       HealthDailyTip(category: 'Vascular Movement Break', quote: 'Standing and moving for just 2 minutes every 45 minutes breaks venous stasis in the lower extremities and restores cerebral blood flow.', source: 'Vascular Surgery & Ergonomics'),
       HealthDailyTip(category: 'Mindfulness & Heart Harmony', quote: 'Spending just one minute practicing heartfelt gratitude measurably lowers cortisol and increases beneficial heart rate variability (HRV).', source: 'Psychophysiology Research'),
+      HealthDailyTip(category: 'Minerals & Natural Salts', quote: 'Using unrefined, mineral-rich natural rock salt instead of chemically bleached table salt supports cellular electrolyte balance and aids optimal stomach acid (HCl) production.', source: 'Biochemistry & Electrolytes'),
+      HealthDailyTip(category: 'Minerals & Blood Health', quote: 'Iron is the cornerstone of hemoglobin and cellular oxygen delivery; pairing plant-based iron with vitamin C dramatically boosts its intestinal absorption.', source: 'Hematology Standards'),
+      HealthDailyTip(category: 'Minerals & Immunity', quote: 'Zinc is essential for over 300 enzymatic reactions, robust T-cell immune defenses, rapid tissue healing, and the maintenance of taste and smell receptors.', source: 'Immunology & Micronutrients'),
+      HealthDailyTip(category: 'Vitamins & Brain Health', quote: 'Vitamin B12 (methylcobalamin) preserves the myelin sheath protecting nerve fibers, orchestrates red blood cell synthesis, and combats mental brain fog.', source: 'Neurology & Biochemistry'),
+      HealthDailyTip(category: 'Vitamins & Bone-Vascular', quote: 'While Vitamin D3 promotes intestinal calcium absorption, Vitamin K2 (MK-7) directs calcium out of arteries and into bones, preventing vascular calcification.', source: 'Cardiology & Bone Metabolism'),
+      HealthDailyTip(category: 'Minerals & Antioxidants', quote: 'Selenium forms the catalytic core of glutathione peroxidase, the master cellular antioxidant that shields DNA and thyroid tissue from oxidative injury.', source: 'Biochemistry & Thyroid'),
+      HealthDailyTip(category: 'Vitamins & Eye Health', quote: 'Vitamin A (retinol) reconstitutes rhodopsin for sharp night vision, supports corneal epithelial clarity, and maintains tear film integrity.', source: 'Ophthalmology & Nutrition'),
+      HealthDailyTip(category: 'Minerals & Metabolism', quote: 'Iodine is the fundamental building block of thyroid hormones T3 and T4, governing basal metabolic rate, core temperature, and cellular energy synthesis.', source: 'Endocrine Guidelines'),
+      HealthDailyTip(category: 'Vitamins & Cellular Defense', quote: 'Vitamin E (alpha-tocopherol) serves as the primary fat-soluble antioxidant shield, halting lipid peroxidation in cell membranes and vascular walls.', source: 'Biophysics & Dermatology'),
+      HealthDailyTip(category: 'Vitamins & Energy Metabolism', quote: 'The B-complex vitamin family (B1 through B6) acts as mandatory coenzymes converting dietary macronutrients into cellular energy (ATP) and mood neurotransmitters.', source: 'Cellular Biochemistry'),
+      HealthDailyTip(category: 'Minerals & Joint Resilience', quote: 'Boron reduces urinary excretion of calcium and magnesium, extends the biological half-life of vitamin D, and reinforces joint cartilage resilience.', source: 'Orthopedics & Osteology'),
+      HealthDailyTip(category: 'Minerals & Glycemic Balance', quote: 'Chromium potentiates insulin receptor sensitivity as part of Glucose Tolerance Factor (GTF), curbing sudden sugar cravings and steadying post-meal glucose.', source: 'Metabolic Endocrinology'),
     ],
     'zh': [
       HealthDailyTip(category: '眼睛健康', quote: '遵循20-20-20护眼法则：每使用屏幕20分钟，抬头向20英尺（约6米）外远眺20秒。', source: '眼科临床指南'),
@@ -161,6 +190,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: '胶原蛋白与维生素C', quote: '柑橘、猕猴桃与彩椒中丰富的维生素C是胶原蛋白合成的必需辅酶，可强韧关节软骨并维持肌肤弹性。', source: '皮肤科与生物化学'),
       HealthDailyTip(category: '下肢静脉与工位起立', quote: '久坐每45分钟站立活动2分钟，能有效消除下肢静脉血液淤积，改善全身微循环并振奋精神。', source: '血管外科与人体工效学'),
       HealthDailyTip(category: '心境平和与心率变异性', quote: '每天花1分钟体验由衷的感恩与平和，能显著降低皮质醇压力激素，并提升反映心脏韧性的心率变异性（HRV）。', source: '身心生理学研究'),
+      HealthDailyTip(category: '矿物质与天然盐', quote: '选用富含多种微量矿物质的天然未精制岩盐替代精炼白盐，有助于维持细胞电解质平衡，并支持正常的胃酸（HCl）分泌。', source: '生物化学与微量营养'),
+      HealthDailyTip(category: '矿物质与血液健康', quote: '铁是合成血红蛋白与输送氧气的核心矿物质；将植物性非血红素铁与富含维生素C的食物同食，可成倍提升肠道吸收率。', source: '血液学临床标准'),
+      HealthDailyTip(category: '矿物质与免疫力', quote: '锌是300多种酶活性的核心催化剂，对T淋巴细胞免疫、皮肤黏膜快速愈合以及维持灵敏的嗅觉和味觉至关重要。', source: '免疫学与微量营养学会'),
+      HealthDailyTip(category: '维生素与大脑神经', quote: '维生素B12（甲基钴胺）保护神经纤维周围的髓鞘完整性，主导红细胞生成，并有效缓解慢性大脑疲劳与健忘。', source: '神经科学与生物化学'),
+      HealthDailyTip(category: '维生素与骨骼血管协同', quote: '维生素D3促进肠道充分吸收钙质，而维生素K2（MK-7）则如同“交通向导”，将钙引导沉淀入骨骼而非沉积于血管壁，预防动脉钙化。', source: '心血管与骨代谢前沿'),
+      HealthDailyTip(category: '矿物质与抗氧化', quote: '硒是人体最核心抗氧化酶——谷胱甘肽过氧化物酶的催化活性中心，能强力守护DNA和甲状腺免受自由基氧化损伤。', source: '生物化学与甲状腺学会'),
+      HealthDailyTip(category: '维生素与视力健康', quote: '维生素A（视黄醇）是视网膜感光视紫红质的必需原料，可显著增强暗适应能力并维持角膜上皮光滑透亮。', source: '眼科学与营养医学'),
+      HealthDailyTip(category: '矿物质与基础代谢', quote: '碘是合成甲状腺素T3与T4必不可少的核心元素，掌管全身基础代谢速率、体温调节与细胞线粒体能量释放。', source: '内分泌临床指南'),
+      HealthDailyTip(category: '维生素与细胞屏障', quote: '维生素E（α-生育酚）是人体最重要的脂溶性抗氧化防御者，能阻断细胞膜和血管壁的脂质过氧化链式反应，延缓衰老。', source: '生物物理与抗衰医学'),
+      HealthDailyTip(category: '维生素与能量代谢', quote: 'B族维生素群（B1、B2、B3、B5、B6）是不可或缺的辅酶，负责将碳水化合物和脂肪转化为细胞能量ATP，并主导神经递质合成。', source: '细胞生物化学'),
+      HealthDailyTip(category: '矿物质与骨骼关节', quote: '硼是维护骨骼微结构的得力助手；它能显著减少钙和镁的尿液流失，延长活性维生素D半衰期，并呵护关节软骨弹性。', source: '骨科与骨矿物质研究'),
+      HealthDailyTip(category: '矿物质与糖代谢', quote: '铬元素是葡萄糖耐量因子（GTF）的核心辅助因子，可显著提高胰岛素受体敏感度，平抑暴食甜食的冲动并稳定餐后血糖。', source: '代谢与糖尿病学会'),
     ],
     'hi': [
       HealthDailyTip(category: 'आंखों का स्वास्थ्य', quote: 'आंखों की थकान दूर करने के लिए 20-20-20 नियम अपनाएं: हर 20 मिनट बाद 20 सेकंड के लिए 20 फीट दूर देखें।', source: 'नेत्र विज्ञान दिशानिर्देश'),
@@ -193,6 +234,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'कोलेजन और विटामिन सी', quote: 'खट्टे फल, कीवी और शिमला मिर्च में मौजूद विटामिन सी कोलेजन बनाने के लिए अनिवार्य है, जो त्वचा और जोड़ों को मजबूत रखता है।', source: 'त्वचा विज्ञान और पोषण'),
       HealthDailyTip(category: 'रक्त प्रवाह और गतिशीलता', quote: 'कुर्सी पर लगातार बैठने के दौरान हर 45 मिनट बाद 2 मिनट खड़े होकर टहलने से पैरों की नसों में रक्त संचार तेज होता है।', source: 'संवहनी स्वास्थ्य गाइड'),
       HealthDailyTip(category: 'मानसिक शांति और दिल की धड़कन', quote: 'दिन में 1 मिनट कृतज्ञता और सकारात्मकता महसूस करने से तनाव हार्मोन कोर्टिसोल घटता है और दिल की धड़कन संतुलित होती है।', source: 'साइकोफिजियोलॉजी'),
+      HealthDailyTip(category: 'खनिज और प्राकृतिक लवण', quote: 'परिष्कृत टेबल नमक के बजाय खनिजों से भरपूर प्राकृतिक सेंधा/सफेद रॉक सॉल्ट का उपयोग शरीर में इलेक्ट्रोलाइट संतुलन और पेट के एसिड को संतुलित रखता है।', source: 'बायोकेमिस्ट्री गाइड'),
+      HealthDailyTip(category: 'खनिज और रक्त स्वास्थ्य', quote: 'आयरन हीमोग्लोबिन और पूरे शरीर में ऑक्सीजन पहुंचाने के लिए अनिवार्य है; इसके बेहतर अवशोषण के लिए आयरन युक्त खाद्य पदार्थों के साथ विटामिन सी लें।', source: 'हेमेटोलॉजी गाइड'),
+      HealthDailyTip(category: 'खनिज और रोग प्रतिरोधक क्षमता', quote: 'जिंक 300 से अधिक एंजाइमों की कार्यप्रणाली, मजबूत रोग प्रतिरोधक क्षमता (टी-कोशिकाएं), घाव भरने और स्वाद-गंध की पहचान के लिए जरूरी है।', source: 'इम्यूनोलॉजी गाइड'),
+      HealthDailyTip(category: 'विटामिन और मस्तिष्क', quote: 'विटामिन बी12 (मिथाइलकोबालामिन) नसों के सुरक्षात्मक आवरण (मायलिन) को मजबूत रखता है, लाल रक्त कोशिकाओं का निर्माण करता है और दिमागी थकान मिटाता है।', source: 'न्यूरोलॉजी और बायोकेमिस्ट्री'),
+      HealthDailyTip(category: 'विटामिन और हड्डियां-धमनियां', quote: 'विटामिन डी3 आंतों से कैल्शियम सोखने में मदद करता है, जबकि विटामिन के2 (एमके-7) उस कैल्शियम को धमनियों से हटाकर हड्डियों में भेजता है।', source: 'कार्डियोलॉजी और बोन रिसर्च'),
+      HealthDailyTip(category: 'खनिज और एंटीऑक्सीडेंट', quote: 'सेलेनियम शरीर के सबसे शक्तिशाली एंटीऑक्सीडेंट (ग्लूटाथियोन पेरोक्सीडेज) का निर्माण करता है, जो थायरॉयड और डीएनए को सुरक्षित रखता है।', source: 'बायोकेमिस्ट्री और थायरॉयड'),
+      HealthDailyTip(category: 'विटामिन और दृष्टि', quote: 'विटामिन ए (रेटिनॉल) रात में साफ देखने के लिए आंखों के रोडोप्सिन को पुनर्निर्मित करता है और कॉर्निया की रक्षा करता है।', source: 'नेत्र विज्ञान और पोषण'),
+      HealthDailyTip(category: 'खनिज और मेटाबॉलिज्म', quote: 'आयोडीन थायरॉयड हार्मोन (T3 और T4) का मुख्य घटक है, जो शरीर के मेटाबॉलिज्म की गति, तापमान और ऊर्जा उत्पादन को नियंत्रित करता है।', source: 'एंडोक्राइनोलॉजी गाइड'),
+      HealthDailyTip(category: 'विटामिन और कोशिका सुरक्षा', quote: 'विटामिन ई सबसे शक्तिशाली वसा में घुलनशील एंटीऑक्सीडेंट है, जो कोशिकाओं की झिल्लियों और रक्त वाहिकाओं को ऑक्सीडेटिव क्षति से बचाता है।', source: 'बायोफिजिक्स और त्वचा विज्ञान'),
+      HealthDailyTip(category: 'विटामिन और ऊर्जा मेटाबॉलिज्म', quote: 'बी-कॉम्प्लेक्स विटामिन (B1 से B6) भोजन को कोशिकीय ऊर्जा (ATP) में बदलने और मस्तिष्क में मूड हार्मोन्स के निर्माण के लिए जरूरी उत्प्रेरक हैं।', source: 'सेलुलर बायोकेमिस्ट्री'),
+      HealthDailyTip(category: 'खनिज और हड्डियां-जोड़', quote: 'बोरॉन खनिज मूत्र के माध्यम से कैल्शियम और मैग्नीशियम के नुकसान को रोकता है, विटामिन डी को सक्रिय रखता है और जोड़ों के लचीलेपन को बढ़ाता है।', source: 'ऑर्थोपेडिक्स गाइड'),
+      HealthDailyTip(category: 'खनिज और शुगर संतुलन', quote: 'क्रोमियम इंसुलिन रिसेप्टर्स की संवेदनशीलता बढ़ाता है, जिससे मीठा खाने की अवांछित तलब कम होती है और भोजन के बाद रक्त शर्करा नियंत्रित रहती है।', source: 'मेटाबॉलिज्म और डायबिटीज'),
     ],
     'es': [
       HealthDailyTip(category: 'Salud Ocular', quote: 'Aplica la regla 20-20-20 para aliviar la fatiga visual: cada 20 minutos, mira a 6 metros de distancia durante 20 segundos.', source: 'Guía de Oftalmología'),
@@ -225,6 +278,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Colágeno y Vitamina C', quote: 'La vitamina C de los cítricos, el kiwi y los pimientos es un cofactor indispensable para la síntesis de colágeno en piel y articulaciones.', source: 'Dermatología y Bioquímica'),
       HealthDailyTip(category: 'Pausa Activa Circulatoria', quote: 'Ponerse de pie y moverse 2 minutos cada 45 minutos previene la estasis venosa en las piernas y reactiva el flujo sanguíneo cerebral.', source: 'Cirugía Vascular y Ergonomía'),
       HealthDailyTip(category: 'Serenidad y Coherencia Cardíaca', quote: 'Dedicar solo un minuto a sentir gratitud sincera reduce el cortisol y mejora la variabilidad de la frecuencia cardíaca (VFC).', source: 'Psicofisiología Clínica'),
+      HealthDailyTip(category: 'Minerales y Sales Naturales', quote: 'Usar sal de roca natural y sin refinar en lugar de sal de mesa procesada aporta oligoelementos esenciales y favorece la producción óptima de ácido estomacal.', source: 'Bioquímica y Electrolitos'),
+      HealthDailyTip(category: 'Minerales y Sangre', quote: 'El hierro es indispensable para la hemoglobina y el transporte de oxígeno; combinar fuentes vegetales de hierro con vitamina C multiplica su absorción.', source: 'Estándares de Hematología'),
+      HealthDailyTip(category: 'Minerales e Inmunidad', quote: 'El zinc es vital para más de 300 enzimas, fortalece los linfocitos T del sistema inmune, acelera la cicatrización y cuida el gusto y el olfato.', source: 'Inmunología y Nutrición'),
+      HealthDailyTip(category: 'Vitaminas y Cerebro', quote: 'La vitamina B12 (metilcobalamina) protege la vaina de mielina de los nervios, dirige la formación de glóbulos rojos y previene la niebla mental.', source: 'Neurología y Bioquímica'),
+      HealthDailyTip(category: 'Vitaminas y Huesos-Arterias', quote: 'La vitamina D3 estimula la absorción de calcio, mientras que la vitamina K2 (MK-7) lo guía hacia los huesos, evitando que calcifique las arterias.', source: 'Cardiología y Metabolismo Óseo'),
+      HealthDailyTip(category: 'Minerales y Antioxidantes', quote: 'El selenio es el núcleo de la glutatión peroxidasa, el principal antioxidante celular que protege el ADN y la glándula tiroides del estrés oxidativo.', source: 'Bioquímica y Tiroides'),
+      HealthDailyTip(category: 'Vitaminas y Visión', quote: 'La vitamina A (retinol) regenera la rodopsina en la retina, afinando la visión nocturna y manteniendo la córnea transparente y saludable.', source: 'Oftalmología y Nutrición'),
+      HealthDailyTip(category: 'Minerales y Tiroides', quote: 'El yodo es el componente esencial de las hormonas tiroideas T3 y T4, encargadas de regular la tasa metabólica basal y la temperatura corporal.', source: 'Guías de Endocrinología'),
+      HealthDailyTip(category: 'Vitaminas y Protección Celular', quote: 'La vitamina E (alfa-tocoferol) es el mayor antioxidante liposoluble, protegiendo las membranas celulares y el endotelio vascular contra el daño oxidativo.', source: 'Biofísica y Dermatología'),
+      HealthDailyTip(category: 'Vitaminas y Energía Celular', quote: 'El complejo de vitaminas B (B1 a B6) actúa como catalizador esencial para convertir los alimentos en energía celular (ATP) y sintetizar neurotransmisores.', source: 'Bioquímica Celular'),
+      HealthDailyTip(category: 'Minerales y Articulaciones', quote: 'El boro reduce la pérdida urinaria de calcio y magnesio, prolonga la vida media de la vitamina D y refuerza la flexibilidad articular.', source: 'Ortopedia y Osteología'),
+      HealthDailyTip(category: 'Minerales y Glucosa', quote: 'El cromo potencia la sensibilidad de los receptores de insulina (factor GTF), mitigando los antojos de dulce y equilibrando la glucemia postprandial.', source: 'Endocrinología Metabólica'),
     ],
     'de': [
       HealthDailyTip(category: 'Augengesundheit', quote: 'Nutzen Sie die 20-20-20-Regel gegen Augenmüdigkeit: Alle 20 Minuten 20 Sekunden lang mindestens 6 Meter in die Ferne blicken.', source: 'Ophthalmologie-Leitfaden'),
@@ -257,6 +322,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Kollagen & Vitamin C', quote: 'Vitamin C aus Zitrusfrüchten, Kiwi und Paprika ist ein unverzichtbarer Cofaktor der Kollagensynthese für elastische Haut und Gelenke.', source: 'Dermatologie & Biochemie'),
       HealthDailyTip(category: 'Aktive Gefäßpause', quote: 'Alle 45 Minuten 2 Minuten aufzustehen und sich zu bewegen verhindert venösen Blutstau in den Beinen und regt die Durchblutung an.', source: 'Gefäßchirurgie & Ergonomie'),
       HealthDailyTip(category: 'Mentale Ruhe & Herzharmonie', quote: 'Täglich eine Minute bewusste Dankbarkeit senkt das Stresshormon Cortisol und steigert die gesunde Herzratenvariabilität (HRV).', source: 'Psychophysiologie'),
+      HealthDailyTip(category: 'Mineralien & Natursalz', quote: 'Naturbelassenes, mineralstoffreiches Steinsalz statt raffiniertem Speisesalz unterstützt das zelluläre Elektrolytgleichgewicht und die gesunde Magensäurebildung.', source: 'Biochemie & Mikronährstoffe'),
+      HealthDailyTip(category: 'Mineralien & Blutgesundheit', quote: 'Eisen ist das Herzstück des Hämoglobins für den Sauerstofftransport; pflanzliches Eisen zusammen mit Vitamin C erhöht die Bioverfügbarkeit massiv.', source: 'Hämatologie-Leitlinien'),
+      HealthDailyTip(category: 'Mineralien & Immunsystem', quote: 'Zink steuert über 300 Enzyme, stärkt die T-Zell-Immunabwehr, beschleunigt die Wundheilung und erhält den Geschmacks- und Geruchssinn.', source: 'Immunologie & Mikronährstoffe'),
+      HealthDailyTip(category: 'Vitamine & Nervensystem', quote: 'Vitamin B12 (Methylcobalamin) schützt die Myelinscheide der Nervenbahnen, steuert die Erythrozytenbildung und beugt geistiger Erschöpfung vor.', source: 'Neurologie & Biochemie'),
+      HealthDailyTip(category: 'Vitamine & Knochen-Gefäße', quote: 'Während Vitamin D3 die Kalziumaufnahme im Darm sichert, lenkt Vitamin K2 (MK-7) das Kalzium gezielt in die Knochen und schützt vor Gefäßverkalkung.', source: 'Kardiologie & Knochenstoffwechsel'),
+      HealthDailyTip(category: 'Mineralien & Antioxidantien', quote: 'Selen bildet das aktive Zentrum der Glutathionperoxidase, dem Master-Antioxidans, das Schilddrüse und zelluläre DNA vor oxidativem Stress schützt.', source: 'Biochemie & Schilddrüsenforschung'),
+      HealthDailyTip(category: 'Vitamine & Augengesundheit', quote: 'Vitamin A (Retinol) regeneriert das Sehpigment Rhodopsin in der Netzhaut, schärft das Nachtsehen und hält die Hornhautoberfläche gesund.', source: 'Ophthalmologie & Ernährung'),
+      HealthDailyTip(category: 'Mineralien & Schilddrüse', quote: 'Jod ist der Grundbaustein der Schilddrüsenhormone T3 und T4; es steuert den Grundumsatz, die Körperkerntemperatur und die zelluläre Energie.', source: 'Endokrinologie-Leitfaden'),
+      HealthDailyTip(category: 'Vitamine & Zellschutz', quote: 'Vitamin E (Alpha-Tocopherol) ist das wichtigste fettlösliche Antioxidans; es schützt Zellmembranen und Gefäßwände vor Lipidperoxidation.', source: 'Biophysik & Dermatologie'),
+      HealthDailyTip(category: 'Vitamine & Energiestoffwechsel', quote: 'Der B-Komplex (B1 bis B6) liefert unverzichtbare Coenzyme, um Nahrung in zelluläre ATP-Energie umzuwandeln und Neurotransmitter zu bilden.', source: 'Zelluläre Biochemie'),
+      HealthDailyTip(category: 'Mineralien & Knochen-Gelenke', quote: 'Das Spurenelement Bor verringert die Kalzium- und Magnesiumausscheidung im Urin, verlängert die Halbwertszeit von Vitamin D und stärkt Gelenkknorpel.', source: 'Orthopädie & Osteologie'),
+      HealthDailyTip(category: 'Mineralien & Blutzucker', quote: 'Chrom verbessert als Teil des Glukosetoleranzfaktors (GTF) die Insulinrezeptor-Sensitivität, bremst Heißhunger auf Süßes und stabilisiert den Blutzucker.', source: 'Stoffwechsel & Diabetologie'),
     ],
     'sv': [
       HealthDailyTip(category: 'Ögonhälsa', quote: 'Följ 20-20-20-regeln för att minska ögontrötthet: var 20:e minut, titta 6 meter bort i 20 sekunder.', source: 'Ögonvårdsriktlinjer'),
@@ -289,6 +366,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Kollagen & C-vitamin', quote: 'C-vitamin från citrus, kiwi och paprika är ett nödvändigt enzymatiskt stöd för kroppens kollagensyntes i hud och leder.', source: 'Dermatologi & Biokemi'),
       HealthDailyTip(category: 'Kärlhälsa & Rörelsepaus', quote: 'Att resa sig och röra på sig i 2 minuter var 45:e minut bryter venös stas i benen och ökar syresättningen till hjärnan.', source: 'Kärlkirurgi och Ergonomi'),
       HealthDailyTip(category: 'Sinnesro & Hjärtvariabilitet', quote: 'Att ägna en minut om dagen åt tacksamhet sänker stresshormonet kortisol och höjer en hälsosam hjärtfrekvensvariabilitet (HRV).', source: 'Psykofysiologisk Forskning'),
+      HealthDailyTip(category: 'Mineraler & Naturligt Salt', quote: 'Att välja oraffinerat, mineralrikt bergsalt framför raffinerat bordssalt stödjer cellernas elektrolytbalans och gynnar en god saltsyraproduktion i magsäcken.', source: 'Biokemi och Elektrolyter'),
+      HealthDailyTip(category: 'Mineraler & Blodhälsa', quote: 'Järn är avgörande för hemoglobin och syretransport; att kombinera vegetabiliskt järn med C-vitamin ökar upptaget i tarmen markant.', source: 'Hematologiska Riktlinjer'),
+      HealthDailyTip(category: 'Mineraler & Immunförsvar', quote: 'Zink krävs för över 300 enzymatiska reaktioner, stärker T-cellernas immunförsvar, påskyndar sårläkning och bevarar smak- och luktsinnet.', source: 'Immunologi & Näringsfysiologi'),
+      HealthDailyTip(category: 'Vitaminer & Hjärnhälsa', quote: 'Vitamin B12 (metylkobalamin) bevarar myelinskidan kring nervtrådarna, styr bildandet av röda blodkroppar och motverkar mental trötthet.', source: 'Neurologi och Biokemi'),
+      HealthDailyTip(category: 'Vitaminer & Skelett-Kärl', quote: 'Medan D3-vitamin främjar tarmens kalciumupptag, styr K2-vitamin (MK-7) kalciumet bort från kärlväggarna och in i skelettet mot åderförkalkning.', source: 'Kardiologi & Benmetabolism'),
+      HealthDailyTip(category: 'Mineraler & Antioxidanter', quote: 'Selen utgör den aktiva kärnan i glutationperoxidas, kroppens främsta cellulära antioxidant som skyddar sköldkörteln och DNA mot oxidativ skada.', source: 'Biokemi och Sköldkörtelhälsa'),
+      HealthDailyTip(category: 'Vitaminer & Synhälsa', quote: 'A-vitamin (retinol) återbildar ögats synpigment rodopsin, skärper mörkerseendet och bevarar hornhinnans klara, fuktiga yta.', source: 'Oftalmologi och Näringslära'),
+      HealthDailyTip(category: 'Mineraler & Ämnesomsättning', quote: 'Jod är den primära byggstenen i sköldkörtelhormonerna T3 och T4 som reglerar ämnesomsättningens hastighet, kroppstemperatur och cellulär energi.', source: 'Endokrinologiska Riktlinjer'),
+      HealthDailyTip(category: 'Vitaminer & Cellskydd', quote: 'E-vitamin (alfa-tokoferol) är kroppens främsta fettlösliga antioxidant som skyddar cellmembran och blodkärl mot lipidperoxidation.', source: 'Biofysik & Dermatologi'),
+      HealthDailyTip(category: 'Vitaminer & Energimetabolism', quote: 'B-vitaminkomplexet (B1 till B6) fungerar som nödvändiga koenzymer för att omvandla näring till cellulär ATP-energi och signalsubstanser.', source: 'Cellulär Biokemi'),
+      HealthDailyTip(category: 'Mineraler & Ledhälsa', quote: 'Spårämnet bor minskar förlusten av kalcium och magnesium via urinen, förlänger D-vitaminets halveringstid och stärker ledbroskets tålighet.', source: 'Ortopedi och Osteologi'),
+      HealthDailyTip(category: 'Mineraler & Blodsockerbalans', quote: 'Krom förstärker insulinreceptorernas känslighet som en del av glukostoleransfaktorn (GTF), vilket dämpar sötsug och stabiliserar blodsockret.', source: 'Metabol Endokrinologi'),
     ],
     'fr': [
       HealthDailyTip(category: 'Santé Oculaire', quote: 'Adoptez la règle des 20-20-20 contre la fatigue visuelle : toutes les 20 minutes, regardez à 6 mètres pendant 20 secondes.', source: 'Guide d\'Ophtalmologie'),
@@ -321,6 +410,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Collagène & Vitamine C', quote: 'La vitamine C des agrumes, kiwis et poivrons est un cofacteur clé de la synthèse du collagène, garantissant la souplesse de la peau.', source: 'Dermatologie et Biochimie'),
       HealthDailyTip(category: 'Pause Active Vasculaire', quote: 'Se lever et bouger 2 minutes toutes les 45 minutes évite la stase veineuse dans les jambes et réactive le flux sanguin cérébral.', source: 'Chirurgie Vasculaire'),
       HealthDailyTip(category: 'Sérénité & Cohérence Cardiaque', quote: 'Consacrer une minute à la gratitude sincère fait baisser le cortisol et optimise la variabilité de la fréquence cardiaque (VFC).', source: 'Psychophysiologie Clinique'),
+      HealthDailyTip(category: 'Minéraux & Sels Naturels', quote: 'Préférer le sel gemme naturel non raffiné au sel blanc industriel apporte des oligo-éléments précieux et soutient la sécrétion normale d\'acide gastrique.', source: 'Biochimie et Électrolytes'),
+      HealthDailyTip(category: 'Minéraux & Santé Sanguine', quote: 'Le fer est essentiel à l\'hémoglobine et à l\'oxygénation des tissus ; associer le fer végétal à la vitamine C décuple son absorption intestinale.', source: 'Standards d\'Hématologie'),
+      HealthDailyTip(category: 'Minéraux & Immunité', quote: 'Le zinc régule plus de 300 enzymes, stimule l\'immunité des lymphocytes T, accélère la cicatrisation cutanée et protège l\'odorat et le goût.', source: 'Immunologie et Micronutriments'),
+      HealthDailyTip(category: 'Vitamines & Cerveau', quote: 'La vitamine B12 (méthylcobalamine) préserve la gaine de myéline des nerfs, pilote la production de globules rouges et combat le brouillard mental.', source: 'Neurologie et Biochimie'),
+      HealthDailyTip(category: 'Vitamines & Os-Vaisseaux', quote: 'Si la vitamine D3 favorise l\'absorption du calcium, la vitamine K2 (MK-7) l\'oriente vers les os et préserve les artères des calcifications.', source: 'Cardiologie et Métabolisme Osseux'),
+      HealthDailyTip(category: 'Minéraux & Antioxydants', quote: 'Le sélénium constitue le cœur de la glutathion peroxydase, l\'antioxydant cellulaire suprême qui préserve la thyroïde et l\'ADN du stress oxydatif.', source: 'Biochimie et Thyroïde'),
+      HealthDailyTip(category: 'Vitamines & Vision', quote: 'La vitamine A (rétinol) régénère la rhodopsine rétinienne pour une vision nocturne nette et maintient la cornée parfaitement transparente.', source: 'Ophtalmologie et Nutrition'),
+      HealthDailyTip(category: 'Minéraux & Thyroïde', quote: 'L\'iode est le constituant fondamental des hormones thyroïdiennes T3 et T4, régulant le métabolisme de base et la production d\'énergie cellulaire.', source: 'Guides d\'Endocrinologie'),
+      HealthDailyTip(category: 'Vitamines & Défense Cellulaire', quote: 'La vitamine E (alpha-tocophérol) est le bouclier antioxydant liposoluble majeur, neutralisant la peroxydation des lipides dans les membranes cellulaires.', source: 'Biophysique et Dermatologie'),
+      HealthDailyTip(category: 'Vitamines & Énergie Cellulaire', quote: 'Le complexe de vitamines B (B1 à B6) fournit les coenzymes clés pour transformer les nutriments en énergie cellulaire (ATP) et soutenir les neurotransmetteurs.', source: 'Biochimie Cellulaire'),
+      HealthDailyTip(category: 'Minéraux & Articulations', quote: 'Le bore limite la fuite urinaire du calcium et du magnésium, prolonge la demi-vie de la vitamine D et protège le cartilage articulaire.', source: 'Orthopédie et Ostéologie'),
+      HealthDailyTip(category: 'Minéraux & Contrôle Glycémique', quote: 'Le chrome potentialise la sensibilité des récepteurs à l\'insuline (facteur GTF), apaisant les envies de sucre et stabilisant la glycémie post-repas.', source: 'Endocrinologie Métabolique'),
     ],
     'it': [
       HealthDailyTip(category: 'Salute Oculare', quote: 'Segui la regola 20-20-20 contro l\'affaticamento visivo: ogni 20 minuti, guarda a 6 metri di distanza per 20 secondi.', source: 'Linee Guida Oculistiche'),
@@ -353,6 +454,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Collagene & Vitamina C', quote: 'La vitamina C di agrumi, kiwi e peperoni è il cofattore essenziale per la sintesi del collagene di pelle e articolazioni.', source: 'Dermatologia & Biochimica'),
       HealthDailyTip(category: 'Pausa Attiva & Circolazione', quote: 'Alzarsi e muoversi per 2 minuti ogni 45 minuti elimina il ristagno venoso nelle gambe e riattiva il flusso cerebrale.', source: 'Chirurgia Vascolare & Ergonomia'),
       HealthDailyTip(category: 'Serenità & Coerenza Cardiaca', quote: 'Praticare un minuto di sincera gratitudine al giorno abbassa il cortisolo e migliora la variabilità della frequenza cardiaca (HRV).', source: 'Psicofisiologia Clinica'),
+      HealthDailyTip(category: 'Minerali & Sali Naturali', quote: 'Utilizzare sale di roccia naturale non raffinato al posto del comune sale da tavola preserva oligoelementi preziosi e favorisce la corretta acidità gastrica.', source: 'Biochimica e Nutrizione'),
+      HealthDailyTip(category: 'Minerali & Sangue', quote: 'Il ferro è il pilastro dell\'emoglobina e del trasporto di ossigeno; assumere ferro vegetale insieme a vitamina C ne potenzia enormemente l\'assorbimento.', source: 'Linee Guida di Ematologia'),
+      HealthDailyTip(category: 'Minerali & Difese Immunitarie', quote: 'Lo zinco è indispensabile per oltre 300 enzimi, rinforza le difese immunitarie dei linfociti T, favorisce la guarigione dei tessuti e il senso del gusto.', source: 'Immunologia Clinica'),
+      HealthDailyTip(category: 'Vitamine & Cervello', quote: 'La vitamina B12 (metilcobalamina) protegge la guaina mielinica dei nervi, guida la sintesi dei globuli rossi e contrasta la stanchezza mentale.', source: 'Neurologia Clinica'),
+      HealthDailyTip(category: 'Vitamine & Ossa-Vasi', quote: 'Mentre la vitamina D3 favorisce l\'assorbimento del calcio, la vitamina K2 (MK-7) lo guida nelle ossa, prevenendo la calcificazione delle arterie.', source: 'Cardiologia & Metabolismo Osseo'),
+      HealthDailyTip(category: 'Minerali & Antiossidanti', quote: 'Il selenio è il cuore della glutatione perossidasi, il principale antiossidante cellulare che protegge tiroide e DNA dai radicali liberi.', source: 'Biochimica & Tiroide'),
+      HealthDailyTip(category: 'Vitamine & Vista', quote: 'La vitamina A (retinolo) rigenera la rodopsina nella retina per una vista notturna acuta e mantiene sana la superficie corneale.', source: 'Oftalmologia Clinica'),
+      HealthDailyTip(category: 'Minerali & Tiroide', quote: 'Lo iodio è il componente fondamentale degli ormoni tiroidei T3 e T4, deputati a regolare il metabolismo basale e l\'energia cellulare.', source: 'Linee Guida di Endocrinologia'),
+      HealthDailyTip(category: 'Vitamine & Protezione Cellulare', quote: 'La vitamina E (alfa-tocoferolo) è il principale antiossidante liposolubile, proteggendo le membrane cellulari e i vasi sanguigni dallo stress ossidativo.', source: 'Biofisica Clinica'),
+      HealthDailyTip(category: 'Vitamine & Metabolismo Energetico', quote: 'Il complesso vitaminico B (da B1 a B6) fornisce i coenzimi chiave per convertire il cibo in energia cellulare (ATP) e produrre neurotrasmettitori.', source: 'Biochimica Cellulare'),
+      HealthDailyTip(category: 'Minerali & Articolazioni', quote: 'Il boro riduce l\'eliminazione urinaria di calcio e magnesio, allunga l\'emivita della vitamina D e sostiene la flessibilità della cartilagine articolare.', source: 'Ortopedia & Osteologia'),
+      HealthDailyTip(category: 'Minerali & Controllo della Glicemia', quote: 'Il cromo potenzia la sensibilità dei recettori dell\'insulina (fattore GTF), frenando la voglia improvvisa di dolci e stabilizzando la glicemia.', source: 'Endocrinologia & Diabete'),
     ],
     'nl': [
       HealthDailyTip(category: 'Ooggezondheid', quote: 'Pas de 20-20-20-regel toe tegen vermoeide ogen: kijk elke 20 minuten minstens 20 seconden naar 6 meter afstand.', source: 'Oogheelkundige Richtlijnen'),
@@ -385,6 +498,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Collageen & Vitamine C', quote: 'Vitamine C uit citrusvruchten, kiwi en paprika is een onmisbare cofactor voor collageensynthese voor elastische huid en gewrichten.', source: 'Dermatologie & Biochemie'),
       HealthDailyTip(category: 'Actieve Vaatpauze', quote: 'Elke 45 minuten 2 minuten opstaan en bewegen doorbreekt veneuze stuwing in de benen en stimuleert de bloedtoevoer naar het brein.', source: 'Vaatchirurgie & Ergonomie'),
       HealthDailyTip(category: 'Mentale Rust & Hartcoherentie', quote: 'Slechts één minuut oprechte dankbaarheid per dag verlaagt het stresshormoon cortisol en verhoogt je hartritmevariabiliteit (HRV).', source: 'Psychofysiologisch Onderzoek'),
+      HealthDailyTip(category: 'Mineralen & Natuurzout', quote: 'Kies voor ongeraffineerd, mineraalrijk steenzout in plaats van bewerkt tafelzout om je elektrolytenbalans te ondersteunen en de maagzuurproductie te bevorderen.', source: 'Biochemie & Elektrolyten'),
+      HealthDailyTip(category: 'Mineralen & Bloedgezondheid', quote: 'IJzer is essentieel voor hemoglobine en zuurstoftransport; combineer plantaardig ijzer met vitamine C om de opname in je darmen sterk te verhogen.', source: 'Hematologie Richtlijnen'),
+      HealthDailyTip(category: 'Mineralen & Weerstand', quote: 'Zink activeert ruim 300 enzymen, versterkt de T-celweerstand, versnelt wondgenezing en is onmisbaar voor een scherp reuk- en smaakvermogen.', source: 'Immunologie & Voedingsleer'),
+      HealthDailyTip(category: 'Vitaminen & Breingezondheid', quote: 'Vitamine B12 (methylcobalamine) beschermt de myelineschede rondom zenuwvezels, stuurt de aanmaak van rode bloedcellen aan en verdrijft mentale mist.', source: 'Neurologie & Biochemie'),
+      HealthDailyTip(category: 'Vitaminen & Bot-Vaatgezondheid', quote: 'Vitamine D3 verhoogt de opname van calcium, terwijl vitamine K2 (MK-7) het calcium uit de vaten weghaalt en naar de botten leidt tegen vaatverkalking.', source: 'Cardiologie & Botstofwisseling'),
+      HealthDailyTip(category: 'Mineralen & Antioxidanten', quote: 'Selenium vormt de kern van glutathionperoxidase, de belangrijkste cellulaire antioxidant die je schildklier en DNA beschermt tegen oxidatieve schade.', source: 'Biochemie & Schilddrieronderzoek'),
+      HealthDailyTip(category: 'Vitaminen & Gezichtsvermogen', quote: 'Vitamine A (retinol) herstelt rodopsine in het netvlies voor scherp nachtzicht en beschermt het hoornvliesoppervlak tegen uitdroging.', source: 'Oogheelkunde & Voeding'),
+      HealthDailyTip(category: 'Mineralen & Schildklier', quote: 'Jodium is de essentiële bouwsteen van schildklierhormonen T3 en T4; het reguleert je basaalmetabolisme, lichaamstemperatuur en cellulaire energie.', source: 'Endocrinologische Richtlijnen'),
+      HealthDailyTip(category: 'Vitaminen & Celbescherming', quote: 'Vitamine E (alfa-tocoferol) is het belangrijkste vetoplosbare antioxidantschild dat celmembranen en vaatwanden beschermt tegen oxidatie.', source: 'Biofysica & Dermatologie'),
+      HealthDailyTip(category: 'Vitaminen & Energiemetabolisme', quote: 'Het B-complex (B1 t/m B6) levert onmisbare co-enzymen die voeding omzetten in bruikbare celenergie (ATP) en neurotransmitters aanmaken.', source: 'Cellulaire Biochemie'),
+      HealthDailyTip(category: 'Mineralen & Gewrichten', quote: 'Het mineraal boor vermindert het verlies van calcium en magnesium via de urine, verlengt de werking van vitamine D en versterkt gewrichtskraakbeen.', source: 'Orthopedie & Osteologie'),
+      HealthDailyTip(category: 'Mineralen & Suikerspiegel', quote: 'Chroom verhoogt de gevoeligheid van insulinereceptoren (GTF), waardoor zoete trek wordt afgeremd en je bloedsuikerspiegel stabieler blijft.', source: 'Metabole Endocrinologie'),
     ],
     'ar': [
       HealthDailyTip(category: 'صحة العيون', quote: 'طبق قاعدة 20-20-20 لتخفيف إجهاد العين: كل 20 دقيقة، انظر إلى مسافة 6 أمتار لمدة 20 ثانية.', source: 'إرشادات طب العيون'),
@@ -417,6 +542,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'الكولاجين وفيتامين سي', quote: 'فيتامين سي في الحمضيات والكيوي والفلفل محفز إنزيمي لا غنى عنه لتخليق الكولاجين والحفاظ على نضارة البشرة والمفاصل.', source: 'طب الجلدية والكيمياء الحيوية'),
       HealthDailyTip(category: 'الراحة الحركية وتدفق الدم', quote: 'الوقوف والحركة لمدة دقيقتين كل 45 دقيقة من الجلوس يمنع ركود الدم في أوردة الساقين وينشط التروية الدماغية.', source: 'جراحة الأوعية الدموية'),
       HealthDailyTip(category: 'السكينة النفسية وصحة القلب', quote: 'ممارسة الامتنان الصادق لدقيقة واحدة يومياً تخفض هرمون التوتر (الكورتيزول) وترفع تباين نبضات القلب الإيجابي (HRV).', source: 'أبحاث علم وظائف النفس'),
+      HealthDailyTip(category: 'المعادن والأملاح الطبيعية', quote: 'استخدام الملح الصخري الطبيعي غير المكرر بدلاً من ملح المائدة الصناعي يمد الجسم بمعادن نادرة ويدعم توازن الكهارل وإفراز حمض المعدة الصحي.', source: 'الكيمياء الحيوية والمعادن'),
+      HealthDailyTip(category: 'المعادن وصحة الدم', quote: 'الحديد هو العنصر الأساسي في الهيموغلوبين لنقل الأكسجين للخلايا؛ ودمج الحديد النباتي مع فيتامين سي يضاعف امتصاصه المعوي بشكل مذهل.', source: 'معايير طب الدم'),
+      HealthDailyTip(category: 'المعادن والمناعة', quote: 'الزنك ضروري لعمل أكثر من 300 إنزيم، ويقوي الخلايا التائية المناعية، ويسرع التئام الجروح، ويحافظ على حاستي التذوق والشم.', source: 'علم المناعة والتغذية'),
+      HealthDailyTip(category: 'الفيتامينات وصحة الأعصاب', quote: 'فيتامين ب12 (ميثيل كوبالامين) يحمي غمد الميالين المحيط بالأعصاب، ويتحكم في إنتاج خلايا الدم الحمراء، ويمنع الضبابية والإنهاك الذهني.', source: 'طب الأعصاب والكيمياء الحيوية'),
+      HealthDailyTip(category: 'الفيتامينات وصحة العظام والقلب', quote: 'بينما يساعد فيتامين د3 على امتصاص الكالسيوم، يعمل فيتامين ك2 (MK-7) كمرشد يوجه الكالسيوم إلى العظام ويمنع تكلس الشرايين الخطير.', source: 'أبحاث القلب واستقلاب العظام'),
+      HealthDailyTip(category: 'المعادن ومضادات الأكسدة', quote: 'السيلينيوم يشكل النواة النشطة لإنزيم الجلوتاثيون بيروكسيديز، وهو مضاد الأكسدة الأقوى الذي يحمي الغدة الدرقية والحمض النووي من التلف.', source: 'الكيمياء الحيوية والغدة الدرقية'),
+      HealthDailyTip(category: 'الفيتامينات وصحة الإبصار', quote: 'فيتامين أ (الريتينول) يجدد صبغة الرودوبسين في الشبكية لتعزيز الرؤية الليلية والحفاظ على صفاء القرنية ورطوبة العين.', source: 'طب العيون والتغذية'),
+      HealthDailyTip(category: 'المعادن والغدة الدرقية', quote: 'اليود هو المكون الأساسي لهرمونات الغدة الدرقية T3 وT4، وهو المسؤول عن ضبط معدل الأيض الأساسي وحرارة الجسم وطاقة الخلايا.', source: 'إرشادات الغدد الصماء'),
+      HealthDailyTip(category: 'الفيتامينات وحماية الخلايا', quote: 'فيتامين هـ (ألفا-توكوفيرول) هو الدرع المضاد للأكسدة الأقوى القابل للذوبان في الدهون، حيث يحمي أغشية الخلايا وبطانة الأوعية من التلف.', source: 'الفيزياء الحيوية والجلدية'),
+      HealthDailyTip(category: 'الفيتامينات وإنتاج الطاقة', quote: 'تعمل مجموعة فيتامينات ب المركبة (ب1 إلى ب6) كعوامل مساعدة أساسية لتحويل الغذاء إلى طاقة خلوية (ATP) وتصنيع النواقل العصبية الحيوية.', source: 'الكيمياء الحيوية الخلوية'),
+      HealthDailyTip(category: 'المعادن وصحة المفاصل', quote: 'يقلل معدن البورون من طرح الكالسيوم والمغنيسيوم في البول، ويطيل عمر النصف لفيتامين د النشط، ويعزز مرونة الغضاريف والمفاصل.', source: 'جراحة العظام وأمراض المفاصل'),
+      HealthDailyTip(category: 'المعادن وتنظيم السكر', quote: 'يعزز الكروم حساسية مستقبلات الأنسولين كجزء من عامل تحمل الجلوكوز (GTF)، مما يحد من الرغبة الشديدة في السكريات ويثبت سكر الدم.', source: 'الغدد الصماء والسكري'),
     ],
     'bn': [
       HealthDailyTip(category: 'চোখের স্বাস্থ্য', quote: 'চোখের ক্লান্তি কমাতে ২০-২০-২০ নিয়ম মেনে চলুন: প্রতি ২০ মিনিট পর ২০ সেকেন্ডের জন্য ২০ ফুট দূরে তাকান।', source: 'চক্ষুবিজ্ঞান নির্দেশিকা'),
@@ -449,6 +586,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'কোলাজেন ও ভিটামিন সি', quote: 'লেবু, কিউই ও ক্যাপসিকামের ভিটামিন সি ত্বকের স্থিতিস্থাপকতা ও অস্থিসন্ধি রক্ষাকারী কোলাজেন তৈরির প্রধান সহায়ক।', source: 'ডার্মাটোলজি ও বায়োকেমিস্ট্রি'),
       HealthDailyTip(category: 'রক্ত চলাচল ও সচলতা', quote: 'প্রতি ৪৫ মিনিট পর ২ মিনিটের জন্য উঠে দাঁড়ালে পায়ের শিরায় রক্ত জমাট বাঁধা রোধ হয় এবং মস্তিষ্কে রক্ত সঞ্চালন বাড়ে।', source: 'ভাস্কুলার স্বাস্থ্য নির্দেশিকা'),
       HealthDailyTip(category: 'মানসিক প্রশান্তি ও হৃদস্পন্দন', quote: 'দিনে মাত্র ১ মিনিট কৃতজ্ঞতাবোধ চর্চা করলে কর্টিসল স্ট্রেস হরমোন কমে এবং হৃদস্পন্দনের স্বাস্থ্যকর ছন্দ (HRV) বৃদ্ধি পায়।', source: 'সাইকোফিজিওলজি স্টাডিজ'),
+      HealthDailyTip(category: 'খনিজ ও প্রাকৃতিক লবণ', quote: 'প্রক্রিয়াজাত টেবিল লবণের বদলে খনিজসমৃদ্ধ প্রাকৃতিক সৈন্ধব/শিলা লবণ ব্যবহার করলে শরীরের ইলেক্ট্রোলাইট ভারসাম্য ঠিক থাকে এবং পাকস্থলীর অ্যাসিড উৎপাদন উন্নত হয়।', source: 'বায়োকেমিস্ট্রি নির্দেশিকা'),
+      HealthDailyTip(category: 'খনিজ ও রক্তের স্বাস্থ্য', quote: 'আয়রন রক্তে হিমোগ্লোবিন তৈরি ও কোষে অক্সিজেন পরিবহনে মুখ্য ভূমিকা পালন করে; উদ্ভিজ্জ আয়রনের সাথে ভিটামিন সি খেলে তা সহজে শরীরে শোষিত হয়।', source: 'হেমাটোলজি নির্দেশিকা'),
+      HealthDailyTip(category: 'খনিজ ও রোগ প্রতিরোধ', quote: 'জিংক দেহে ৩০০টির বেশি এনজাইমের ক্রিয়া নিয়ন্ত্রণ করে, টি-সেল রোগ প্রতিরোধ ক্ষমতা বাড়ায়, দ্রুত ক্ষত নিরাময় করে এবং স্বাদ ও ঘ্রাণশক্তি সতেজ রাখে।', source: 'ইমিউনোলজি নির্দেশিকা'),
+      HealthDailyTip(category: 'ভিটামিন ও মস্তিষ্কের স্বাস্থ্য', quote: 'ভিটামিন বি১২ (মিথাইলকোবালামিন) স্নায়ুতন্তুর চারপাশের মায়েলিন আবরণ সুরক্ষিত রাখে, রক্তকণিকা তৈরিতে সাহায্য করে এবং মানসিক ক্লান্তি দূর করে।', source: 'নিউরোলজি ও বায়োকেমিস্ট্রি'),
+      HealthDailyTip(category: 'ভিটামিন ও হাড়-রক্তনালী', quote: 'ভিটামিন ডি৩ অন্ত্রে ক্যালসিয়াম শোষণে সাহায্য করে এবং ভিটামিন কে২ (MK-7) সেই ক্যালসিয়াম রক্তনালী থেকে হাড়ে পৌঁছে দিয়ে ধমনীর জমাট বাঁধা রোধ করে।', source: 'কার্ডিওলজি ও অস্থিবিজ্ঞান'),
+      HealthDailyTip(category: 'খনিজ ও অ্যান্টিঅক্সিডেন্ট', quote: 'সেলেনিয়াম হলো শরীরের প্রধান অ্যান্টিঅক্সিডেন্ট গ্লুটাথিয়ন পারঅক্সিডেজের মূল উপাদান, যা থাইরয়েড গ্রন্থি ও ডিএনএকে জারণজনিত ক্ষতি থেকে রক্ষা করে।', source: 'বায়োকেমিস্ট্রি ও থাইরয়েড গাইড'),
+      HealthDailyTip(category: 'ভিটামিন ও চোখের দৃষ্টি', quote: 'ভিটামিন এ (রেটিনল) চোখের রেটিনার রোডপসিন উপাদান পুনরুজ্জীবিত করে রাতের দৃষ্টিশক্তি প্রখর রাখে এবং কর্নিয়ার সুরক্ষা দেয়।', source: 'চক্ষুবিজ্ঞান ও পুষ্টি'),
+      HealthDailyTip(category: 'খনিজ ও থাইরয়েড বিপাক', quote: 'আয়োডিন থাইরয়েড হরমোন টি৩ এবং টি৪-এর প্রধান উপাদান, যা শরীরের ভিত্তি বিপাকীয় হার, তাপমাত্রা ও শক্তি উৎপাদন নিয়ন্ত্রণ করে।', source: 'এন্ডোক্রিনোলজি নির্দেশিকা'),
+      HealthDailyTip(category: 'ভিটামিন ও কোষের সুরক্ষা', quote: 'ভিটামিন ই চর্বিতে দ্রবণীয় প্রধান অ্যান্টিঅক্সিডেন্ট হিসেবে কাজ করে কোষের প্রাচীর এবং রক্তনালীকে ফ্রি র‍্যাডিকেলের ক্ষতি থেকে রক্ষা করে।', source: 'বায়োফিজিক্স ও ডার্মাটোলজি'),
+      HealthDailyTip(category: 'ভিটামিন ও শক্তি বিপাক', quote: 'বি-কমপ্লেক্স ভিটামিনগুলো (বি১ থেকে বি৬) খাদ্যকে কোষীয় শক্তিতে (ATP) রূপান্তরিত করতে এবং মস্তিষ্কের নিউরোট্রান্সমিটার তৈরিতে মূল অনুঘটক হিসেবে কাজ করে।', source: 'সেলুলার বায়োকেমিস্ট্রি'),
+      HealthDailyTip(category: 'খনিজ ও অস্থিসন্ধি', quote: 'বোরন খনিজটি প্রস্রাবের মাধ্যমে ক্যালসিয়াম ও ম্যাগনেসিয়াম বের হওয়া রোধ করে, ভিটামিন ডি-এর কার্যকাল বাড়ায় এবং অস্থিসন্ধির নমনীয়তা রক্ষা করে।', source: 'অর্থোপেডিকস নির্দেশিকা'),
+      HealthDailyTip(category: 'খনিজ ও শর্করার ভারসাম্য', quote: 'ক্রোমিয়াম গ্লুকোজ টলারেন্স ফ্যাক্টর হিসেবে ইনসুলিন রিসেপ্টরের কার্যক্ষমতা বাড়ায়, অতিরিক্ত মিষ্টি খাওয়ার প্রবণতা কমায় এবং রক্তে শর্করা নিয়ন্ত্রণ করে।', source: 'মেটাবলিক এন্ডোক্রিনোলজি'),
     ],
     'pt': [
       HealthDailyTip(category: 'Saúde Ocular', quote: 'Aplique a regra 20-20-20 para aliviar o cansaço visual: a cada 20 minutos, olhe para 6 metros de distância por 20 segundos.', source: 'Diretrizes de Oftalmologia'),
@@ -481,6 +630,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Colágeno & Vitamina C', quote: 'A vitamina C das frutas cítricas, kiwi e pimentão é cofator essencial para a síntese de colágeno na pele e articulações.', source: 'Dermatologia e Bioquímica'),
       HealthDailyTip(category: 'Pausa Ativa Circulatória', quote: 'Ficar de pé e caminhar 2 minutos a cada 45 minutos evita a estase venosa nas pernas e reativa a circulação cerebral.', source: 'Cirurgia Vascular e Ergonomia'),
       HealthDailyTip(category: 'Serenidade & Coerência Cardíaca', quote: 'Dedicar 1 minuto por dia à gratidão genuína reduz o cortisol e eleva a variabilidade da frequência cardíaca (VFC).', source: 'Psicofisiologia Clínica'),
+      HealthDailyTip(category: 'Minerais & Sais Naturais', quote: 'Preferir sal-gema natural não refinado ao sal de cozinha processado fornece minerais essenciais, equilibrando os eletrólitos e a acidez gástrica benéfica.', source: 'Bioquímica e Eletrólitos'),
+      HealthDailyTip(category: 'Minerais & Saúde Sanguínea', quote: 'O ferro é o núcleo da hemoglobina no transporte de oxigênio; consumir fontes vegetais de ferro com vitamina C amplia drasticamente sua absorção.', source: 'Padrões de Hematologia'),
+      HealthDailyTip(category: 'Minerais & Imunidade', quote: 'O zinco é vital para mais de 300 enzimas, potencializa os linfócitos T na imunidade, acelera a cicatrização e preserva o paladar e olfato.', source: 'Imunologia e Nutrição'),
+      HealthDailyTip(category: 'Vitaminas & Cérebro', quote: 'A vitamina B12 (metilcobalamina) protege a bainha de mielina dos nervos, orquestra os glóbulos vermelhos e dissipa a névoa mental e o cansaço.', source: 'Neurologia e Bioquímica'),
+      HealthDailyTip(category: 'Vitaminas & Ossos-Vasos', quote: 'Enquanto a vitamina D3 absorve o cálcio no intestino, a vitamina K2 (MK-7) direciona o cálcio para os ossos, evitando a calcificação das artérias.', source: 'Cardiologia e Metabolismo Ósseo'),
+      HealthDailyTip(category: 'Minerais & Antioxidantes', quote: 'O selênio é o centro catalítico da glutationa peroxidase, o antioxidante mestre que protege a tireoide e o DNA do estresse oxidativo.', source: 'Bioquímica e Tireoide'),
+      HealthDailyTip(category: 'Vitaminas & Visão', quote: 'A vitamina A (retinol) regenera a rodopsina na retina para uma visão noturna nítida e protege a transparência da córnea.', source: 'Oftalmologia e Nutrição'),
+      HealthDailyTip(category: 'Minerais & Tireoide', quote: 'O iodo é a matéria-prima dos hormônios tireoidianos T3 e T4, responsáveis por comandar a taxa metabólica basal e a energia das células.', source: 'Diretrizes de Endocrinologia'),
+      HealthDailyTip(category: 'Vitaminas & Defesa Celular', quote: 'A vitamina E (alfa-tocoferol) é o principal escudo antioxidante lipossolúvel, blindando as membranas celulares contra a peroxidação lipídica.', source: 'Biofísica e Dermatologia'),
+      HealthDailyTip(category: 'Vitaminas & Energia Celular', quote: 'O complexo B (B1 a B6) fornece as coenzimas necessárias para transformar os alimentos em energia celular (ATP) e sintetizar neurotransmissores.', source: 'Bioquímica Celular'),
+      HealthDailyTip(category: 'Minerais & Articulações', quote: 'O boro reduz a perda urinária de cálcio e magnésio, prolonga a meia-vida da vitamina D e reforça a flexibilidade e cartilagem das articulações.', source: 'Ortopedia e Osteologia'),
+      HealthDailyTip(category: 'Minerais & Controle Glicêmico', quote: 'O cromo potencializa os receptores de insulina (fator GTF), atenuando a compulsão por doces e estabilizando a glicemia pós-refeição.', source: 'Endocrinologia Metabólica'),
     ],
     'ru': [
       HealthDailyTip(category: 'Здоровье глаз', quote: 'Соблюдайте правило 20-20-20 для снятия усталости глаз: каждые 20 минут смотрите на 6 метров вдаль в течение 20 секунд.', source: 'Офтальмологические рекомендации'),
@@ -513,6 +674,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'Коллаген и витамин C', quote: 'Витамин C из цитрусовых, киви и перца — незаменимый кофактор выработки коллагена для упругости кожи и суставов.', source: 'Дерматология и биохимия'),
       HealthDailyTip(category: 'Двигательная пауза', quote: '2 минуты разминки каждые 45 минут сидения устраняют венозный застой в ногах и мгновенно освежают кровообращение мозга.', source: 'Сосудистая хирургия и эргономика'),
       HealthDailyTip(category: 'Душевный покой и сердце', quote: 'Всего одна минута искренней благодарности в день снижает гормон стресса кортизол и повышает вариабельность сердечного ритма.', source: 'Психофизиологические исследования'),
+      HealthDailyTip(category: 'Минералы и природные соли', quote: 'Натуральная нерафинированная каменная соль богата природными микроэлементами, поддерживает электролитный баланс и нормальную выработку соляной кислоты в желудке.', source: 'Биохимия и электролиты'),
+      HealthDailyTip(category: 'Минералы и кровь', quote: 'Железо — основа гемоглобина и кислородного обмена; сочетание растительного железа с витамином C в разы увеличивает его усвоение в кишечнике.', source: 'Стандарты гематологии'),
+      HealthDailyTip(category: 'Минералы и иммунитет', quote: 'Цинк регулирует более 300 ферментов, укрепляет Т-клеточный иммунитет, ускоряет заживление тканей и поддерживает остроту вкуса и обоняния.', source: 'Иммунология и нутрициология'),
+      HealthDailyTip(category: 'Витамины и мозг', quote: 'Витамин B12 (метилкобаламин) защищает миелиновую оболочку нервов, управляет кроветворением и предотвращает хроническую умственную утомляемость.', source: 'Неврология и биохимия'),
+      HealthDailyTip(category: 'Витамины и кости-сосуды', quote: 'Витамин D3 стимулирует всасывание кальция, а витамин K2 (MK-7) направляет его точно в костную ткань, предотвращая опасную кальцинацию артерий.', source: 'Кардиология и остеология'),
+      HealthDailyTip(category: 'Минералы и антиоксиданты', quote: 'Селен — ключевой компонент глутатионпероксидазы, главного антиоксиданта клеток, защищающего щитовидную железу и ДНК от свободных радикалов.', source: 'Биохимия и эндокринология'),
+      HealthDailyTip(category: 'Витамины и зрение', quote: 'Витамин A (ретинол) обновляет зрительный пигмент родопсин, улучшает сумеречное зрение и защищает поверхность роговицы.', source: 'Офтальмология и нутрициология'),
+      HealthDailyTip(category: 'Минералы и метаболизм', quote: 'Йод — ключевой строительный блок гормонов щитовидной железы T3 и T4, определяющих базовую скорость метаболизма и выработку энергии в клетках.', source: 'Клиническая эндокринология'),
+      HealthDailyTip(category: 'Витамины и защита клеток', quote: 'Витамин E (альфа-токоферол) — мощнейший жирорастворимый антиоксидант, защищающий липидный слой клеточных мембран и сосуды от окисления.', source: 'Биофизика и дерматология'),
+      HealthDailyTip(category: 'Витамины и энергообмен', quote: 'Комплекс витаминов группы B (B1–B6) служит коферментом для превращения пищи в клеточную энергию (АТФ) и синтеза нейромедиаторов настроения.', source: 'Клеточная биохимия'),
+      HealthDailyTip(category: 'Минералы и суставы', quote: 'Микроэлемент бор снижает потери кальция и магния с мочой, продлевает период полураспада витамина D и укрепляет суставные хрящи.', source: 'Ортопедия и остеология'),
+      HealthDailyTip(category: 'Минералы и гликемический контроль', quote: 'Хром повышает чувствительность рецепторов к инсулину в составе фактора толерантности к глюкозе (GTF), снимая тягу к сладкому и выравнивая сахар.', source: 'Эндокринология и диабетология'),
     ],
     'ur': [
       HealthDailyTip(category: 'آنکھوں کی صحت', quote: 'آنکھوں کی تھکن دور کرنے کے لیے 20-20-20 کا اصول اپنائیں: ہر 20 منٹ بعد 20 سیکنڈ تک 20 فٹ دور دیکھیں۔', source: 'امراض چشم کی گائیڈ'),
@@ -545,6 +718,18 @@ class DailyWellnessExtras {
       HealthDailyTip(category: 'کولیجن اور وٹامن سی', quote: 'مالٹا، کیوی اور شملہ مرچ میں وٹامن سی کولیجن بنانے میں لازمی کردار ادا کرتا ہے جس سے جلد اور جوڑ مضبوط رہتے ہیں۔', source: 'ڈرمیٹالوجی اور بائیو کیمسٹری'),
       HealthDailyTip(category: 'خون کی روانی اور مختصر حرکت', quote: 'مسلسل بیٹھنے کے دوران ہر 45 منٹ بعد 2 منٹ کھڑے ہو کر چہل قدمی کرنا ٹانگوں کی رگوں میں خون کی گردش کو بحال رکھتا ہے۔', source: 'عروقی صحت اور ارگونومکس'),
       HealthDailyTip(category: 'ذہنی سکون اور دل کا توازن', quote: 'روزانہ صرف 1 منٹ شکر گزاری کا احساس پیدا کرنا تناؤ کے ہارمون کورٹیسول کو گھٹا کر دل کی دھڑکن کے توازن کو بہتر کرتا ہے۔', source: 'نفسیاتی و طبی تحقیق'),
+      HealthDailyTip(category: 'معدنیات اور قدرتی نمک', quote: 'پروسیس شدہ سفید نمک کے بجائے قدرتی معدنیات سے بھرپور کالا یا خردنی پتھری نمک کا استعمال الیکٹرولائٹ بیلنس اور معدے کے ہاضمے کو بہتر بناتا ہے۔', source: 'بائیو کیمسٹری گائیڈ'),
+      HealthDailyTip(category: 'معدنیات اور خون کی صحت', quote: 'آئرن ہیموگلوبن کی ساخت اور آکسیجن کی ترسیل کے لیے لازم ہے؛ آئرن والی غذا کے ساتھ وٹامن سی لینے سے اس کا جسم میں جذب ہونا دوگنا ہو جاتا ہے۔', source: 'ہیمیٹولوجی گائیڈ'),
+      HealthDailyTip(category: 'معدنیات اور قوت مدافعت', quote: 'زنک جسم کے 300 سے زائد انزائمز کے کام، مدافعتی نظام کی مضبوطی، زخموں کے فوری بھرنے اور سونگھنے و چکھنے کی حس کے لیے لازمی ہے۔', source: 'امیونولوجی گائیڈ'),
+      HealthDailyTip(category: 'وٹامنز اور دماغی صحت', quote: 'وٹامن بی 12 اعصابی ریشوں کی حفاظتی تہہ (مائلین) کو مضبوط رکھتا ہے، سرخ خون کے خلیات بناتا ہے اور ذہنی تھکن کو دور کرتا ہے۔', source: 'نیورولوجی اور بائیو کیمسٹری'),
+      HealthDailyTip(category: 'وٹامنز اور ہڈیاں و شریانیں', quote: 'وٹامن ڈی 3 کیلشیم کو جسم میں جذب کرتا ہے جبکہ وٹامن کے 2 اسے شریانوں میں جمنے سے روک کر سیدھا ہڈیوں میں پہنچاتا ہے۔', source: 'کارڈیالوجی اور ہڈیوں کی تحقیق'),
+      HealthDailyTip(category: 'معدنیات اور اینٹی آکسیڈنٹس', quote: 'سیلینیم جسم کے طاقتور ترین اینٹی آکسیڈنٹ گلوٹاتھیون کا لازمی جزو ہے جو تھائیرائیڈ اور ڈی این اے کو نقصان سے بچاتا ہے۔', source: 'بائیو کیمسٹری اور تھائیرائیڈ'),
+      HealthDailyTip(category: 'وٹامنز اور بینائی', quote: 'وٹامن اے (ریٹینول) رات کی بصارت کو تیز کرنے والے پگمنٹ روڈوپسین کو بحال کرتا ہے اور آنکھ کی پتلی کو شفاف رکھتا ہے۔', source: 'امراض چشم اور غذائیت'),
+      HealthDailyTip(category: 'معدنیات اور تھائیرائیڈ', quote: 'آیوڈین تھائیرائیڈ ہارمونز کا بنیادی حصہ ہے جو جسم کی میٹابولک رفتار، حرارت اور خلیاتی توانائی کی پیداوار کو منظم کرتا ہے۔', source: 'اینڈوکرائنولوجی گائیڈ'),
+      HealthDailyTip(category: 'وٹامنز اور خلیاتی تحفظ', quote: 'وٹامن ای چکنائی میں گھلنے والا بہترین اینٹی آکسیڈنٹ ہے جو خلیاتی جھلیوں اور خون کی نالیوں کو اندرونی نقصانات سے بچاتا ہے۔', source: 'بائیو فزکس اور ڈرمیٹالوجی'),
+      HealthDailyTip(category: 'وٹامنز اور توانائی', quote: 'بی کمپلیکس وٹامنز غذا کو خلیاتی توانائی (ATP) میں تبدیل کرنے اور دماغی نیورو ٹرانسمیٹرز بنانے میں کلیدی کردار ادا کرتے ہیں۔', source: 'سیلولر بائیو کیمسٹری'),
+      HealthDailyTip(category: 'معدنیات اور جوڑوں کی حفاظت', quote: 'بوران معدنیات کیلشیم اور میگنیشیم کے اخراج کو کم کر کے وٹامن ڈی کے اثر کو طویل کرتا ہے اور جوڑوں کی ہڈیوں کو لچکدار بناتا ہے۔', source: 'آرتھوپیڈکس گائیڈ'),
+      HealthDailyTip(category: 'معدنیات اور شوگر کنٹرول', quote: 'کرومیم انسولین کے جذب ہونے کی صلاحیت کو بہتر بناتا ہے جس سے میٹھا کھانے کی اچانک خواہش پر قابو پانے اور شوگر کو متوازن رکھنے میں مدد ملتی ہے۔', source: 'ذیابیطس اور میٹابولک گائیڈ'),
     ],
   };
 }
@@ -561,78 +746,465 @@ class DailyHealthTipCard extends StatelessWidget {
     final langCode = Localizations.localeOf(context).languageCode;
     final tipItem = DailyWellnessExtras.dailyTipItemForLocale(langCode);
 
-    return Container(
-      key: const Key('home_daily_health_tip_card'),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF122826)
-            : AppTheme.primaryTeal.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppTheme.primaryTeal.withValues(alpha: 0.25),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryTeal.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.format_quote_rounded,
-              size: 20,
-              color: AppTheme.primaryTeal,
-            ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => WellnessKnowledgeCornerSheet.show(context),
+      child: Container(
+        key: const Key('home_daily_health_tip_card'),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark
+              ? const Color(0xFF122826)
+              : AppTheme.primaryTeal.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppTheme.primaryTeal.withValues(alpha: 0.25),
           ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      l10n.dailyHealthTipTitle,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: AppTheme.primaryTeal,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryTeal.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        tipItem.category,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryTeal.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.format_quote_rounded,
+                size: 20,
+                color: AppTheme.primaryTeal,
+              ),
+            ),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.dailyHealthTipTitle,
+                        style: theme.textTheme.labelLarge?.copyWith(
                           color: AppTheme.primaryTeal,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryTeal.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          tipItem.category,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primaryTeal,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '“${tipItem.quote}”',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.4,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Rich interactive "Faydalı Bilgiler Köşesi" modal sheet allowing users
+/// to browse, search, and copy mineral, vitamin, salt, and lifestyle tips.
+class WellnessKnowledgeCornerSheet extends StatefulWidget {
+  const WellnessKnowledgeCornerSheet({super.key});
+
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const WellnessKnowledgeCornerSheet(),
+    );
+  }
+
+  @override
+  State<WellnessKnowledgeCornerSheet> createState() =>
+      _WellnessKnowledgeCornerSheetState();
+}
+
+class _WellnessKnowledgeCornerSheetState
+    extends State<WellnessKnowledgeCornerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCategory = 'all';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final langCode = Localizations.localeOf(context).languageCode;
+    final allTips = DailyWellnessExtras.allTipsForLocale(langCode);
+    final query = _searchController.text.trim().toLowerCase();
+
+    final filtered = allTips.where((t) {
+      if (_selectedCategory == 'minerals' &&
+          !t.category.toLowerCase().contains('mineral') &&
+          !t.category.toLowerCase().contains('tuz') &&
+          !t.category.toLowerCase().contains('salt')) {
+        return false;
+      }
+      if (_selectedCategory == 'vitamins' &&
+          !t.category.toLowerCase().contains('vitamin')) {
+        return false;
+      }
+      if (_selectedCategory == 'lifestyle' &&
+          (t.category.toLowerCase().contains('mineral') ||
+              t.category.toLowerCase().contains('vitamin') ||
+              t.category.toLowerCase().contains('tuz') ||
+              t.category.toLowerCase().contains('salt'))) {
+        return false;
+      }
+      if (query.isNotEmpty) {
+        final matchesCat = t.category.toLowerCase().contains(query);
+        final matchesQuote = t.quote.toLowerCase().contains(query);
+        final matchesSrc = t.source?.toLowerCase().contains(query) ?? false;
+        return matchesCat || matchesQuote || matchesSrc;
+      }
+      return true;
+    }).toList();
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.88,
+      minChildSize: 0.50,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF101E20) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Drag Handle
+              Container(
+                width: 44,
+                height: 4.5,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 4, 18, 10),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF06B6D4), Color(0xFF0D9488)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.auto_stories_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Faydalı Bilgiler Köşesi',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          Text(
+                            'Mineraller, Vitaminler, Kaya Tuzu & Sağlık Rehberi (${allTips.length} Bilgi)',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '“${tipItem.quote}”',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.4,
-                    fontStyle: FontStyle.italic,
+              ),
+
+              // Search Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    hintText: 'Mineral, vitamin, kaya tuzu veya konu ara...',
+                    hintStyle: TextStyle(
+                      fontSize: 12.5,
+                      color: isDark ? Colors.white38 : Colors.black38,
+                    ),
+                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {});
+                            },
+                          )
+                        : null,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? const Color(0xFF172D30)
+                        : const Color(0xFFF1F5F9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Category Filter Pills
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    _filterChip('all', '🌟 Tümü (${allTips.length})'),
+                    const SizedBox(width: 6),
+                    _filterChip('minerals', '💎 Mineraller & Kaya Tuzu'),
+                    const SizedBox(width: 6),
+                    _filterChip('vitamins', '💊 Vitaminler Dünyası'),
+                    const SizedBox(width: 6),
+                    _filterChip('lifestyle', '🌿 Yaşam & Görsel Muayene'),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 8),
+              Divider(
+                height: 1,
+                color: isDark ? Colors.white12 : Colors.grey.shade200,
+              ),
+
+              // List of Tips
+              Expanded(
+                child: filtered.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off_rounded,
+                              size: 44,
+                              color: isDark ? Colors.white24 : Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Aranan kriterde bilgi bulunamadı',
+                              style: TextStyle(
+                                color: isDark ? Colors.white54 : Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final tip = filtered[index];
+                          return Container(
+                            padding: const EdgeInsets.all(13),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF142628)
+                                  : const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFF06B6D4)
+                                    .withValues(alpha: isDark ? 0.24 : 0.16),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 7,
+                                        vertical: 2.5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF06B6D4)
+                                            .withValues(alpha: 0.14),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        tip.category,
+                                        style: const TextStyle(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF0891B2),
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.copy_rounded,
+                                        size: 16,
+                                      ),
+                                      color: const Color(0xFF0891B2),
+                                      tooltip: 'Kopyala',
+                                      visualDensity: VisualDensity.compact,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(
+                                        minWidth: 28,
+                                        minHeight: 28,
+                                      ),
+                                      onPressed: () {
+                                        HapticFeedback.lightImpact();
+                                        Clipboard.setData(ClipboardData(
+                                          text:
+                                              '“${tip.quote}”\n— ${tip.category} (${tip.source ?? 'Visual CheckUp'})',
+                                        ));
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${tip.category} panoya kopyalandı 📋',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                const Color(0xFF0D9488),
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            duration: const Duration(seconds: 2),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  '“${tip.quote}”',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    height: 1.42,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                if (tip.source != null) ...[
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      const Spacer(),
+                                      const Icon(
+                                        Icons.verified_rounded,
+                                        size: 12,
+                                        color: Color(0xFF0D9488),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        tip.source!,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: isDark
+                                              ? Colors.white54
+                                              : Colors.black45,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  Widget _filterChip(String categoryKey, String label) {
+    final isSelected = _selectedCategory == categoryKey;
+    return ChoiceChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+          color: isSelected ? Colors.white : null,
+        ),
       ),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) setState(() => _selectedCategory = categoryKey);
+      },
+      selectedColor: const Color(0xFF0D9488),
+      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }

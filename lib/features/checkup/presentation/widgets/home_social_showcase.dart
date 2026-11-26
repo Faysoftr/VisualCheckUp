@@ -240,6 +240,15 @@ class SfbDailyHealthTipCard extends StatelessWidget {
                 ),
               ),
               IconButton(
+                icon: const Icon(Icons.auto_stories_rounded, size: 18),
+                color: const Color(0xFF0891B2),
+                tooltip: 'Faydalı Bilgiler Köşesi',
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                onPressed: () => WellnessKnowledgeCornerSheet.show(context),
+              ),
+              IconButton(
                 icon: const Icon(Icons.copy_rounded, size: 18),
                 color: const Color(0xFF0891B2),
                 tooltip: 'Kopyala',
@@ -290,28 +299,71 @@ class SfbDailyHealthTipCard extends StatelessWidget {
               ),
             ),
           ),
-          if (tipItem.source != null) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Spacer(),
-                const Icon(
-                  Icons.verified_rounded,
-                  size: 13,
-                  color: Color(0xFF0D9488),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  tipItem.source!,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white60 : Colors.black54,
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => WellnessKnowledgeCornerSheet.show(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.menu_book_rounded,
+                          size: 13,
+                          color: Color(0xFF0891B2),
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Faydalı Bilgiler Köşesi ➔',
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0891B2),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(width: 8),
+              if (tipItem.source != null)
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.verified_rounded,
+                        size: 13,
+                        color: Color(0xFF0D9488),
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          tipItem.source!,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white60 : Colors.black54,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );
