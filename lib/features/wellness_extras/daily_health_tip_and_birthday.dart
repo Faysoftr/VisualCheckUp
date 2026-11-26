@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/visual_announcement_effect_service.dart';
+import 'package:visualcheckup/features/community/data/health_community_repository.dart';
+import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 
 /// Evidence-based daily health tips (rotates deterministically by day of year)
 /// plus birthday celebration helper for VisualCheckUp HomeScreen.
@@ -148,7 +152,7 @@ class DailyHealthTipCard extends StatelessWidget {
 }
 
 /// Festive health-focused birthday card shown when today matches the user's
-/// saved birthday.
+/// saved birthday, featuring celebratory confetti, balloons, and cake bursts.
 class BirthdayCelebrationCard extends StatefulWidget {
   const BirthdayCelebrationCard({
     super.key,
@@ -166,6 +170,7 @@ class BirthdayCelebrationCard extends StatefulWidget {
 
 class _BirthdayCelebrationCardState extends State<BirthdayCelebrationCard> {
   bool _isBirthday = false;
+  bool _hasTriggeredInitialBurst = false;
 
   @override
   void initState() {
@@ -179,6 +184,23 @@ class _BirthdayCelebrationCardState extends State<BirthdayCelebrationCard> {
     );
     if (!mounted) return;
     setState(() => _isBirthday = hit);
+
+    if (hit && !_hasTriggeredInitialBurst) {
+      _hasTriggeredInitialBurst = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _triggerCelebration();
+      });
+    }
+  }
+
+  void _triggerCelebration() {
+    HapticFeedback.heavyImpact();
+    VisualAnnouncementEffectService.showEffect(
+      context,
+      type: 'birthday',
+      shape: 'doğum günü',
+    );
   }
 
   @override
@@ -187,43 +209,482 @@ class _BirthdayCelebrationCardState extends State<BirthdayCelebrationCard> {
     final l10n = context.l10n;
     return Container(
       key: const Key('home_birthday_celebration_card'),
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [Color(0xFFE11D48), Color(0xFFF59E0B)],
         ),
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE11D48).withValues(alpha: 0.32),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Row(
-        children: [
-          const Text('🎂', style: TextStyle(fontSize: 30)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: _triggerCelebration,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+            child: Row(
               children: [
-                Text(
-                  l10n.birthdayCardTitle(widget.displayName),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('🎂', style: TextStyle(fontSize: 26)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.birthdayCardTitle(widget.displayName),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.birthdayCardSubtitle,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.94),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.birthdayCardSubtitle,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    fontSize: 12.5,
+                ElevatedButton.icon(
+                  onPressed: _triggerCelebration,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFFE11D48),
+                    elevation: 0,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.celebration_rounded, size: 16),
+                  label: const Text(
+                    'Kutla 🎉',
+                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900),
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Social Formul Bank-inspired showcase card listing community members
+/// whose birthday is today, with cake badges and interactive "Kutla 🎉" wishes.
+class CommunityBirthdayShowcaseCard extends StatefulWidget {
+  const CommunityBirthdayShowcaseCard({
+    super.key,
+    this.profiles,
+    this.onOpenProfile,
+  });
+
+  final List<HealthCommunityProfile>? profiles;
+  final ValueChanged<HealthCommunityProfile>? onOpenProfile;
+
+  @override
+  State<CommunityBirthdayShowcaseCard> createState() =>
+      _CommunityBirthdayShowcaseCardState();
+}
+
+class _CommunityBirthdayShowcaseCardState
+    extends State<CommunityBirthdayShowcaseCard> {
+  final Set<String> _celebratedUids = {};
+
+  void _celebrateMember(HealthCommunityProfile member) {
+    HapticFeedback.heavyImpact();
+    setState(() => _celebratedUids.add(member.uid));
+    VisualAnnouncementEffectService.showEffect(
+      context,
+      type: 'birthday',
+      shape: 'doğum günü',
+    );
+
+    _showWishSheet(member);
+  }
+
+  void _showWishSheet(HealthCommunityProfile member) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final controller = TextEditingController(
+      text: '🎂 Sağlıklı, mutlu ve neşeyle dolu nice güzel yaşlara! 🎉',
+    );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF132223) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF2A8D).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Text('🎂', style: TextStyle(fontSize: 20)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${member.visibleName} için Doğum Günü Notu',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          'Tebrik dileğin topluluk panosuna iletilecek',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  _wishChip(
+                    '🎂 Nice Sağlıklı Yaşlara!',
+                    controller,
+                    '🎂 Sağlıklı, mutlu ve neşeyle dolu nice güzel yaşlara! 🎉',
+                  ),
+                  _wishChip(
+                    '✨ Şifa & Huzur',
+                    controller,
+                    '✨ Yeni yaşın sana bol şifa, enerji ve huzur getirsin! 🌟',
+                  ),
+                  _wishChip(
+                    '💪 Sağlık Yolculuğunda Başarılar',
+                    controller,
+                    '💪 Sağlıklı yaşam yolculuğunda nice başarılı yıllara! 🌿',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  hintText: 'Tebrik mesajını yaz...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Text('💌', style: TextStyle(fontSize: 18)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${member.visibleName} için kutlama notun iletildi! 🎉',
+                                style: const TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFF10B981),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF2A8D),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.send_rounded, size: 18),
+                  label: const Text(
+                    'Kutlamayı İlet 💌',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _wishChip(
+    String label,
+    TextEditingController controller,
+    String fullText,
+  ) {
+    return ActionChip(
+      label: Text(label, style: const TextStyle(fontSize: 11)),
+      onPressed: () => controller.text = fullText,
+      backgroundColor: const Color(0xFFFF2A8D).withValues(alpha: 0.08),
+      side: BorderSide(
+        color: const Color(0xFFFF2A8D).withValues(alpha: 0.22),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final members = HealthCommunityRepository.getTodayBirthdayProfiles(
+      source: widget.profiles,
+    );
+
+    if (members.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      key: const Key('home_community_birthdays_section'),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF142426)
+            : const Color(0xFFFFF1F2).withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(0xFFFF2A8D).withValues(alpha: isDark ? 0.35 : 0.25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF2A8D).withValues(alpha: isDark ? 0.08 : 0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 11, 14, 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF2A8D).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.cake_rounded,
+                    color: Color(0xFFFF2A8D),
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(
+                    'Bugün Doğum Günü Olan Üyelerimiz',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF2A8D).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${members.length}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFFF2A8D),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(
+            height: 1,
+            color: isDark ? Colors.white10 : Colors.pink.withValues(alpha: 0.12),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 116,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              itemCount: members.length,
+              itemBuilder: (context, index) {
+                final member = members[index];
+                final isCelebrated = _celebratedUids.contains(member.uid);
+
+                return Container(
+                  width: 96,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: widget.onOpenProfile != null
+                            ? () => widget.onOpenProfile!(member)
+                            : null,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: const Color(0xFFFF2A8D)
+                                  .withValues(alpha: 0.18),
+                              child: Text(
+                                member.initials,
+                                style: const TextStyle(
+                                  color: Color(0xFFFF2A8D),
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: -2,
+                              right: -4,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Text(
+                                  '🎂',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        member.visibleName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        height: 24,
+                        child: ElevatedButton(
+                          onPressed: isCelebrated
+                              ? null
+                              : () => _celebrateMember(member),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isCelebrated
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFFF2A8D),
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: const Color(0xFF10B981)
+                                .withValues(alpha: 0.8),
+                            disabledForegroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            isCelebrated ? '✓ Kutlandı' : 'Kutla 🎉',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 6),
         ],
       ),
     );
   }
 }
+

@@ -611,6 +611,14 @@ class HealthCommunityProfile {
 
   bool get isVisibleOnline => isVisibleOnlineAt(DateTime.now());
 
+  /// Returns true if this member's birthday matches today's month and day.
+  bool isBirthdayTodayAt(DateTime now) {
+    if (birthMonth == null || birthDay == null) return false;
+    return birthMonth == now.month && birthDay == now.day;
+  }
+
+  bool get isBirthdayToday => isBirthdayTodayAt(DateTime.now());
+
   /// Returns true if this profile shares at least one chronic condition
   /// (selected enum or normalized custom entry) with [other].
   bool sharesConditionWith(HealthCommunityProfile other) {

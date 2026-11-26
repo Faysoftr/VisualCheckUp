@@ -87,6 +87,8 @@ class HealthCommunityRepository {
         isOnline: true,
         showOnlineStatus: true,
         lastActiveAt: baseTime,
+        birthMonth: DateTime.now().month,
+        birthDay: DateTime.now().day,
         likedBy: const ['u_demo_1', 'u_demo_2', 'u_demo_3', 'u_demo_4'],
         isSampleProfile: true,
         updatedAt: baseTime,
@@ -118,6 +120,8 @@ class HealthCommunityRepository {
         isOnline: true,
         showOnlineStatus: true,
         lastActiveAt: baseTime,
+        birthMonth: DateTime.now().month,
+        birthDay: DateTime.now().day,
         likedBy: const ['u_demo_1', 'u_demo_5', 'u_demo_6'],
         isSampleProfile: true,
         updatedAt: baseTime.subtract(const Duration(hours: 2)),
@@ -226,6 +230,16 @@ class HealthCommunityRepository {
         updatedAt: baseTime.subtract(const Duration(hours: 10)),
       ),
     ];
+  }
+
+  /// Returns active community members whose birthday is today.
+  static List<HealthCommunityProfile> getTodayBirthdayProfiles({
+    List<HealthCommunityProfile>? source,
+    DateTime? now,
+  }) {
+    final dt = now ?? DateTime.now();
+    final list = source ?? starterGlobalProfiles();
+    return list.where((p) => p.isBirthdayTodayAt(dt)).toList();
   }
 
   // ---------------------------------------------------------------------------

@@ -946,6 +946,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       BirthdayCelebrationCard(
                         displayName: widget.currentUser.displayName,
                       ),
+                      CommunityBirthdayShowcaseCard(
+                        profiles: _communityMembers,
+                        onOpenProfile: _openMemberProfile,
+                      ),
                       const SfbDailyHealthTipCard(),
                       const SizedBox(height: 12),
 
