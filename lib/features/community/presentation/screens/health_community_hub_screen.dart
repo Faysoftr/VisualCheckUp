@@ -197,6 +197,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
           myDisplayName:
               _myProfile?.visibleName ?? widget.currentUser.displayName,
           myPhotoUrl: _myProfile?.visiblePhotoUrl,
+          myEmail: widget.currentUser.email,
           peer: target,
           repository: widget.repository,
           uploadService: _uploadService,
@@ -217,6 +218,7 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
               _myProfile?.visibleName ?? widget.currentUser.displayName,
           myNickname: _myProfile?.nickname ?? '',
           myPhotoUrl: _myProfile?.visiblePhotoUrl,
+          myEmail: widget.currentUser.email,
           repository: widget.repository,
           uploadService: _uploadService,
           photoPicker: widget.photoPicker,

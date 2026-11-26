@@ -10,6 +10,7 @@ import 'package:visualcheckup/features/community/data/health_community_repositor
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 
 typedef CommunityUrlLauncher = Future<void> Function(Uri uri);
 
@@ -238,7 +239,9 @@ class HealthProfileDetailScreen extends StatefulWidget {
     required this.myDisplayName,
     this.myNickname = '',
     this.myPhotoUrl,
+    this.myEmail,
     required this.repository,
+    this.subscriptionRepository,
     this.uploadService,
     this.photoPicker,
     this.urlLauncher,
@@ -249,7 +252,9 @@ class HealthProfileDetailScreen extends StatefulWidget {
   final String myDisplayName;
   final String myNickname;
   final String? myPhotoUrl;
+  final String? myEmail;
   final HealthCommunityRepository repository;
+  final SubscriptionRepository? subscriptionRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
   final CommunityUrlLauncher? urlLauncher;
@@ -388,8 +393,10 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
           myUid: widget.myUid,
           myDisplayName: widget.myDisplayName,
           myPhotoUrl: widget.myPhotoUrl,
+          myEmail: widget.myEmail,
           peer: _profile,
           repository: widget.repository,
+          subscriptionRepository: widget.subscriptionRepository,
           uploadService: widget.uploadService,
           photoPicker: widget.photoPicker,
         ),

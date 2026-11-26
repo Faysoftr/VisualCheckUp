@@ -5,7 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/core/safety/content_safety_service.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
+import 'package:visualcheckup/features/subscription/domain/subscription_models.dart';
 
 /// Repository powering VisualCheckUp's opt-in Global Health Community:
 /// - Opt-in health profiles (`community_profiles/{uid}`) — strictly separated
@@ -24,14 +27,20 @@ class HealthCommunityRepository {
   HealthCommunityRepository({
     this.useFirebase = true,
     this.rateLimitSeconds = 3,
-    this.dailyMessageLimit = 100,
+    int? dailyMessageLimit,
+    this.subscriptionRepository,
     DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  })  : _clock = clock ?? DateTime.now,
+        _customDailyMessageLimit = dailyMessageLimit;
 
   final bool useFirebase;
   final int rateLimitSeconds;
-  final int dailyMessageLimit;
+  final int? _customDailyMessageLimit;
+  final SubscriptionRepository? subscriptionRepository;
   final DateTime Function() _clock;
+
+  int get dailyMessageLimit =>
+      _customDailyMessageLimit ?? UserSubscriptionState.freeDailyMessageLimit;
 
   static const String _profilesKey = 'visualcheckup_comm_profiles_v1';
   static const String _blocksKeyPrefix = 'visualcheckup_comm_blocks_v1_';
@@ -1128,6 +1137,7 @@ class HealthCommunityRepository {
     required String senderUid,
     required String senderDisplayName,
     String? senderPhotoUrl,
+    String? senderEmail,
     required HealthCommunityProfile receiver,
     String text = '',
     String? imageUrl,
@@ -1183,6 +1193,18 @@ class HealthCommunityRepository {
     final todayKey =
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
+    final subRepo = subscriptionRepository ?? SubscriptionRepository();
+    final senderSub = await subRepo.loadSubscription(uid: senderUid);
+    final isSenderAdmin = AdminUtils.isAdmin(
+      email: senderEmail,
+      uid: senderUid,
+    );
+    final effectiveDailyLimit = _customDailyMessageLimit ??
+        subRepo.dailyDirectMessageLimit(
+          subscription: senderSub,
+          isAdmin: isSenderAdmin,
+        );
+
     if (rawRate != null && rawRate.isNotEmpty) {
       try {
         final rateMap = jsonDecode(rawRate) as Map<String, dynamic>;
@@ -1195,7 +1217,7 @@ class HealthCommunityRepository {
             now.millisecondsSinceEpoch - lastMs < rateLimitSeconds * 1000) {
           return SendMessageStatus.rateLimited;
         }
-        if (sentToday >= dailyMessageLimit) {
+        if (sentToday >= effectiveDailyLimit) {
           return SendMessageStatus.dailyLimitExceeded;
         }
       } catch (_) {
