@@ -597,6 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
     for (final status in active) {
       if (status.isDueNow) return status;
     }
+    active.sort((a, b) => a.daysRemaining.compareTo(b.daysRemaining));
     return active.first;
   }
 
