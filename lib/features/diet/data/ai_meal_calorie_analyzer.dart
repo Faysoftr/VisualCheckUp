@@ -154,26 +154,32 @@ class GeminiMealCalorieAnalyzer implements MealCalorieAnalyzer {
         },
       {
         'text':
-            'Analyze this meal/plate and estimate realistic calories and macronutrients.\n'
+            'Analyze this meal/plate in detail. Break down the entire dish into its constituent ingredients and food components (yemekteki malzemeler/bileşenler).\n'
+            'For every key ingredient (e.g. et/kıyma, sebzeler, pirinç/bulgur, pişirme yağı/soslar, peynir, baklagiller vb.), list it separately in the "items" array with:\n'
+            '- "name": Ingredient name in $languageCode (e.g. Kıymalı Harç, Patlıcan, Zeytinyağı, Domates & Biber)\n'
+            '- "portion": Estimated portion/weight (e.g. 100 g, 1 tatlı kaşığı, 1 adet)\n'
+            '- "calories": Estimated calories for this ingredient\n'
+            '- "proteinG", "carbsG", "fatG": Macronutrients for this ingredient\n'
+            'Make sure "totalCalories" is the exact sum of all ingredient items (toplam kalori).\n'
             '$noteLine'
             'Respond in language "$languageCode" with STRICT valid JSON using this exact schema:\n'
             '{\n'
-            '  "dishName": "Short clear dish title",\n'
-            '  "totalCalories": 520,\n'
-            '  "proteinG": 32.0,\n'
-            '  "carbsG": 45.0,\n'
-            '  "fatG": 18.0,\n'
-            '  "fiberG": 7.5,\n'
+            '  "dishName": "Short clear dish title (e.g. Kıymalı Karnıyarık)",\n'
+            '  "totalCalories": 420,\n'
+            '  "proteinG": 24.0,\n'
+            '  "carbsG": 18.0,\n'
+            '  "fatG": 28.0,\n'
+            '  "fiberG": 6.5,\n'
             '  "healthScore": 8,\n'
-            '  "healthComment": "Short plain-language senior-friendly feedback (1-2 sentences) on balance, glycemic impact, or hydration.",\n'
+            '  "healthComment": "Short plain-language feedback (1-2 sentences) on balance, glycemic impact, or digestion.",\n'
             '  "items": [\n'
             '    {\n'
-            '      "name": "Food item name",\n'
-            '      "portion": "Estimated portion (e.g. 150 g / 1 bowl)",\n'
-            '      "calories": 240,\n'
-            '      "proteinG": 28.0,\n'
+            '      "name": "Ingredient / component name",\n'
+            '      "portion": "Estimated portion (e.g. 100 g / 1 adet)",\n'
+            '      "calories": 210,\n'
+            '      "proteinG": 20.0,\n'
             '      "carbsG": 0.0,\n'
-            '      "fatG": 6.0\n'
+            '      "fatG": 14.0\n'
             '    }\n'
             '  ]\n'
             '}',
@@ -255,13 +261,16 @@ class GeminiMealCalorieAnalyzer implements MealCalorieAnalyzer {
         .toList();
 
     final sumCal = items.fold<int>(0, (s, i) => s + i.calories);
-    final totalCal = (map['totalCalories'] as num?)?.round() ?? sumCal;
+    final rawTotal = (map['totalCalories'] as num?)?.round() ?? sumCal;
+    final totalCal = (items.isNotEmpty && sumCal > 0)
+        ? sumCal
+        : (rawTotal > 0 ? rawTotal : sumCal);
 
     return CalorieAnalysisResult(
       dishName: (map['dishName'] as String?)?.trim().isNotEmpty == true
           ? (map['dishName'] as String).trim()
           : (items.isNotEmpty ? items.map((e) => e.name).join(', ') : 'Öğün'),
-      totalCalories: totalCal > 0 ? totalCal : sumCal,
+      totalCalories: totalCal,
       proteinG: (map['proteinG'] as num?)?.toDouble() ??
           items.fold<double>(0, (s, i) => s + i.proteinG),
       carbsG: (map['carbsG'] as num?)?.toDouble() ??
@@ -275,6 +284,24 @@ class GeminiMealCalorieAnalyzer implements MealCalorieAnalyzer {
       analyzedByAi: true,
     );
   }
+}
+
+class _DishRecipe {
+  const _DishRecipe({
+    required this.keywords,
+    required this.dishName,
+    required this.ingredients,
+    this.fiberG = 4.0,
+    this.commentTr = 'Dengeli porsiyonlu lezzetli bir öğün.',
+    this.commentEn = 'Balanced, nutritious meal portion.',
+  });
+
+  final List<String> keywords;
+  final String dishName;
+  final List<PlateFoodItem> ingredients;
+  final double fiberG;
+  final String commentTr;
+  final String commentEn;
 }
 
 class _FoodPreset {
@@ -307,9 +334,292 @@ class LocalMealCalorieEstimator implements MealCalorieAnalyzer {
   @override
   bool get usesCloudAi => false;
 
+  static const List<_DishRecipe> _recipes = [
+    _DishRecipe(
+      keywords: ['menemen'],
+      dishName: 'Menemen',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Yumurta',
+          portion: '2 adet',
+          calories: 155,
+          proteinG: 13.0,
+          carbsG: 1.5,
+          fatG: 11.0,
+        ),
+        PlateFoodItem(
+          name: 'Domates & Yeşil Biber',
+          portion: '1 kase (150 g)',
+          calories: 40,
+          proteinG: 1.8,
+          carbsG: 8.0,
+          fatG: 0.4,
+        ),
+        PlateFoodItem(
+          name: 'Sızma Zeytinyağı',
+          portion: '1 tatlı kaşığı (5 g)',
+          calories: 45,
+          proteinG: 0.0,
+          carbsG: 0.0,
+          fatG: 5.0,
+        ),
+      ],
+      fiberG: 2.5,
+      commentTr: 'Yüksek proteinli, likopen ve sağlıklı yağlar içeren harika bir Akdeniz kahvaltısı.',
+      commentEn: 'High-protein Mediterranean breakfast rich in lycopene and healthy fats.',
+    ),
+    _DishRecipe(
+      keywords: ['karnıyarık', 'karniyarik'],
+      dishName: 'Kıymalı Karnıyarık',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Kıymalı Harç (Orta Yağlı)',
+          portion: '100 g',
+          calories: 215,
+          proteinG: 20.0,
+          carbsG: 0.0,
+          fatG: 15.0,
+        ),
+        PlateFoodItem(
+          name: 'Közlenmiş / Fırın Patlıcan',
+          portion: '1 adet (150 g)',
+          calories: 55,
+          proteinG: 1.5,
+          carbsG: 9.0,
+          fatG: 2.0,
+        ),
+        PlateFoodItem(
+          name: 'Domates, Biber & Soğan Sosu',
+          portion: '80 g',
+          calories: 40,
+          proteinG: 1.5,
+          carbsG: 7.0,
+          fatG: 1.0,
+        ),
+        PlateFoodItem(
+          name: 'Pişirme Zeytinyağı',
+          portion: '1 yemek kaşığı (10 g)',
+          calories: 90,
+          proteinG: 0.0,
+          carbsG: 0.0,
+          fatG: 10.0,
+        ),
+      ],
+      fiberG: 5.5,
+      commentTr: 'Geleneksel lezzet; patlıcan lifi ve kıyma proteini ile dengeli ve doyurucu.',
+      commentEn: 'Traditional Turkish dish rich in eggplant fiber and lean protein.',
+    ),
+    _DishRecipe(
+      keywords: ['tost', 'kaşarlı tost', 'kasarli tost'],
+      dishName: 'Kaşarlı Tost',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Tost Ekmeği',
+          portion: '2 dilim (60 g)',
+          calories: 150,
+          proteinG: 5.0,
+          carbsG: 28.0,
+          fatG: 2.0,
+        ),
+        PlateFoodItem(
+          name: 'Tam Yağlı Kaşar Peyniri',
+          portion: '45 g',
+          calories: 160,
+          proteinG: 11.0,
+          carbsG: 1.0,
+          fatG: 13.0,
+        ),
+        PlateFoodItem(
+          name: 'Sürülen Tereyağı',
+          portion: '1 tatlı kaşığı (5 g)',
+          calories: 36,
+          proteinG: 0.1,
+          carbsG: 0.0,
+          fatG: 4.0,
+        ),
+      ],
+      fiberG: 2.0,
+      commentTr: 'Kalsiyum ve enerji açısından zengin pratik öğün; yanında yeşillikle tüketilmesi önerilir.',
+      commentEn: 'Calcium and energy-rich toast; best enjoyed with fresh greens.',
+    ),
+    _DishRecipe(
+      keywords: ['çoban salata', 'coban salata'],
+      dishName: 'Çoban Salata (Zeytinyağlı)',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Domates',
+          portion: '1 orta boy (120 g)',
+          calories: 22,
+          proteinG: 1.0,
+          carbsG: 4.5,
+          fatG: 0.2,
+        ),
+        PlateFoodItem(
+          name: 'Salatalık',
+          portion: '1 adet (100 g)',
+          calories: 15,
+          proteinG: 0.7,
+          carbsG: 3.0,
+          fatG: 0.1,
+        ),
+        PlateFoodItem(
+          name: 'Kuru Soğan & Maydanoz',
+          portion: '50 g',
+          calories: 20,
+          proteinG: 0.8,
+          carbsG: 4.0,
+          fatG: 0.1,
+        ),
+        PlateFoodItem(
+          name: 'Sızma Zeytinyağı Sosu',
+          portion: '1 yemek kaşığı (10 ml)',
+          calories: 90,
+          proteinG: 0.0,
+          carbsG: 0.0,
+          fatG: 10.0,
+        ),
+      ],
+      fiberG: 3.5,
+      commentTr: 'Antioksidan, vitamin ve sağlıklı tekli doymamış yağlar içeren mükemmel garnitür.',
+      commentEn: 'Antioxidant and vitamin-rich salad dressed with extra virgin olive oil.',
+    ),
+    _DishRecipe(
+      keywords: ['tavuk pilav', 'tavuklu pilav'],
+      dishName: 'Tavuklu Pilav',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Haşlanmış Tavuk Göğsü',
+          portion: '120 g',
+          calories: 195,
+          proteinG: 36.0,
+          carbsG: 0.0,
+          fatG: 4.5,
+        ),
+        PlateFoodItem(
+          name: 'Pirinç Pilavı',
+          portion: '4 yemek kaşığı (120 g)',
+          calories: 190,
+          proteinG: 3.5,
+          carbsG: 36.0,
+          fatG: 4.0,
+        ),
+        PlateFoodItem(
+          name: 'Pişirme Tereyağı',
+          portion: '1 tatlı kaşığı (5 g)',
+          calories: 40,
+          proteinG: 0.0,
+          carbsG: 0.0,
+          fatG: 4.5,
+        ),
+      ],
+      fiberG: 1.5,
+      commentTr: 'Kas gelişimi ve enerji için kaliteli protein ve kompleks karbonhidrat bileşimi.',
+      commentEn: 'Lean chicken protein combined with classic rice pilaf.',
+    ),
+    _DishRecipe(
+      keywords: ['köfte patates', 'kofte patates'],
+      dishName: 'Izgara Köfte & Fırın Patates',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Izgara Köfte',
+          portion: '4 adet (120 g)',
+          calories: 270,
+          proteinG: 22.0,
+          carbsG: 4.0,
+          fatG: 18.0,
+        ),
+        PlateFoodItem(
+          name: 'Fırınlanmış Patates',
+          portion: '1 orta porsiyon (130 g)',
+          calories: 160,
+          proteinG: 3.0,
+          carbsG: 28.0,
+          fatG: 4.5,
+        ),
+        PlateFoodItem(
+          name: 'Közlenmiş Domates & Biber',
+          portion: '70 g',
+          calories: 25,
+          proteinG: 1.0,
+          carbsG: 5.0,
+          fatG: 0.2,
+        ),
+      ],
+      fiberG: 4.0,
+      commentTr: 'Demir ve protein açısından zengin, dengeli fırın patates eşliğinde klasik menü.',
+      commentEn: 'Classic grilled meatballs with oven-roasted potatoes and roasted peppers.',
+    ),
+    _DishRecipe(
+      keywords: ['mercimek çorbası', 'mercimek corbasi'],
+      dishName: 'Süzme Kırmızı Mercimek Çorbası',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Kırmızı Mercimek',
+          portion: '1 kase (150 g haşlanmış)',
+          calories: 115,
+          proteinG: 8.0,
+          carbsG: 19.0,
+          fatG: 0.8,
+        ),
+        PlateFoodItem(
+          name: 'Havuç, Patates & Soğan',
+          portion: '60 g',
+          calories: 30,
+          proteinG: 0.8,
+          carbsG: 6.5,
+          fatG: 0.2,
+        ),
+        PlateFoodItem(
+          name: 'Zeytinyağı & Salça Sosu',
+          portion: '1 tatlı kaşığı (5 g)',
+          calories: 45,
+          proteinG: 0.4,
+          carbsG: 1.5,
+          fatG: 4.5,
+        ),
+      ],
+      fiberG: 4.5,
+      commentTr: 'Bitkisel protein ve lif zengini, mide dostu sindirimi kolay sıcak başlangıç.',
+      commentEn: 'Hearty plant-based lentil soup rich in dietary fiber and micronutrients.',
+    ),
+    _DishRecipe(
+      keywords: ['mantı', 'manti'],
+      dishName: 'Kayseri Mantısı',
+      ingredients: [
+        PlateFoodItem(
+          name: 'Mantı Hamuru & Kıyma',
+          portion: '1 tabak (150 g)',
+          calories: 320,
+          proteinG: 15.0,
+          carbsG: 46.0,
+          fatG: 9.0,
+        ),
+        PlateFoodItem(
+          name: 'Sarımsaklı Yoğurt',
+          portion: '3 yemek kaşığı (60 g)',
+          calories: 45,
+          proteinG: 3.0,
+          carbsG: 3.0,
+          fatG: 2.0,
+        ),
+        PlateFoodItem(
+          name: 'Tereyağlı Salça Sosu',
+          portion: '1 yemek kaşığı (10 g)',
+          calories: 75,
+          proteinG: 0.2,
+          carbsG: 0.5,
+          fatG: 8.0,
+        ),
+      ],
+      fiberG: 2.5,
+      commentTr: 'Geleneksel Türk mantısı; probiyotik yoğurt sosu sindirimi destekler.',
+      commentEn: 'Traditional dumplings with garlic yogurt and lightly spiced butter sauce.',
+    ),
+  ];
+
   static const List<_FoodPreset> _database = [
     _FoodPreset(
-      keywords: ['yumurta', 'egg', 'omlet', 'menemen'],
+      keywords: ['yumurta', 'egg', 'omlet'],
       displayName: 'Yumurta / Omlet',
       portion: '2 adet',
       calories: 155,
@@ -558,6 +868,42 @@ class LocalMealCalorieEstimator implements MealCalorieAnalyzer {
     String languageCode = 'tr',
   }) async {
     final text = (foodDescription ?? '').trim().toLowerCase();
+
+    // 1. Check if user entered a specific composite recipe / dish
+    if (text.isNotEmpty) {
+      for (final recipe in _recipes) {
+        if (recipe.keywords.any(text.contains)) {
+          final totalCal =
+              recipe.ingredients.fold<int>(0, (s, i) => s + i.calories);
+          final protein =
+              recipe.ingredients.fold<double>(0, (s, i) => s + i.proteinG);
+          final carbs =
+              recipe.ingredients.fold<double>(0, (s, i) => s + i.carbsG);
+          final fat =
+              recipe.ingredients.fold<double>(0, (s, i) => s + i.fatG);
+          final score = _computeBalanceScore(
+            calories: totalCal,
+            proteinG: protein,
+            carbsG: carbs,
+            fiberG: recipe.fiberG,
+          );
+          return CalorieAnalysisResult(
+            dishName: recipe.dishName,
+            totalCalories: totalCal,
+            proteinG: double.parse(protein.toStringAsFixed(1)),
+            carbsG: double.parse(carbs.toStringAsFixed(1)),
+            fatG: double.parse(fat.toStringAsFixed(1)),
+            fiberG: double.parse(recipe.fiberG.toStringAsFixed(1)),
+            items: recipe.ingredients,
+            healthScore: score,
+            healthComment:
+                languageCode == 'tr' ? recipe.commentTr : recipe.commentEn,
+            analyzedByAi: false,
+          );
+        }
+      }
+    }
+
     final matchedItems = <PlateFoodItem>[];
     double totalFiber = 0;
 
@@ -685,27 +1031,31 @@ class LocalMealCalorieEstimator implements MealCalorieAnalyzer {
     final fiberG = double.parse((3.0 + greenRatio * 12.0).toStringAsFixed(1));
 
     final isTr = languageCode == 'tr';
+    final cal1 = (totalCal * 0.46).round();
+    final cal2 = (totalCal * 0.34).round();
+    final cal3 = totalCal - cal1 - cal2; // Exact sum of ingredients equals totalCal!
+
     final items = <PlateFoodItem>[
       PlateFoodItem(
-        name: isTr ? 'Ana Protein / Yemek Bölümü' : 'Main Protein / Entrée',
+        name: isTr ? 'Ana Protein / Yemek Malzemesi' : 'Main Protein / Entrée',
         portion: isTr ? 'Tahmini 1 porsiyon' : 'Est. 1 serving',
-        calories: (totalCal * 0.46).round(),
+        calories: cal1,
         proteinG: double.parse((proteinG * 0.72).toStringAsFixed(1)),
         carbsG: double.parse((carbsG * 0.22).toStringAsFixed(1)),
         fatG: double.parse((fatG * 0.55).toStringAsFixed(1)),
       ),
       PlateFoodItem(
-        name: isTr ? 'Tahıl / Yan Garnitür' : 'Grains / Side Starch',
+        name: isTr ? 'Tahıl & Karbonhidrat Bileşeni' : 'Grains & Side Starch',
         portion: isTr ? 'Orta porsiyon' : 'Medium side',
-        calories: (totalCal * 0.34).round(),
+        calories: cal2,
         proteinG: double.parse((proteinG * 0.18).toStringAsFixed(1)),
         carbsG: double.parse((carbsG * 0.62).toStringAsFixed(1)),
         fatG: double.parse((fatG * 0.25).toStringAsFixed(1)),
       ),
       PlateFoodItem(
-        name: isTr ? 'Sebze / Salata & Sos' : 'Vegetables / Salad & Dressing',
+        name: isTr ? 'Sebze, Salata & Pişirme Yağı' : 'Vegetables, Salad & Oil',
         portion: isTr ? 'Tabak kenarı' : 'Side portion',
-        calories: (totalCal * 0.20).round(),
+        calories: cal3,
         proteinG: double.parse((proteinG * 0.10).toStringAsFixed(1)),
         carbsG: double.parse((carbsG * 0.16).toStringAsFixed(1)),
         fatG: double.parse((fatG * 0.20).toStringAsFixed(1)),

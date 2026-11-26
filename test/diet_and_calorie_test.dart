@@ -233,6 +233,31 @@ void main() {
       );
       expect(photoRes.totalCalories, inInclusiveRange(250, 750));
       expect(photoRes.items, isNotEmpty);
+      final photoSum =
+          photoRes.items.fold<int>(0, (sum, item) => sum + item.calories);
+      expect(photoRes.totalCalories, equals(photoSum));
+    });
+
+    test(
+        'LocalMealCalorieEstimator breaks composite dishes into ingredients and sums to exact total',
+        () async {
+      const estimator = LocalMealCalorieEstimator();
+      final menemenRes = await estimator.analyzePlate(
+        foodDescription: 'Menemen',
+      );
+      expect(menemenRes.items, isNotEmpty);
+      final sumItemCal =
+          menemenRes.items.fold<int>(0, (sum, i) => sum + i.calories);
+      expect(menemenRes.totalCalories, equals(sumItemCal));
+      expect(menemenRes.items.any((i) => i.name.contains('Yumurta')), isTrue);
+
+      final karniRes = await estimator.analyzePlate(
+        foodDescription: 'Karnıyarık',
+      );
+      expect(karniRes.items, isNotEmpty);
+      final sumKarni =
+          karniRes.items.fold<int>(0, (sum, i) => sum + i.calories);
+      expect(karniRes.totalCalories, equals(sumKarni));
     });
   });
 
@@ -380,6 +405,15 @@ void main() {
         );
         expect(find.text('540 kcal'), findsOneWidget);
         expect(find.text('Gemini AI Görsel Analiz'), findsOneWidget);
+        expect(
+          find.byKey(const Key('diet_meal_ingredients_card')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('diet_total_calories_summary')),
+          findsOneWidget,
+        );
+        expect(find.text('Toplam: 540 kcal'), findsOneWidget);
 
         // Save to today's log
         final saveLogBtn = find.byKey(const Key('diet_save_meal_log_button'));
