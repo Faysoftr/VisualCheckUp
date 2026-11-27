@@ -114,8 +114,6 @@ class SobrietyState {
       smokeMoneySavedAt(now) + alcoholMoneySavedAt(now);
 
   /// Calculates how much money the user saved TODAY ("Bugün şu kadar kazandınız").
-  /// If a tracker was started prior to today's midnight, returns the full daily savings
-  /// for today (or proportional if started earlier today, with a clean daily floor).
   double todayMoneySavedAt(DateTime now) {
     final startOfToday = DateTime(now.year, now.month, now.day);
     double total = 0.0;
@@ -372,15 +370,18 @@ class SobrietyKnowledgeBase {
     ),
   ];
 
+  /// Complete day-by-day physiological recovery entries.
+  /// IMPORTANT: Future days are NEVER shown ahead of time; only days `<= activeDay`
+  /// are progressively revealed day by day as the user's streak advances!
   static const List<BodyRecoveryMilestone> dayByDayMilestones = [
     BodyRecoveryMilestone(
       dayNumber: 1,
       dayLabel: 'Gün 1',
       title: 'Oksijen ve Kan Şekeri Dengeleniyor',
       smokingChange:
-          'İlk 20 dakikada nabız ve tansiyon normale inmeye başlar. 8-24 saat sonunda kandaki zehirli karbonmonoksit gazı temizlenir, hücrelere giden oksijen seviyesi yükselir.',
+          'Vücutta nabız ve tansiyon normale inmeye başladı; kandaki zehirli karbonmonoksit gazı yarı yarıya temizlendi ve hücrelere giden oksijen arttı.',
       alcoholChange:
-          'Karaciğer kandaki alkol kalıntılarını tamamen temizler, kan şekeri dalgalanmaları durulur ve vücut su dengesini yeniden kurmaya başlar.',
+          'Karaciğer kandaki alkol kalıntılarını temizledi, kan şekeri dalgalanmaları duruldu ve hücreler su dengesini yeniden kurmaya başladı.',
       requiredHours: 24,
     ),
     BodyRecoveryMilestone(
@@ -388,9 +389,9 @@ class SobrietyKnowledgeBase {
       dayLabel: 'Gün 2',
       title: 'Sinir Uçları Canlanıyor, Tat & Koku Keskinleşiyor',
       smokingChange:
-          'Nikotin vücuttan büyük ölçüde atılır. Yıpranan sinir uçları kendini onarmaya başlar; yemeklerin tadı ve kokular çok daha net hissedilir.',
+          'Nikotin vücuttan büyük ölçüde atıldı. Yıpranan sinir uçları kendini onarmaya başladı; yemeklerin tadı ve kokular daha net hissediliyor.',
       alcoholChange:
-          'Mide asidi ve sindirim sistemi yatışır, baş ağrısı ve sisli zihin hissi dağılmaya başlar.',
+          'Mide asidi ve sindirim mukozası yatıştı; baş ağrısı, çarpıntı ve sisli zihin hissi dağılmaya başladı.',
       requiredHours: 48,
     ),
     BodyRecoveryMilestone(
@@ -398,59 +399,109 @@ class SobrietyKnowledgeBase {
       dayLabel: 'Gün 3',
       title: 'Bronşlar Gevşiyor, Nefes Kapasitesi Açılıyor',
       smokingChange:
-          'Akciğerlerdeki bronş tüpleri gevşer, nefes alıp vermek belirgin biçimde rahatlar ve günlük fiziksel enerji seviyesi yükselir.',
+          'Akciğerlerdeki bronş tüpleri gevşedi, nefes alıp vermek belirgin biçimde rahatladı ve günlük fiziksel enerjiniz yükseldi.',
       alcoholChange:
-          'Böbrek ve elektrolit dengesi toparlanır; sabahları daha dinç ve ödemi azalmış bir yüzle uyanırsınız.',
+          'Böbrek ve elektrolit dengesi toparlandı; yüzdeki ve vücuttaki alkol ödemi inmeye başladı.',
       requiredHours: 72,
+    ),
+    BodyRecoveryMilestone(
+      dayNumber: 4,
+      dayLabel: 'Gün 4',
+      title: 'Fiziksel Nikotin Çekilmesi Geriliyor & Zihin Berraklaşıyor',
+      smokingChange:
+          'Kandaki nikotin tamamen sıfırlandı; beyin reseptörleri nikotinsiz düzene uyum sağlamaya başladı.',
+      alcoholChange:
+          'Karaciğer detoks enzimleri rahatladı, gün içi odaklanma ve dikkat süreniz gözle görülür şekilde arttı.',
+      requiredHours: 96,
     ),
     BodyRecoveryMilestone(
       dayNumber: 5,
       dayLabel: 'Gün 5',
-      title: 'Dolaşım Hızlanıyor ve Uyku Derinleşiyor',
+      title: 'Kılcal Kan Dolaşımı ve REM Uykusu Güçleniyor',
       smokingChange:
-          'El ve ayak uçlarındaki kılcal kan dolaşımı güçlenir, fiziksel nikotin çekilmesi en yüksek tepe noktasını geride bırakır.',
+          'El ve ayak uçlarındaki kılcal kan dolaşımı hızlandı; sabah yorgunluğu azalmaya başladı.',
       alcoholChange:
-          'Kesintili uyku yerine gerçek dinlendirici REM uykusu geri döner; gün içi yorgunluk ve kaygı belirgin şekilde azalır.',
+          'Kesintili uyku yerine gerçek dinlendirici REM uykusu geri döndü; sabahları çok daha dinç uyanıyorsunuz.',
       requiredHours: 120,
+    ),
+    BodyRecoveryMilestone(
+      dayNumber: 6,
+      dayLabel: 'Gün 6',
+      title: 'Antioksidan Savunması ve Mide Onarımı',
+      smokingChange:
+          'Kandaki koruyucu antioksidan ve C vitamini seviyeleri yükselmeye başladı; boğazdaki tahriş yatıştı.',
+      alcoholChange:
+          'Mide duvarındaki hassasiyet ve reflü eğilimi azaldı, sindirim sistemi düzenli ritmine kavuştu.',
+      requiredHours: 144,
     ),
     BodyRecoveryMilestone(
       dayNumber: 7,
       dayLabel: 'Gün 7 (1. Hafta)',
       title: 'İlk Hafta Zaferi: Hücresel Yenilenme',
       smokingChange:
-          'Akciğerlerdeki mukus temizleyici tüycükler (siliyalar) yeniden çalışmaya başlar; kanınızdaki antioksidan seviyesi normale yaklaşır.',
+          'Akciğerlerdeki mukus temizleyici tüycükler (siliyalar) yeniden canlandı; akciğerler kendi kendini temizlemeye başladı.',
       alcoholChange:
-          'Karaciğer yağlanması gerilemeye başlar, cilt nemini geri kazanır ve haftalık yüzlerce boş kaloriden kurtulursunuz.',
+          'Karaciğer yağlanması gerileme sürecine girdi, cildiniz nemini geri kazandı ve binlerce boş kaloriden kurtuldunuz.',
       requiredHours: 168,
+    ),
+    BodyRecoveryMilestone(
+      dayNumber: 10,
+      dayLabel: 'Gün 10',
+      title: 'Diş Eti, Cilt Dolaşımı ve Ruh Hali Dengesi',
+      smokingChange:
+          'Diş etlerine ve yüz cildine giden kan akışı normale döndü; solgun görünüm yerini canlılığa bırakıyor.',
+      alcoholChange:
+          'Serotonin ve dopamin dengesi toparlanıyor; ani sinirlilik ve kaygı dalgaları belirgin biçimde azaldı.',
+      requiredHours: 240,
     ),
     BodyRecoveryMilestone(
       dayNumber: 14,
       dayLabel: 'Gün 14 (2. Hafta)',
       title: 'Yürüyüş Kondisyonu ve Damar Esnekliği Artıyor',
       smokingChange:
-          'Kan dolaşımı ve kalp pompası verimi gözle görülür biçimde iyileşir; merdiven çıkarken veya yürürken nefes nefese kalma azalır.',
+          'Damar esnekliği ve kalp pompası verimi iyileşti; merdiven çıkarken veya yürürken nefes nefese kalma azaldı.',
       alcoholChange:
-          'Mide mukozası kendini onarır, reflü şikayetleri geriler ve yüksek seyreden kan basıncı düşüş eğilimine girer.',
+          'Kan basıncı (tansiyon) ve kalp ritmi daha sağlıklı ve dengeli bir çizgiye oturdu.',
       requiredHours: 336,
+    ),
+    BodyRecoveryMilestone(
+      dayNumber: 21,
+      dayLabel: 'Gün 21 (3. Hafta)',
+      title: 'Yeni Alışkanlık Sinir Ağları Kalıcılaşıyor',
+      smokingChange:
+          'Beyindeki bağımlılık tetikleyicileri zayıfladı; günlük rutinleriniz sigarasız olarak otomatikleşmeye başladı.',
+      alcoholChange:
+          'Bağışıklık hücreleriniz güçlendi, bel çevresi ödemi ve karaciğer yükü belirgin biçimde hafifledi.',
+      requiredHours: 504,
     ),
     BodyRecoveryMilestone(
       dayNumber: 30,
       dayLabel: 'Gün 30 (1. Ay)',
       title: '1 Aylık Dönüşüm: Temiz Akciğer & Dinç Karaciğer',
       smokingChange:
-          'Akciğer siliyaları hızla yenilenir, balgam ve kronik öksürük ciddi oranda azalır, enfeksiyonlara karşı direnç artar.',
+          'Akciğer siliyaları hızla yenilendi, balgam ve kronik öksürük ciddi oranda azaldı, enfeksiyonlara karşı direnç arttı.',
       alcoholChange:
-          'Karaciğer yağ oranı %15-20 oranında azalabilir; zihinsel berraklık, hafıza ve odaklanma üst düzeye çıkar.',
+          'Karaciğer yağ oranı %15-20 oranında azaldı; zihinsel berraklık, hafıza ve uyku kalitesi zirveye çıktı.',
       requiredHours: 720,
+    ),
+    BodyRecoveryMilestone(
+      dayNumber: 60,
+      dayLabel: 'Gün 60 (2. Ay)',
+      title: '2 Aylık Güçlenme: Cilt Kolajeni & Metabolik Denge',
+      smokingChange:
+          'Cilt elastikiyeti koruma altına girdi, hırıltılı solunum geriledi ve egzersiz kapasiteniz belirgin ölçüde yükseldi.',
+      alcoholChange:
+          'İnsülin duyarlılığı ve kan yağları (trigliserit) çok daha sağlıklı seviyelere indi.',
+      requiredHours: 1440,
     ),
     BodyRecoveryMilestone(
       dayNumber: 90,
       dayLabel: 'Gün 90 (3. Ay)',
       title: 'Akciğer Kapasitesinde %30’a Varan Artış',
       smokingChange:
-          'Akciğer fonksiyonları %30’a kadar güçlenir; cilt rengi canlanır ve dopamin reseptörleri doğal mutluluk düzeyine döner.',
+          'Akciğer fonksiyonları %30’a kadar güçlendi; doğal dopamin dengesi tamamen geri kazanıldı.',
       alcoholChange:
-          'Karaciğer enzimleri (ALT/AST) büyük oranda ideal aralığa geriler, bağışıklık sistemi ve hormon dengesi güçlenir.',
+          'Karaciğer enzimleri (ALT/AST) büyük oranda ideal aralığa geriledi, bağışıklık ve hormon dengesi güçlendi.',
       requiredHours: 2160,
     ),
     BodyRecoveryMilestone(
@@ -458,9 +509,9 @@ class SobrietyKnowledgeBase {
       dayLabel: 'Gün 180 (6. Ay)',
       title: 'Yarım Yıllık Özgürlük ve Kalıcı Kondisyon',
       smokingChange:
-          'Hava yollarındaki kronik iltihap büyük ölçüde söner; stres anlarında sigarasız baş etme refleksi kalıcı hale gelir.',
+          'Hava yollarındaki kronik iltihap büyük ölçüde söndü; stres anlarında sigarasız baş etme refleksi kalıcı hale geldi.',
       alcoholChange:
-          'Kalp ritmi, trigliserit ve kan şekeri dengesi uzun vadeli koruma altına girer; kilo kontrolü çok daha kolaylaşır.',
+          'Kalp kası, tansiyon ve metabolizma uzun vadeli koruma altına girdi.',
       requiredHours: 4320,
     ),
     BodyRecoveryMilestone(
@@ -470,10 +521,54 @@ class SobrietyKnowledgeBase {
       smokingChange:
           'Koroner kalp hastalığı ve kalp krizi riskiniz, içmeye devam eden birine göre tam %50 oranında azaldı!',
       alcoholChange:
-          'Karaciğer hasarı, hipertansiyon ve alkole bağlı metabolik hastalık riskleriniz dramatik biçimde düştü; koca bir yılı özgür tamamladınız!',
+          'Karaciğer hasarı, hipertansiyon ve alkole bağlı metabolik hastalık riskleriniz dramatik biçimde düştü!',
       requiredHours: 8760,
     ),
   ];
+
+  /// Generates a specific day's body recovery entry for ANY day `1..N`, so every
+  /// passing day (`Gün 1`, `Gün 2`, ..., `Gün 8`, `Gün 9`, ...) has its own live card entry!
+  static BodyRecoveryMilestone changeForExactDay(int day) {
+    final clamped = day < 1 ? 1 : day;
+    for (final m in dayByDayMilestones) {
+      if (m.dayNumber == clamped) return m;
+    }
+    // Find the most recent milestone <= clamped to contextualize intermediate days
+    BodyRecoveryMilestone latest = dayByDayMilestones.first;
+    for (final m in dayByDayMilestones) {
+      if (m.dayNumber <= clamped) {
+        latest = m;
+      } else {
+        break;
+      }
+    }
+    return BodyRecoveryMilestone(
+      dayNumber: clamped,
+      dayLabel: 'Gün $clamped',
+      title: '$clamped. Günde Hücresel İyileşme Devam Ediyor',
+      smokingChange:
+          '${latest.smokingChange} ($clamped. günde akciğer dokusu ve damar esnekliği her saat daha da güçleniyor.)',
+      alcoholChange:
+          '${latest.alcoholChange} ($clamped. günde karaciğer onarımı ve sinir sistemi dengesi istikrarla ilerliyor.)',
+      requiredHours: clamped * 24,
+    );
+  }
+
+  /// Returns ONLY the day-by-day entries that the user has ACTUALLY reached (`1..activeDay`),
+  /// ordered newest day first (`Gün N` down to `Gün 1`), NEVER revealing future days!
+  static List<BodyRecoveryMilestone> unlockedDailyFeed(int activeDay) {
+    if (activeDay <= 0) return const [];
+    final list = <BodyRecoveryMilestone>[];
+    // For the most recent 14 days, include every single consecutive day; for older history, include milestone days + recent days so the list stays crisp and fast!
+    for (int d = activeDay; d >= 1; d--) {
+      final isRecent = (activeDay - d) < 14;
+      final isLandmark = dayByDayMilestones.any((m) => m.dayNumber == d);
+      if (isRecent || isLandmark) {
+        list.add(changeForExactDay(d));
+      }
+    }
+    return list;
+  }
 
   static const List<SobrietyTipItem> recommendations = [
     SobrietyTipItem(

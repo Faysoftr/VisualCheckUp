@@ -9,6 +9,7 @@ import 'package:visualcheckup/features/pedometer/domain/pedometer_models.dart';
 import 'package:visualcheckup/features/sobriety/data/sobriety_repository.dart';
 import 'package:visualcheckup/features/sobriety/domain/sobriety_models.dart';
 import 'package:visualcheckup/features/widgets_hub/data/quick_widgets_preferences.dart';
+import 'package:visualcheckup/features/widgets_hub/presentation/screens/widgets_manager_screen.dart';
 
 class HealthQuickWidgetsHub extends StatefulWidget {
   const HealthQuickWidgetsHub({
@@ -42,6 +43,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
   late final LabsVitalsRepository _vitalsRepo;
   late final MedicationReminderRepository _medRepo;
 
+  bool _hubVisible = true;
   List<QuickWidgetType> _enabled = List<QuickWidgetType>.from(
     QuickWidgetsPreferences.defaultEnabled,
   );
@@ -62,6 +64,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
     SobrietyRepository.revisionNotifier.addListener(_refreshAll);
     LabsVitalsRepository.revisionNotifier.addListener(_refreshAll);
     MedicationReminderRepository.revisionNotifier.addListener(_refreshAll);
+    QuickWidgetsPreferences.revisionNotifier.addListener(_refreshAll);
     _pedometer.ensureLoaded();
     _refreshAll();
     QuickWidgetsPreferences.bindWidgetDeepLinkHandler(_handleWidgetDeepLink);
@@ -73,6 +76,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
     SobrietyRepository.revisionNotifier.removeListener(_refreshAll);
     LabsVitalsRepository.revisionNotifier.removeListener(_refreshAll);
     MedicationReminderRepository.revisionNotifier.removeListener(_refreshAll);
+    QuickWidgetsPreferences.revisionNotifier.removeListener(_refreshAll);
     super.dispose();
   }
 
@@ -100,6 +104,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
   Future<void> _refreshAll() async {
     final results = await Future.wait<dynamic>([
+      QuickWidgetsPreferences.isHubVisible(),
       QuickWidgetsPreferences.loadEnabledWidgets(),
       _sobrietyRepo.loadState(),
       _vitalsRepo.loadBloodPressureReadings(),
@@ -108,11 +113,12 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
     ]);
 
     if (!mounted) return;
-    final enabled = results[0] as List<QuickWidgetType>;
-    final sob = results[1] as SobrietyState;
-    final bps = results[2] as List<BloodPressureReading>;
-    final sugars = results[3] as List<BloodSugarReading>;
-    final alarms = (results[4] as List<MedicationReminder>)
+    final hubVisible = results[0] as bool;
+    final enabled = results[1] as List<QuickWidgetType>;
+    final sob = results[2] as SobrietyState;
+    final bps = results[3] as List<BloodPressureReading>;
+    final sugars = results[4] as List<BloodSugarReading>;
+    final alarms = (results[5] as List<MedicationReminder>)
         .where((r) => r.enabled)
         .toList();
 
@@ -130,12 +136,49 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     if (!mounted) return;
     setState(() {
+      _hubVisible = hubVisible;
       _enabled = enabled;
       _sobriety = sob;
       _latestBp = bps.isNotEmpty ? bps.first : null;
       _latestSugar = sugars.isNotEmpty ? sugars.first : null;
       _activeAlarms = alarms;
     });
+  }
+
+  Future<void> _closeEntireHub() async {
+    await QuickWidgetsPreferences.setHubVisible(false);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Hızlı Widget Paneli kapatıldı. Menü > Widget Merkezi’nden dilediğiniz zaman tekrar açabilirsiniz.',
+        ),
+        action: SnackBarAction(
+          label: 'Geri Aç',
+          onPressed: () => QuickWidgetsPreferences.setHubVisible(true),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _closeSingleCard(QuickWidgetType type) async {
+    await QuickWidgetsPreferences.closeSingleWidget(type);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${type.title} gizlendi.'),
+        action: SnackBarAction(
+          label: 'Geri Al',
+          onPressed: () async {
+            final current = await QuickWidgetsPreferences.loadEnabledWidgets();
+            if (!current.contains(type)) {
+              current.add(type);
+              await QuickWidgetsPreferences.saveEnabledWidgets(current);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _pinNativeWidgetWithFeedback(
@@ -151,8 +194,8 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       SnackBar(
         content: Text(
           pinned
-              ? '📱 "$label" telefon ana ekranına sabitlenmek üzere gönderildi!'
-              : 'Telefonunuzun ana ekranına basılı tutup Widget’lar menüsünden "$label" widget’ını ekleyebilirsiniz.',
+              ? '📱 "$label" Android ana ekranına gönderildi! Açılan sistem penceresinden onaylayın.'
+              : 'Telefonunuzun ana ekranına basılı tutup Widget’lar > VisualCheckUp altından "$label" widget’ını ekleyebilirsiniz.',
         ),
       ),
     );
@@ -165,6 +208,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       showDragHandle: true,
       builder: (ctx) {
         var working = List<QuickWidgetType>.from(_enabled);
+        var workingHubVisible = _hubVisible;
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             return SafeArea(
@@ -180,21 +224,52 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Sağlık Widget’larını Yönet',
+                            'Android & Ana Sayfa Widget’ları',
                             style:
                                 Theme.of(ctx).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w800,
                                     ),
                           ),
                         ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const WidgetsManagerScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text('Tam Ekran Aç'),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SwitchListTile(
+                      key: const Key('sheet_hub_visibility_switch'),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        'Uygulama Ana Sayfasında Widget Panelini Göster',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      subtitle: const Text(
+                        'Kapatırsanız uygulama içindeki widget alanı tamamen gizlenir.',
+                        style: TextStyle(fontSize: 11.5),
+                      ),
+                      value: workingHubVisible,
+                      onChanged: (v) {
+                        setModalState(() => workingHubVisible = v);
+                      },
+                    ),
+                    const Divider(height: 12),
                     Text(
-                      'Uygulama içi widget’ları açıp kapatabilir veya her birini ayrı ayrı telefonunuzun ana ekranına sabitleyebilirsiniz.',
+                      'Tek tıkla sağdaki telefon simgesine basarak istediğiniz widget’ı doğrudan Android telefonunuzun ana ekranına ekleyebilirsiniz:',
                       style: Theme.of(ctx).textTheme.bodySmall,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     for (final type in QuickWidgetType.values)
                       Row(
                         children: [
@@ -238,18 +313,28 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
                               },
                             ),
                           ),
-                          IconButton(
+                          FilledButton.tonalIcon(
                             key: Key('pin_widget_${type.name}_btn'),
-                            tooltip: 'Telefon Ana Ekranına Ekle',
+                            style: FilledButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                            ),
                             onPressed: () => _pinNativeWidgetWithFeedback(
                               ctx,
                               type.name,
                               type.title,
                             ),
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.add_to_home_screen_rounded,
-                              size: 20,
-                              color: type.accentColor,
+                              size: 16,
+                            ),
+                            label: const Text(
+                              'Android',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
                         ],
@@ -262,11 +347,11 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
                         onPressed: () => _pinNativeWidgetWithFeedback(
                           ctx,
                           'all',
-                          'VisualCheckUp Tümü Bir Arada',
+                          'VisualCheckUp • Tümü Bir Arada',
                         ),
-                        icon: const Icon(Icons.add_to_home_screen_rounded),
+                        icon: const Icon(Icons.android_rounded),
                         label: const Text(
-                          'Tümü Bir Arada Ana Ekran Widget’ı Sabitle',
+                          'Tümü Bir Arada Widget’ı Android’e Ekle',
                         ),
                       ),
                     ),
@@ -276,14 +361,14 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
                       child: FilledButton.icon(
                         key: const Key('save_quick_widgets_btn'),
                         onPressed: () async {
+                          await QuickWidgetsPreferences.setHubVisible(
+                            workingHubVisible,
+                          );
                           await QuickWidgetsPreferences.saveEnabledWidgets(
                             working,
                           );
                           if (!ctx.mounted) return;
                           Navigator.of(ctx).pop();
-                          if (mounted) {
-                            setState(() => _enabled = working);
-                          }
                         },
                         icon: const Icon(Icons.check_rounded),
                         label: const Text('Widget Düzenini Kaydet'),
@@ -408,6 +493,10 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_hubVisible) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final now = DateTime.now();
@@ -418,7 +507,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       children: [
         Row(
           children: [
-            Icon(Icons.widgets_outlined, size: 19, color: colorScheme.primary),
+            Icon(Icons.widgets_outlined, size: 18, color: colorScheme.primary),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -430,18 +519,30 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
             TextButton.icon(
               key: const Key('customize_quick_widgets_btn'),
               style: TextButton.styleFrom(
                 visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
               ),
               onPressed: _openCustomizeSheet,
-              icon: const Icon(Icons.add_box_outlined, size: 16),
+              icon: const Icon(Icons.add_to_home_screen_rounded, size: 15),
               label: const Text(
-                'Widget Düzenle',
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+                'Android / Düzenle',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
+            ),
+            IconButton(
+              key: const Key('close_quick_widgets_hub_btn'),
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+              tooltip: 'Widget Panelini Kapat',
+              onPressed: _closeEntireHub,
+              icon: Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -451,13 +552,17 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
           Card(
             margin: EdgeInsets.zero,
             child: ListTile(
+              dense: true,
               onTap: _openCustomizeSheet,
               leading: const Icon(Icons.widgets_rounded),
-              title: const Text('Henüz aktif widget seçilmedi'),
+              title: const Text('Tüm kartlar gizlendi'),
               subtitle: const Text(
-                'Yürüyüş, alarm, bırakma sayacı veya şeker/tansiyon widget’ı eklemek için dokunun.',
+                'Widget eklemek için dokunun veya sağ üstteki ✕ ile paneli tamamen kapatın.',
               ),
-              trailing: const Icon(Icons.add_rounded),
+              trailing: IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: _closeEntireHub,
+              ),
             ),
           )
         else
@@ -469,7 +574,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
               crossAxisCount: 2,
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
-              mainAxisExtent: 142,
+              mainAxisExtent: 144,
             ),
             itemBuilder: (context, index) {
               final type = _enabled[index];
@@ -498,6 +603,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     return _MiniWidgetShell(
       key: const Key('quick_widget_pedometer'),
+      closeKey: const Key('close_widget_pedometer_btn'),
       accent: accent,
       icon: Icons.directions_walk_rounded,
       title: 'Yürüyüş & Adım',
@@ -508,6 +614,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       secondaryText:
           'Hedef: %${(ratio * 100).round()} • ${st.selectedMode.shortLabel}',
       onTap: widget.onOpenPedometer,
+      onClose: () => _closeSingleCard(QuickWidgetType.pedometer),
     );
   }
 
@@ -520,6 +627,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     return _MiniWidgetShell(
       key: const Key('quick_widget_sobriety'),
+      closeKey: const Key('close_widget_sobriety_btn'),
       accent: accent,
       icon: Icons.smoke_free_rounded,
       title: 'Sigara & Alkol',
@@ -529,6 +637,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
           ? 'Ömür: +$lifeStr'
           : 'Ort: ${SobrietyState.formatTry(_sobriety.combinedMonthlySpendTry)}/ay',
       onTap: widget.onOpenSobriety,
+      onClose: () => _closeSingleCard(QuickWidgetType.sobriety),
     );
   }
 
@@ -539,6 +648,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     return _MiniWidgetShell(
       key: const Key('quick_widget_vitals'),
+      closeKey: const Key('close_widget_vitals_btn'),
       accent: accent,
       icon: Icons.monitor_heart_rounded,
       title: 'Şeker & Tansiyon',
@@ -547,6 +657,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       secondaryText: 'Şeker: $sugarStr',
       onTap: widget.onOpenVitals,
       onBadgeTap: _openQuickVitalEntrySheet,
+      onClose: () => _closeSingleCard(QuickWidgetType.vitals),
     );
   }
 
@@ -556,6 +667,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     return _MiniWidgetShell(
       key: const Key('quick_widget_alarms'),
+      closeKey: const Key('close_widget_alarms_btn'),
       accent: accent,
       icon: Icons.alarm_on_rounded,
       title: 'İlaç & Alarm',
@@ -564,6 +676,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
       secondaryText:
           next != null ? next.title : 'Su & ilaç hatırlatıcısı ekleyin',
       onTap: widget.onOpenAlarms,
+      onClose: () => _closeSingleCard(QuickWidgetType.alarms),
     );
   }
 }
@@ -571,6 +684,7 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 class _MiniWidgetShell extends StatelessWidget {
   const _MiniWidgetShell({
     super.key,
+    required this.closeKey,
     required this.accent,
     required this.icon,
     required this.title,
@@ -578,9 +692,11 @@ class _MiniWidgetShell extends StatelessWidget {
     required this.primaryValue,
     required this.secondaryText,
     required this.onTap,
+    required this.onClose,
     this.onBadgeTap,
   });
 
+  final Key closeKey;
   final Color accent;
   final IconData icon;
   final String title;
@@ -588,6 +704,7 @@ class _MiniWidgetShell extends StatelessWidget {
   final String primaryValue;
   final String secondaryText;
   final VoidCallback onTap;
+  final VoidCallback onClose;
   final VoidCallback? onBadgeTap;
 
   @override
@@ -603,7 +720,7 @@ class _MiniWidgetShell extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(11),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -611,9 +728,9 @@ class _MiniWidgetShell extends StatelessWidget {
               Row(
                 children: [
                   CircleAvatar(
-                    radius: 15,
+                    radius: 14,
                     backgroundColor: accent.withValues(alpha: 0.14),
-                    child: Icon(icon, color: accent, size: 17),
+                    child: Icon(icon, color: accent, size: 16),
                   ),
                   const Spacer(),
                   InkWell(
@@ -621,8 +738,8 @@ class _MiniWidgetShell extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
+                        horizontal: 7,
+                        vertical: 2.5,
                       ),
                       decoration: BoxDecoration(
                         color: accent.withValues(alpha: 0.14),
@@ -631,10 +748,25 @@ class _MiniWidgetShell extends StatelessWidget {
                       child: Text(
                         badge,
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 10,
                           fontWeight: FontWeight.w800,
                           color: accent,
                         ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    key: closeKey,
+                    onTap: onClose,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 15,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.7),
                       ),
                     ),
                   ),

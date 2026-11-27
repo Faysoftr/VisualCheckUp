@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/sobriety/data/sobriety_repository.dart';
 import 'package:visualcheckup/features/sobriety/domain/sobriety_models.dart';
+import 'package:visualcheckup/features/widgets_hub/data/quick_widgets_preferences.dart';
 
 class SobrietyTrackerScreen extends StatefulWidget {
   const SobrietyTrackerScreen({
@@ -97,7 +98,7 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '🎉 ${type.title} yolculuğunuz başlatıldı! Gün 1 değişimleri aktif.',
+          '🎉 ${type.title} başlatıldı! Gün 1 değişimleri kartın içinde açıldı.',
         ),
       ),
     );
@@ -131,6 +132,22 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${type.title} sayacı sıfırlandı.')),
+    );
+  }
+
+  Future<void> _pinSobrietyAndroidWidget() async {
+    final pinned = await QuickWidgetsPreferences.requestPinNativeHomeWidget(
+      widgetType: 'sobriety',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          pinned
+              ? '📱 Sigara & Alkol Bırakma widget’ı Android ana ekranına gönderildi!'
+              : 'Telefon ana ekranına basılı tutup Widget’lar menüsünden "VisualCheckUp • Sigara & Alkol Bırakma" widget’ını ekleyebilirsiniz.',
+        ),
+      ),
     );
   }
 
@@ -257,6 +274,12 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
         title: const Text('Sigara & Alkol Bırakma'),
         actions: [
           IconButton(
+            key: const Key('sobriety_pin_android_widget_btn'),
+            tooltip: 'Android Ana Ekrana Widget Ekle',
+            onPressed: _pinSobrietyAndroidWidget,
+            icon: const Icon(Icons.add_to_home_screen_rounded),
+          ),
+          IconButton(
             tooltip: 'Harcama Ortalamasını Düzenle',
             onPressed: _openCostEditorSheet,
             icon: const Icon(Icons.tune_rounded),
@@ -269,8 +292,8 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
           tabs: const [
             Tab(
               key: Key('sobriety_tab_timeline'),
-              icon: Icon(Icons.timeline_rounded, size: 18),
-              text: 'Gün Gün Değişimler',
+              icon: Icon(Icons.bolt_rounded, size: 18),
+              text: 'Takip & Günlük Değişim',
             ),
             Tab(
               key: Key('sobriety_tab_harms'),
@@ -287,64 +310,95 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildFinancialAndLongevityHero(
-                          context,
-                          now,
-                          theme,
-                          colorScheme,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildTrackerControlCards(context, now, theme),
-                        const SizedBox(height: 10),
-                        Card(
-                          margin: EdgeInsets.zero,
-                          child: SwitchListTile(
-                            key: const Key('sobriety_profile_visibility_switch'),
-                            dense: true,
-                            secondary: Icon(
-                              _state.showOnProfile
-                                  ? Icons.visibility_rounded
-                                  : Icons.visibility_off_outlined,
-                              color: colorScheme.primary,
-                            ),
-                            title: const Text(
-                              'Profil Kartımda Göster',
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            ),
-                            subtitle: Text(
-                              _state.showOnProfile
-                                  ? 'Bırakma gününüz, kazancınız ve kazanılan ömür profilinizde görünür.'
-                                  : 'Gizli: Yalnızca siz bu ekranda görebilirsiniz.',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                            value: _state.showOnProfile,
-                            onChanged: (val) => _persistAndSync(
-                              _state.copyWith(showOnProfile: val),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMainTrackerAndProgressiveCardsTab(
+                  context,
+                  now,
+                  theme,
+                  colorScheme,
                 ),
+                _buildHarmsTab(context, theme),
+                _buildTipsTab(context, theme),
               ],
-              body: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildDayByDayTab(context, now, theme),
-                  _buildHarmsTab(context, theme),
-                  _buildTipsTab(context, theme),
-                ],
-              ),
             ),
+    );
+  }
+
+  Widget _buildMainTrackerAndProgressiveCardsTab(
+    BuildContext context,
+    DateTime now,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+      children: [
+        _buildFinancialAndLongevityHero(context, now, theme, colorScheme),
+        const SizedBox(height: 12),
+        _SingleTrackActionCard(
+          key: const Key('sobriety_smoking_card'),
+          type: SobrietyTrackType.smoking,
+          isActive: _state.isSmokingActive,
+          dayNumber: _state.smokeCurrentDayNumber(now),
+          elapsed: _state.smokeElapsedAt(now),
+          savedTry: _state.smokeMoneySavedAt(now),
+          dailyAvgTry: _state.dailySmokeSpendTry,
+          monthlyAvgTry: _state.monthlySmokeSpendTry,
+          onStartNow: () => _startNow(SobrietyTrackType.smoking),
+          onPickDate: () => _pickCustomQuitDate(SobrietyTrackType.smoking),
+          onReset: () => _resetTrack(SobrietyTrackType.smoking),
+        ),
+        const SizedBox(height: 12),
+        _SingleTrackActionCard(
+          key: const Key('sobriety_alcohol_card'),
+          type: SobrietyTrackType.alcohol,
+          isActive: _state.isAlcoholActive,
+          dayNumber: _state.alcoholCurrentDayNumber(now),
+          elapsed: _state.alcoholElapsedAt(now),
+          savedTry: _state.alcoholMoneySavedAt(now),
+          dailyAvgTry: _state.dailyAlcoholCostTry,
+          monthlyAvgTry: _state.monthlyAlcoholSpendTry,
+          onStartNow: () => _startNow(SobrietyTrackType.alcohol),
+          onPickDate: () => _pickCustomQuitDate(SobrietyTrackType.alcohol),
+          onReset: () => _resetTrack(SobrietyTrackType.alcohol),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          margin: EdgeInsets.zero,
+          child: SwitchListTile(
+            key: const Key('sobriety_profile_visibility_switch'),
+            dense: true,
+            secondary: Icon(
+              _state.showOnProfile
+                  ? Icons.visibility_rounded
+                  : Icons.visibility_off_outlined,
+              color: colorScheme.primary,
+            ),
+            title: const Text(
+              'Profil Kartımda Göster',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            subtitle: Text(
+              _state.showOnProfile
+                  ? 'Bulunduğunuz günün vücut değişimi, kazancınız ve kazanılan ömür profilinizde görünür.'
+                  : 'Gizli: Yalnızca siz bu ekranda görebilirsiniz.',
+              style: theme.textTheme.bodySmall,
+            ),
+            value: _state.showOnProfile,
+            onChanged: (val) => _persistAndSync(
+              _state.copyWith(showOnProfile: val),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: _pinSobrietyAndroidWidget,
+          icon: const Icon(Icons.add_to_home_screen_rounded),
+          label: const Text('Sigara & Alkol Widget’ını Android Ana Ekrana Ekle'),
+        ),
+      ],
     );
   }
 
@@ -423,7 +477,11 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
               IconButton(
                 visualDensity: VisualDensity.compact,
                 onPressed: _openCostEditorSheet,
-                icon: const Icon(Icons.edit_outlined, color: Colors.white, size: 18),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 tooltip: 'Ortalamayı Düzenle',
               ),
             ],
@@ -476,167 +534,6 @@ class _SobrietyTrackerScreenState extends State<SobrietyTrackerScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTrackerControlCards(
-    BuildContext context,
-    DateTime now,
-    ThemeData theme,
-  ) {
-    return Column(
-      children: [
-        _SingleTrackActionCard(
-          key: const Key('sobriety_smoking_card'),
-          type: SobrietyTrackType.smoking,
-          isActive: _state.isSmokingActive,
-          dayNumber: _state.smokeCurrentDayNumber(now),
-          elapsed: _state.smokeElapsedAt(now),
-          savedTry: _state.smokeMoneySavedAt(now),
-          dailyAvgTry: _state.dailySmokeSpendTry,
-          monthlyAvgTry: _state.monthlySmokeSpendTry,
-          onStartNow: () => _startNow(SobrietyTrackType.smoking),
-          onPickDate: () => _pickCustomQuitDate(SobrietyTrackType.smoking),
-          onReset: () => _resetTrack(SobrietyTrackType.smoking),
-        ),
-        const SizedBox(height: 10),
-        _SingleTrackActionCard(
-          key: const Key('sobriety_alcohol_card'),
-          type: SobrietyTrackType.alcohol,
-          isActive: _state.isAlcoholActive,
-          dayNumber: _state.alcoholCurrentDayNumber(now),
-          elapsed: _state.alcoholElapsedAt(now),
-          savedTry: _state.alcoholMoneySavedAt(now),
-          dailyAvgTry: _state.dailyAlcoholCostTry,
-          monthlyAvgTry: _state.monthlyAlcoholSpendTry,
-          onStartNow: () => _startNow(SobrietyTrackType.alcohol),
-          onPickDate: () => _pickCustomQuitDate(SobrietyTrackType.alcohol),
-          onReset: () => _resetTrack(SobrietyTrackType.alcohol),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDayByDayTab(
-    BuildContext context,
-    DateTime now,
-    ThemeData theme,
-  ) {
-    final smokeElapsed = _state.smokeElapsedAt(now);
-    final alcElapsed = _state.alcoholElapsedAt(now);
-    final maxElapsed =
-        smokeElapsed > alcElapsed ? smokeElapsed : alcElapsed;
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-      itemCount: SobrietyKnowledgeBase.dayByDayMilestones.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final m = SobrietyKnowledgeBase.dayByDayMilestones[index];
-        final progress =
-            _state.isAnyActive ? m.progressFor(maxElapsed) : 0.0;
-        final completed = _state.isAnyActive && m.isCompletedFor(maxElapsed);
-        final isCurrentDay = _state.isAnyActive &&
-            !completed &&
-            (index == 0 ||
-                SobrietyKnowledgeBase.dayByDayMilestones[index - 1]
-                    .isCompletedFor(maxElapsed));
-
-        return Card(
-          margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(
-              color: completed
-                  ? const Color(0xFF10B981).withValues(alpha: 0.55)
-                  : isCurrentDay
-                      ? theme.colorScheme.primary.withValues(alpha: 0.65)
-                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-              width: completed || isCurrentDay ? 1.5 : 1,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: completed
-                            ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                            : theme.colorScheme.primaryContainer
-                                .withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        m.dayLabel,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: completed
-                              ? const Color(0xFF059669)
-                              : theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        m.title,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    if (completed)
-                      const Icon(
-                        Icons.check_circle_rounded,
-                        color: Color(0xFF10B981),
-                        size: 20,
-                      )
-                    else if (_state.isAnyActive)
-                      Text(
-                        '%${(progress * 100).round()}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                  ],
-                ),
-                if (_state.isAnyActive) ...[
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 6,
-                      color: completed
-                          ? const Color(0xFF10B981)
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 10),
-                Text(
-                  '🚭 Sigara Bırakıldığında: ${m.smokingChange}',
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '🍷 Alkol Bırakıldığında: ${m.alcoholChange}',
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -776,7 +673,7 @@ class _HeroMetricTile extends StatelessWidget {
   }
 }
 
-class _SingleTrackActionCard extends StatelessWidget {
+class _SingleTrackActionCard extends StatefulWidget {
   const _SingleTrackActionCard({
     super.key,
     required this.type,
@@ -803,31 +700,51 @@ class _SingleTrackActionCard extends StatelessWidget {
   final VoidCallback onReset;
 
   @override
+  State<_SingleTrackActionCard> createState() => _SingleTrackActionCardState();
+}
+
+class _SingleTrackActionCardState extends State<_SingleTrackActionCard> {
+  bool _showPastDays = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = type.accentColor;
+    final accent = widget.type.accentColor;
+    final unlockedFeed = widget.isActive
+        ? SobrietyKnowledgeBase.unlockedDailyFeed(widget.dayNumber)
+        : const <BodyRecoveryMilestone>[];
+    final todayEntry = unlockedFeed.isNotEmpty ? unlockedFeed.first : null;
+    final previousEntries = unlockedFeed.length > 1
+        ? unlockedFeed.sublist(1)
+        : const <BodyRecoveryMilestone>[];
+
+    String changeTextFor(BodyRecoveryMilestone m) =>
+        widget.type == SobrietyTrackType.smoking
+            ? m.smokingChange
+            : m.alcoholChange;
 
     return Card(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isActive
-              ? accent.withValues(alpha: 0.5)
+          color: widget.isActive
+              ? accent.withValues(alpha: 0.55)
               : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+          width: widget.isActive ? 1.5 : 1,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 CircleAvatar(
-                  radius: 18,
+                  radius: 19,
                   backgroundColor: accent.withValues(alpha: 0.14),
-                  child: Icon(type.icon, color: accent, size: 20),
+                  child: Icon(widget.type.icon, color: accent, size: 21),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -835,21 +752,22 @@ class _SingleTrackActionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        type.title,
+                        widget.type.title,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                       Text(
-                        isActive
-                            ? 'Gün $dayNumber (${elapsed.inDays}g ${elapsed.inHours % 24}s) • Kazanç: ${SobrietyState.formatTry(savedTry)}'
-                            : 'Ortalama Harcama: ${SobrietyState.formatTry(dailyAvgTry)}/gün • ${SobrietyState.formatTry(monthlyAvgTry)}/ay',
+                        widget.isActive
+                            ? 'Gün ${widget.dayNumber} (${widget.elapsed.inDays}g ${widget.elapsed.inHours % 24}s) • Kazanç: ${SobrietyState.formatTry(widget.savedTry)}'
+                            : 'Ort. Harcama: ${SobrietyState.formatTry(widget.dailyAvgTry)}/gün • ${SobrietyState.formatTry(widget.monthlyAvgTry)}/ay',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isActive
+                          color: widget.isActive
                               ? accent
                               : theme.colorScheme.onSurfaceVariant,
-                          fontWeight:
-                              isActive ? FontWeight.w700 : FontWeight.normal,
+                          fontWeight: widget.isActive
+                              ? FontWeight.w700
+                              : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -857,19 +775,159 @@ class _SingleTrackActionCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+
+            // Progressive Day-by-Day Change INSIDE THE CARD (ONLY shows unlocked days!)
+            if (!widget.isActive)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  'Başlattığınızda geçen her gün vücudunuzda gerçekleşen değişimler ("Gün 1: ...", "Gün 2: ...") gün geçtikçe bu kartın içinde yazacaktır.',
+                  style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+                ),
+              )
+            else if (todayEntry != null) ...[
+              Container(
+                key: Key('sobriety_live_day_box_${widget.type.name}'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: accent.withValues(alpha: 0.32)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: accent,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'Gün ${todayEntry.dayNumber}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            todayEntry.title,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: accent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'Gün ${todayEntry.dayNumber}: ${changeTextFor(todayEntry)}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        height: 1.45,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '⏳ Gün ${widget.dayNumber + 1} değişimi bir sonraki gün tamamlandığında açılacak.',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (previousEntries.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () => setState(() => _showPastDays = !_showPastDays),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 4,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _showPastDays
+                              ? Icons.expand_less_rounded
+                              : Icons.history_rounded,
+                          size: 16,
+                          color: accent,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          _showPastDays
+                              ? 'Geçmiş Günleri Gizle'
+                              : 'Geride Kalan Günlerin Değişimleri (${previousEntries.length} gün)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: accent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (_showPastDays) ...[
+                  const SizedBox(height: 6),
+                  for (final past in previousEntries)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '✓ Gün ${past.dayNumber}: ${changeTextFor(past)}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            height: 1.38,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ],
+            ],
+
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                if (!isActive)
+                if (!widget.isActive)
                   FilledButton.icon(
-                    key: Key('sobriety_start_${type.name}_btn'),
+                    key: Key('sobriety_start_${widget.type.name}_btn'),
                     style: FilledButton.styleFrom(
                       backgroundColor: accent,
                       visualDensity: VisualDensity.compact,
                     ),
-                    onPressed: onStartNow,
+                    onPressed: widget.onStartNow,
                     icon: const Icon(Icons.play_arrow_rounded, size: 18),
                     label: const Text('Başlat'),
                   ),
@@ -877,20 +935,22 @@ class _SingleTrackActionCard extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     visualDensity: VisualDensity.compact,
                   ),
-                  onPressed: onPickDate,
+                  onPressed: widget.onPickDate,
                   icon: const Icon(Icons.calendar_month_rounded, size: 16),
                   label: Text(
-                    isActive ? 'Bırakma Tarihini Değiştir' : 'Geçmiş Tarih Seç',
+                    widget.isActive
+                        ? 'Bırakma Tarihini Değiştir'
+                        : 'Geçmiş Tarih Seç',
                   ),
                 ),
-                if (isActive)
+                if (widget.isActive)
                   TextButton.icon(
-                    key: Key('sobriety_reset_${type.name}_btn'),
+                    key: Key('sobriety_reset_${widget.type.name}_btn'),
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.error,
                       visualDensity: VisualDensity.compact,
                     ),
-                    onPressed: onReset,
+                    onPressed: widget.onReset,
                     icon: const Icon(Icons.restart_alt_rounded, size: 16),
                     label: const Text('Sıfırla'),
                   ),

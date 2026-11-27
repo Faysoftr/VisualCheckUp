@@ -51,6 +51,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenChildrenGrowth,
     this.onOpenPedometer,
     this.onOpenSobriety,
+    this.onOpenWidgetsManager,
   });
 
   final AuthUser currentUser;
@@ -87,6 +88,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenChildrenGrowth;
   final VoidCallback? onOpenPedometer;
   final VoidCallback? onOpenSobriety;
+  final VoidCallback? onOpenWidgetsManager;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
     Navigator.of(context).pop();
@@ -621,6 +623,15 @@ class AppDrawer extends StatelessWidget {
                             label: 'Sigara & Alkol Bırakma',
                             accentColor: const Color(0xFF16A34A),
                             onTap: () => _closeAndRun(context, onOpenSobriety!),
+                          ),
+                        if (onOpenWidgetsManager != null)
+                          _DrawerTile(
+                            key: const Key('drawer_widgets_manager_tile'),
+                            icon: Icons.widgets_rounded,
+                            label: 'Widget Merkezi (Android & Aç/Kapat)',
+                            accentColor: const Color(0xFF2563EB),
+                            onTap: () =>
+                                _closeAndRun(context, onOpenWidgetsManager!),
                           ),
                         if (onOpenMedicationReminders != null)
                           _DrawerTile(

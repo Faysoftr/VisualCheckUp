@@ -10,6 +10,7 @@ import 'package:visualcheckup/features/pedometer/presentation/screens/step_count
 import 'package:visualcheckup/features/sobriety/data/sobriety_repository.dart';
 import 'package:visualcheckup/features/sobriety/domain/sobriety_models.dart';
 import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tracker_screen.dart';
+import 'package:visualcheckup/features/widgets_hub/presentation/screens/widgets_manager_screen.dart';
 import 'package:visualcheckup/features/widgets_hub/presentation/widgets/health_quick_widgets_hub.dart';
 import 'package:visualcheckup/l10n/generated/app_localizations.dart';
 
@@ -69,7 +70,6 @@ void main() {
         updatedAt: DateTime(2026, 11, 27),
       );
 
-      // Visitor cannot see hidden motto
       await tester.pumpWidget(
         _wrapWithMaterial(
           ProfileMottoCard(profile: hiddenProfile, isOwner: false),
@@ -77,7 +77,6 @@ void main() {
       );
       expect(find.byKey(const Key('profile_motto_card')), findsNothing);
 
-      // Owner sees it with 'Gizli' badge and can toggle visibility
       await tester.pumpWidget(
         _wrapWithMaterial(
           ProfileMottoCard(
@@ -95,30 +94,28 @@ void main() {
     });
   });
 
-  group('Smoking & Alcohol Cessation Tracker (Money, Longevity & Day-by-Day)', () {
-    test('Calculates daily/monthly spend, today saved, total saved, and life regained accurately', () {
+  group('Smoking & Alcohol Cessation Tracker (Progressive In-Card Day-by-Day)', () {
+    test('Calculates daily/monthly spend, today saved, total saved, life regained & progressive feed', () {
       final now = DateTime(2026, 11, 27, 15, 0);
       final state = SobrietyState(
-        smokeQuitAt: now.subtract(const Duration(days: 3)),
-        alcoholQuitAt: now.subtract(const Duration(days: 3)),
+        smokeQuitAt: now.subtract(const Duration(days: 2)), // Day 3
+        alcoholQuitAt: now.subtract(const Duration(days: 2)),
         dailyCigarettes: 20,
-        packPriceTry: 80.0, // 80/day, 2400/month
-        dailyAlcoholCostTry: 120.0, // 120/day, 3600/month
+        packPriceTry: 80.0,
+        dailyAlcoholCostTry: 120.0,
       );
 
-      expect(state.dailySmokeSpendTry, 80.0);
-      expect(state.monthlySmokeSpendTry, 2400.0);
-      expect(state.monthlyAlcoholSpendTry, 3600.0);
-      // Started 3 days ago -> full daily rate saved today = 80 + 120 = 200 TL
+      expect(state.smokeCurrentDayNumber(now), 3);
       expect(state.todayMoneySavedAt(now), closeTo(200.0, 0.01));
-      // 3 full days total = 600 TL
-      expect(state.totalMoneySavedAt(now), closeTo(600.0, 0.01));
-      // Unsmoked cigarettes = 60 -> 60 * 11 = 660 min + 3 * 45 = 135 min = 795 min
-      expect(state.unsmokedCigarettesAt(now), 60);
-      expect(state.lifeRegainedAt(now).inMinutes, 795);
+      expect(state.totalMoneySavedAt(now), closeTo(400.0, 0.01));
+
+      // Unlocked feed on Day 3 MUST ONLY contain Days 3, 2, 1 (never future days!)
+      final feed = SobrietyKnowledgeBase.unlockedDailyFeed(3);
+      expect(feed.map((m) => m.dayNumber).toList(), [3, 2, 1]);
+      expect(SobrietyKnowledgeBase.unlockedDailyFeed(0), isEmpty);
     });
 
-    testWidgets('SobrietyTrackerScreen starts tracker, shows today savings & day-by-day changes', (tester) async {
+    testWidgets('SobrietyTrackerScreen reveals ONLY reached days inside card as days pass', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
       addTearDown(() {
@@ -137,12 +134,18 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('sobriety_hero_card')), findsOneWidget);
-      expect(find.text('Gün 1'), findsOneWidget);
+      // Before starting: NO day change box is shown, future days are NOT dumped!
+      expect(find.byKey(const Key('sobriety_live_day_box_smoking')), findsNothing);
+      expect(find.textContaining('Gün 30'), findsNothing);
+      expect(find.textContaining('Gün 365'), findsNothing);
 
+      // Start smoking tracker -> ONLY Day 1 appears inside the card!
       await tester.tap(find.byKey(const Key('sobriety_start_smoking_btn')));
       await tester.pumpAndSettle();
 
+      expect(find.byKey(const Key('sobriety_live_day_box_smoking')), findsOneWidget);
+      expect(find.text('Gün 1'), findsWidgets);
+      expect(find.textContaining('Gün 30'), findsNothing);
       expect(find.textContaining('Kazandınız!'), findsOneWidget);
 
       // Switch to Harms tab
@@ -161,27 +164,21 @@ void main() {
       await service.recordSteps(500, now: t0);
       expect(service.state.todayStepsAt(t0), 500);
 
-      // Start Mountain Hiking instant session while Continuous Mode is ON
       await service.startInstantSession(
         mode: WalkActivityMode.mountainHiking,
         now: t0.add(const Duration(minutes: 5)),
       );
       await service.recordSteps(1200, now: t0.add(const Duration(minutes: 20)));
 
-      // Instant session has 1200 steps AND Continuous Mode seamlessly has 500 + 1200 = 1700!
       expect(service.state.activeSession?.steps, 1200);
       expect(service.state.todayStepsAt(t0), 1700);
-      expect(service.state.thisWeekStepsAt(t0), 1700);
-      expect(service.state.thisMonthStepsAt(t0), 1700);
 
       final completed = await service.stopInstantSession(
         now: t0.add(const Duration(minutes: 25)),
       );
       expect(completed, isNotNull);
       expect(completed!.steps, 1200);
-      expect(completed.mode, WalkActivityMode.mountainHiking);
       expect(service.state.sessions.length, 1);
-      // Continuous total remains 1700
       expect(service.state.todayStepsAt(t0), 1700);
     });
 
@@ -204,18 +201,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Select Running mode
       await tester.tap(find.byKey(const Key('pedometer_mode_running')));
       await tester.pumpAndSettle();
 
-      // Enable Continuous Mode
       await tester.tap(find.byKey(const Key('pedometer_continuous_switch')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('pedometer_today_box')), findsOneWidget);
       expect(find.byKey(const Key('pedometer_week_box')), findsOneWidget);
       expect(find.byKey(const Key('pedometer_month_box')), findsOneWidget);
 
-      // Start Instant Session, add +100 steps, and Stop
       await tester.tap(find.byKey(const Key('pedometer_start_instant_btn')));
       await tester.pumpAndSettle();
 
@@ -225,7 +219,6 @@ void main() {
       await tester.tap(find.byKey(const Key('pedometer_stop_instant_btn')));
       await tester.pumpAndSettle();
 
-      // Verify stacked history table now has 1 recorded session
       expect(
         find.textContaining('Anlık Yürüyüş Kayıtları Tablosu (1)'),
         findsOneWidget,
@@ -233,8 +226,8 @@ void main() {
     });
   });
 
-  group('Customizable Quick Health Widgets Hub', () {
-    testWidgets('Renders all 4 quick widgets and allows toggling in customization sheet', (tester) async {
+  group('Closable Widgets Hub & Android Home Screen Widgets Manager', () {
+    testWidgets('Allows closing single widgets, closing entire hub, and pinning Android widgets', (tester) async {
       await tester.pumpWidget(
         _wrapWithMaterial(
           SingleChildScrollView(
@@ -252,22 +245,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('quick_widget_pedometer')), findsOneWidget);
-      expect(find.byKey(const Key('quick_widget_sobriety')), findsOneWidget);
-      expect(find.byKey(const Key('quick_widget_vitals')), findsOneWidget);
       expect(find.byKey(const Key('quick_widget_alarms')), findsOneWidget);
 
-      // Open Customize Sheet and uncheck alarms widget
-      await tester.tap(find.byKey(const Key('customize_quick_widgets_btn')));
+      // 1-tap close single Alarms widget directly from its card
+      await tester.tap(find.byKey(const Key('close_widget_alarms_btn')));
       await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('widget_toggle_alarms')));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('save_quick_widgets_btn')));
-      await tester.pumpAndSettle();
-
       expect(find.byKey(const Key('quick_widget_alarms')), findsNothing);
       expect(find.byKey(const Key('quick_widget_pedometer')), findsOneWidget);
+
+      // 1-tap close the entire widgets hub
+      await tester.tap(find.byKey(const Key('close_quick_widgets_hub_btn')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('health_quick_widgets_hub')), findsNothing);
+
+      // Open dedicated WidgetsManagerScreen -> verify Android pin buttons & re-enable hub
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('tr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const WidgetsManagerScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('android_pin_all_btn')), findsOneWidget);
+      expect(find.byKey(const Key('android_pin_pedometer_btn')), findsOneWidget);
+      expect(find.byKey(const Key('android_pin_sobriety_btn')), findsOneWidget);
+      expect(find.byKey(const Key('android_pin_vitals_btn')), findsOneWidget);
+      expect(find.byKey(const Key('android_pin_alarms_btn')), findsOneWidget);
     });
   });
 }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/pedometer/data/pedometer_service.dart';
 import 'package:visualcheckup/features/pedometer/domain/pedometer_models.dart';
+import 'package:visualcheckup/features/widgets_hub/data/quick_widgets_preferences.dart';
 
 class StepCounterScreen extends StatefulWidget {
   const StepCounterScreen({
@@ -150,6 +151,27 @@ class _StepCounterScreenState extends State<StepCounterScreen> {
       appBar: AppBar(
         title: const Text('Adım Sayar & Yürüyüş'),
         actions: [
+          IconButton(
+            key: const Key('pedometer_pin_android_widget_btn'),
+            tooltip: 'Android Ana Ekrana Widget Ekle',
+            onPressed: () async {
+              final pinned =
+                  await QuickWidgetsPreferences.requestPinNativeHomeWidget(
+                widgetType: 'pedometer',
+              );
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    pinned
+                        ? '📱 Adım Sayar widget’ı Android ana ekranına gönderildi!'
+                        : 'Telefon ana ekranına basılı tutup Widget’lar > VisualCheckUp altından "Adım Sayar" widget’ını ekleyebilirsiniz.',
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.add_to_home_screen_rounded),
+          ),
           IconButton(
             tooltip: 'Günlük Adım Hedefi',
             onPressed: _openGoalDialog,

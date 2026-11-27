@@ -63,6 +63,7 @@ import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tr
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 import 'package:visualcheckup/features/support/presentation/widgets/donation_support_dialog.dart';
+import 'package:visualcheckup/features/widgets_hub/presentation/screens/widgets_manager_screen.dart';
 import 'package:visualcheckup/features/widgets_hub/presentation/widgets/health_quick_widgets_hub.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -353,6 +354,15 @@ class _HomeScreenState extends State<HomeScreen> {
           currentUserId: widget.currentUser.id,
           currentUserDisplayName: widget.currentUser.displayName,
         ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openWidgetsManager() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const WidgetsManagerScreen(),
       ),
     );
     await _loadDashboardData();
@@ -701,6 +711,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenPedometer: _openPedometer,
         onOpenSobriety: _openSobrietyTracker,
+        onOpenWidgetsManager: _openWidgetsManager,
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,
         onOpenHistory: _openHistory,

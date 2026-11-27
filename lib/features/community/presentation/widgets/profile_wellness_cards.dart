@@ -277,17 +277,8 @@ class ProfileSobrietyShowcaseCard extends StatelessWidget {
     final lifeRegained =
         SobrietyState.formatLifeRegained(effState.lifeRegainedAt(now));
 
-    BodyRecoveryMilestone? activeMilestone;
-    if (active) {
-      final maxElapsed = effState.smokeElapsedAt(now) >
-              effState.alcoholElapsedAt(now)
-          ? effState.smokeElapsedAt(now)
-          : effState.alcoholElapsedAt(now);
-      for (final m in SobrietyKnowledgeBase.dayByDayMilestones) {
-        activeMilestone = m;
-        if (!m.isCompletedFor(maxElapsed)) break;
-      }
-    }
+    final BodyRecoveryMilestone? activeMilestone =
+        active ? SobrietyKnowledgeBase.changeForExactDay(maxDay) : null;
 
     return Card(
       key: const Key('profile_sobriety_card'),
@@ -364,7 +355,7 @@ class ProfileSobrietyShowcaseCard extends StatelessWidget {
             const SizedBox(height: 8),
             if (!active)
               Text(
-                'Sigara ve alkolü bırakma sayacını başlatarak gün gün vücudunuzdaki iyileşmeleri, kazanılan parayı ve kazanılan ömrü takip edin.',
+                'Sigara ve alkolü bırakma sayacını başlatarak gün geçtikçe vücudunuzdaki değişimleri, kazanılan parayı ve kazanılan ömrü takip edin.',
                 style: theme.textTheme.bodySmall,
               )
             else ...[
@@ -391,10 +382,39 @@ class ProfileSobrietyShowcaseCard extends StatelessWidget {
               ),
               if (activeMilestone != null) ...[
                 const SizedBox(height: 8),
-                Text(
-                  '✨ ${activeMilestone.dayLabel}: ${activeMilestone.title}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16A34A).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '✨ Gün $maxDay — ${activeMilestone.title}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF16A34A),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (effState.isSmokingActive)
+                        Text(
+                          '🚭 ${activeMilestone.smokingChange}',
+                          style:
+                              theme.textTheme.bodySmall?.copyWith(height: 1.38),
+                        ),
+                      if (effState.isAlcoholActive) ...[
+                        if (effState.isSmokingActive) const SizedBox(height: 4),
+                        Text(
+                          '🍷 ${activeMilestone.alcoholChange}',
+                          style:
+                              theme.textTheme.bodySmall?.copyWith(height: 1.38),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],

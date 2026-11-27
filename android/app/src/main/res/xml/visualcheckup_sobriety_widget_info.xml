@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:description="@string/vcu_widget_sobriety_desc"
     android:initialLayout="@layout/visualcheckup_single_widget"
     android:minHeight="70dp"
     android:minWidth="160dp"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/visualcheckup_single_widget"
     android:resizeMode="horizontal|vertical"
+    android:targetCellHeight="1"
+    android:targetCellWidth="2"
     android:updatePeriodMillis="1800000"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    tools:targetApi="s" />
