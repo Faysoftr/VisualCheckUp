@@ -94,23 +94,25 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     });
   }
 
-  Future<void> _openCreateAnnouncementSheet() async {
-    final created = await showModalBottomSheet<GlobalAnnouncement>(
+  Future<void> _openAnnouncementSheet({GlobalAnnouncement? existing}) async {
+    final saved = await showModalBottomSheet<GlobalAnnouncement>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (_) => const _CreateAnnouncementSheet(),
+      builder: (_) => _CreateAnnouncementSheet(initialAnnouncement: existing),
     );
 
-    if (created != null) {
-      await widget.repository.saveAnnouncement(created);
+    if (saved != null) {
+      await widget.repository.saveAnnouncement(saved);
       await _refreshAll();
     }
   }
 
-  Future<void> _openCreatePromotionSheet() async {
-    final created = await showModalBottomSheet<HealthPromotion>(
+  Future<void> _openCreateAnnouncementSheet() => _openAnnouncementSheet();
+
+  Future<void> _openPromotionSheet({HealthPromotion? existing}) async {
+    final saved = await showModalBottomSheet<HealthPromotion>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -118,14 +120,17 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       builder: (_) => _CreatePromotionSheet(
         uploadService: _uploadService,
         photoPicker: widget.photoPicker,
+        initialPromotion: existing,
       ),
     );
 
-    if (created != null) {
-      await widget.repository.savePromotion(created);
+    if (saved != null) {
+      await widget.repository.savePromotion(saved);
       await _refreshAll();
     }
   }
+
+  Future<void> _openCreatePromotionSheet() => _openPromotionSheet();
 
   @override
   Widget build(BuildContext context) {
@@ -545,6 +550,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   Widget _buildAnnouncementsTab(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Column(
       children: [
@@ -589,6 +595,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            IconButton(
+                              key: Key('admin_edit_announcement_${ann.id}'),
+                              tooltip: 'Duyuruyu Düzenle',
+                              onPressed: () =>
+                                  _openAnnouncementSheet(existing: ann),
+                              icon: Icon(
+                                Icons.edit_outlined,
+                                color: colorScheme.primary,
+                              ),
+                            ),
                             Switch(
                               value: ann.isActive,
                               onChanged: (v) async {
@@ -788,6 +804,16 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            IconButton(
+                              key: Key('admin_edit_promo_${promo.id}'),
+                              tooltip: 'Reklamı Düzenle',
+                              onPressed: () =>
+                                  _openPromotionSheet(existing: promo),
+                              icon: Icon(
+                                Icons.edit_outlined,
+                                color: colorScheme.primary,
+                              ),
+                            ),
                             Switch(
                               value: promo.isActive,
                               onChanged: (v) async {
@@ -1221,7 +1247,9 @@ class _AdminStatCard extends StatelessWidget {
 }
 
 class _CreateAnnouncementSheet extends StatefulWidget {
-  const _CreateAnnouncementSheet();
+  const _CreateAnnouncementSheet({this.initialAnnouncement});
+
+  final GlobalAnnouncement? initialAnnouncement;
 
   @override
   State<_CreateAnnouncementSheet> createState() =>
@@ -1229,10 +1257,20 @@ class _CreateAnnouncementSheet extends StatefulWidget {
 }
 
 class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
-  final TextEditingController _titleCtrl = TextEditingController();
-  final TextEditingController _msgCtrl = TextEditingController();
-  final TextEditingController _linkCtrl = TextEditingController();
-  AnnouncementType _type = AnnouncementType.info;
+  late final TextEditingController _titleCtrl;
+  late final TextEditingController _msgCtrl;
+  late final TextEditingController _linkCtrl;
+  late AnnouncementType _type;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialAnnouncement;
+    _titleCtrl = TextEditingController(text: initial?.title ?? '');
+    _msgCtrl = TextEditingController(text: initial?.message ?? '');
+    _linkCtrl = TextEditingController(text: initial?.linkUrl ?? '');
+    _type = initial?.type ?? AnnouncementType.info;
+  }
 
   @override
   void dispose() {
@@ -1245,6 +1283,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isEditing = widget.initialAnnouncement != null;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -1258,7 +1297,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l10n.adminNewAnnouncement,
+              isEditing ? 'Duyuruyu Düzenle' : l10n.adminNewAnnouncement,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -1327,20 +1366,32 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                     _msgCtrl.text.trim().isEmpty) {
                   return;
                 }
+                final existing = widget.initialAnnouncement;
                 Navigator.of(context).pop(
-                  GlobalAnnouncement(
-                    id: 'ann_${DateTime.now().microsecondsSinceEpoch}',
-                    title: _titleCtrl.text.trim(),
-                    message: _msgCtrl.text.trim(),
-                    type: _type,
-                    linkUrl: _linkCtrl.text.trim(),
-                    isActive: true,
-                    createdAt: DateTime.now(),
-                  ),
+                  existing != null
+                      ? existing.copyWith(
+                          title: _titleCtrl.text.trim(),
+                          message: _msgCtrl.text.trim(),
+                          type: _type,
+                          linkUrl: _linkCtrl.text.trim(),
+                        )
+                      : GlobalAnnouncement(
+                          id: 'ann_${DateTime.now().microsecondsSinceEpoch}',
+                          title: _titleCtrl.text.trim(),
+                          message: _msgCtrl.text.trim(),
+                          type: _type,
+                          linkUrl: _linkCtrl.text.trim(),
+                          isActive: true,
+                          createdAt: DateTime.now(),
+                        ),
                 );
               },
-              icon: const Icon(Icons.campaign_rounded),
-              label: Text(l10n.adminNewAnnouncement),
+              icon: Icon(
+                isEditing ? Icons.save_rounded : Icons.campaign_rounded,
+              ),
+              label: Text(
+                isEditing ? 'Değişiklikleri Kaydet' : l10n.adminNewAnnouncement,
+              ),
             ),
           ],
         ),
@@ -1353,23 +1404,37 @@ class _CreatePromotionSheet extends StatefulWidget {
   const _CreatePromotionSheet({
     required this.uploadService,
     this.photoPicker,
+    this.initialPromotion,
   });
 
   final CommunityImageUploadService uploadService;
   final CommunityPhotoPicker? photoPicker;
+  final HealthPromotion? initialPromotion;
 
   @override
   State<_CreatePromotionSheet> createState() => _CreatePromotionSheetState();
 }
 
 class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
-  final TextEditingController _titleCtrl = TextEditingController();
-  final TextEditingController _subtitleCtrl = TextEditingController();
-  final TextEditingController _linkCtrl = TextEditingController();
-  PromotionPlacement _placement = PromotionPlacement.homeTop;
+  late final TextEditingController _titleCtrl;
+  late final TextEditingController _subtitleCtrl;
+  late final TextEditingController _linkCtrl;
+  late PromotionPlacement _placement;
   String? _uploadedImageUrl;
   String? _uploadedImageKey;
   bool _uploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialPromotion;
+    _titleCtrl = TextEditingController(text: initial?.title ?? '');
+    _subtitleCtrl = TextEditingController(text: initial?.subtitle ?? '');
+    _linkCtrl = TextEditingController(text: initial?.linkUrl ?? '');
+    _placement = initial?.placement ?? PromotionPlacement.homeTop;
+    _uploadedImageUrl = initial?.imageUrl;
+    _uploadedImageKey = initial?.imageKey;
+  }
 
   @override
   void dispose() {
@@ -1415,6 +1480,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isEditing = widget.initialPromotion != null;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -1428,14 +1494,14 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l10n.adminNewPromotion,
+              isEditing ? 'Reklamı / Kampanyayı Düzenle' : l10n.adminNewPromotion,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<PromotionPlacement>(
-              initialValue: _placement,
+              value: _placement,
               decoration: InputDecoration(
                 labelText: l10n.adminFieldPlacement,
                 border: OutlineInputBorder(
@@ -1507,22 +1573,36 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
               key: const Key('admin_promo_save_button'),
               onPressed: () {
                 if (_titleCtrl.text.trim().isEmpty) return;
+                final existing = widget.initialPromotion;
                 Navigator.of(context).pop(
-                  HealthPromotion(
-                    id: 'promo_${DateTime.now().microsecondsSinceEpoch}',
-                    title: _titleCtrl.text.trim(),
-                    subtitle: _subtitleCtrl.text.trim(),
-                    placement: _placement,
-                    imageUrl: _uploadedImageUrl,
-                    imageKey: _uploadedImageKey,
-                    linkUrl: _linkCtrl.text.trim(),
-                    isActive: true,
-                    createdAt: DateTime.now(),
-                  ),
+                  existing != null
+                      ? existing.copyWith(
+                          title: _titleCtrl.text.trim(),
+                          subtitle: _subtitleCtrl.text.trim(),
+                          placement: _placement,
+                          imageUrl: _uploadedImageUrl,
+                          imageKey: _uploadedImageKey,
+                          linkUrl: _linkCtrl.text.trim(),
+                        )
+                      : HealthPromotion(
+                          id: 'promo_${DateTime.now().microsecondsSinceEpoch}',
+                          title: _titleCtrl.text.trim(),
+                          subtitle: _subtitleCtrl.text.trim(),
+                          placement: _placement,
+                          imageUrl: _uploadedImageUrl,
+                          imageKey: _uploadedImageKey,
+                          linkUrl: _linkCtrl.text.trim(),
+                          isActive: true,
+                          createdAt: DateTime.now(),
+                        ),
                 );
               },
-              icon: const Icon(Icons.local_offer_rounded),
-              label: Text(l10n.adminNewPromotion),
+              icon: Icon(
+                isEditing ? Icons.save_rounded : Icons.local_offer_rounded,
+              ),
+              label: Text(
+                isEditing ? 'Değişiklikleri Kaydet' : l10n.adminNewPromotion,
+              ),
             ),
           ],
         ),

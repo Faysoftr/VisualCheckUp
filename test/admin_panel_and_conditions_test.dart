@@ -303,7 +303,7 @@ void main() {
       );
       expect(conditionHeader, findsOneWidget);
 
-      // 2. Announcements tab -> create new announcement
+      // 2. Announcements tab -> create new announcement & edit it
       await tester.ensureVisible(find.text('Duyurular'));
       await tester.tap(find.text('Duyurular'));
       await tester.pumpAndSettle();
@@ -321,7 +321,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Kış Sağlığı Duyurusu'), findsOneWidget);
 
-      // 3. Promotions tab -> create new banner ad
+      final allAnnouncements = await adminRepo.loadAnnouncements();
+      final createdAnnId = allAnnouncements.first.id;
+      final editAnnBtn =
+          find.byKey(Key('admin_edit_announcement_$createdAnnId'));
+      expect(editAnnBtn, findsOneWidget);
+      await tester.tap(editAnnBtn);
+      await tester.pumpAndSettle();
+      expect(find.text('Duyuruyu Düzenle'), findsOneWidget);
+      await tester.enterText(
+        find.byKey(const Key('admin_announcement_title_field')),
+        'Güncellenmiş Kış Duyurusu',
+      );
+      await tester.tap(find.byKey(const Key('admin_announcement_save_button')));
+      await tester.pumpAndSettle();
+      expect(find.text('Güncellenmiş Kış Duyurusu'), findsOneWidget);
+
+      // 3. Promotions tab -> create new banner ad & edit it
       await tester.ensureVisible(find.text('Reklamlar'));
       await tester.tap(find.text('Reklamlar'));
       await tester.pumpAndSettle();
@@ -338,6 +354,21 @@ void main() {
       await tester.tap(find.byKey(const Key('admin_promo_save_button')));
       await tester.pumpAndSettle();
       expect(find.text('Sağlık Kampanyası'), findsOneWidget);
+
+      final allPromos = await adminRepo.loadPromotions();
+      final createdPromoId = allPromos.first.id;
+      final editPromoBtn = find.byKey(Key('admin_edit_promo_$createdPromoId'));
+      expect(editPromoBtn, findsOneWidget);
+      await tester.tap(editPromoBtn);
+      await tester.pumpAndSettle();
+      expect(find.text('Reklamı / Kampanyayı Düzenle'), findsOneWidget);
+      await tester.enterText(
+        find.byKey(const Key('admin_promo_title_field')),
+        'Güncellenmiş Sağlık Kampanyası',
+      );
+      await tester.tap(find.byKey(const Key('admin_promo_save_button')));
+      await tester.pumpAndSettle();
+      expect(find.text('Güncellenmiş Sağlık Kampanyası'), findsOneWidget);
 
       // 4. Users tab -> verify & suspend a member
       final usersTab = find.textContaining('Kullanıcılar');
@@ -388,8 +419,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Kış Sağlığı Duyurusu'), findsOneWidget);
-      expect(find.text('Sağlık Kampanyası'), findsOneWidget);
+      expect(find.text('Güncellenmiş Kış Duyurusu'), findsOneWidget);
+      expect(find.text('Güncellenmiş Sağlık Kampanyası'), findsOneWidget);
     });
 
     testWidgets('HealthCommunityHubScreen saves chronic conditions and filters by Online Now & Same Condition', (tester) async {

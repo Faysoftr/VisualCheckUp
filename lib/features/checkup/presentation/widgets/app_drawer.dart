@@ -709,17 +709,9 @@ class AppDrawer extends StatelessWidget {
                       title: l10n.menuSectionSettings,
                       icon: Icons.settings_outlined,
                       accentColor: const Color(0xFF8B5CF6),
-                      badgeText: (isAdmin && onOpenAdminPanel != null) ? '6' : '5',
+                      badgeText: '5',
                       initiallyExpanded: false,
                       children: [
-                        if (isAdmin && onOpenAdminPanel != null)
-                          _DrawerTile(
-                            key: const Key('drawer_admin_panel_tile'),
-                            icon: Icons.admin_panel_settings_rounded,
-                            label: l10n.adminPanelTitle,
-                            accentColor: const Color(0xFFD97706),
-                            onTap: () => _closeAndRun(context, onOpenAdminPanel!),
-                          ),
                         if (onOpenSettings != null)
                           _DrawerTile(
                             icon: Icons.settings_outlined,
@@ -866,6 +858,22 @@ class AppDrawer extends StatelessWidget {
                           label: l10n.deleteAccount,
                           accentColor: colorScheme.error,
                           onTap: () => _confirmDeleteAccount(context),
+                        ),
+                      ],
+                      if (isAdmin && onOpenAdminPanel != null) ...[
+                        Divider(
+                          height: 8,
+                          thickness: 0.5,
+                          color: colorScheme.outlineVariant.withValues(
+                            alpha: isDark ? 0.35 : 0.6,
+                          ),
+                        ),
+                        _DrawerTile(
+                          key: const Key('drawer_admin_panel_tile'),
+                          icon: Icons.admin_panel_settings_rounded,
+                          label: l10n.adminPanelTitle,
+                          accentColor: const Color(0xFFD97706),
+                          onTap: () => _closeAndRun(context, onOpenAdminPanel!),
                         ),
                       ],
                     ],
