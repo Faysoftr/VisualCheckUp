@@ -75,15 +75,15 @@ void main() {
         expect(communityTile, findsOneWidget);
         expect(donateBtn, findsOneWidget);
 
-        // Verify exact vertical hierarchy: Profilim -> Sağlık Topluluğu -> Bağış -> Ana Ekran
+        // Verify exact vertical hierarchy: Ana Ekran -> Bağış Yap -> Profilim -> Sağlık Topluluğu
+        final homeY = tester.getTopLeft(homeIcon).dy;
+        final donateY = tester.getTopLeft(donateBtn).dy;
         final profileY = tester.getTopLeft(profileTile).dy;
         final communityY = tester.getTopLeft(communityTile).dy;
-        final donateY = tester.getTopLeft(donateBtn).dy;
-        final homeY = tester.getTopLeft(homeIcon).dy;
 
+        expect(homeY, lessThan(donateY));
+        expect(donateY, lessThan(profileY));
         expect(profileY, lessThan(communityY));
-        expect(communityY, lessThan(donateY));
-        expect(donateY, lessThan(homeY));
 
         // Tap Profilim -> opens dedicated MyHealthProfileScreen
         await tester.tap(profileTile);
@@ -133,33 +133,37 @@ void main() {
         expect(find.byKey(const Key('comm_my_profile_listeners_btn')), findsOneWidget);
         expect(find.byKey(const Key('comm_profile_name_field')), findsNothing);
 
-        // Tap mood chip -> updates mood live
-        final showcaseScrollable = find
-            .descendant(
-              of: find.byKey(const Key('comm_my_profile_showcase_list')),
-              matching: find.byType(Scrollable),
-            )
-            .first;
-        final energeticChip = find.byKey(const Key('comm_mood_chip_energetic'));
-        await tester.scrollUntilVisible(
-          energeticChip,
-          200,
-          scrollable: showcaseScrollable,
-        );
-        await tester.ensureVisible(energeticChip);
+        // Tap mood trigger -> opens bottom sheet modal, selects energetic mood
+        final moodTrigger = find.byKey(const Key('comm_mood_pill_trigger'));
+        expect(moodTrigger, findsOneWidget);
+        await tester.tap(moodTrigger);
         await tester.pumpAndSettle();
+
+        final energeticChip = find.byKey(const Key('comm_mood_chip_energetic'));
+        expect(energeticChip, findsOneWidget);
         await tester.tap(energeticChip);
         await tester.pumpAndSettle();
 
         final updated = await repo.loadMyProfile(_testUser.id);
         expect(updated?.mood, HealthMood.energetic);
 
-        // Tap Edit Profile -> switches cleanly into edit form
+        // Verify Motivasyon Müziği and Arkadaşlarım cards are present
+        expect(find.byKey(const Key('profile_motivation_music_card')), findsOneWidget);
+
+        final friendsCard = find.byKey(const Key('profile_friends_card'));
+        await tester.scrollUntilVisible(
+          friendsCard,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(friendsCard, findsOneWidget);
+
+        // Tap Edit Profile (now at the very bottom) -> switches cleanly into edit form
         final editBtn = find.byKey(const Key('comm_edit_profile_toggle_btn'));
         await tester.scrollUntilVisible(
           editBtn,
-          -200,
-          scrollable: showcaseScrollable,
+          300,
+          scrollable: find.byType(Scrollable).first,
         );
         await tester.ensureVisible(editBtn);
         await tester.pumpAndSettle();

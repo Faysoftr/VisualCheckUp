@@ -494,6 +494,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      final settingsAccordion = find.byKey(const Key('drawer_group_settings'));
+      if (settingsAccordion.evaluate().isNotEmpty) {
+        await tester.scrollUntilVisible(
+          settingsAccordion,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(settingsAccordion);
+        await tester.pumpAndSettle();
+      }
       final adminTile = find.byKey(const Key('drawer_admin_panel_tile'));
       await tester.scrollUntilVisible(
         adminTile,
@@ -709,7 +719,7 @@ void main() {
       AnnouncementNotificationService.instance.onNotifyForTest = null;
     });
 
-    testWidgets('AppDrawer places Admin Control Panel at the very bottom below Theme', (tester) async {
+    testWidgets('AppDrawer places Admin Control Panel at the very bottom outside Settings', (tester) async {
       final themeController = ThemeController();
 
       await tester.pumpWidget(
@@ -732,6 +742,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      final settingsGroup = find.byKey(const Key('drawer_group_settings'));
       final adminTile = find.byKey(const Key('drawer_admin_panel_tile'));
       await tester.scrollUntilVisible(
         adminTile,
@@ -740,13 +751,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final themeWidget = find.byType(SegmentedButton<ThemeMode>);
-      expect(themeWidget, findsOneWidget);
+      expect(settingsGroup, findsOneWidget);
       expect(adminTile, findsOneWidget);
-
-      final themeBottom = tester.getBottomLeft(themeWidget).dy;
-      final adminTop = tester.getTopLeft(adminTile).dy;
-      expect(adminTop, greaterThanOrEqualTo(themeBottom));
+      expect(
+        tester.getTopLeft(adminTile).dy,
+        greaterThanOrEqualTo(tester.getBottomLeft(settingsGroup).dy),
+      );
     });
 
     testWidgets('AdminPanelScreen saves chosen confetti icon and dispatches notification', (tester) async {

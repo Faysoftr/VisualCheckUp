@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/subscription/domain/subscription_models.dart';
 
@@ -137,4 +138,67 @@ class SubscriptionRepository {
     return countReportsInCurrentMonth(existingReports) <
         UserSubscriptionState.freeMonthlyLabReportLimit;
   }
+
+  /// Daily limit for plate calorie scans based on subscription and admin status.
+  int dailyPlateCalorieLimit({
+    required UserSubscriptionState subscription,
+    bool isAdmin = false,
+  }) {
+    if (isAdmin) return 999999;
+    return subscription.isProAt(_clock())
+        ? UserSubscriptionState.proDailyPlateCalorieLimit
+        : UserSubscriptionState.freeDailyPlateCalorieLimit;
+  }
+
+  /// Counts plate calorie scans performed today.
+  int countPlateCalorieScansToday(List<CalorieScanEntry> scans) {
+    final now = _clock();
+    return scans.where((s) {
+      return s.createdAt.year == now.year &&
+          s.createdAt.month == now.month &&
+          s.createdAt.day == now.day;
+    }).length;
+  }
+
+  /// Remaining plate calorie scans today (`-1` means unlimited for admin).
+  int remainingPlateCalorieScansToday({
+    required List<CalorieScanEntry> scans,
+    required UserSubscriptionState subscription,
+    bool isAdmin = false,
+  }) {
+    if (isAdmin) return -1;
+    final max = dailyPlateCalorieLimit(
+      subscription: subscription,
+      isAdmin: false,
+    );
+    final used = countPlateCalorieScansToday(scans);
+    final rem = max - used;
+    return rem < 0 ? 0 : rem;
+  }
+
+  /// Whether user can perform a plate calorie scan right now.
+  bool canScanPlateCalorie({
+    required List<CalorieScanEntry> scans,
+    required UserSubscriptionState subscription,
+    bool isAdmin = false,
+  }) {
+    if (isAdmin) return true;
+    final max = dailyPlateCalorieLimit(
+      subscription: subscription,
+      isAdmin: false,
+    );
+    return countPlateCalorieScansToday(scans) < max;
+  }
+
+  /// Daily message limit based on subscription and admin status (Social Formul Bank style).
+  int dailyDirectMessageLimit({
+    required UserSubscriptionState subscription,
+    bool isAdmin = false,
+  }) {
+    if (isAdmin) return 999999;
+    return subscription.isProAt(_clock())
+        ? UserSubscriptionState.proDailyMessageLimit
+        : UserSubscriptionState.freeDailyMessageLimit;
+  }
 }
+

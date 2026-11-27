@@ -4,6 +4,7 @@ import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/health_drawer_background.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/data/announcement_notification_service.dart';
@@ -156,15 +157,24 @@ class _HomeScreenState extends State<HomeScreen> {
     _bootstrap();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(const AssetImage(HealthDrawerBackground.lightAssetPath), context);
+    precacheImage(const AssetImage(HealthDrawerBackground.darkAssetPath), context);
+  }
+
   Future<void> _bootstrap() async {
     await _loadDashboardData();
     final accepted = await widget.historyRepository.isDisclaimerAccepted();
     if (!accepted && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
-        final ok = await DisclaimerDialog.show(context);
+        final ok = await DisclaimerDialog.show(context, initiallyAgreed: false);
         if (ok) {
           await widget.historyRepository.setDisclaimerAccepted();
+        } else {
+          widget.onSignOut();
         }
       });
     }
@@ -586,6 +596,30 @@ class _HomeScreenState extends State<HomeScreen> {
     return l10n.userGreeting(firstName);
   }
 
+  int _calculateStreak() {
+    if (_allHistory.isEmpty) return 1;
+    final dates = _allHistory
+        .map((h) => DateTime(h.createdAt.year, h.createdAt.month, h.createdAt.day))
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (!dates.contains(today) && !dates.contains(yesterday)) {
+      return 1;
+    }
+
+    int streak = 0;
+    DateTime checkDate = dates.contains(today) ? today : yesterday;
+    while (dates.contains(checkDate)) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    }
+    return streak.clamp(1, 365);
+  }
+
   FollowUpTrackStatus? _nextHighlightedTrack() {
     final active = FollowUpEvaluator.evaluate(
       enabledTracks: _enabledTracks,
@@ -598,6 +632,7 @@ class _HomeScreenState extends State<HomeScreen> {
     for (final status in active) {
       if (status.isDueNow) return status;
     }
+    active.sort((a, b) => a.daysRemaining.compareTo(b.daysRemaining));
     return active.first;
   }
 
@@ -649,7 +684,8 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           historyRepository: widget.historyRepository,
         ),
-        onOpenDisclaimer: () => DisclaimerDialog.show(context),
+        onOpenDisclaimer: () =>
+            DisclaimerDialog.show(context, initiallyAgreed: true),
         onSignOut: widget.onSignOut,
         onDeleteAccount: widget.onDeleteAccount,
       ),
@@ -868,6 +904,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         checksLabel: l10n.menuHistory,
                         labsLabel: l10n.menuLabReports,
                         vitalsLabel: l10n.menuVitalsTracker,
+                        streakDays: _calculateStreak(),
                         onTapChecks: _openHistory,
                         onTapLabs: _openLabReports,
                         onTapVitals: () => _openVitalsTracker(),
@@ -950,6 +987,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 5a. Birthday & Glowing Daily Health Tip + Announcements Card
                       BirthdayCelebrationCard(
                         displayName: widget.currentUser.displayName,
+                      ),
+                      CommunityBirthdayShowcaseCard(
+                        profiles: _communityMembers,
+                        onOpenProfile: _openMemberProfile,
                       ),
                       SfbDailyHealthTipCard(
                         announcements: _activeAnnouncements,
@@ -1305,6 +1346,7 @@ class _HeroWellnessCard extends StatelessWidget {
     required this.onTapChecks,
     required this.onTapLabs,
     required this.onTapVitals,
+    this.streakDays = 1,
   });
 
   final String greeting;
@@ -1319,6 +1361,7 @@ class _HeroWellnessCard extends StatelessWidget {
   final VoidCallback onTapChecks;
   final VoidCallback onTapLabs;
   final VoidCallback onTapVitals;
+  final int streakDays;
 
   @override
   Widget build(BuildContext context) {
@@ -1396,6 +1439,37 @@ class _HeroWellnessCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
+                      if (streakDays > 0) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEA580C).withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('🔥', style: TextStyle(fontSize: 11)),
+                              const SizedBox(width: 3),
+                              Text(
+                                '$streakDays Gün',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                      ],
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,

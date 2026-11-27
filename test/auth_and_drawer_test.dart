@@ -125,6 +125,12 @@ void main() {
       expect(find.byKey(const ValueKey<String>('drawer_bg_light')), findsOneWidget);
       expect(find.text('Zeynep Kaya'), findsOneWidget);
       expect(find.text('Apple Hesabı'), findsOneWidget);
+
+      // Expand Visual Checks group (starts closed by default)
+      final visualAccordion = find.byKey(const Key('drawer_group_visual'));
+      await tester.tap(visualAccordion);
+      await tester.pumpAndSettle();
+
       expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
       expect(find.text('Dil'), findsAtLeastNWidgets(1));
       expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
@@ -133,29 +139,68 @@ void main() {
       final drawerScrollable = find.descendant(
         of: find.byType(Drawer),
         matching: find.byType(Scrollable),
-      );
-      await tester.scrollUntilVisible(
-        find.text('Tahlil & Hastane Raporları'),
-        150,
-        scrollable: drawerScrollable,
-      );
-      expect(find.text('Tansiyon & Şeker Takibi'), findsOneWidget);
-      expect(find.text('Tahlil & Hastane Raporları'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Görsel Referans Rehberi'),
-        150,
-        scrollable: drawerScrollable,
-      );
-      expect(find.text('Görsel Referans Rehberi'), findsOneWidget);
+      ).first;
 
+      // Expand Tracking accordion group
+      final trackingAccordion = find.byKey(const Key('drawer_group_tracking'));
       await tester.scrollUntilVisible(
-        find.text('Koyu'),
+        trackingAccordion,
         150,
         scrollable: drawerScrollable,
       );
-      await tester.ensureVisible(find.text('Koyu'));
+      await tester.tap(trackingAccordion);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Koyu'));
+
+      final labReportsFinder = find.descendant(
+        of: find.byType(Drawer),
+        matching: find.text('Tahlil & Hastane Raporları'),
+      );
+      await tester.scrollUntilVisible(
+        labReportsFinder,
+        150,
+        scrollable: drawerScrollable,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text('Tansiyon & Şeker Takibi'),
+        ),
+        findsOneWidget,
+      );
+      expect(labReportsFinder, findsOneWidget);
+      final visualRefFinder = find.descendant(
+        of: find.byType(Drawer),
+        matching: find.text('Görsel Referans Rehberi'),
+      );
+      await tester.scrollUntilVisible(
+        visualRefFinder,
+        150,
+        scrollable: drawerScrollable,
+      );
+      expect(visualRefFinder, findsOneWidget);
+
+      // Expand Settings accordion group
+      final settingsAccordion = find.byKey(const Key('drawer_group_settings'));
+      await tester.scrollUntilVisible(
+        settingsAccordion,
+        150,
+        scrollable: drawerScrollable,
+      );
+      await tester.tap(settingsAccordion);
+      await tester.pumpAndSettle();
+
+      final darkThemeFinder = find.descendant(
+        of: find.byType(Drawer),
+        matching: find.text('Koyu'),
+      );
+      await tester.scrollUntilVisible(
+        darkThemeFinder,
+        150,
+        scrollable: drawerScrollable,
+      );
+      await tester.ensureVisible(darkThemeFinder);
+      await tester.pumpAndSettle();
+      await tester.tap(darkThemeFinder);
       await tester.pumpAndSettle();
       expect(themeController.value, ThemeMode.dark);
       expect(find.byKey(const ValueKey<String>('drawer_bg_dark')), findsOneWidget);

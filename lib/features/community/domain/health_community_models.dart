@@ -503,6 +503,9 @@ class HealthCommunityProfile {
     this.isVerified = false,
     this.isSuspended = false,
     this.suspensionReason = '',
+    this.hasAppealed = false,
+    this.appealText,
+    this.appealTimestamp,
     this.mood,
     this.streakDays = 1,
     this.birthMonth,
@@ -548,6 +551,9 @@ class HealthCommunityProfile {
   final bool isVerified;
   final bool isSuspended;
   final String suspensionReason;
+  final bool hasAppealed;
+  final String? appealText;
+  final DateTime? appealTimestamp;
   final HealthMood? mood;
   final int streakDays;
   final int? birthMonth;
@@ -610,6 +616,14 @@ class HealthCommunityProfile {
   }
 
   bool get isVisibleOnline => isVisibleOnlineAt(DateTime.now());
+
+  /// Returns true if this member's birthday matches today's month and day.
+  bool isBirthdayTodayAt(DateTime now) {
+    if (birthMonth == null || birthDay == null) return false;
+    return birthMonth == now.month && birthDay == now.day;
+  }
+
+  bool get isBirthdayToday => isBirthdayTodayAt(DateTime.now());
 
   /// Returns true if this profile shares at least one chronic condition
   /// (selected enum or normalized custom entry) with [other].
@@ -725,6 +739,9 @@ class HealthCommunityProfile {
     bool? isVerified,
     bool? isSuspended,
     String? suspensionReason,
+    bool? hasAppealed,
+    String? appealText,
+    DateTime? appealTimestamp,
     HealthMood? mood,
     bool clearMood = false,
     int? streakDays,
@@ -775,6 +792,9 @@ class HealthCommunityProfile {
       isVerified: isVerified ?? this.isVerified,
       isSuspended: isSuspended ?? this.isSuspended,
       suspensionReason: suspensionReason ?? this.suspensionReason,
+      hasAppealed: hasAppealed ?? this.hasAppealed,
+      appealText: appealText ?? this.appealText,
+      appealTimestamp: appealTimestamp ?? this.appealTimestamp,
       mood: clearMood ? null : (mood ?? this.mood),
       streakDays: streakDays ?? this.streakDays,
       birthMonth: birthMonth ?? this.birthMonth,
@@ -830,6 +850,11 @@ class HealthCommunityProfile {
       'isSuspended': isSuspended,
       if (suspensionReason.trim().isNotEmpty)
         'suspensionReason': suspensionReason.trim(),
+      'hasAppealed': hasAppealed,
+      if (appealText != null && appealText!.trim().isNotEmpty)
+        'appealText': appealText!.trim(),
+      if (appealTimestamp != null)
+        'appealTimestamp': appealTimestamp!.toIso8601String(),
       if (mood != null) 'mood': mood!.id,
       'streakDays': streakDays,
       if (birthMonth != null) 'birthMonth': birthMonth,
@@ -919,6 +944,9 @@ class HealthCommunityProfile {
       isVerified: (json['isVerified'] as bool?) ?? false,
       isSuspended: (json['isSuspended'] as bool?) ?? false,
       suspensionReason: (json['suspensionReason'] as String?) ?? '',
+      hasAppealed: (json['hasAppealed'] as bool?) ?? false,
+      appealText: json['appealText'] as String?,
+      appealTimestamp: DateTime.tryParse((json['appealTimestamp'] as String?) ?? ''),
       mood: HealthMoodX.fromId(json['mood'] as String?),
       streakDays: (json['streakDays'] as num?)?.toInt() ?? 1,
       birthMonth: (json['birthMonth'] as num?)?.toInt(),

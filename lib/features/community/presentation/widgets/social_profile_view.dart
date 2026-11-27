@@ -245,7 +245,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     }
   }
 
-  Future<void> _updateQuickMood(HealthMood mood) async {
+  Future<void> _updateQuickMood(HealthMood? mood) async {
     final nextMood = _myProfile?.mood == mood ? null : mood;
     final updated = await widget.repository.updateMood(_myUid, nextMood);
     if (!mounted || updated == null) return;
@@ -254,6 +254,87 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       _selectedMood = updated.mood;
     });
     widget.onProfileChanged?.call();
+  }
+
+  void _showMoodSelectionModal() {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Nasıl Hissediyorsun?',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: AppTheme.primaryTeal,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ActionChip(
+                          key: const Key('comm_mood_chip_clear'),
+                          label: Text(
+                            'Temizle',
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                          ),
+                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
+                          onPressed: () {
+                            _updateQuickMood(null);
+                            Navigator.pop(ctx);
+                          },
+                        ),
+                        for (final mood in HealthMood.values)
+                          ActionChip(
+                            key: Key('comm_mood_chip_${mood.name}'),
+                            label: Text(
+                              '${mood.emoji} ${mood.localizedLabel(l10n)}',
+                              style: TextStyle(
+                                color: mood.accentColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            backgroundColor:
+                                mood.accentColor.withValues(alpha: 0.12),
+                            side: BorderSide(
+                              color: mood.accentColor.withValues(alpha: 0.35),
+                            ),
+                            onPressed: () {
+                              _updateQuickMood(mood);
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _saveMyProfile() async {
@@ -780,9 +861,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       email: widget.currentUser.email,
       uid: widget.currentUser.id,
     );
-    final acceptedFriendsCount = _friendships
+    final acceptedFriends = _friendships
         .where((f) => f.status == FriendshipStatus.accepted)
-        .length;
+        .toList();
+    final acceptedFriendsCount = acceptedFriends.length;
     final pendingIncomingCount = _friendships
         .where(
           (f) =>
@@ -921,64 +1003,128 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        if (isAdmin) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.verified_user_rounded,
-                                  size: 13,
-                                  color: Colors.black87,
+                        // 2. Row: Role/Admin Badge + Mood (Ruh Hali) - Exactly like Social Formul Bank
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            if (isAdmin)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2.5,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  l10n.sfbAdminBadge,
-                                  style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.verified_user_rounded,
+                                      size: 12.5,
+                                      color: Colors.black87,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      l10n.sfbAdminBadge,
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (profile.mood != null)
+                              GestureDetector(
+                                key: const Key('comm_mood_pill_trigger'),
+                                onTap: _showMoodSelectionModal,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: profile.mood!.accentColor
+                                        .withValues(alpha: 0.10),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: profile.mood!.accentColor
+                                          .withValues(alpha: 0.32),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        profile.mood!.emoji,
+                                        style: const TextStyle(fontSize: 12.5),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          '${profile.mood!.localizedLabel(l10n)} hissediyor',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: colorScheme.onSurface
+                                                .withValues(alpha: 0.85),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                        ],
-                        if (profile.mood != null) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: profile.mood!.accentColor
-                                    .withValues(alpha: 0.35),
+                              )
+                            else
+                              GestureDetector(
+                                key: const Key('comm_mood_pill_trigger'),
+                                onTap: _showMoodSelectionModal,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryTeal
+                                        .withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: AppTheme.primaryTeal
+                                          .withValues(alpha: 0.28),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.add_reaction_outlined,
+                                        size: 13,
+                                        color: AppTheme.primaryTeal,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Mod Seç',
+                                        style: TextStyle(
+                                          color: AppTheme.primaryTeal,
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              '${profile.mood!.emoji} ${profile.mood!.localizedLabel(l10n)}',
-                              style: TextStyle(
-                                color: profile.mood!.accentColor,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11.5,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         // Compact Stat Pills (Likes, Friends, Listeners)
                         Wrap(
                           spacing: 6,
@@ -1113,16 +1259,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                   ),
                 ),
               ],
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.tonalIcon(
-                  key: const Key('comm_edit_profile_toggle_btn'),
-                  onPressed: () => setState(() => _editingProfile = true),
-                  icon: const Icon(Icons.edit_rounded, size: 17),
-                  label: Text(l10n.commEditProfile),
-                ),
-              ),
             ],
           ),
         ),
@@ -1229,44 +1365,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           const SizedBox(height: 12),
         ],
 
-        // 4. Today's Mood 1-Tap Selector
-        Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.commMoodSectionTitle,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final mood in HealthMood.values)
-                      ChoiceChip(
-                        key: Key('comm_mood_chip_${mood.name}'),
-                        label: Text(
-                          '${mood.emoji} ${mood.localizedLabel(l10n)}',
-                        ),
-                        selected: profile.mood == mood,
-                        selectedColor: mood.accentColor.withValues(alpha: 0.2),
-                        onSelected: (_) => _updateQuickMood(mood),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
+
 
         // 5. Chronic Conditions & Health Goals Showcase
         if (profile.hasAnyChronicCondition || profile.healthGoals.isNotEmpty)
@@ -1341,50 +1440,19 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           ),
         const SizedBox(height: 12),
 
-        // 6. Concentration Music Now-Playing Card
-        if (profile.hasMusic) ...[
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 6,
-              ),
-              leading: CircleAvatar(
-                backgroundColor: MusicLinkHelper.detectPlatformColor(
-                  profile.currentMusicUrl,
-                ).withValues(alpha: 0.14),
-                child: Icon(
-                  Icons.music_note_rounded,
-                  color: MusicLinkHelper.detectPlatformColor(
-                    profile.currentMusicUrl,
-                  ),
-                ),
-              ),
-              title: Text(
-                profile.currentMusicTitle.trim().isNotEmpty
-                    ? profile.currentMusicTitle.trim()
-                    : l10n.commMusicSectionTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-              subtitle: Text(
-                '${MusicLinkHelper.detectPlatformName(profile.currentMusicUrl)} • ❤️ ${profile.musicLikesCount}',
-              ),
-              trailing: FilledButton.tonalIcon(
-                onPressed: () => _launchExternalUrl(profile.currentMusicUrl),
-                icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                label: Text(l10n.commMusicListenAction),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
+        // 3. Motivasyon Müziği Card (Social Formul Bank Style!)
+        _buildMotivationMusicCard(context, profile),
+        const SizedBox(height: 12),
 
-        // 7. Social Media Links Card
+        // 4. Arkadaşlarım Dedicated Card (Social Formul Bank Style!)
+        _buildFriendsCard(
+          context: context,
+          acceptedFriends: acceptedFriends,
+          pendingIncomingCount: pendingIncomingCount,
+        ),
+        const SizedBox(height: 12),
+
+        // 5. Social Media Links Card
         if (profile.allSocialHandles.isNotEmpty) ...[
           Card(
             shape: RoundedRectangleBorder(
@@ -1441,7 +1509,34 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
         BirthdayCelebrationCard(displayName: profile.displayName),
         const DailyHealthTipCard(),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
+
+        // 6. EN ALTTA: Profili Düzenle Butonu (Social Formul Bank Stili)
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: FilledButton.icon(
+            key: const Key('comm_edit_profile_toggle_btn'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryTeal,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            onPressed: () => setState(() => _editingProfile = true),
+            icon: const Icon(Icons.edit_note_rounded, size: 20),
+            label: Text(
+              l10n.commEditProfile,
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
         TextButton.icon(
           key: const Key('comm_leave_community_button'),
           style: TextButton.styleFrom(foregroundColor: colorScheme.error),
@@ -1450,6 +1545,677 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           label: Text(l10n.commLeaveCommunity),
         ),
       ],
+    );
+  }
+
+  Widget _buildMotivationMusicCard(
+    BuildContext context,
+    HealthCommunityProfile profile,
+  ) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    const neonPink = Color(0xFFFF007F);
+    final musicAccent = profile.hasMusic
+        ? MusicLinkHelper.detectPlatformColor(profile.currentMusicUrl)
+        : neonPink;
+    final platformName = profile.hasMusic
+        ? MusicLinkHelper.detectPlatformName(profile.currentMusicUrl)
+        : '';
+    final totalPlays = _myMusicListeners.fold<int>(
+      0,
+      (sum, r) => sum + r.listenCount,
+    );
+
+    return Card(
+      key: const Key('profile_motivation_music_card'),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row: Music Note + Motivasyon Müziği Title + Kimler Dinledi Button
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: musicAccent.withValues(alpha: isDark ? 0.22 : 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.music_note_rounded,
+                    size: 19,
+                    color: musicAccent,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Motivasyon Müziği',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      if (profile.hasMusic)
+                        Text(
+                          platformName,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: musicAccent,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  key: const Key('comm_my_profile_music_listeners_btn'),
+                  onPressed: _openListenersSheet,
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 4,
+                    ),
+                    backgroundColor: musicAccent.withValues(alpha: 0.12),
+                    foregroundColor: musicAccent,
+                  ),
+                  icon: const Icon(Icons.headphones_rounded, size: 14),
+                  label: Text(
+                    'Kimler Dinledi? (${_myMusicListeners.length})',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            if (!profile.hasMusic)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Henüz bir motivasyon müziği veya çalma listesi eklemedin.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton.tonalIcon(
+                      onPressed: () => setState(() => _editingProfile = true),
+                      icon: const Icon(Icons.queue_music_rounded, size: 16),
+                      label: const Text('Müzik Ekle 🎵'),
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              // Active Music Player Box (SFB Style)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      musicAccent.withValues(alpha: isDark ? 0.20 : 0.08),
+                      musicAccent.withValues(alpha: isDark ? 0.08 : 0.03),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: musicAccent.withValues(alpha: isDark ? 0.35 : 0.25),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () {
+                        widget.repository.recordMusicListen(
+                          targetUid: profile.uid,
+                          listenerUid: _myUid,
+                          listenerName: widget.currentUser.displayName,
+                          listenerNickname: profile.nickname,
+                          listenerPhotoUrl: _photoUrl,
+                          musicUrl: profile.currentMusicUrl,
+                        );
+                        _launchExternalUrl(profile.currentMusicUrl);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: musicAccent,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: musicAccent.withValues(alpha: 0.35),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profile.currentMusicTitle.trim().isNotEmpty
+                                ? profile.currentMusicTitle.trim()
+                                : platformName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 13.5,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            profile.currentMusicUrl.trim(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.tonal(
+                      onPressed: () {
+                        widget.repository.recordMusicListen(
+                          targetUid: profile.uid,
+                          listenerUid: _myUid,
+                          listenerName: widget.currentUser.displayName,
+                          listenerNickname: profile.nickname,
+                          listenerPhotoUrl: _photoUrl,
+                          musicUrl: profile.currentMusicUrl,
+                        );
+                        _launchExternalUrl(profile.currentMusicUrl);
+                      },
+                      style: FilledButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: musicAccent.withValues(alpha: 0.16),
+                        foregroundColor: musicAccent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.commMusicListenAction,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.open_in_new_rounded, size: 14),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Interactive Social Formula Bank Stat Row
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: _openListenersSheet,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: neonPink.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: neonPink.withValues(alpha: 0.30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.people_alt_rounded,
+                            size: 13,
+                            color: neonPink,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            '${_myMusicListeners.length} Kişi Dinledi',
+                            style: const TextStyle(
+                              color: neonPink,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: _openListenersSheet,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: musicAccent.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: musicAccent.withValues(alpha: 0.30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.play_circle_outline_rounded,
+                            size: 14,
+                            color: musicAccent,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            '$totalPlays Kez Dinlendi',
+                            style: TextStyle(
+                              color: musicAccent,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFE11D48).withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.favorite_rounded,
+                          size: 13,
+                          color: Color(0xFFE11D48),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          '${profile.musicLikesCount} Beğeni',
+                          style: const TextStyle(
+                            color: Color(0xFFE11D48),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFriendsCard({
+    required BuildContext context,
+    required List<FriendshipRecord> acceptedFriends,
+    required int pendingIncomingCount,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Card(
+      key: const Key('profile_friends_card'),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row: Icon + Title + Count Badge + Manage Button
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06B6D4)
+                        .withValues(alpha: isDark ? 0.22 : 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.people_alt_rounded,
+                    size: 18,
+                    color: Color(0xFF06B6D4),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text(
+                        'Arkadaşlarım',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF06B6D4)
+                              .withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFF06B6D4)
+                                .withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Text(
+                          '${acceptedFriends.length}',
+                          style: const TextStyle(
+                            color: Color(0xFF0891B2),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  key: const Key('profile_friends_manage_btn'),
+                  onPressed: _openFriendsSheet,
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                  ),
+                  icon: const Icon(Icons.people_outline_rounded, size: 15),
+                  label: const Text(
+                    'Yönet',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Pending request alert notification banner
+            if (pendingIncomingCount > 0) ...[
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: _openFriendsSheet,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59E0B)
+                        .withValues(alpha: isDark ? 0.20 : 0.10),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.mark_email_unread_rounded,
+                        size: 16,
+                        color: Color(0xFFD97706),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '$pendingIncomingCount yeni arkadaşlık isteği bekliyor!',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFFD97706),
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color: Color(0xFFD97706),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 14),
+
+            // Friends Avatars / List
+            if (acceptedFriends.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.person_add_alt_1_outlined,
+                      size: 28,
+                      color: colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.7),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Henüz hiç sağlık arkadaşın yok.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Sağlık Topluluğu\'ndan üyeleri keşfedip arkadaş olabilirsin.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.75),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              SizedBox(
+                height: 94,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: acceptedFriends.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (context, idx) {
+                    final friend = acceptedFriends[idx];
+                    final friendName = friend.peerNameFor(_myUid);
+                    final friendUid = friend.peerIdFor(_myUid);
+                    final initial = friendName.isNotEmpty
+                        ? friendName[0].toUpperCase()
+                        : '?';
+
+                    return FutureBuilder<HealthCommunityProfile?>(
+                      future: widget.repository.getProfile(friendUid),
+                      builder: (ctx, snapshot) {
+                        final peerProfile = snapshot.data;
+                        final photoUrl = peerProfile?.photoUrl;
+                        final displayName =
+                            peerProfile?.displayName ?? friendName;
+                        final isOnline = peerProfile?.isVisibleOnline ?? false;
+
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            if (peerProfile != null) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => HealthProfileDetailScreen(
+                                    profile: peerProfile,
+                                    myUid: _myUid,
+                                    myDisplayName:
+                                        widget.currentUser.displayName,
+                                    myPhotoUrl: _photoUrl,
+                                    repository: widget.repository,
+                                    uploadService: _uploadService,
+                                    photoPicker: widget.photoPicker,
+                                    urlLauncher: widget.urlLauncher,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _openFriendsSheet();
+                            }
+                          },
+                          child: Container(
+                            width: 68,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    CommunityAvatar(
+                                      initials: initial,
+                                      photoUrl: photoUrl,
+                                      radius: 24,
+                                    ),
+                                    if (isOnline)
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF10B981),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: theme.cardColor,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  displayName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 

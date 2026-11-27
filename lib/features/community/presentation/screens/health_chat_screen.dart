@@ -8,6 +8,9 @@ import 'package:visualcheckup/features/community/data/community_image_upload_ser
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/core/notifications/health_notification_service.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
+import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 
 typedef CommunityPhotoPicker = Future<Uint8List?> Function(ImageSource source);
 
@@ -22,8 +25,10 @@ class HealthChatScreen extends StatefulWidget {
     required this.myUid,
     required this.myDisplayName,
     this.myPhotoUrl,
+    this.myEmail,
     required this.peer,
     required this.repository,
+    this.subscriptionRepository,
     this.uploadService,
     this.photoPicker,
   });
@@ -31,8 +36,10 @@ class HealthChatScreen extends StatefulWidget {
   final String myUid;
   final String myDisplayName;
   final String? myPhotoUrl;
+  final String? myEmail;
   final HealthCommunityProfile peer;
   final HealthCommunityRepository repository;
+  final SubscriptionRepository? subscriptionRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
 
@@ -58,6 +65,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
   @override
   void initState() {
     super.initState();
+    HealthNotificationService.instance.currentlyActiveChatId = _chatId;
     _uploadService =
         widget.uploadService ?? R2CommunityImageUploadService.instance;
     _loadChat();
@@ -65,6 +73,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
 
   @override
   void dispose() {
+    HealthNotificationService.instance.currentlyActiveChatId = null;
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -114,6 +123,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
       senderUid: widget.myUid,
       senderDisplayName: widget.myDisplayName,
       senderPhotoUrl: widget.myPhotoUrl,
+      senderEmail: widget.myEmail,
       receiver: widget.peer,
       text: text,
       imageUrl: imageUrl,
@@ -143,7 +153,7 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
         _toast(l10n.commBlockedNotice);
         break;
       case SendMessageStatus.dailyLimitExceeded:
-        _toast(l10n.commRateLimited);
+        await _showDailyMessageLimitSheet();
         break;
       case SendMessageStatus.unsafeContent:
         _toast(l10n.safetyContentBlocked);
@@ -152,6 +162,102 @@ class _HealthChatScreenState extends State<HealthChatScreen> {
       case SendMessageStatus.error:
         break;
     }
+  }
+
+  Future<void> _showDailyMessageLimitSheet() async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final subRepo = widget.subscriptionRepository ??
+        widget.repository.subscriptionRepository ??
+        SubscriptionRepository();
+    final sub = await subRepo.loadSubscription(uid: widget.myUid);
+
+    if (!mounted) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetCtx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  size: 32,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Günlük Mesaj Limiti Doldu 💬',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                sub.isPro
+                    ? 'Pro üyelikte günlük 500 mesaj kotanızı doldurdunuz. Mesaj hakkınız her gece yarısı sıfırlanır.'
+                    : 'Ücretsiz üyelikte günde en fazla 10 mesaj gönderebilirsiniz. Bugünkü mesaj kotanız doldu.\n\nVisualCheckUp Pro ile günde 500 mesaja kadar mesajlaşabilir, günde 20 tabak kalori analizi yapabilir ve reklamsız topluluk deneyiminin tadını çıkarabilirsiniz.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (!sub.isPro) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton.icon(
+                    key: const Key('comm_chat_upgrade_pro_button'),
+                    onPressed: () {
+                      Navigator.of(sheetCtx).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute<bool>(
+                          builder: (_) => ProPaywallScreen(
+                            repository: subRepo,
+                            userId: widget.myUid,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.workspace_premium_rounded),
+                    label: const Text(
+                      'Pro\'ya Yükselt (Günde 500 Mesaj)',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(sheetCtx).pop(),
+                  child: const Text('Anladım'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _pickAndSendImage(ImageSource source) async {

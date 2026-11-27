@@ -179,6 +179,11 @@ class DoctorProfile {
     this.planTier = DoctorPlanTier.standardMonthly,
     this.status = DoctorApplicationStatus.pending,
     this.isSampleDoctor = false,
+    this.aiVerificationStatus = 'unverified',
+    this.aiConfidence = 0.0,
+    this.aiNotes = '',
+    this.purchasedPackage,
+    this.isPaid = false,
     required this.createdAt,
   });
 
@@ -202,6 +207,11 @@ class DoctorProfile {
   final DoctorPlanTier planTier;
   final DoctorApplicationStatus status;
   final bool isSampleDoctor;
+  final String aiVerificationStatus;
+  final double aiConfidence;
+  final String aiNotes;
+  final String? purchasedPackage;
+  final bool isPaid;
   final DateTime createdAt;
 
   String get displayTitleName =>
@@ -241,6 +251,11 @@ class DoctorProfile {
     bool? isVerified,
     DoctorPlanTier? planTier,
     DoctorApplicationStatus? status,
+    String? aiVerificationStatus,
+    double? aiConfidence,
+    String? aiNotes,
+    String? purchasedPackage,
+    bool? isPaid,
   }) {
     return DoctorProfile(
       uid: uid,
@@ -264,6 +279,12 @@ class DoctorProfile {
       planTier: planTier ?? this.planTier,
       status: status ?? this.status,
       isSampleDoctor: isSampleDoctor,
+      aiVerificationStatus:
+          aiVerificationStatus ?? this.aiVerificationStatus,
+      aiConfidence: aiConfidence ?? this.aiConfidence,
+      aiNotes: aiNotes ?? this.aiNotes,
+      purchasedPackage: purchasedPackage ?? this.purchasedPackage,
+      isPaid: isPaid ?? this.isPaid,
       createdAt: createdAt,
     );
   }
@@ -290,6 +311,11 @@ class DoctorProfile {
         'isVerified': isVerified,
         'planTier': planTier.name,
         'status': status.name,
+        'aiVerificationStatus': aiVerificationStatus,
+        'aiConfidence': aiConfidence,
+        'aiNotes': aiNotes,
+        if (purchasedPackage != null) 'purchasedPackage': purchasedPackage,
+        'isPaid': isPaid,
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -322,6 +348,12 @@ class DoctorProfile {
       planTier: DoctorPlanTierX.fromId(json['planTier'] as String?),
       status: DoctorApplicationStatusX.fromId(json['status'] as String?),
       isSampleDoctor: (json['isSampleDoctor'] as bool?) ?? false,
+      aiVerificationStatus:
+          (json['aiVerificationStatus'] as String?) ?? 'unverified',
+      aiConfidence: (json['aiConfidence'] as num?)?.toDouble() ?? 0.0,
+      aiNotes: (json['aiNotes'] as String?) ?? '',
+      purchasedPackage: json['purchasedPackage'] as String?,
+      isPaid: (json['isPaid'] as bool?) ?? false,
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
           DateTime.now(),
     );

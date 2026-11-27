@@ -786,7 +786,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ),
                   title: Text(l10n.menuDisclaimer),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => DisclaimerDialog.show(context),
+                  onTap: () => DisclaimerDialog.show(context, initiallyAgreed: true),
                 ),
               ],
             ),

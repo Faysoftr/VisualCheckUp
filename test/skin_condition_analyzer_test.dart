@@ -303,6 +303,12 @@ void main() {
     testWidgets('Drawer Cilt category launches SkinCheckScreen directly into Morluk Takibi', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
       tester.platformDispatcher.localesTestValue = const [Locale('tr')];
       addTearDown(tester.platformDispatcher.clearLocalesTestValue);
       SharedPreferences.setMockInitialValues({
@@ -320,35 +326,51 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Open left drawer and expand Cilt (Ben, Siğil, Morluk, Leke)
+      // Open left drawer and expand Visual Checks accordion, then Cilt (Ben, Siğil, Morluk, Leke)
       final scaffoldState = tester.firstState<ScaffoldState>(find.byType(Scaffold));
       scaffoldState.openDrawer();
+      await tester.pumpAndSettle();
+
+      final drawerScrollable = find.descendant(
+        of: find.byType(Drawer),
+        matching: find.byType(Scrollable),
+      ).first;
+
+      final visualAccordion = find.byKey(const Key('drawer_group_visual'));
+      await tester.scrollUntilVisible(
+        visualAccordion,
+        150,
+        scrollable: drawerScrollable,
+      );
+      await tester.ensureVisible(visualAccordion);
+      await tester.pumpAndSettle();
+      await tester.tap(visualAccordion);
       await tester.pumpAndSettle();
 
       expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
       expect(find.text('Dil'), findsAtLeastNWidgets(1));
       expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
 
+      final ciltTile = find.text('Cilt (Ben, Siğil, Morluk, Leke)');
       await tester.scrollUntilVisible(
-        find.text('Cilt (Ben, Siğil, Morluk, Leke)'),
+        ciltTile,
         200,
-        scrollable: find.descendant(
-          of: find.byType(Drawer),
-          matching: find.byType(Scrollable),
-        ).first,
+        scrollable: drawerScrollable,
       );
-      await tester.tap(find.text('Cilt (Ben, Siğil, Morluk, Leke)'));
+      await tester.ensureVisible(ciltTile);
+      await tester.pumpAndSettle();
+      await tester.tap(ciltTile);
       await tester.pumpAndSettle();
 
+      final morlukTile = find.text('Morluk Takibi');
       await tester.scrollUntilVisible(
-        find.text('Morluk Takibi'),
+        morlukTile,
         200,
-        scrollable: find.descendant(
-          of: find.byType(Drawer),
-          matching: find.byType(Scrollable),
-        ).first,
+        scrollable: drawerScrollable,
       );
-      await tester.tap(find.text('Morluk Takibi'));
+      await tester.ensureVisible(morlukTile);
+      await tester.pumpAndSettle();
+      await tester.tap(morlukTile);
       await tester.pumpAndSettle();
 
       expect(find.text('Cilt Hastalıkları Ön Kontrol'), findsOneWidget);

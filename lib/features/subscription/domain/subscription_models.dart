@@ -90,6 +90,14 @@ class UserSubscriptionState {
   /// Free-tier limit for lab report uploads/analyses per calendar month.
   static const int freeMonthlyLabReportLimit = 3;
 
+  /// Daily limits for AI plate calorie calculation
+  static const int freeDailyPlateCalorieLimit = 2;
+  static const int proDailyPlateCalorieLimit = 20;
+
+  /// Daily limits for community direct messages (Social Formul Bank standard)
+  static const int freeDailyMessageLimit = 10;
+  static const int proDailyMessageLimit = 500;
+
   final SubscriptionTier tier;
   final DateTime? activatedAt;
   final DateTime? expiresAt;

@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/core/theme/visual_announcement_effect_service.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 
 /// Displays the newest active [GlobalAnnouncement] published from Admin Panel.
+///
+/// Features Social Formul Bank-inspired atmospheric ambient neon glow and
+/// interactive particle celebration effects (hearts, stars, confetti).
 class GlobalAnnouncementBanner extends StatefulWidget {
   const GlobalAnnouncementBanner({
     super.key,
@@ -45,13 +51,44 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
     final repo = widget.repository ?? AdminRepository();
     final active = await repo.loadAnnouncements(activeOnly: true);
     if (!mounted) return;
-    final next = active.isEmpty ? null : active.first;
+    final latest = active.isEmpty ? null : active.first;
     setState(() {
-      if (next?.id != _announcement?.id) {
+      if (latest?.id != _announcement?.id) {
         _dismissed = false;
       }
-      _announcement = next;
+      _announcement = latest;
     });
+
+    if (latest != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final lastSeen = prefs.getString('last_seen_global_announcement_id');
+        if (lastSeen != latest.id) {
+          await prefs.setString('last_seen_global_announcement_id', latest.id);
+          if (mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _triggerCelebrationEffect(latest);
+            });
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  void _triggerCelebrationEffect(GlobalAnnouncement ann) {
+    HapticFeedback.mediumImpact();
+    final emoji = ann.effectiveEmoji;
+    final shape = (emoji == '❤️' || ann.type == AnnouncementType.healthTip)
+        ? 'kalp'
+        : ((emoji == '🎉' || ann.type == AnnouncementType.campaign)
+            ? 'konfeti'
+            : 'yıldız');
+    VisualAnnouncementEffectService.showEffect(
+      context,
+      type: ann.type.name,
+      shape: shape,
+    );
   }
 
   @override
@@ -66,54 +103,107 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
     return Container(
       key: Key('global_announcement_banner_${ann.id}'),
       margin: widget.margin,
-      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: isDark ? 0.18 : 0.10),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: accent.withValues(alpha: 0.42)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              ann.effectiveEmoji,
-              style: const TextStyle(fontSize: 19),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: isDark ? 0.14 : 0.08),
+            blurRadius: 14,
+            spreadRadius: 1,
+            offset: const Offset(0, 3),
           ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => _triggerCelebrationEffect(ann),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  ann.title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w800,
+                Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    ann.effectiveEmoji,
+                    style: const TextStyle(fontSize: 19),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  ann.message,
-                  style: theme.textTheme.bodySmall?.copyWith(height: 1.35),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              ann.title,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: accent,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accent.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'DUYURU',
+                              style: TextStyle(
+                                color: accent,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        ann.message,
+                        style: theme.textTheme.bodySmall?.copyWith(height: 1.35),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Işıkları & Parçacıkları Oynat',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => _triggerCelebrationEffect(ann),
+                  icon: Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 19,
+                    color: accent,
+                  ),
+                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => setState(() => _dismissed = true),
+                  icon: const Icon(Icons.close_rounded, size: 18),
                 ),
               ],
             ),
           ),
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            onPressed: () => setState(() => _dismissed = true),
-            icon: const Icon(Icons.close_rounded, size: 18),
-          ),
-        ],
+        ),
       ),
     );
   }

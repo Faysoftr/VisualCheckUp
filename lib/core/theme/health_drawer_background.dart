@@ -43,6 +43,8 @@ class HealthDrawerBackground extends StatelessWidget {
                 assetPath,
                 fit: BoxFit.cover,
                 alignment: Alignment.centerRight,
+                gaplessPlayback: true,
+                cacheWidth: 720,
                 errorBuilder: (_, _, _) => const SizedBox.shrink(),
               ),
             ),

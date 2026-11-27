@@ -1,17 +1,22 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/photo_zoom_viewer.dart';
 import 'package:visualcheckup/features/diet/data/ai_meal_calorie_analyzer.dart';
 import 'package:visualcheckup/features/diet/data/diet_repository.dart';
 import 'package:visualcheckup/features/diet/data/diet_template_catalog.dart';
 import 'package:visualcheckup/features/diet/domain/diet_models.dart';
 import 'package:visualcheckup/features/diet/presentation/widgets/weight_trend_chart.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
+import 'package:visualcheckup/features/subscription/domain/subscription_models.dart';
+import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 
 typedef PlatePhotoPicker = Future<Uint8List?> Function(ImageSource source);
 
@@ -26,12 +31,18 @@ class DietHubScreen extends StatefulWidget {
     required this.repository,
     this.calorieAnalyzer,
     this.platePhotoPicker,
+    this.subscriptionRepository,
+    this.userId,
+    this.userEmail,
     this.initialTabIndex = 0,
   });
 
   final DietRepository repository;
   final MealCalorieAnalyzer? calorieAnalyzer;
   final PlatePhotoPicker? platePhotoPicker;
+  final SubscriptionRepository? subscriptionRepository;
+  final String? userId;
+  final String? userEmail;
   final int initialTabIndex;
 
   @override
@@ -42,6 +53,7 @@ class _DietHubScreenState extends State<DietHubScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final MealCalorieAnalyzer _calorieAnalyzer;
+  late final SubscriptionRepository _subscriptionRepository;
 
   bool _loading = true;
   ActiveDietPlan? _activePlan;
@@ -54,6 +66,7 @@ class _DietHubScreenState extends State<DietHubScreen>
   );
   List<DietWeightEntry> _weightEntries = const [];
   List<CalorieScanEntry> _calorieScans = const [];
+  UserSubscriptionState _subscription = const UserSubscriptionState();
 
   // AI Plate Scanner tab state
   final TextEditingController _foodDescController = TextEditingController();
@@ -72,6 +85,8 @@ class _DietHubScreenState extends State<DietHubScreen>
       initialIndex: widget.initialTabIndex.clamp(0, 3),
     );
     _calorieAnalyzer = widget.calorieAnalyzer ?? GeminiMealCalorieAnalyzer();
+    _subscriptionRepository =
+        widget.subscriptionRepository ?? SubscriptionRepository();
     _loadAll();
   }
 
@@ -82,11 +97,145 @@ class _DietHubScreenState extends State<DietHubScreen>
     super.dispose();
   }
 
+  bool get _isAdmin {
+    String? email = widget.userEmail;
+    String? uid = widget.userId;
+    if (email == null) {
+      try {
+        email = fb.FirebaseAuth.instance.currentUser?.email;
+        uid ??= fb.FirebaseAuth.instance.currentUser?.uid;
+      } catch (_) {}
+    }
+    return AdminUtils.isAdmin(email: email, uid: uid);
+  }
+
+  int get _usedScansToday =>
+      _subscriptionRepository.countPlateCalorieScansToday(_calorieScans);
+
+  int get _dailyScanLimit => _subscriptionRepository.dailyPlateCalorieLimit(
+        subscription: _subscription,
+        isAdmin: _isAdmin,
+      );
+
+  int get _remainingScansToday =>
+      _subscriptionRepository.remainingPlateCalorieScansToday(
+        scans: _calorieScans,
+        subscription: _subscription,
+        isAdmin: _isAdmin,
+      );
+
+  bool get _canScanPlateCalorie => _subscriptionRepository.canScanPlateCalorie(
+        scans: _calorieScans,
+        subscription: _subscription,
+        isAdmin: _isAdmin,
+      );
+
+  Future<void> _openProPaywall({bool triggeredByLimit = false}) async {
+    final upgraded = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ProPaywallScreen(
+          repository: _subscriptionRepository,
+          userId: widget.userId,
+          triggeredByLabLimit: triggeredByLimit,
+        ),
+      ),
+    );
+    if (upgraded == true) {
+      await _loadAll();
+    }
+  }
+
+  Future<void> _showPlateCalorieQuotaExceededSheet(BuildContext context) async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isPro = _subscription.isPro;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetCtx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: colorScheme.errorContainer.withValues(alpha: 0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.no_meals_rounded,
+                  size: 32,
+                  color: colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Günlük Tabak Kalori Limiti Doldu',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                isPro
+                    ? 'Pro üyelikte günlük 20 tabak kalori analizi hakkınızı doldurdunuz. Haklarınız her gece yarısı sıfırlanır.'
+                    : 'Ücretsiz planda günde en fazla 2 tabak kalori analizi yapabilirsiniz. Bugünkü 2 hakkınızı kullandınız.\n\nVisualCheckUp Pro ile günde 20 tabağa kadar AI kalori analizi yapabilir, sınırsız tahlil analizi ve reklamsız deneyimin tadını çıkarabilirsiniz.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (!isPro) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton.icon(
+                    key: const Key('diet_upgrade_pro_button'),
+                    onPressed: () {
+                      Navigator.of(sheetCtx).pop();
+                      _openProPaywall(triggeredByLimit: true);
+                    },
+                    icon: const Icon(Icons.workspace_premium_rounded),
+                    label: const Text(
+                      'Pro\'ya Yükselt (Günde 20 Hak)',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.of(sheetCtx).pop(),
+                  child: const Text('Anladım'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _loadAll() async {
     final plan = await widget.repository.loadActivePlan();
     final customTemplates = await widget.repository.loadCustomTemplates();
     final weights = await widget.repository.loadWeightEntries();
     final scans = await widget.repository.loadCalorieScans();
+    final sub =
+        await _subscriptionRepository.loadSubscription(uid: widget.userId);
     Map<MealSlot, DietMealComplianceLog> dayMap = const {};
     DietComplianceSummary summary = const DietComplianceSummary(
       followedCount: 0,
@@ -108,6 +257,7 @@ class _DietHubScreenState extends State<DietHubScreen>
       _calorieScans = scans;
       _dayCompliance = dayMap;
       _complianceSummary = summary;
+      _subscription = sub;
       _loading = false;
     });
   }
@@ -269,6 +419,10 @@ class _DietHubScreenState extends State<DietHubScreen>
   // ── AI Plate Calorie Scanner Actions ──────────────────────────────────────
 
   Future<void> _pickAndAnalyzePlate(ImageSource source) async {
+    if (!_canScanPlateCalorie) {
+      await _showPlateCalorieQuotaExceededSheet(context);
+      return;
+    }
     try {
       Uint8List? bytes;
       if (widget.platePhotoPicker != null) {
@@ -311,6 +465,10 @@ class _DietHubScreenState extends State<DietHubScreen>
   Future<void> _analyzeFromTextOnly() async {
     final desc = _foodDescController.text.trim();
     if (desc.isEmpty && _pendingPlateBytes == null) return;
+    if (!_canScanPlateCalorie) {
+      await _showPlateCalorieQuotaExceededSheet(context);
+      return;
+    }
     setState(() {
       _analyzingPlate = true;
       _portionScale = 1.0;
@@ -1252,12 +1410,129 @@ class _DietHubScreenState extends State<DietHubScreen>
     );
   }
 
+  Widget _buildCalorieQuotaBadge(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    if (_isAdmin) {
+      return Container(
+        key: const Key('diet_plate_calorie_quota_badge'),
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF59E0B).withValues(alpha: isDark ? 0.22 : 0.12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
+          ),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.shield_rounded, size: 20, color: Color(0xFFD97706)),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Yönetici Hesabı: Sınırsız AI Tabak Kalori Analizi 👑',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  color: Color(0xFFB45309),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final isPro = _subscription.isPro;
+    final limit = _dailyScanLimit;
+    final used = _usedScansToday;
+    final remaining = _remainingScansToday;
+
+    final badgeColor =
+        isPro ? const Color(0xFF0F766E) : const Color(0xFF2563EB);
+
+    return Container(
+      key: const Key('diet_plate_calorie_quota_badge'),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: isDark ? 0.22 : 0.09),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: badgeColor.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPro ? Icons.workspace_premium_rounded : Icons.flash_on_rounded,
+            size: 20,
+            color: badgeColor,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isPro
+                      ? 'Pro Üyelik: Günlük Tabak Analizi'
+                      : 'Ücretsiz Plan: Günlük Tabak Analizi',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                    color: isDark
+                        ? colorScheme.onSurface
+                        : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Kalan Hak: $remaining / $limit (Bugün $used yapıldı)',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (!isPro)
+            TextButton(
+              key: const Key('diet_quota_upgrade_chip'),
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+              ),
+              onPressed: () => _openProPaywall(triggeredByLimit: false),
+              child: Text(
+                'Pro (20/gün) ↗',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   // ── TAB 4: AI Plate Calorie Calculator (Works with OR without a Diet!) ───
 
   Widget _buildAiCaloriesTab(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final todayKey = ActiveDietPlan.dateKeyFor(DateTime.now());
     final todayScans =
         _calorieScans.where((s) => s.dateKey == todayKey).toList();
@@ -1273,6 +1548,7 @@ class _DietHubScreenState extends State<DietHubScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 36),
       children: [
+        _buildCalorieQuotaBadge(context),
         // Today's Calorie & Macro Summary Banner
         Container(
           padding: const EdgeInsets.all(16),
@@ -1662,33 +1938,283 @@ class _DietHubScreenState extends State<DietHubScreen>
                         ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
 
-                  // Itemized detected foods
-                  for (final item in scaledPreview.items)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.circle, size: 7),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${item.name} (${item.portion})',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '${item.calories} kcal',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
+                  // ── INGREDIENTS BREAKDOWN LIST ──
+                  Container(
+                    key: const Key('diet_meal_ingredients_card'),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.35)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color:
+                            colorScheme.outlineVariant.withValues(alpha: 0.6),
                       ),
                     ),
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0F766E)
+                                    .withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.restaurant_menu_rounded,
+                                size: 18,
+                                color: Color(0xFF0F766E),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Yemekteki Malzemeler (${scaledPreview.items.length})',
+                                    style:
+                                        theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Porsiyon ve kalori dökümü',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(height: 1),
+                        const SizedBox(height: 10),
+
+                        // List of individual ingredients
+                        for (int i = 0; i < scaledPreview.items.length; i++) ...[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 22,
+                                height: 22,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0F766E)
+                                      .withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '${i + 1}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF0F766E),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      scaledPreview.items[i].name,
+                                      style:
+                                          theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '${scaledPreview.items[i].portion} • P:${scaledPreview.items[i].proteinG.round()}g K:${scaledPreview.items[i].carbsG.round()}g Y:${scaledPreview.items[i].fatG.round()}g',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w500,
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFC8553D)
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${scaledPreview.items[i].calories} kcal',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                    color: Color(0xFFC8553D),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (i < scaledPreview.items.length - 1)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Divider(
+                                height: 1,
+                                color: colorScheme.outlineVariant
+                                    .withValues(alpha: 0.35),
+                              ),
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // ── PROMINENT TOTAL CALORIES SUMMARY ──
+                  Container(
+                    key: const Key('diet_total_calories_summary'),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDark
+                            ? [
+                                const Color(0xFF0F766E)
+                                    .withValues(alpha: 0.35),
+                                const Color(0xFF134E4A)
+                                    .withValues(alpha: 0.45),
+                              ]
+                            : [
+                                const Color(0xFFF0FDFA),
+                                const Color(0xFFCCFBF1),
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color:
+                            const Color(0xFF0D9488).withValues(alpha: 0.45),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.calculate_rounded,
+                              size: 22,
+                              color: Color(0xFF0D9488),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'TOPLAM KALORİ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 12,
+                                      letterSpacing: 0.8,
+                                      color: Color(0xFF0F766E),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${scaledPreview.items.length} malzemenin toplamı',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC8553D),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFC8553D)
+                                        .withValues(alpha: 0.25),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                'Toplam: ${scaledPreview.totalCalories} kcal',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Divider(
+                          height: 1,
+                          color: const Color(0xFF0D9488)
+                              .withValues(alpha: 0.25),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _MacroItem(
+                              label: l10n.dietProtein,
+                              value: '${scaledPreview.proteinG.round()}g',
+                              color: const Color(0xFF2563EB),
+                            ),
+                            _MacroItem(
+                              label: l10n.dietCarbs,
+                              value: '${scaledPreview.carbsG.round()}g',
+                              color: const Color(0xFFD97706),
+                            ),
+                            _MacroItem(
+                              label: l10n.dietFat,
+                              value: '${scaledPreview.fatG.round()}g',
+                              color: const Color(0xFFDC2626),
+                            ),
+                            _MacroItem(
+                              label: l10n.dietFiber,
+                              value: '${scaledPreview.fiberG.round()}g',
+                              color: const Color(0xFF16A34A),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
 
                   if (scaledPreview.healthComment.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -2045,6 +2571,42 @@ class _MacroChip extends StatelessWidget {
   }
 }
 
+class _MacroItem extends StatelessWidget {
+  const _MacroItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w900,
+            fontSize: 13.5,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _CalorieScanHistoryTile extends StatelessWidget {
   const _CalorieScanHistoryTile({
     required this.scan,
@@ -2059,11 +2621,33 @@ class _CalorieScanHistoryTile extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final photoPath = scan.photoPath;
     final hasPhoto = photoPath != null &&
         photoPath.isNotEmpty &&
         File(photoPath).existsSync();
     final timeStr = DateFormat('dd.MM HH:mm').format(scan.createdAt);
+
+    final totalGrams = scan.proteinG + scan.carbsG + scan.fatG;
+    final proteinPct = totalGrams > 0 ? (scan.proteinG / totalGrams * 100).round() : 0;
+    final carbsPct = totalGrams > 0 ? (scan.carbsG / totalGrams * 100).round() : 0;
+    final fatPct = totalGrams > 0 ? (scan.fatG / totalGrams * 100).round() : 0;
+
+    final String healthBadge;
+    final Color healthBadgeColor;
+    if (carbsPct <= 35 && proteinPct >= 25) {
+      healthBadge = '🌾 Düşük Glisemik • Diyabet Dostu ✓';
+      healthBadgeColor = const Color(0xFF10B981);
+    } else if (carbsPct >= 65) {
+      healthBadge = '⚠️ Yüksek Karbonhidrat • Şeker Uyarısı';
+      healthBadgeColor = const Color(0xFFEA580C);
+    } else if (fatPct >= 50) {
+      healthBadge = '🧈 Yüksek Yağ • Kolesterol & Kalp Uyarısı';
+      healthBadgeColor = const Color(0xFFD97706);
+    } else {
+      healthBadge = '✓ Dengeli Sağlık Tabağı';
+      healthBadgeColor = const Color(0xFF0F766E);
+    }
 
     return Card(
       elevation: 0,
@@ -2106,10 +2690,61 @@ class _CalorieScanHistoryTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
         ),
-        subtitle: Text(
-          '${scan.mealSlot.localizedLabel(l10n)} • $timeStr\n'
-          'P:${scan.proteinG.round()}g  K:${scan.carbsG.round()}g  Y:${scan.fatG.round()}g',
-          style: theme.textTheme.bodySmall,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${scan.mealSlot.localizedLabel(l10n)} • $timeStr',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'P:${scan.proteinG.round()}g (%$proteinPct) • K:${scan.carbsG.round()}g (%$carbsPct) • Y:${scan.fatG.round()}g (%$fatPct)',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 11.5,
+              ),
+            ),
+            const SizedBox(height: 3),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: healthBadgeColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: healthBadgeColor.withValues(alpha: 0.4)),
+                ),
+                child: Text(
+                  healthBadge,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: healthBadgeColor,
+                  ),
+                ),
+              ),
+            ),
+            if (scan.items.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Malzemeler: ${scan.items.map((i) => '${i.name} (${i.calories} kcal)').join(', ')}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? const Color(0xFF5EEAD4)
+                      : const Color(0xFF0F766E),
+                ),
+              ),
+            ],
+          ],
         ),
         isThreeLine: true,
         trailing: Column(

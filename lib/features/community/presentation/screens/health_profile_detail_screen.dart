@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/visual_announcement_effect_service.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 
 typedef CommunityUrlLauncher = Future<void> Function(Uri uri);
 
@@ -236,7 +239,9 @@ class HealthProfileDetailScreen extends StatefulWidget {
     required this.myDisplayName,
     this.myNickname = '',
     this.myPhotoUrl,
+    this.myEmail,
     required this.repository,
+    this.subscriptionRepository,
     this.uploadService,
     this.photoPicker,
     this.urlLauncher,
@@ -247,7 +252,9 @@ class HealthProfileDetailScreen extends StatefulWidget {
   final String myDisplayName;
   final String myNickname;
   final String? myPhotoUrl;
+  final String? myEmail;
   final HealthCommunityRepository repository;
+  final SubscriptionRepository? subscriptionRepository;
   final CommunityImageUploadService? uploadService;
   final CommunityPhotoPicker? photoPicker;
   final CommunityUrlLauncher? urlLauncher;
@@ -386,8 +393,10 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
           myUid: widget.myUid,
           myDisplayName: widget.myDisplayName,
           myPhotoUrl: widget.myPhotoUrl,
+          myEmail: widget.myEmail,
           peer: _profile,
           repository: widget.repository,
+          subscriptionRepository: widget.subscriptionRepository,
           uploadService: widget.uploadService,
           photoPicker: widget.photoPicker,
         ),
@@ -566,6 +575,11 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   children: [
                     if (_profile.isVisibleOnline)
                       _HeaderPill(text: '🟢 ${l10n.commOnlineNow}'),
+                    if (_profile.mood != null)
+                      _HeaderPill(
+                        text:
+                            '${_profile.mood!.emoji} ${_profile.mood!.localizedLabel(l10n)} hissediyor',
+                      ),
                     _HeaderPill(
                       text:
                           '${_profile.country.flag} ${_profile.city.isNotEmpty ? '${_profile.city}, ' : ''}${_profile.country.label}',
@@ -585,6 +599,95 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
             ),
           ),
           const SizedBox(height: 14),
+
+          // Celebratory Birthday Banner (Social Formul Bank style)
+          if (_profile.isBirthdayToday)
+            Container(
+              key: const Key('profile_detail_birthday_banner'),
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFE11D48), Color(0xFFF59E0B)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE11D48).withValues(alpha: 0.28),
+                    blurRadius: 14,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Text('🎂', style: TextStyle(fontSize: 26)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Bugün ${_profile.visibleName}\'in Doğum Günü! 🎉',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          'Kutlama dileklerini ve sevgilerini ilet!',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.92),
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      VisualAnnouncementEffectService.showEffect(
+                        context,
+                        type: 'birthday',
+                        shape: 'doğum günü',
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${_profile.visibleName} için doğum günü tebriğin iletildi! 🎂✨',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          backgroundColor: const Color(0xFF10B981),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFE11D48),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.celebration_rounded, size: 16),
+                    label: const Text(
+                      'Kutla 🎉',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
           // Primary Actions: Like & Send Message (other members)
           if (!_isOwnProfile) ...[

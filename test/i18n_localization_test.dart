@@ -112,6 +112,12 @@ void main() {
     testWidgets('follows phone system language automatically and opens Settings with permissions & language', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
       tester.platformDispatcher.localeTestValue = const Locale('en');
       addTearDown(tester.platformDispatcher.clearLocaleTestValue);
       SharedPreferences.setMockInitialValues({
@@ -146,12 +152,25 @@ void main() {
         of: find.byType(Drawer),
         matching: find.byType(Scrollable),
       ).first;
+
+      final settingsAccordion = find.byKey(const Key('drawer_group_settings'));
       await tester.scrollUntilVisible(
-        find.text('Settings (Permissions & Language)'),
+        settingsAccordion,
+        150,
+        scrollable: drawerScrollable,
+      );
+      await tester.tap(settingsAccordion);
+      await tester.pumpAndSettle();
+
+      final settingsTile = find.text('Settings (Permissions & Language)');
+      await tester.scrollUntilVisible(
+        settingsTile,
         200,
         scrollable: drawerScrollable,
       );
-      await tester.tap(find.text('Settings (Permissions & Language)'));
+      await tester.ensureVisible(settingsTile);
+      await tester.pumpAndSettle();
+      await tester.tap(settingsTile);
       await tester.pumpAndSettle();
 
       // SettingsScreen renders fully in English (including Cloud Backup section!)
@@ -186,6 +205,12 @@ void main() {
     testWidgets('Recent Checks and HistoryScreen translate stored Turkish checks into active language', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
       tester.platformDispatcher.localeTestValue = const Locale('en');
       addTearDown(tester.platformDispatcher.clearLocaleTestValue);
       SharedPreferences.setMockInitialValues({
@@ -231,13 +256,14 @@ void main() {
       expect(find.text('Misafir'), findsNothing);
 
       // Scroll down to Recent Checks and verify zero Turkish leakage
+      final recentItem = find.text('Eye (Sclera) • Normal Appearance');
       await tester.scrollUntilVisible(
-        find.text('Recent Checks'),
+        recentItem,
         300,
         scrollable: find.byType(Scrollable).first,
       );
       expect(find.text('Recent Checks'), findsOneWidget);
-      expect(find.text('Eye (Sclera) • Normal Appearance'), findsOneWidget);
+      expect(recentItem, findsOneWidget);
       expect(
         find.text('Göz akında belirgin sarılık veya kızarıklık saptanmadı'),
         findsNothing,

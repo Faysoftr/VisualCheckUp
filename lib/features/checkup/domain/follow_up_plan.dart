@@ -343,12 +343,24 @@ class FollowUpEvaluator {
         );
       }
 
-      final elapsedHours = current.difference(lastAt).inHours;
-      final requiredHours = track.intervalDays * 24;
-      final isDue = elapsedHours >= requiredHours;
-      final remainingDays = isDue
-          ? 0
-          : ((requiredHours - elapsedHours) / 24).ceil().clamp(1, 365);
+      final bool isDue;
+      final int remainingDays;
+
+      if (track.intervalDays == 1) {
+        // Daily tracks (hydration, blood pressure, blood sugar) reset cleanly per calendar day
+        final isSameCalendarDay = lastAt.year == current.year &&
+            lastAt.month == current.month &&
+            lastAt.day == current.day;
+        isDue = !isSameCalendarDay;
+        remainingDays = isDue ? 0 : 1;
+      } else {
+        final elapsedHours = current.difference(lastAt).inHours;
+        final requiredHours = track.intervalDays * 24;
+        isDue = elapsedHours >= requiredHours;
+        remainingDays = isDue
+            ? 0
+            : ((requiredHours - elapsedHours) / 24).ceil().clamp(1, 365);
+      }
 
       return FollowUpTrackStatus(
         track: track,
