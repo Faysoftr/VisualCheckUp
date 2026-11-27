@@ -309,6 +309,19 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('admin_add_announcement_button')));
       await tester.pumpAndSettle();
+
+      // Test live effect preview button
+      expect(
+        find.byKey(const Key('admin_test_announcement_effect_button')),
+        findsOneWidget,
+      );
+      await tester.tap(
+        find.byKey(const Key('admin_test_announcement_effect_button')),
+      );
+      await tester.pump();
+      expect(find.byType(CustomPaint), findsWidgets);
+      await tester.pumpAndSettle();
+
       await tester.enterText(
         find.byKey(const Key('admin_announcement_title_field')),
         'Kış Sağlığı Duyurusu',
@@ -317,7 +330,9 @@ void main() {
         find.byKey(const Key('admin_announcement_message_field')),
         'D vitamini ve su tüketiminizi ihmal etmeyin.',
       );
-      await tester.tap(find.byKey(const Key('admin_announcement_save_button')));
+      final saveBtn1 = find.byKey(const Key('admin_announcement_save_button'));
+      await tester.ensureVisible(saveBtn1);
+      await tester.tap(saveBtn1);
       await tester.pumpAndSettle();
       expect(find.text('Kış Sağlığı Duyurusu'), findsOneWidget);
 
@@ -329,13 +344,37 @@ void main() {
       await tester.tap(editAnnBtn);
       await tester.pumpAndSettle();
       expect(find.text('Duyuruyu Düzenle'), findsOneWidget);
+
+      // Change shape to Kalp
+      final shapeDropdown =
+          find.byKey(const Key('admin_announcement_shape_dropdown'));
+      await tester.ensureVisible(shapeDropdown);
+      await tester.tap(shapeDropdown);
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Kalp').last);
+      await tester.pumpAndSettle();
+
+      // Live test the Kalp effect
+      final liveEffectBtn =
+          find.byKey(const Key('admin_test_announcement_effect_button'));
+      await tester.ensureVisible(liveEffectBtn);
+      await tester.tap(liveEffectBtn);
+      await tester.pump();
+      expect(find.byType(CustomPaint), findsWidgets);
+      await tester.pumpAndSettle();
+
       await tester.enterText(
         find.byKey(const Key('admin_announcement_title_field')),
         'Güncellenmiş Kış Duyurusu',
       );
-      await tester.tap(find.byKey(const Key('admin_announcement_save_button')));
+      final saveBtn2 = find.byKey(const Key('admin_announcement_save_button'));
+      await tester.ensureVisible(saveBtn2);
+      await tester.tap(saveBtn2);
       await tester.pumpAndSettle();
       expect(find.text('Güncellenmiş Kış Duyurusu'), findsOneWidget);
+
+      final updatedAnn = (await adminRepo.loadAnnouncements()).first;
+      expect(updatedAnn.effectShape, 'Kalp');
 
       // 3. Promotions tab -> create new banner ad & edit it
       await tester.ensureVisible(find.text('Reklamlar'));

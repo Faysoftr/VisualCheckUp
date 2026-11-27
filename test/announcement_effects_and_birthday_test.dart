@@ -79,7 +79,7 @@ void main() {
 
       expect(find.text('Yeni Sağlık Güncellemesi'), findsOneWidget);
       expect(find.text('Tüm modüller aktif edildi!'), findsOneWidget);
-      expect(find.text('DUYURU'), findsOneWidget);
+      expect(find.textContaining('DUYURU'), findsOneWidget);
 
       final sparkleBtn = find.byIcon(Icons.auto_awesome_rounded);
       expect(sparkleBtn, findsOneWidget);

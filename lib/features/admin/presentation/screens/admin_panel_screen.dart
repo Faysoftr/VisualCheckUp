@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/core/theme/visual_announcement_effect_service.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
@@ -582,9 +583,33 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                               ann.type.accentColor.withValues(alpha: 0.15),
                           child: Icon(ann.type.icon, color: ann.type.accentColor),
                         ),
-                        title: Text(
-                          ann.title,
-                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                ann.title,
+                                style: const TextStyle(fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: ann.type.accentColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${GlobalAnnouncement.shapeEmoji(ann.effectShape)} ${ann.effectShape}',
+                                style: TextStyle(
+                                  color: ann.type.accentColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         subtitle: Text(
                           ann.message,
@@ -1261,6 +1286,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
   late final TextEditingController _msgCtrl;
   late final TextEditingController _linkCtrl;
   late AnnouncementType _type;
+  late String _effectShape;
 
   @override
   void initState() {
@@ -1270,6 +1296,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
     _msgCtrl = TextEditingController(text: initial?.message ?? '');
     _linkCtrl = TextEditingController(text: initial?.linkUrl ?? '');
     _type = initial?.type ?? AnnouncementType.info;
+    _effectShape = initial?.effectShape ?? 'Konfeti';
   }
 
   @override
@@ -1326,6 +1353,69 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
               ],
             ),
             const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              key: const Key('admin_announcement_shape_dropdown'),
+              value: GlobalAnnouncement.availableEffectShapes
+                      .contains(_effectShape)
+                  ? _effectShape
+                  : 'Konfeti',
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: 'Akacak Şekil (Ekran Yağmuru / Efekt)',
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    GlobalAnnouncement.shapeEmoji(_effectShape),
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ),
+                prefixIconConstraints:
+                    const BoxConstraints(minWidth: 44, minHeight: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              items: [
+                for (final shape in GlobalAnnouncement.availableEffectShapes)
+                  DropdownMenuItem(
+                    value: shape,
+                    child: Text(
+                      GlobalAnnouncement.shapeLabel(shape),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: (val) {
+                if (val != null) setState(() => _effectShape = val);
+              },
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              key: const Key('admin_test_announcement_effect_button'),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+              onPressed: () {
+                VisualAnnouncementEffectService.showEffect(
+                  context,
+                  type: _type.name,
+                  shape: _effectShape,
+                );
+              },
+              icon: const Icon(
+                Icons.auto_awesome_rounded,
+                color: Color(0xFFFF2A8D),
+                size: 19,
+              ),
+              label: Text(
+                'Efekti Canlı Test Et (${GlobalAnnouncement.shapeEmoji(_effectShape)} $_effectShape)',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(height: 12),
             TextField(
               key: const Key('admin_announcement_title_field'),
               controller: _titleCtrl,
@@ -1373,6 +1463,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                           title: _titleCtrl.text.trim(),
                           message: _msgCtrl.text.trim(),
                           type: _type,
+                          effectShape: _effectShape,
                           linkUrl: _linkCtrl.text.trim(),
                         )
                       : GlobalAnnouncement(
@@ -1380,6 +1471,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                           title: _titleCtrl.text.trim(),
                           message: _msgCtrl.text.trim(),
                           type: _type,
+                          effectShape: _effectShape,
                           linkUrl: _linkCtrl.text.trim(),
                           isActive: true,
                           createdAt: DateTime.now(),

@@ -107,24 +107,35 @@ class _AnnouncementEffectWidgetState extends State<_AnnouncementEffectWidget>
     if (s.contains('kalp') || s.contains('heart')) {
       return const Color(0xFFFF2A8D); // Neon Pink
     }
+    if (s.contains('ünlem') || s.contains('warning') || t.contains('warning')) {
+      return const Color(0xFFEF4444); // Neon Red
+    }
+    if (s.contains('yıldız') || s.contains('star')) {
+      return const Color(0xFFFBBF24); // Gold
+    }
+    if (s.contains('roket') || s.contains('rocket')) {
+      return const Color(0xFFFF6D00); // Neon Orange
+    }
     if (s.contains('doğum') || s.contains('birthday') || t.contains('birthday')) {
       return const Color(0xFFF59E0B); // Festive Amber/Gold
-    }
-    if (t.contains('uyarı') || t.contains('warning')) {
-      return const Color(0xFFEF4444); // Red
     }
     if (t.contains('kampanya') || t.contains('campaign')) {
       return const Color(0xFF8B5CF6); // Purple
     }
-    if (t.contains('healthtip') || t.contains('sağlık')) {
+    if (s.contains('sağlık') || t.contains('healthtip') || t.contains('sağlık')) {
       return const Color(0xFF10B981); // Emerald
     }
     return const Color(0xFF00F2FE); // Electric Cyan
   }
 
   void _buildParticles() {
-    final color = _resolveBaseColor();
     final s = (widget.shape ?? widget.type).toLowerCase();
+    if (s.contains('sadece neon') || s == 'neon') {
+      // Glow-only: do not spawn emoji/icon particles
+      return;
+    }
+
+    final color = _resolveBaseColor();
 
     for (int i = 0; i < 42; i++) {
       _ParticleSymbol symbol;
@@ -148,12 +159,70 @@ class _AnnouncementEffectWidgetState extends State<_AnnouncementEffectWidget>
           heartSymbols[_random.nextInt(heartSymbols.length)],
         );
         pColor = const Color(0xFFFF2A8D);
+      } else if (s.contains('ünlem') || s.contains('uyarı')) {
+        const warningSymbols = ['❗', '⚠️', '🚨', '⚡', '🔔'];
+        symbol = _ParticleSymbol(
+          warningSymbols[_random.nextInt(warningSymbols.length)],
+        );
+        pColor = [
+          const Color(0xFFEF4444),
+          const Color(0xFFF59E0B),
+          const Color(0xFFFF1744),
+        ][_random.nextInt(3)];
       } else if (s.contains('yıldız') || s.contains('star')) {
         const starSymbols = ['⭐', '✨', '🌟', '💫', '⚡'];
         symbol = _ParticleSymbol(
           starSymbols[_random.nextInt(starSymbols.length)],
         );
         pColor = const Color(0xFFFBBF24);
+      } else if (s.contains('megafon')) {
+        const megafonSymbols = ['📢', '📣', '🔔', '✨'];
+        symbol = _ParticleSymbol(
+          megafonSymbols[_random.nextInt(megafonSymbols.length)],
+        );
+        pColor = [
+          const Color(0xFF00F2FE),
+          const Color(0xFFF59E0B),
+          const Color(0xFFFF2A8D),
+        ][_random.nextInt(3)];
+      } else if (s.contains('soru')) {
+        const questionSymbols = ['❓', '❔', '🤔', '💡', '✨'];
+        symbol = _ParticleSymbol(
+          questionSymbols[_random.nextInt(questionSymbols.length)],
+        );
+        pColor = [
+          const Color(0xFF8B5CF6),
+          const Color(0xFF00F2FE),
+          const Color(0xFF38BDF8),
+        ][_random.nextInt(3)];
+      } else if (s.contains('roket')) {
+        const rocketSymbols = ['🚀', '✨', '🔥', '💫', '🌟'];
+        symbol = _ParticleSymbol(
+          rocketSymbols[_random.nextInt(rocketSymbols.length)],
+        );
+        pColor = [
+          const Color(0xFFFF6D00),
+          const Color(0xFFEF4444),
+          const Color(0xFFFBBF24),
+        ][_random.nextInt(3)];
+      } else if (s.contains('gülücük') || s.contains('smile')) {
+        const smileSymbols = ['😊', '😂', '😎', '😍', '😁', '✨'];
+        symbol = _ParticleSymbol(
+          smileSymbols[_random.nextInt(smileSymbols.length)],
+        );
+        pColor = const Color(0xFFFBBF24);
+      } else if (s.contains('karışık') || s.contains('mixed')) {
+        const mixedSymbols = ['🎨', '⭐', '❤️', '🎵', '🎈', '🎉', '🍀', '✨'];
+        symbol = _ParticleSymbol(
+          mixedSymbols[_random.nextInt(mixedSymbols.length)],
+        );
+        pColor = [
+          const Color(0xFFFF2A8D),
+          const Color(0xFF00F2FE),
+          const Color(0xFFF59E0B),
+          const Color(0xFF10B981),
+          const Color(0xFF8B5CF6),
+        ][_random.nextInt(5)];
       } else if (s.contains('sağlık') || s.contains('health')) {
         const healthSymbols = ['🩺', '💊', '🌿', '🍎', '❤️', '✨', '💧'];
         symbol = _ParticleSymbol(

@@ -74,6 +74,7 @@ class GlobalAnnouncement {
     required this.title,
     required this.message,
     this.type = AnnouncementType.info,
+    this.effectShape = 'Konfeti',
     this.linkUrl = '',
     this.isActive = true,
     required this.createdAt,
@@ -83,14 +84,97 @@ class GlobalAnnouncement {
   final String title;
   final String message;
   final AnnouncementType type;
+  final String effectShape;
   final String linkUrl;
   final bool isActive;
   final DateTime createdAt;
+
+  static const List<String> availableEffectShapes = [
+    'Kalp',
+    'Konfeti',
+    'Ünlem',
+    'Yıldız',
+    'Megafon',
+    'Soru İşareti',
+    'Roket',
+    'Doğum Günü',
+    'Sağlık',
+    'Karışık',
+    'Gülücükler',
+    'Sadece Neon Işık',
+  ];
+
+  static String shapeEmoji(String shape) {
+    switch (shape.toLowerCase()) {
+      case 'kalp':
+        return '❤️';
+      case 'konfeti':
+        return '🎉';
+      case 'ünlem':
+        return '❗';
+      case 'yıldız':
+        return '⭐';
+      case 'megafon':
+        return '📢';
+      case 'soru işareti':
+      case 'soru':
+        return '❓';
+      case 'roket':
+        return '🚀';
+      case 'doğum günü':
+        return '🎂';
+      case 'sağlık':
+        return '🩺';
+      case 'karışık':
+        return '🎨';
+      case 'gülücükler':
+        return '😊';
+      case 'sadece neon ışık':
+      case 'neon':
+        return '✨';
+      default:
+        return '🎉';
+    }
+  }
+
+  static String shapeLabel(String shape) {
+    switch (shape.toLowerCase()) {
+      case 'kalp':
+        return '❤️ Kalp (Sevgi & Kalp Yağmuru)';
+      case 'konfeti':
+        return '🎉 Konfeti (Kutlama & Neşe)';
+      case 'ünlem':
+        return '❗ Ünlem (Önemli Uyarı)';
+      case 'yıldız':
+        return '⭐ Yıldız (Işıltı & Başarı)';
+      case 'megafon':
+        return '📢 Megafon (Resmi Duyuru)';
+      case 'soru işareti':
+      case 'soru':
+        return '❓ Soru İşareti (Bilgi & Merak)';
+      case 'roket':
+        return '🚀 Roket (Yenilik & Hız)';
+      case 'doğum günü':
+        return '🎂 Doğum Günü (Parti & Kutlama)';
+      case 'sağlık':
+        return '🩺 Sağlık (Stetoskop & Vitamin)';
+      case 'karışık':
+        return '🎨 Karışık (Renkli Karnaval)';
+      case 'gülücükler':
+        return '😊 Gülücükler (Pozitif Yaşam)';
+      case 'sadece neon ışık':
+      case 'neon':
+        return '✨ Sadece Neon Işık (Kenar Glow)';
+      default:
+        return '🎉 $shape';
+    }
+  }
 
   GlobalAnnouncement copyWith({
     String? title,
     String? message,
     AnnouncementType? type,
+    String? effectShape,
     String? linkUrl,
     bool? isActive,
   }) {
@@ -99,6 +183,7 @@ class GlobalAnnouncement {
       title: title ?? this.title,
       message: message ?? this.message,
       type: type ?? this.type,
+      effectShape: effectShape ?? this.effectShape,
       linkUrl: linkUrl ?? this.linkUrl,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt,
@@ -110,6 +195,7 @@ class GlobalAnnouncement {
         'title': title.trim(),
         'message': message.trim(),
         'type': type.name,
+        'effectShape': effectShape,
         if (linkUrl.trim().isNotEmpty) 'linkUrl': linkUrl.trim(),
         'isActive': isActive,
         'createdAt': createdAt.toIso8601String(),
@@ -124,6 +210,9 @@ class GlobalAnnouncement {
       title: (json['title'] as String?) ?? '',
       message: (json['message'] as String?) ?? '',
       type: AnnouncementTypeX.fromId(json['type'] as String?),
+      effectShape: (json['effectShape'] as String?) ??
+          (json['shape'] as String?) ??
+          'Konfeti',
       linkUrl: (json['linkUrl'] as String?) ?? '',
       isActive: (json['isActive'] as bool?) ?? true,
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??

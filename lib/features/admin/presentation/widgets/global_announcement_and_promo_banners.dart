@@ -62,9 +62,11 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
 
   void _triggerCelebrationEffect(GlobalAnnouncement ann) {
     HapticFeedback.mediumImpact();
-    final shape = ann.type == AnnouncementType.healthTip
-        ? 'kalp'
-        : (ann.type == AnnouncementType.campaign ? 'konfeti' : 'yıldız');
+    final shape = ann.effectShape.isNotEmpty
+        ? ann.effectShape
+        : (ann.type == AnnouncementType.healthTip
+            ? 'kalp'
+            : (ann.type == AnnouncementType.campaign ? 'konfeti' : 'yıldız'));
     VisualAnnouncementEffectService.showEffect(
       context,
       type: ann.type.name,
@@ -142,7 +144,7 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              'DUYURU',
+                              '${GlobalAnnouncement.shapeEmoji(ann.effectShape)} DUYURU',
                               style: TextStyle(
                                 color: accent,
                                 fontSize: 9.5,
