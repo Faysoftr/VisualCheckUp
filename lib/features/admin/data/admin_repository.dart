@@ -106,7 +106,7 @@ class AdminRepository {
         await _db
             .collection('app_announcements')
             .doc(announcement.id)
-            .set(announcement.toJson(), SetOptions(merge: true));
+            .set(announcement.toJson());
       } catch (_) {}
     }
     return announcement;
@@ -188,7 +188,7 @@ class AdminRepository {
         await _db
             .collection('app_promotions')
             .doc(promo.id)
-            .set(promo.toJson(), SetOptions(merge: true));
+            .set(promo.toJson());
       } catch (_) {}
     }
     return promo;

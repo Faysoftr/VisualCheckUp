@@ -71,6 +71,7 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
       context,
       type: ann.type.name,
       shape: shape,
+      customColor: ann.customColor,
     );
   }
 

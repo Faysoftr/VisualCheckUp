@@ -593,6 +593,55 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                               ann.title,
                               style: const TextStyle(fontWeight: FontWeight.w800),
                             ),
+                            InkWell(
+                              key: Key('admin_toggle_ann_live_${ann.id}'),
+                              borderRadius: BorderRadius.circular(6),
+                              onTap: () async {
+                                final next = !ann.isActive;
+                                await widget.repository.saveAnnouncement(
+                                  ann.copyWith(isActive: next),
+                                );
+                                await _refreshAll();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(next
+                                        ? '✓ "${ann.title}" duyurusu yayına alındı.'
+                                        : '⏸️ "${ann.title}" duyurusu durduruldu (Yayından kaldırıldı).'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ann.isActive
+                                      ? const Color(0xFF10B981)
+                                          .withValues(alpha: 0.14)
+                                      : const Color(0xFFEF4444)
+                                          .withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: ann.isActive
+                                        ? const Color(0xFF10B981)
+                                        : const Color(0xFFEF4444),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  ann.isActive ? '🟢 Yayında' : '⏸️ Durduruldu',
+                                  style: TextStyle(
+                                    color: ann.isActive
+                                        ? const Color(0xFF10B981)
+                                        : const Color(0xFFEF4444),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
@@ -622,6 +671,39 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            TextButton(
+                              key: Key('admin_stop_ann_btn_${ann.id}'),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                foregroundColor: ann.isActive
+                                    ? const Color(0xFFEF4444)
+                                    : const Color(0xFF10B981),
+                              ),
+                              onPressed: () async {
+                                final next = !ann.isActive;
+                                await widget.repository.saveAnnouncement(
+                                  ann.copyWith(isActive: next),
+                                );
+                                await _refreshAll();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(next
+                                        ? '✓ "${ann.title}" duyurusu yayına alındı.'
+                                        : '⏸️ "${ann.title}" duyurusu durduruldu (Yayından kaldırıldı).'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                ann.isActive ? 'Durdur' : 'Yayına Al',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ),
                             IconButton(
                               key: Key('admin_edit_announcement_${ann.id}'),
                               tooltip: 'Duyuruyu Düzenle',
@@ -637,18 +719,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                 Icons.edit_outlined,
                                 color: colorScheme.primary,
                                 size: 20,
-                              ),
-                            ),
-                            Transform.scale(
-                              scale: 0.80,
-                              child: Switch(
-                                value: ann.isActive,
-                                onChanged: (v) async {
-                                  await widget.repository.saveAnnouncement(
-                                    ann.copyWith(isActive: v),
-                                  );
-                                  await _refreshAll();
-                                },
                               ),
                             ),
                             IconButton(
@@ -709,28 +779,86 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         color: AppTheme.primaryTeal, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        'Açılış Reklamı (App Open Ad)',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Açılış Reklamı (App Open Ad)',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            adManager.isEnabled
+                                ? '🟢 Durum: Yayında (Aktif)'
+                                : '⏸️ Durum: Durduruldu (Kapalı)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: adManager.isEnabled
+                                  ? const Color(0xFF10B981)
+                                  : const Color(0xFFEF4444),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Switch(
-                      key: const Key('admin_app_open_ad_switch'),
-                      value: adManager.isEnabled,
-                      onChanged: (val) async {
-                        await adManager.setEnabled(val);
+                    FilledButton.tonal(
+                      key: const Key('admin_toggle_app_open_ad_btn'),
+                      style: FilledButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: adManager.isEnabled
+                            ? const Color(0xFFEF4444).withValues(alpha: 0.15)
+                            : const Color(0xFF10B981).withValues(alpha: 0.15),
+                        foregroundColor: adManager.isEnabled
+                            ? const Color(0xFFEF4444)
+                            : const Color(0xFF10B981),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                      ),
+                      onPressed: () async {
+                        final next = !adManager.isEnabled;
+                        await adManager.setEnabled(next);
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(val
-                                ? '✓ Uygulama açılış reklamı aktif edildi.'
-                                : 'Açılış reklamı kapatıldı.'),
+                            content: Text(next
+                                ? '✓ Uygulama açılış reklamı yayına alındı.'
+                                : '⏸️ Açılış reklamı durduruldu (Yayından kaldırıldı).'),
                             duration: const Duration(seconds: 2),
                           ),
                         );
                       },
+                      child: Text(
+                        adManager.isEnabled ? 'Reklamı Durdur' : 'Yayına Al',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Transform.scale(
+                      scale: 0.80,
+                      child: Switch(
+                        key: const Key('admin_app_open_ad_switch'),
+                        value: adManager.isEnabled,
+                        onChanged: (val) async {
+                          await adManager.setEnabled(val);
+                          setState(() {});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(val
+                                  ? '✓ Uygulama açılış reklamı yayına alındı.'
+                                  : '⏸️ Açılış reklamı durduruldu (Yayından kaldırıldı).'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -842,15 +970,79 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: theme.colorScheme.primaryContainer,
+                          backgroundColor: promo.isActive
+                              ? theme.colorScheme.primaryContainer
+                              : theme.colorScheme.errorContainer
+                                  .withValues(alpha: 0.35),
                           child: Icon(
-                            Icons.local_offer_rounded,
-                            color: theme.colorScheme.primary,
+                            promo.isActive
+                                ? Icons.local_offer_rounded
+                                : Icons.pause_circle_rounded,
+                            color: promo.isActive
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.error,
                           ),
                         ),
-                        title: Text(
-                          promo.title,
-                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        title: Wrap(
+                          spacing: 6,
+                          runSpacing: 2,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              promo.title,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                            InkWell(
+                              key: Key('admin_toggle_promo_live_${promo.id}'),
+                              borderRadius: BorderRadius.circular(6),
+                              onTap: () async {
+                                final next = !promo.isActive;
+                                await widget.repository.savePromotion(
+                                  promo.copyWith(isActive: next),
+                                );
+                                await _refreshAll();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(next
+                                        ? '✓ "${promo.title}" reklamı yayına alındı.'
+                                        : '⏸️ "${promo.title}" reklamı durduruldu (Yayından kaldırıldı).'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: promo.isActive
+                                      ? const Color(0xFF10B981)
+                                          .withValues(alpha: 0.14)
+                                      : const Color(0xFFEF4444)
+                                          .withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: promo.isActive
+                                        ? const Color(0xFF10B981)
+                                        : const Color(0xFFEF4444),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  promo.isActive ? '🟢 Yayında' : '⏸️ Durduruldu',
+                                  style: TextStyle(
+                                    color: promo.isActive
+                                        ? const Color(0xFF10B981)
+                                        : const Color(0xFFEF4444),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         subtitle: Text(
                           '${promo.placement.localizedLabel(l10n)}${promo.subtitle.isNotEmpty ? ' • ${promo.subtitle}' : ''}',
@@ -860,6 +1052,39 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            TextButton(
+                              key: Key('admin_stop_promo_btn_${promo.id}'),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                foregroundColor: promo.isActive
+                                    ? const Color(0xFFEF4444)
+                                    : const Color(0xFF10B981),
+                              ),
+                              onPressed: () async {
+                                final next = !promo.isActive;
+                                await widget.repository.savePromotion(
+                                  promo.copyWith(isActive: next),
+                                );
+                                await _refreshAll();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(next
+                                        ? '✓ "${promo.title}" reklamı yayına alındı.'
+                                        : '⏸️ "${promo.title}" reklamı durduruldu (Yayından kaldırıldı).'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                promo.isActive ? 'Durdur' : 'Yayına Al',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11.5,
+                                ),
+                              ),
+                            ),
                             IconButton(
                               key: Key('admin_edit_promo_${promo.id}'),
                               tooltip: 'Reklamı Düzenle',
@@ -875,18 +1100,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                 Icons.edit_outlined,
                                 color: colorScheme.primary,
                                 size: 20,
-                              ),
-                            ),
-                            Transform.scale(
-                              scale: 0.80,
-                              child: Switch(
-                                value: promo.isActive,
-                                onChanged: (v) async {
-                                  await widget.repository.savePromotion(
-                                    promo.copyWith(isActive: v),
-                                  );
-                                  await _refreshAll();
-                                },
                               ),
                             ),
                             IconButton(
@@ -1357,6 +1570,16 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
     super.dispose();
   }
 
+  Color _resolveColor(String? hex) {
+    if (hex == null || hex.isEmpty || hex == 'default') {
+      return _type.accentColor;
+    }
+    final cleaned = hex.replaceAll('#', '');
+    final val =
+        int.tryParse(cleaned.length == 6 ? 'FF$cleaned' : cleaned, radix: 16);
+    return val != null ? Color(val) : _type.accentColor;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -1403,112 +1626,75 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              'Duyuru Vurgu Rengi',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+            DropdownButtonFormField<String>(
+              key: const Key('admin_announcement_color_dropdown'),
+              value: (_selectedColorHex != null &&
+                      GlobalAnnouncement.presetColors
+                          .any((c) => c['hex'] == _selectedColorHex))
+                  ? _selectedColorHex
+                  : '',
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: 'Duyuru Rengi (Vurgu & Neon Efekt)',
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: _resolveColor(_selectedColorHex),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white70, width: 1.5),
+                    ),
                   ),
-            ),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
+                ),
+                prefixIconConstraints:
+                    const BoxConstraints(minWidth: 44, minHeight: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              items: [
                 for (final colorOpt in GlobalAnnouncement.presetColors)
-                  Builder(
-                    builder: (context) {
-                      final hex = colorOpt['hex']!;
-                      final name = colorOpt['name']!;
-                      final isDefault = hex.isEmpty;
-                      final isSelected = isDefault
-                          ? (_selectedColorHex == null ||
-                              _selectedColorHex!.isEmpty)
-                          : (_selectedColorHex?.toUpperCase() ==
-                              hex.toUpperCase());
-                      final previewColor = isDefault
-                          ? _type.accentColor
-                          : (int.tryParse(
-                                      'FF${hex.replaceAll('#', '')}',
-                                      radix: 16) !=
-                                  null
-                              ? Color(int.parse(
-                                  'FF${hex.replaceAll('#', '')}',
-                                  radix: 16))
-                              : _type.accentColor);
-
-                      return InkWell(
-                        key: Key(
-                            'admin_announcement_color_${hex.isEmpty ? 'default' : hex.replaceAll('#', '')}'),
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          setState(() {
-                            _selectedColorHex = isDefault ? null : hex;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
+                  DropdownMenuItem<String>(
+                    value: colorOpt['hex']!,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 14,
+                          height: 14,
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? previewColor.withValues(alpha: 0.18)
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest
-                                    .withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? previewColor
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .outlineVariant,
-                              width: isSelected ? 2 : 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 14,
-                                height: 14,
-                                decoration: BoxDecoration(
-                                  color: previewColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                name,
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w800
-                                      : FontWeight.w600,
-                                  color: isSelected
-                                      ? previewColor
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                ),
-                              ),
-                              if (isSelected) ...[
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.check_rounded,
-                                  size: 14,
-                                  color: previewColor,
-                                ),
-                              ],
-                            ],
+                            color: colorOpt['hex']!.isEmpty
+                                ? _type.accentColor
+                                : (int.tryParse(
+                                            'FF${colorOpt['hex']!.replaceAll('#', '')}',
+                                            radix: 16) !=
+                                        null
+                                    ? Color(int.parse(
+                                        'FF${colorOpt['hex']!.replaceAll('#', '')}',
+                                        radix: 16))
+                                    : _type.accentColor),
+                            shape: BoxShape.circle,
                           ),
                         ),
-                      );
-                    },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            colorOpt['name']!,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
               ],
+              onChanged: (val) {
+                setState(() {
+                  _selectedColorHex =
+                      (val == null || val.isEmpty) ? null : val;
+                });
+              },
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
@@ -1561,6 +1747,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                   context,
                   type: _type.name,
                   shape: _effectShape,
+                  customColor: _resolveColor(_selectedColorHex),
                 );
               },
               icon: const Icon(
@@ -1674,6 +1861,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
   late final TextEditingController _subtitleCtrl;
   late final TextEditingController _linkCtrl;
   late PromotionPlacement _placement;
+  late bool _isActive;
   String? _uploadedImageUrl;
   String? _uploadedImageKey;
   bool _uploading = false;
@@ -1686,6 +1874,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
     _subtitleCtrl = TextEditingController(text: initial?.subtitle ?? '');
     _linkCtrl = TextEditingController(text: initial?.linkUrl ?? '');
     _placement = initial?.placement ?? PromotionPlacement.homeTop;
+    _isActive = initial?.isActive ?? true;
     _uploadedImageUrl = initial?.imageUrl;
     _uploadedImageKey = initial?.imageKey;
   }
@@ -1774,6 +1963,26 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
               },
             ),
             const SizedBox(height: 12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Reklam Durumu',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(
+                _isActive
+                    ? '🟢 Yayında (Kullanıcılara gösteriliyor)'
+                    : '⏸️ Durduruldu (Yayından kaldırıldı)',
+                style: TextStyle(
+                  color: _isActive
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFFEF4444),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              value: _isActive,
+              onChanged: (v) => setState(() => _isActive = v),
+            ),
+            const SizedBox(height: 8),
             TextField(
               key: const Key('admin_promo_title_field'),
               controller: _titleCtrl,
@@ -1837,6 +2046,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                           imageUrl: _uploadedImageUrl,
                           imageKey: _uploadedImageKey,
                           linkUrl: _linkCtrl.text.trim(),
+                          isActive: _isActive,
                         )
                       : HealthPromotion(
                           id: 'promo_${DateTime.now().microsecondsSinceEpoch}',
@@ -1846,7 +2056,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                           imageUrl: _uploadedImageUrl,
                           imageKey: _uploadedImageKey,
                           linkUrl: _linkCtrl.text.trim(),
-                          isActive: true,
+                          isActive: _isActive,
                           createdAt: DateTime.now(),
                         ),
                 );

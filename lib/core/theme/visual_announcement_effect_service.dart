@@ -15,6 +15,7 @@ class VisualAnnouncementEffectService {
     BuildContext context, {
     String type = 'duyuru',
     String? shape,
+    Color? customColor,
     Duration duration = const Duration(milliseconds: 3600),
   }) {
     final overlay = Overlay.maybeOf(context);
@@ -25,6 +26,7 @@ class VisualAnnouncementEffectService {
       builder: (ctx) => _AnnouncementEffectWidget(
         type: type,
         shape: shape,
+        customColor: customColor,
         duration: duration,
         onComplete: () {
           if (entry.mounted) {
@@ -42,12 +44,14 @@ class _AnnouncementEffectWidget extends StatefulWidget {
   const _AnnouncementEffectWidget({
     required this.type,
     this.shape,
+    this.customColor,
     required this.duration,
     required this.onComplete,
   });
 
   final String type;
   final String? shape;
+  final Color? customColor;
   final Duration duration;
   final VoidCallback onComplete;
 
@@ -101,6 +105,9 @@ class _AnnouncementEffectWidgetState extends State<_AnnouncementEffectWidget>
   }
 
   Color _resolveBaseColor() {
+    if (widget.customColor != null) {
+      return widget.customColor!;
+    }
     final t = widget.type.toLowerCase();
     final s = (widget.shape ?? '').toLowerCase();
 

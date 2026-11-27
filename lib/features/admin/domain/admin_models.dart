@@ -221,8 +221,7 @@ class GlobalAnnouncement {
         'message': message.trim(),
         'type': type.name,
         'effectShape': effectShape,
-        if (colorHex != null && colorHex!.trim().isNotEmpty)
-          'colorHex': colorHex!.trim(),
+        'colorHex': colorHex?.trim() ?? '',
         if (linkUrl.trim().isNotEmpty) 'linkUrl': linkUrl.trim(),
         'isActive': isActive,
         'createdAt': createdAt.toIso8601String(),
@@ -232,6 +231,7 @@ class GlobalAnnouncement {
     Map<String, dynamic> json, {
     String? fallbackId,
   }) {
+    final rawColor = json['colorHex']?.toString().trim();
     return GlobalAnnouncement(
       id: (json['id'] as String?) ?? fallbackId ?? '',
       title: (json['title'] as String?) ?? '',
@@ -240,7 +240,9 @@ class GlobalAnnouncement {
       effectShape: (json['effectShape'] as String?) ??
           (json['shape'] as String?) ??
           'Konfeti',
-      colorHex: json['colorHex'] as String?,
+      colorHex: (rawColor != null && rawColor.isNotEmpty && rawColor != 'default')
+          ? rawColor
+          : null,
       linkUrl: (json['linkUrl'] as String?) ?? '',
       isActive: (json['isActive'] as bool?) ?? true,
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??
