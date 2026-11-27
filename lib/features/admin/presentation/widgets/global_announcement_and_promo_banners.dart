@@ -79,7 +79,7 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
     final ann = _announcement;
     if (ann == null || _dismissed) return const SizedBox.shrink();
 
-    final accent = ann.type.accentColor;
+    final accent = ann.customColor ?? ann.type.accentColor;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -122,18 +122,18 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Flexible(
-                            child: Text(
-                              ann.title,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                color: accent,
-                                fontWeight: FontWeight.w800,
-                              ),
+                          Text(
+                            ann.title,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: accent,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
-                          const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -166,6 +166,9 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
                 IconButton(
                   tooltip: 'Işıkları & Parçacıkları Oynat',
                   visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                   onPressed: () => _triggerCelebrationEffect(ann),
                   icon: Icon(
                     Icons.auto_awesome_rounded,
@@ -175,6 +178,9 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
                 ),
                 IconButton(
                   visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
                   onPressed: () => setState(() => _dismissed = true),
                   icon: const Icon(Icons.close_rounded, size: 18),
                 ),
@@ -277,6 +283,8 @@ class _HealthPromotionBannerState extends State<HealthPromotionBanner> {
                     children: [
                       Text(
                         promo.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),

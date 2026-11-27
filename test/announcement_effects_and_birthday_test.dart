@@ -89,6 +89,32 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
       await tester.pumpAndSettle();
     });
+
+    testWidgets('GlobalAnnouncement supports customColor and renders with custom accent', (tester) async {
+      final ann = GlobalAnnouncement(
+        id: 'ann_color_1',
+        title: 'Özel Renkli Duyuru',
+        message: 'Neon Pembe Renk!',
+        type: AnnouncementType.info,
+        colorHex: '#FF1E56',
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+      expect(ann.customColor, const Color(0xFFFF1E56));
+
+      final repo = AdminRepository();
+      await repo.saveAnnouncement(ann);
+
+      await tester.pumpWidget(
+        _wrap(
+          GlobalAnnouncementBanner(repository: repo),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Özel Renkli Duyuru'), findsOneWidget);
+      expect(find.text('Neon Pembe Renk!'), findsOneWidget);
+    });
   });
 
   group('Birthday Celebration System (Personal & Community)', () {

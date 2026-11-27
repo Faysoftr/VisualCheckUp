@@ -1220,13 +1220,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                   ),
                 ],
               ),
-              if (profile.bio.trim().isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(
-                  profile.bio.trim(),
-                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
-                ),
-              ],
               if (profile.dailyFocus.trim().isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(
@@ -1264,106 +1257,63 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         ),
         const SizedBox(height: 12),
 
-        // 2. Admin Official Identity & Quick Management Console (SFB Style!)
-        if (isAdmin && widget.onOpenAdminPanel != null) ...[
-          SfbGradientBorderCard(
-            key: const Key('profile_admin_console_card'),
-            gradientColors: const [
-              Color(0xFFFACC15),
-              Color(0xFFFB923C),
-              Color(0xFFEC4899),
-            ],
-            glowColor: const Color(0xFFFB923C),
-            borderRadius: 24,
+        // Hakkımda (Bio) Card - 100% harmonious with HealthProfileDetailScreen and Edit Profile
+        Card(
+          key: const Key('profile_bio_card'),
+          child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7)
-                        .withValues(alpha: isDark ? 0.16 : 0.9),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.verified_user_rounded,
-                        size: 16,
-                        color: Color(0xFFD97706),
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          l10n.sfbAdminFounderBanner,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFFB45309),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  '⚡ ${l10n.sfbAdminConsoleTitle}',
-                  style: const TextStyle(
-                    color: Color(0xFFB45309),
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Expanded(
-                      child: _AdminConsoleShortcut(
-                        icon: Icons.dashboard_rounded,
-                        label: l10n.adminPanelTitle.split(' ').first,
-                        color: const Color(0xFFEC4899),
-                        onTap: widget.onOpenAdminPanel!,
-                      ),
+                    Icon(
+                      Icons.format_quote_rounded,
+                      size: 20,
+                      color: colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: _AdminConsoleShortcut(
-                        icon: Icons.people_alt_rounded,
-                        label: l10n.adminTabUsers,
-                        color: const Color(0xFF06B6D4),
-                        onTap: widget.onOpenAdminPanel!,
+                    Text(
+                      l10n.commFieldBio,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _AdminConsoleShortcut(
-                        icon: Icons.campaign_rounded,
-                        label: l10n.adminTabPromotions,
-                        color: const Color(0xFFF59E0B),
-                        onTap: widget.onOpenAdminPanel!,
+                    const Spacer(),
+                    if (profile.bio.trim().isEmpty)
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        onPressed: () => setState(() => _editingProfile = true),
+                        icon: const Icon(Icons.edit_note_rounded, size: 16),
+                        label: const Text(
+                          'Biyografi Ekle',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
-                    ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  profile.bio.trim().isNotEmpty
+                      ? profile.bio.trim()
+                      : 'Henüz bir biyografi eklemediniz. Kendinizden, sağlık yolculuğunuzdan ve hedeflerinizden bahsedebilirsiniz.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.45,
+                    fontStyle:
+                        profile.bio.trim().isEmpty ? FontStyle.italic : null,
+                    color: profile.bio.trim().isEmpty
+                        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
+                        : null,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-        ],
+        ),
+        const SizedBox(height: 12),
 
 
 
@@ -2327,6 +2277,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _countryCode,
+                isExpanded: true,
                 decoration: InputDecoration(
                   labelText: l10n.commFieldCountry,
                   border: OutlineInputBorder(
@@ -2352,6 +2303,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 initialValue: _languageCode,
+                isExpanded: true,
                 decoration: InputDecoration(
                   labelText: l10n.commFieldLanguage,
                   border: OutlineInputBorder(
@@ -2734,59 +2686,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _AdminConsoleShortcut extends StatelessWidget {
-  const _AdminConsoleShortcut({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Material(
-      color: color.withValues(alpha: isDark ? 0.18 : 0.1),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: color.withValues(alpha: isDark ? 0.35 : 0.28),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 22, color: color),
-              const SizedBox(height: 5),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

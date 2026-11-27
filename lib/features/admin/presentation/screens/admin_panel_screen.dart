@@ -576,20 +576,22 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final ann = _announcements[index];
+                    final annAccent = ann.customColor ?? ann.type.accentColor;
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor:
-                              ann.type.accentColor.withValues(alpha: 0.15),
-                          child: Icon(ann.type.icon, color: ann.type.accentColor),
+                              annAccent.withValues(alpha: 0.15),
+                          child: Icon(ann.type.icon, color: annAccent),
                         ),
-                        title: Row(
+                        title: Wrap(
+                          spacing: 6,
+                          runSpacing: 2,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Expanded(
-                              child: Text(
-                                ann.title,
-                                style: const TextStyle(fontWeight: FontWeight.w800),
-                              ),
+                            Text(
+                              ann.title,
+                              style: const TextStyle(fontWeight: FontWeight.w800),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -597,13 +599,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: ann.type.accentColor.withValues(alpha: 0.12),
+                                color: annAccent.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '${GlobalAnnouncement.shapeEmoji(ann.effectShape)} ${ann.effectShape}',
                                 style: TextStyle(
-                                  color: ann.type.accentColor,
+                                  color: annAccent,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -623,23 +625,39 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                             IconButton(
                               key: Key('admin_edit_announcement_${ann.id}'),
                               tooltip: 'Duyuruyu Düzenle',
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
                               onPressed: () =>
-                                  _openAnnouncementSheet(existing: ann),
+                                   _openAnnouncementSheet(existing: ann),
                               icon: Icon(
                                 Icons.edit_outlined,
                                 color: colorScheme.primary,
+                                size: 20,
                               ),
                             ),
-                            Switch(
-                              value: ann.isActive,
-                              onChanged: (v) async {
-                                await widget.repository.saveAnnouncement(
-                                  ann.copyWith(isActive: v),
-                                );
-                                await _refreshAll();
-                              },
+                            Transform.scale(
+                              scale: 0.80,
+                              child: Switch(
+                                value: ann.isActive,
+                                onChanged: (v) async {
+                                  await widget.repository.saveAnnouncement(
+                                    ann.copyWith(isActive: v),
+                                  );
+                                  await _refreshAll();
+                                },
+                              ),
                             ),
                             IconButton(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
                               onPressed: () async {
                                 await widget.repository
                                     .deleteAnnouncement(ann.id);
@@ -648,6 +666,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                               icon: Icon(
                                 Icons.delete_outline_rounded,
                                 color: theme.colorScheme.error,
+                                size: 20,
                               ),
                             ),
                           ],
@@ -722,36 +741,48 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    Text(
-                      'Sıklık Sınırı:',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    DropdownButton<int>(
-                      value: adManager.intervalMinutes,
-                      isDense: true,
-                      items: const [
-                        DropdownMenuItem(value: 5, child: Text('5 Dakika')),
-                        DropdownMenuItem(value: 15, child: Text('15 Dakika (Varsayılan)')),
-                        DropdownMenuItem(value: 30, child: Text('30 Dakika')),
-                        DropdownMenuItem(value: 60, child: Text('60 Dakika')),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Sıklık Sınırı:',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        DropdownButton<int>(
+                          value: adManager.intervalMinutes,
+                          isDense: true,
+                          items: const [
+                            DropdownMenuItem(value: 5, child: Text('5 Dk')),
+                            DropdownMenuItem(
+                              value: 15,
+                              child: Text('15 Dk (Varsayılan)'),
+                            ),
+                            DropdownMenuItem(value: 30, child: Text('30 Dk')),
+                            DropdownMenuItem(value: 60, child: Text('60 Dk')),
+                          ],
+                          onChanged: (newVal) async {
+                            if (newVal != null) {
+                              await adManager.setIntervalMinutes(newVal);
+                              setState(() {});
+                            }
+                          },
+                        ),
                       ],
-                      onChanged: (newVal) async {
-                        if (newVal != null) {
-                          await adManager.setIntervalMinutes(newVal);
-                          setState(() {});
-                        }
-                      },
                     ),
-                    const Spacer(),
                     TextButton.icon(
                       key: const Key('admin_test_app_open_ad_btn'),
                       onPressed: () {
-                        final shown = adManager.showAdIfAvailable(ignoreCooldown: true);
+                        final shown =
+                            adManager.showAdIfAvailable(ignoreCooldown: true);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(shown
@@ -832,23 +863,39 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                             IconButton(
                               key: Key('admin_edit_promo_${promo.id}'),
                               tooltip: 'Reklamı Düzenle',
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
                               onPressed: () =>
                                   _openPromotionSheet(existing: promo),
                               icon: Icon(
                                 Icons.edit_outlined,
                                 color: colorScheme.primary,
+                                size: 20,
                               ),
                             ),
-                            Switch(
-                              value: promo.isActive,
-                              onChanged: (v) async {
-                                await widget.repository.savePromotion(
-                                  promo.copyWith(isActive: v),
-                                );
-                                await _refreshAll();
-                              },
+                            Transform.scale(
+                              scale: 0.80,
+                              child: Switch(
+                                value: promo.isActive,
+                                onChanged: (v) async {
+                                  await widget.repository.savePromotion(
+                                    promo.copyWith(isActive: v),
+                                  );
+                                  await _refreshAll();
+                                },
+                              ),
                             ),
                             IconButton(
+                              visualDensity: VisualDensity.compact,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
                               onPressed: () async {
                                 await widget.repository
                                     .deletePromotion(promo.id);
@@ -857,6 +904,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                               icon: Icon(
                                 Icons.delete_outline_rounded,
                                 color: theme.colorScheme.error,
+                                size: 20,
                               ),
                             ),
                           ],
@@ -1287,6 +1335,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
   late final TextEditingController _linkCtrl;
   late AnnouncementType _type;
   late String _effectShape;
+  late String? _selectedColorHex;
 
   @override
   void initState() {
@@ -1297,6 +1346,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
     _linkCtrl = TextEditingController(text: initial?.linkUrl ?? '');
     _type = initial?.type ?? AnnouncementType.info;
     _effectShape = initial?.effectShape ?? 'Konfeti';
+    _selectedColorHex = initial?.colorHex;
   }
 
   @override
@@ -1349,6 +1399,114 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                       fontWeight: FontWeight.w700,
                     ),
                     onSelected: (_) => setState(() => _type = t),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Duyuru Vurgu Rengi',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final colorOpt in GlobalAnnouncement.presetColors)
+                  Builder(
+                    builder: (context) {
+                      final hex = colorOpt['hex']!;
+                      final name = colorOpt['name']!;
+                      final isDefault = hex.isEmpty;
+                      final isSelected = isDefault
+                          ? (_selectedColorHex == null ||
+                              _selectedColorHex!.isEmpty)
+                          : (_selectedColorHex?.toUpperCase() ==
+                              hex.toUpperCase());
+                      final previewColor = isDefault
+                          ? _type.accentColor
+                          : (int.tryParse(
+                                      'FF${hex.replaceAll('#', '')}',
+                                      radix: 16) !=
+                                  null
+                              ? Color(int.parse(
+                                  'FF${hex.replaceAll('#', '')}',
+                                  radix: 16))
+                              : _type.accentColor);
+
+                      return InkWell(
+                        key: Key(
+                            'admin_announcement_color_${hex.isEmpty ? 'default' : hex.replaceAll('#', '')}'),
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          setState(() {
+                            _selectedColorHex = isDefault ? null : hex;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? previewColor.withValues(alpha: 0.18)
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? previewColor
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: previewColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w800
+                                      : FontWeight.w600,
+                                  color: isSelected
+                                      ? previewColor
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                ),
+                              ),
+                              if (isSelected) ...[
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.check_rounded,
+                                  size: 14,
+                                  color: previewColor,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
               ],
             ),
@@ -1464,6 +1622,9 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                           message: _msgCtrl.text.trim(),
                           type: _type,
                           effectShape: _effectShape,
+                          colorHex: _selectedColorHex,
+                          clearColorHex: _selectedColorHex == null ||
+                              _selectedColorHex!.isEmpty,
                           linkUrl: _linkCtrl.text.trim(),
                         )
                       : GlobalAnnouncement(
@@ -1472,6 +1633,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                           message: _msgCtrl.text.trim(),
                           type: _type,
                           effectShape: _effectShape,
+                          colorHex: _selectedColorHex,
                           linkUrl: _linkCtrl.text.trim(),
                           isActive: true,
                           createdAt: DateTime.now(),

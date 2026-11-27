@@ -75,6 +75,7 @@ class GlobalAnnouncement {
     required this.message,
     this.type = AnnouncementType.info,
     this.effectShape = 'Konfeti',
+    this.colorHex,
     this.linkUrl = '',
     this.isActive = true,
     required this.createdAt,
@@ -85,9 +86,30 @@ class GlobalAnnouncement {
   final String message;
   final AnnouncementType type;
   final String effectShape;
+  final String? colorHex;
   final String linkUrl;
   final bool isActive;
   final DateTime createdAt;
+
+  Color? get customColor {
+    if (colorHex == null || colorHex!.trim().isEmpty) return null;
+    final cleaned = colorHex!.trim().replaceAll('#', '');
+    final val =
+        int.tryParse(cleaned.length == 6 ? 'FF$cleaned' : cleaned, radix: 16);
+    return val != null ? Color(val) : null;
+  }
+
+  static const List<Map<String, String>> presetColors = [
+    {'name': 'Varsayılan (Uygulama Teması)', 'hex': ''},
+    {'name': 'Teal Klasik', 'hex': '#0B6E6E'},
+    {'name': 'Camgöbeği (Cyan)', 'hex': '#00F2FE'},
+    {'name': 'Yakut / Pembe', 'hex': '#FF1E56'},
+    {'name': 'Zümrüt Yeşili', 'hex': '#10B981'},
+    {'name': 'Amber / Altın', 'hex': '#F59E0B'},
+    {'name': 'Mor / Violet', 'hex': '#8B5CF6'},
+    {'name': 'Kraliyet Mavisi', 'hex': '#3B82F6'},
+    {'name': 'Mercan Kırmızı', 'hex': '#EF4444'},
+  ];
 
   static const List<String> availableEffectShapes = [
     'Kalp',
@@ -175,6 +197,8 @@ class GlobalAnnouncement {
     String? message,
     AnnouncementType? type,
     String? effectShape,
+    String? colorHex,
+    bool clearColorHex = false,
     String? linkUrl,
     bool? isActive,
   }) {
@@ -184,6 +208,7 @@ class GlobalAnnouncement {
       message: message ?? this.message,
       type: type ?? this.type,
       effectShape: effectShape ?? this.effectShape,
+      colorHex: clearColorHex ? null : (colorHex ?? this.colorHex),
       linkUrl: linkUrl ?? this.linkUrl,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt,
@@ -196,6 +221,8 @@ class GlobalAnnouncement {
         'message': message.trim(),
         'type': type.name,
         'effectShape': effectShape,
+        if (colorHex != null && colorHex!.trim().isNotEmpty)
+          'colorHex': colorHex!.trim(),
         if (linkUrl.trim().isNotEmpty) 'linkUrl': linkUrl.trim(),
         'isActive': isActive,
         'createdAt': createdAt.toIso8601String(),
@@ -213,6 +240,7 @@ class GlobalAnnouncement {
       effectShape: (json['effectShape'] as String?) ??
           (json['shape'] as String?) ??
           'Konfeti',
+      colorHex: json['colorHex'] as String?,
       linkUrl: (json['linkUrl'] as String?) ?? '',
       isActive: (json['isActive'] as bool?) ?? true,
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??

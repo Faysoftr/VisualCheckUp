@@ -322,13 +322,15 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('ADMİN'), findsOneWidget);
+        // Admin profilinde hızlı yönetim paneli kaldırıldı, yönetim drawer altından yapılır
         expect(
           find.byKey(const Key('profile_admin_console_card')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('profile_bio_card')),
           findsOneWidget,
         );
-        await tester.tap(find.text('Kullanıcılar'));
-        await tester.pumpAndSettle();
-        expect(adminOpened, isTrue);
       },
     );
   });
