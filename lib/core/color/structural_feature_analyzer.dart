@@ -109,10 +109,10 @@ class StructuralFeatures {
   bool get hasEyeRedVessels => scleraVesselRatio >= 0.025;
   bool get hasEyeYellowPatch => scleraYellowRatio >= 0.08;
   bool get hasSubconjunctivalHemorrhage => hemorrhagePatchRatio >= 0.035;
-  bool get hasNailWhiteLinesOrSpots => whiteLineSpotRatio >= 0.022;
+  bool get hasNailWhiteLinesOrSpots => whiteLineSpotRatio >= 0.025;
   bool get hasNailCracksOrRoughness => fractureEdgeRoughness >= 0.24;
-  bool get hasNailDarkVerticalBand => darkVerticalBandScore >= 0.22;
-  bool get hasNailTransverseGroove => transverseGrooveScore >= 0.25;
+  bool get hasNailDarkVerticalBand => darkVerticalBandScore >= 0.38;
+  bool get hasNailTransverseGroove => transverseGrooveScore >= 0.28;
   bool get hasTerryOrLindsaySplit => proximalDistalSplitScore >= 0.30;
   bool get hasSplinterHemorrhage => splinterStreakRatio >= 0.012;
 
@@ -490,25 +490,39 @@ class StructuralFeatureAnalyzer {
     final medianL = sortedLuma[sortedLuma.length ~/ 2];
 
     // 1. White spots / transverse white bands (leukonychia / Muehrcke lines)
+    // NOTE: Ignore specular wet/light glares (l >= 245 with near-zero saturation),
+    // which are reflections from ceiling bulbs, windows, or camera flash.
     var whiteSpotPixels = 0;
     var platePixels = 0;
     var splinterPixels = 0;
+    final isGlare = List<bool>.filled(w * h, false);
+
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final idx = y * w + x;
+        if (luma[idx] >= 242 && satList[idx] <= 0.08) {
+          isGlare[idx] = true;
+        }
+      }
+    }
+
     for (var y = 2; y < h - 2; y++) {
       for (var x = 2; x < w - 2; x++) {
         final idx = y * w + x;
         final l = luma[idx];
         final s = satList[idx];
-        if (l < 30) continue;
+        if (l < 30 || isGlare[idx]) continue;
         platePixels++;
 
+        // True leukonychia is a matte, opaque white spot, NOT a specular light reflection
         final isWhiteContrast =
-            l >= 198 && l < 252 && s <= 0.13 && (l - medianL) >= 24.0;
+            l >= 195 && l < 242 && s <= 0.14 && (l - medianL) >= 26.0;
         if (isWhiteContrast) {
           var brightNeighbors = 0;
-          if (luma[idx - 1] >= 195) brightNeighbors++;
-          if (luma[idx + 1] >= 195) brightNeighbors++;
-          if (luma[idx - w] >= 195) brightNeighbors++;
-          if (luma[idx + w] >= 195) brightNeighbors++;
+          if (luma[idx - 1] >= 190 && !isGlare[idx - 1]) brightNeighbors++;
+          if (luma[idx + 1] >= 190 && !isGlare[idx + 1]) brightNeighbors++;
+          if (luma[idx - w] >= 190 && !isGlare[idx - w]) brightNeighbors++;
+          if (luma[idx + w] >= 190 && !isGlare[idx + w]) brightNeighbors++;
           if (brightNeighbors >= 2) {
             whiteSpotPixels++;
           }
@@ -531,37 +545,73 @@ class StructuralFeatureAnalyzer {
     }
 
     // 2. Dark longitudinal vertical band (melanonychia)
+    // NOTE: A true melanonychia band is an internal pigmented stripe INSIDE the
+    // nail plate, bordered on BOTH the left and right by normal nail plate tissue.
+    // Natural edge drop-offs (lateral nail folds / shadows) must NEVER be counted.
     final colMedians = <double>[];
+    final colRedExcess = <double>[];
     final yStart = (h * 0.20).round();
     final yEnd = (h * 0.80).round();
-    for (var x = 4; x < w - 4; x++) {
+    for (var x = 8; x < w - 8; x++) {
       final colVals = <double>[];
+      final colReVals = <double>[];
       for (var y = yStart; y < yEnd; y++) {
-        colVals.add(luma[y * w + x]);
+        final idx = y * w + x;
+        if (!isGlare[idx]) {
+          colVals.add(luma[idx]);
+          colReVals.add(redExcessGrid[idx]);
+        }
       }
-      colVals.sort();
-      colMedians.add(colVals[colVals.length ~/ 2]);
+      if (colVals.isNotEmpty) {
+        colVals.sort();
+        colMedians.add(colVals[colVals.length ~/ 2]);
+        colReVals.sort();
+        colRedExcess.add(colReVals[colReVals.length ~/ 2]);
+      }
     }
 
     var darkBandScore = 0.0;
-    if (colMedians.length >= 10 && medianL >= 95) {
+    if (colMedians.length >= 16 && medianL >= 90) {
       final sortedCols = [...colMedians]..sort();
       final plateColMedian = sortedCols[sortedCols.length ~/ 2];
       var maxDip = 0.0;
       var dipWidth = 0;
       var curWidth = 0;
-      for (final cm in colMedians) {
+      var hasLeftFlank = false;
+      var hasRightFlank = false;
+
+      // Scan columns away from the outer 15% margins to reject lateral shadows
+      final marginCols = (colMedians.length * 0.15).round();
+      for (var i = marginCols; i < colMedians.length - marginCols; i++) {
+        final cm = colMedians[i];
         final dip = plateColMedian - cm;
-        if (dip >= 36.0 && cm < 95.0) {
+
+        // A true melanonychia band has marked luminance drop (>= 42) AND true
+        // dark pigmentation (low luminance < 80, low redness excess < 18)
+        final isPigmentedDip = dip >= 42.0 && cm < 80.0 && colRedExcess[i] < 18.0;
+
+        if (isPigmentedDip) {
+          // Verify left flank has normal nail plate luminance within 4 cols
+          if (!hasLeftFlank && i >= 3) {
+            hasLeftFlank = colMedians[i - 2] >= (plateColMedian - 20.0);
+          }
           curWidth++;
           if (dip > maxDip) maxDip = dip;
           if (curWidth > dipWidth) dipWidth = curWidth;
         } else {
+          if (curWidth > 0 && i < colMedians.length - 2) {
+            hasRightFlank = colMedians[i + 1] >= (plateColMedian - 20.0);
+          }
           curWidth = 0;
         }
       }
-      if (dipWidth >= 2 && dipWidth <= (colMedians.length * 0.40)) {
-        darkBandScore = ((maxDip - 30.0) / 90.0).clamp(0.0, 1.0);
+
+      // Only count as true melanonychia if bordered on BOTH sides by normal nail
+      if (hasLeftFlank &&
+          hasRightFlank &&
+          dipWidth >= 2 &&
+          dipWidth <= (colMedians.length * 0.28)) {
+        darkBandScore = ((maxDip - 38.0) / 75.0).clamp(0.0, 1.0);
       }
     }
 

@@ -72,9 +72,9 @@ class AiVisionPromptBuilder {
   /// automatic implicit context caching maximizes input-token savings.
   static const String systemInstruction =
       'VisualCheckUp görsel ön farkındalık asistanısın. Tıbbi teşhis koymazsın. '
-      'Fotoğrafı verilen modülün sağlıklı/sağlıksız referanslarıyla, renk ve ince yapı/doku '
-      'telemetrisiyle (dilde yarık/çatlak ve pas, gözde kılcal kanlanma veya sararma, '
-      'tırnakta beyaz nokta/çizgi, kırık/soyulma, oluk, koyu dikey bant) kıyasla. '
+      'Fotoğrafı verilen modülün sağlıklı/sağlıksız referanslarıyla, renk ve doku '
+      'telemetrisiyle kıyasla. Flaş/lamba parlamalarını, ışık yansımalarını veya doğal bombelik '
+      'gölgelerini asla çizgi ya da hastalık sayma (artefaktır); şüphede veya genel sağlıklı dokuda normal referansı seç. '
       'Yalnızca geçerli, kısa Türkçe JSON döndür: '
       '{"image_quality_ok":bool,"matched_finding_ids":[str],'
       '"risk_level":"normal|attention|urgent","summary_title":str,'
@@ -159,13 +159,17 @@ class AiVisionPromptBuilder {
       );
     }
 
+    final categorySpecialRule = category == CheckCategory.nail
+        ? 'Önemli: Tırnak üstündeki flaş parlaması, tepe ışığı şeridi veya doğal yansımayı asla dikey çizgi, oluk ya da melanoniki sayma. Gerçek pigmentli bant yoksa nail_healthy_pink seç.\n'
+        : '';
+
     final userPrompt = '''
 Modül: ${category.title} (${category.id})
 Yanıt dili (ISO-639-1): $languageCode
 Referanslar:
 $rubricLines
 Telemetri: ${telemetryParts.isEmpty ? 'yok' : telemetryParts.join(' | ')}
-Kural: Sadece listedeki matched_finding_ids kullan, tüm metin alanlarını $languageCode dilinde yaz, en fazla 2 gözlem ve 2 öneri yaz, yalnızca JSON döndür.''';
+${categorySpecialRule}Kural: Sadece listedeki matched_finding_ids kullan, tüm metin alanlarını $languageCode dilinde yaz, en fazla 2 gözlem ve 2 öneri yaz, yalnızca JSON döndür.''';
 
     return AiVisionRequest(
       category: category,
