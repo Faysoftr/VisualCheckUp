@@ -1,16 +1,22 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/app.dart';
 import 'package:visualcheckup/features/auth/data/auth_service.dart';
 import 'package:visualcheckup/features/auth/data/firebase_social_auth_adapter.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (_) {
-    // Runs gracefully in local-first mode if Firebase config files are not yet added.
-  }
+
+  // Initialize Firebase asynchronously with a safety timeout so it never blocks
+  // runApp or causes the native splash screen to hang/freeze.
+  unawaited(
+    Firebase.initializeApp()
+        .timeout(const Duration(seconds: 4))
+        .catchError((_) => Firebase.app()),
+  );
+
   runApp(
     VisualCheckUpApp(
       authService: LocalAuthService(

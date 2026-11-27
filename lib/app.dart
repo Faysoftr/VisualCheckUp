@@ -117,28 +117,52 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   }
 
   Future<void> _bootstrap() async {
-    await _themeController.load();
-    await _localeController.load();
-    await _profileController.load();
-    await _alarmScheduler.initialize(
-      onAlarmNotificationTap: _handleAlarmNotificationTap,
-    );
+    try {
+      await Future.wait([
+        _themeController.load(),
+        _localeController.load(),
+        _profileController.load(),
+      ]).timeout(const Duration(seconds: 3));
+    } catch (_) {}
+
+    try {
+      await _alarmScheduler
+          .initialize(
+            onAlarmNotificationTap: _handleAlarmNotificationTap,
+          )
+          .timeout(const Duration(seconds: 3));
+    } catch (_) {}
+
     if (widget.initialUser == null) {
-      final restoredUser = await _authService.loadCurrentUser();
+      AuthUser? restoredUser;
+      try {
+        restoredUser = await _authService
+            .loadCurrentUser()
+            .timeout(const Duration(seconds: 3));
+      } catch (_) {}
       if (!mounted) return;
       setState(() {
         _currentUser = restoredUser;
         _bootstrapping = false;
       });
+    } else {
+      if (mounted) {
+        setState(() {
+          _bootstrapping = false;
+        });
+      }
     }
     _alarmWatcher.start();
 
-    final launchReminderId = await _alarmScheduler.getLaunchReminderId();
-    if (launchReminderId != null && mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _handleAlarmNotificationTap(launchReminderId);
-      });
-    }
+    try {
+      final launchReminderId =
+          await _alarmScheduler.getLaunchReminderId().timeout(const Duration(seconds: 2));
+      if (launchReminderId != null && mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _handleAlarmNotificationTap(launchReminderId);
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _handleAlarmNotificationTap(String reminderId) async {
@@ -223,7 +247,12 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
               home = SplashScreen(onComplete: _handleSplashComplete);
             } else if (_bootstrapping) {
               home = const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
+                backgroundColor: Color(0xFF0A1F1C),
+                body: Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF2EFFD6),
+                  ),
+                ),
               );
             } else if (_currentUser == null) {
               home = LoginScreen(

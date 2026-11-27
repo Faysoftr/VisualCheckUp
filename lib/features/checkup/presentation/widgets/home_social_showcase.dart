@@ -201,21 +201,19 @@ class SfbDailyHealthTipCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 6,
+                      runSpacing: 4,
                       children: [
-                        Flexible(
-                          child: Text(
-                            l10n.dailyHealthTipTitle,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              color: const Color(0xFF0891B2),
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          l10n.dailyHealthTipTitle,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: const Color(0xFF0891B2),
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
                           ),
                         ),
-                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
@@ -300,67 +298,57 @@ class SfbDailyHealthTipCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
-              Flexible(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => WellnessKnowledgeCornerSheet.show(context),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.menu_book_rounded,
-                          size: 13,
-                          color: Color(0xFF0891B2),
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            'Faydalı Bilgiler Köşesi ➔',
-                            style: const TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF0891B2),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              if (tipItem.source != null)
-                Flexible(
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => WellnessKnowledgeCornerSheet.show(context),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.verified_rounded,
+                      Icon(
+                        Icons.menu_book_rounded,
                         size: 13,
-                        color: Color(0xFF0D9488),
+                        color: Color(0xFF0891B2),
                       ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          tipItem.source!,
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? Colors.white60 : Colors.black54,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      SizedBox(width: 4),
+                      Text(
+                        'Faydalı Bilgiler Köşesi ➔',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0891B2),
                         ),
                       ),
                     ],
                   ),
+                ),
+              ),
+              if (tipItem.source != null)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 13,
+                      color: Color(0xFF0D9488),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      tipItem.source!,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white60 : Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),

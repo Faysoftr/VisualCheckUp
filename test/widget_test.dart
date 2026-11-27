@@ -41,6 +41,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('VisualCheckUp'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Göz (Sklera)'),
+        250,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Göz (Sklera)'), findsOneWidget);
       expect(find.text('Tırnak'), findsOneWidget);
 
