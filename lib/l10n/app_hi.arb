@@ -943,5 +943,12 @@
   "sfbViewDetails": "विवरण देखें",
   "sfbAdminBadge": "एडमिन",
   "sfbAdminConsoleTitle": "त्वरित एडमिन कंसोल",
-  "sfbAdminFounderBanner": "प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन"
+  "sfbAdminFounderBanner": "प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन",
+  "adminFieldIcon": "स्वास्थ्य और उत्सव आइकन",
+  "adminToggleSendPush": "उपयोगकर्ताओं को सूचना भेजें",
+  "adminToggleSendPushSubtitle": "सूचना भेजें और उपयोगी स्वास्थ्य जानकारी कार्ड में दिखाएँ",
+  "adminAnnouncementPublishedToast": "घोषणा प्रकाशित की गई और सूचना भेजी गई।",
+  "cameraLiveLight": "रोशनी",
+  "cameraLiveFocus": "फ़ोकस",
+  "cameraLiveGlare": "चमक"
 }

@@ -3108,4 +3108,27 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATTFORMSGRUNDARE & SYSTEMADMIN';
+
+  @override
+  String get adminFieldIcon => 'Hälso- och firandeikon';
+
+  @override
+  String get adminToggleSendPush => 'Skicka avisering till användare';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Avisera och visa i kortet Nyttig hälsoinformation';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Meddelande publicerat och avisering skickad.';
+
+  @override
+  String get cameraLiveLight => 'Ljus';
+
+  @override
+  String get cameraLiveFocus => 'Fokus';
+
+  @override
+  String get cameraLiveGlare => 'Blänk';
 }

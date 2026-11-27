@@ -39,6 +39,9 @@ class StructuralFeatures {
     this.proximalDistalSplitScore = 0.0,
     this.splinterStreakRatio = 0.0,
     this.nailErythemaIndex = 0.0,
+    this.nailSkinEiDelta = 0.0,
+    this.urineTurbidityScore = 0.0,
+    this.faceMalarEiDelta = 0.0,
   });
 
   /// Fraction (0..1) of tongue ROI pixels forming dark narrow grooves/fissures.
@@ -102,6 +105,17 @@ class StructuralFeatures {
   /// Mean Mannino-style nailbed Erythema Index (`100 * (log10(R) - log10(G))`).
   final double nailErythemaIndex;
 
+  /// Relative Mannino nailbed-to-surrounding-finger-skin Erythema Index delta
+  /// (`nailEI - fingerSkinEI`), reducing lighting and skin-phototype drift.
+  final double nailSkinEiDelta;
+
+  /// Local texture/cloudiness turbidity score (0..1) for urine clarity cues.
+  final double urineTurbidityScore;
+
+  /// Cheek-vs-forehead Erythema Index delta (`cheekEI - foreheadEI`) for malar
+  /// / facial flushing cues.
+  final double faceMalarEiDelta;
+
   bool get hasTongueFissures => fissureGrooveRatio >= 0.032;
   bool get hasTongueCoatingPatch => coatingPatchRatio >= 0.24;
   bool get hasTongueYellowCoating => yellowCoatingRatio >= 0.20;
@@ -115,6 +129,8 @@ class StructuralFeatures {
   bool get hasNailTransverseGroove => transverseGrooveScore >= 0.25;
   bool get hasTerryOrLindsaySplit => proximalDistalSplitScore >= 0.30;
   bool get hasSplinterHemorrhage => splinterStreakRatio >= 0.012;
+  bool get hasCloudyUrineCue => urineTurbidityScore >= 0.28;
+  bool get hasFaceMalarRedness => faceMalarEiDelta >= 6.5;
 
   String toCompactTelemetry(CheckCategory category) {
     switch (category) {
@@ -137,7 +153,13 @@ class StructuralFeatures {
             'beau=${(transverseGrooveScore * 100).toStringAsFixed(0)}% '
             'terry=${(proximalDistalSplitScore * 100).toStringAsFixed(0)}% '
             'splinter=${(splinterStreakRatio * 100).toStringAsFixed(1)}% '
-            'ei=${nailErythemaIndex.toStringAsFixed(1)}';
+            'ei=${nailErythemaIndex.toStringAsFixed(1)} '
+            'd_ei=${nailSkinEiDelta.toStringAsFixed(1)}';
+      case CheckCategory.urine:
+        return 'turbidity=${(urineTurbidityScore * 100).toStringAsFixed(0)}%';
+      case CheckCategory.face:
+        return 'malar_dei=${faceMalarEiDelta.toStringAsFixed(1)} '
+            'roughness=${(fractureEdgeRoughness * 100).toStringAsFixed(1)}%';
       default:
         return 'roughness=${(fractureEdgeRoughness * 100).toStringAsFixed(1)}%';
     }
@@ -192,6 +214,10 @@ class StructuralFeatureAnalyzer {
         return _analyzeEye(roi);
       case CheckCategory.nail:
         return _analyzeNail(roi);
+      case CheckCategory.urine:
+        return _analyzeUrine(roi);
+      case CheckCategory.face:
+        return _analyzeFace(roi);
       default:
         return StructuralFeatures(
           fractureEdgeRoughness: _computeEdgeRoughness(roi),
@@ -227,8 +253,8 @@ class StructuralFeatureAnalyzer {
         final idx = y * w + x;
         luma[idx] = l;
 
-        // Ignore specular wet glare highlights
-        if (l > 246) continue;
+        // Ignore wet saliva specular glare highlights & dark mouth cavity shadow
+        if (l < 36 || ColorCalibrator.isSpecularGlare(ri, gi, bi)) continue;
         validCount++;
 
         final maxC = math.max(r, math.max(g, b));
@@ -639,7 +665,37 @@ class StructuralFeatureAnalyzer {
       }
     }
 
-    // 5. Surface cracks, peeling, splitting (high-frequency edge energy)
+    // 5. Mannino relative nailbed vs. surrounding finger skin Erythema Index
+    //    delta (central 25%..75% vs outer border 0..14% & 86%..100%).
+    double innerEiSum = 0, outerEiSum = 0;
+    int innerEiN = 0, outerEiN = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final p = roi.getPixel(x, y);
+        final ri = p.r.round().clamp(0, 255);
+        final gi = p.g.round().clamp(0, 255);
+        final bi = p.b.round().clamp(0, 255);
+        final l = 0.299 * ri + 0.587 * gi + 0.114 * bi;
+        if (l < 35 || ColorCalibrator.isSpecularGlare(ri, gi, bi)) continue;
+        final ei = ColorCalibrator.erythemaIndex(ri, gi);
+        final isInner =
+            x >= w * 0.25 && x <= w * 0.75 && y >= h * 0.25 && y <= h * 0.75;
+        final isOuter =
+            x < w * 0.15 || x > w * 0.85 || y < h * 0.15 || y > h * 0.85;
+        if (isInner) {
+          innerEiSum += ei;
+          innerEiN++;
+        } else if (isOuter) {
+          outerEiSum += ei;
+          outerEiN++;
+        }
+      }
+    }
+    final nailSkinEiDelta = (innerEiN >= 16 && outerEiN >= 16)
+        ? ((innerEiSum / innerEiN) - (outerEiSum / outerEiN))
+        : 0.0;
+
+    // 6. Surface cracks, peeling, splitting (high-frequency edge energy)
     final roughness = _computeEdgeRoughness(roi);
 
     return StructuralFeatures(
@@ -654,6 +710,99 @@ class StructuralFeatureAnalyzer {
           ? (splinterPixels / platePixels).clamp(0.0, 1.0)
           : 0.0,
       nailErythemaIndex: eiCount > 0 ? eiSum / eiCount : 0.0,
+      nailSkinEiDelta: nailSkinEiDelta,
+    );
+  }
+
+  /// Evaluates urine sample clarity/turbidity from local luminance variance
+  /// and micro-texture (clear translucent liquid = smooth; cloudy/foamy = high
+  /// local texture + muted saturation patches).
+  static StructuralFeatures _analyzeUrine(img.Image roi) {
+    final w = roi.width;
+    final h = roi.height;
+    final luma = List<double>.filled(w * h, 0);
+    int hazyPixels = 0;
+    int validPixels = 0;
+
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final p = roi.getPixel(x, y);
+        final ri = p.r.round().clamp(0, 255);
+        final gi = p.g.round().clamp(0, 255);
+        final bi = p.b.round().clamp(0, 255);
+        final l = 0.299 * ri + 0.587 * gi + 0.114 * bi;
+        luma[y * w + x] = l;
+        if (l < 30 || ColorCalibrator.isSpecularGlare(ri, gi, bi)) continue;
+        validPixels++;
+        final lab = LabColor.fromRgb(ri, gi, bi);
+        // Milky / hazy cloudy urine exhibits mid-high L* with muted chroma
+        if (lab.l >= 55.0 && lab.l <= 88.0 && lab.chroma <= 24.0) {
+          hazyPixels++;
+        }
+      }
+    }
+
+    double gradSum = 0;
+    int gradN = 0;
+    for (var y = 1; y < h - 1; y++) {
+      for (var x = 1; x < w - 1; x++) {
+        final c = luma[y * w + x];
+        final diff =
+            ((c - luma[y * w + (x + 1)]).abs() + (c - luma[(y + 1) * w + x]).abs()) *
+                0.5;
+        gradSum += diff;
+        gradN++;
+      }
+    }
+
+    final localTexture = gradN > 0 ? (gradSum / gradN / 22.0).clamp(0.0, 1.0) : 0.0;
+    final hazyRatio = validPixels > 0 ? (hazyPixels / validPixels).clamp(0.0, 1.0) : 0.0;
+    final turbidity = (localTexture * 0.65 + hazyRatio * 0.35).clamp(0.0, 1.0);
+
+    return StructuralFeatures(
+      urineTurbidityScore: turbidity,
+      fractureEdgeRoughness: _computeEdgeRoughness(roi),
+    );
+  }
+
+  /// Evaluates facial cheek-vs-forehead Erythema Index delta (malar flushing
+  /// cue) while normalizing for constitutive skin tone.
+  static StructuralFeatures _analyzeFace(img.Image roi) {
+    final w = roi.width;
+    final h = roi.height;
+    double foreheadEi = 0, cheekEi = 0;
+    int foreheadN = 0, cheekN = 0;
+
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final p = roi.getPixel(x, y);
+        final ri = p.r.round().clamp(0, 255);
+        final gi = p.g.round().clamp(0, 255);
+        final bi = p.b.round().clamp(0, 255);
+        final l = 0.299 * ri + 0.587 * gi + 0.114 * bi;
+        if (l < 35 || ColorCalibrator.isSpecularGlare(ri, gi, bi)) continue;
+        final ei = ColorCalibrator.erythemaIndex(ri, gi);
+
+        if (y >= h * 0.12 && y <= h * 0.34 && x >= w * 0.25 && x <= w * 0.75) {
+          foreheadEi += ei;
+          foreheadN++;
+        } else if (y >= h * 0.45 &&
+            y <= h * 0.72 &&
+            ((x >= w * 0.12 && x <= w * 0.38) ||
+                (x >= w * 0.62 && x <= w * 0.88))) {
+          cheekEi += ei;
+          cheekN++;
+        }
+      }
+    }
+
+    final malarDelta = (foreheadN >= 16 && cheekN >= 16)
+        ? ((cheekEi / cheekN) - (foreheadEi / foreheadN))
+        : 0.0;
+
+    return StructuralFeatures(
+      faceMalarEiDelta: malarDelta,
+      fractureEdgeRoughness: _computeEdgeRoughness(roi),
     );
   }
 

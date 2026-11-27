@@ -3111,4 +3111,27 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ';
+
+  @override
+  String get adminFieldIcon => 'Sağlık ve Kutlama İkonu';
+
+  @override
+  String get adminToggleSendPush => 'Kullanıcılara bildirim gönder';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Yayınlandığında bildirim gönder ve Faydalı Bilgiler kartında göster';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Duyuru yayınlandı ve bildirim gönderildi.';
+
+  @override
+  String get cameraLiveLight => 'Işık';
+
+  @override
+  String get cameraLiveFocus => 'Odak';
+
+  @override
+  String get cameraLiveGlare => 'Parlama';
 }

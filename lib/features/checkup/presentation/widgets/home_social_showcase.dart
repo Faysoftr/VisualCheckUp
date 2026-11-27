@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
+import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/domain/wellness_wall_models.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
@@ -148,69 +149,240 @@ class SfbGradientRingAvatar extends StatelessWidget {
   }
 }
 
-/// Glowing cyan Daily Health Tip card (modeled after SFB "Tarihte Bugün" card).
-class SfbDailyHealthTipCard extends StatelessWidget {
-  const SfbDailyHealthTipCard({super.key});
+/// Glowing Daily Health Tip & Live Announcements carousel card
+/// (modeled after Social Formula Bank's "Tarihte Bugün 3/11" card).
+class SfbDailyHealthTipCard extends StatefulWidget {
+  const SfbDailyHealthTipCard({
+    super.key,
+    this.announcements = const [],
+  });
+
+  final List<GlobalAnnouncement> announcements;
+
+  @override
+  State<SfbDailyHealthTipCard> createState() => _SfbDailyHealthTipCardState();
+}
+
+class _SfbDailyHealthTipCardState extends State<SfbDailyHealthTipCard> {
+  static const List<String> _tipEmojis = ['🩺', '❤️', '🏃', '💧', '🥗', '😴'];
+  int _currentIndex = 0;
+
+  @override
+  void didUpdateWidget(covariant SfbDailyHealthTipCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldFirstId =
+        oldWidget.announcements.isEmpty ? null : oldWidget.announcements.first.id;
+    final newFirstId =
+        widget.announcements.isEmpty ? null : widget.announcements.first.id;
+    if (oldFirstId != newFirstId ||
+        oldWidget.announcements.length != widget.announcements.length) {
+      _currentIndex = 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final langCode = Localizations.localeOf(context).languageCode;
-    final tip = DailyWellnessExtras.dailyTipForLocale(langCode);
+    final tips = DailyWellnessExtras.allTipsForLocale(langCode);
+    final activeAnnouncements =
+        widget.announcements.where((a) => a.isActive).toList();
 
-    return SfbGradientBorderCard(
-      key: const Key('home_sfb_daily_tip_card'),
-      gradientColors: const [
-        Color(0xFF06B6D4),
-        Color(0xFF2DD4BF),
-        Color(0xFF38BDF8),
-      ],
-      glowColor: const Color(0xFF06B6D4),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFF06B6D4).withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.campaign_rounded,
-              color: Color(0xFF0891B2),
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.dailyHealthTipTitle,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: const Color(0xFF0891B2),
-                    fontWeight: FontWeight.w800,
-                  ),
+    final items = <_InfoCarouselItem>[
+      for (final ann in activeAnnouncements)
+        _InfoCarouselItem(
+          emoji: ann.effectiveEmoji,
+          accentColor: ann.effectiveAccentColor,
+          badgeLabel: ann.type.localizedLabel(l10n),
+          headline: ann.title,
+          body: ann.message,
+          isAnnouncement: true,
+        ),
+      for (int i = 0; i < tips.length; i++)
+        _InfoCarouselItem(
+          emoji: _tipEmojis[i % _tipEmojis.length],
+          accentColor: const Color(0xFF0891B2),
+          badgeLabel: null,
+          headline: null,
+          body: tips[i],
+          isAnnouncement: false,
+        ),
+    ];
+
+    if (items.isEmpty) return const SizedBox.shrink();
+    final safeIndex = _currentIndex % items.length;
+    final item = items[safeIndex];
+
+    void nextItem() {
+      if (items.length <= 1) return;
+      setState(() => _currentIndex = (safeIndex + 1) % items.length);
+    }
+
+    final borderColors = item.isAnnouncement
+        ? [
+            item.accentColor,
+            Color.lerp(item.accentColor, const Color(0xFF06B6D4), 0.45) ??
+                const Color(0xFF06B6D4),
+            Color.lerp(item.accentColor, const Color(0xFFEC4899), 0.35) ??
+                const Color(0xFFEC4899),
+          ]
+        : const [
+            Color(0xFF06B6D4),
+            Color(0xFF2DD4BF),
+            Color(0xFF38BDF8),
+          ];
+
+    return GestureDetector(
+      onTap: nextItem,
+      child: SfbGradientBorderCard(
+        key: const Key('home_sfb_daily_tip_card'),
+        gradientColors: borderColors,
+        glowColor: item.accentColor,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: item.accentColor.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: item.accentColor.withValues(alpha: 0.28),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  tip,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.38,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+              ),
+              child: Text(
+                item.emoji,
+                style: const TextStyle(fontSize: 22),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              l10n.dailyHealthTipTitle,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: item.accentColor,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            if (item.badgeLabel != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: item.accentColor.withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  item.badgeLabel!,
+                                  style: TextStyle(
+                                    color: item.accentColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (items.length > 1)
+                        InkWell(
+                          key: const Key('home_sfb_tip_next_btn'),
+                          borderRadius: BorderRadius.circular(999),
+                          onTap: nextItem,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: item.accentColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${safeIndex + 1}/${items.length}',
+                                  key: const Key('home_sfb_tip_counter'),
+                                  style: TextStyle(
+                                    color: item.accentColor,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 15,
+                                  color: item.accentColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (item.headline != null && item.headline!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      item.headline!,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 3),
+                  Text(
+                    item.body,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.38,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class _InfoCarouselItem {
+  const _InfoCarouselItem({
+    required this.emoji,
+    required this.accentColor,
+    required this.badgeLabel,
+    required this.headline,
+    required this.body,
+    required this.isAnnouncement,
+  });
+
+  final String emoji;
+  final Color accentColor;
+  final String? badgeLabel;
+  final String? headline;
+  final String body;
+  final bool isAnnouncement;
 }
 
 /// Verified Doctors horizontal showcase card (modeled after SFB "Özel Ders Verenler").

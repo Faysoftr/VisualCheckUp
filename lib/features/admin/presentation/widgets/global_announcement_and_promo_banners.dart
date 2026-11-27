@@ -9,10 +9,12 @@ class GlobalAnnouncementBanner extends StatefulWidget {
   const GlobalAnnouncementBanner({
     super.key,
     this.repository,
+    this.refreshToken = 0,
     this.margin = const EdgeInsets.fromLTRB(16, 10, 16, 4),
   });
 
   final AdminRepository? repository;
+  final int refreshToken;
   final EdgeInsetsGeometry margin;
 
   @override
@@ -30,11 +32,26 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
     _load();
   }
 
+  @override
+  void didUpdateWidget(covariant GlobalAnnouncementBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshToken != widget.refreshToken ||
+        oldWidget.repository != widget.repository) {
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     final repo = widget.repository ?? AdminRepository();
     final active = await repo.loadAnnouncements(activeOnly: true);
     if (!mounted) return;
-    setState(() => _announcement = active.isEmpty ? null : active.first);
+    final next = active.isEmpty ? null : active.first;
+    setState(() {
+      if (next?.id != _announcement?.id) {
+        _dismissed = false;
+      }
+      _announcement = next;
+    });
   }
 
   @override
@@ -42,7 +59,7 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
     final ann = _announcement;
     if (ann == null || _dismissed) return const SizedBox.shrink();
 
-    final accent = ann.type.accentColor;
+    final accent = ann.effectiveAccentColor;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -59,12 +76,17 @@ class _GlobalAnnouncementBannerState extends State<GlobalAnnouncementBanner> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.16),
               shape: BoxShape.circle,
             ),
-            child: Icon(ann.type.icon, color: accent, size: 20),
+            child: Text(
+              ann.effectiveEmoji,
+              style: const TextStyle(fontSize: 19),
+            ),
           ),
           const SizedBox(width: 11),
           Expanded(
@@ -103,11 +125,13 @@ class HealthPromotionBanner extends StatefulWidget {
     super.key,
     required this.placement,
     this.repository,
+    this.refreshToken = 0,
     this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 4),
   });
 
   final PromotionPlacement placement;
   final AdminRepository? repository;
+  final int refreshToken;
   final EdgeInsetsGeometry margin;
 
   @override
@@ -121,6 +145,15 @@ class _HealthPromotionBannerState extends State<HealthPromotionBanner> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant HealthPromotionBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshToken != widget.refreshToken ||
+        oldWidget.repository != widget.repository) {
+      _load();
+    }
   }
 
   Future<void> _load() async {

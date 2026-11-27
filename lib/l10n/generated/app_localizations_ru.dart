@@ -3090,4 +3090,27 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР';
+
+  @override
+  String get adminFieldIcon => 'Значок здоровья и праздника';
+
+  @override
+  String get adminToggleSendPush => 'Отправить уведомление пользователям';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Уведомить и показать в карточке полезной информации';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Объявление опубликовано и уведомление отправлено.';
+
+  @override
+  String get cameraLiveLight => 'Свет';
+
+  @override
+  String get cameraLiveFocus => 'Фокус';
+
+  @override
+  String get cameraLiveGlare => 'Блики';
 }

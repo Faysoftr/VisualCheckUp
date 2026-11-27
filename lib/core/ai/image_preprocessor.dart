@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
+import 'package:visualcheckup/core/color/color_calibrator.dart';
 import 'package:visualcheckup/features/checkup/domain/check_category.dart';
 
 enum ImageQualityIssue {
@@ -9,6 +10,36 @@ enum ImageQualityIssue {
   tooDark,
   overexposed,
   tooBlurry,
+}
+
+enum LiveQualityLevel {
+  good,
+  caution,
+  poor,
+}
+
+/// Real-time capture guidance metrics computed from the camera preview stream.
+class LiveCameraQuality {
+  const LiveCameraQuality({
+    required this.lightingLevel,
+    required this.sharpnessLevel,
+    required this.glareLevel,
+    required this.meanLuminance,
+    required this.tenengradScore,
+    required this.blownRatio,
+  });
+
+  final LiveQualityLevel lightingLevel;
+  final LiveQualityLevel sharpnessLevel;
+  final LiveQualityLevel glareLevel;
+  final double meanLuminance;
+  final double tenengradScore;
+  final double blownRatio;
+
+  bool get isAllGood =>
+      lightingLevel == LiveQualityLevel.good &&
+      sharpnessLevel == LiveQualityLevel.good &&
+      glareLevel == LiveQualityLevel.good;
 }
 
 class PreprocessedImage {
@@ -20,6 +51,9 @@ class PreprocessedImage {
     required this.blurScore,
     required this.meanLuminance,
     required this.contentFingerprint,
+    this.tenengradScore = 0.0,
+    this.glareRatio = 0.0,
+    this.colorCalibratedForAi = false,
   });
 
   /// Cropped, resized, JPEG-compressed bytes optimized for low Vision AI token
@@ -31,7 +65,16 @@ class PreprocessedImage {
 
   /// Variance of Laplacian in the central ROI (higher = sharper).
   final double blurScore;
+
+  /// Mean Sobel Tenengrad gradient energy in the central ROI (robust to ISO noise).
+  final double tenengradScore;
+
+  /// Fraction of hard-blown highlight pixels in central ROI (0..1).
+  final double glareRatio;
   final double meanLuminance;
+
+  /// Whether color constancy / white-balance gains were baked into [jpegBytes].
+  final bool colorCalibratedForAi;
 
   /// Deterministic content hash for 0-token duplicate-image caching.
   final String contentFingerprint;
@@ -43,10 +86,11 @@ class PreprocessedImage {
 /// Vision AI request.
 ///
 /// 1. Rejects overly dark, blown-out, or visibly out-of-focus captures locally
-///    so no API tokens are wasted on unusable photos.
-/// 2. Crops to the central 70% x 70% frame (keeping lesion + surrounding ring)
-///    and downscales to 512px (color-primary modules) or 768px (skin/nail
-///    morphology modules) at JPEG quality 80.
+///    (combining Laplacian variance + Sobel Tenengrad gradient energy) so no
+///    API tokens are wasted on unusable photos.
+/// 2. Crops to the central frame, downscales to 512px (color-primary modules)
+///    or 768px (skin/nail morphology modules), optionally bakes D65 color
+///    constancy gains into the Vision AI crop, and encodes JPEG at quality 82.
 /// 3. Computes a deterministic FNV-1a fingerprint for duplicate-request caching.
 class ImagePreprocessor {
   ImagePreprocessor._();
@@ -83,7 +127,8 @@ class ImagePreprocessor {
     required img.Image decoded,
     required CheckCategory category,
     bool preserveWhiteRefStrip = false,
-    int jpegQuality = 80,
+    WhiteBalanceGains? colorCalibrationGains,
+    int jpegQuality = 82,
   }) {
     final quality = assessQuality(decoded: decoded, category: category);
 
@@ -123,6 +168,17 @@ class ImagePreprocessor {
       }
     }
 
+    // Bake color constancy / white balance gains into the resized AI payload
+    // so Vision AI sees true D65 tissue hues rather than warm/cool room bulbs.
+    var colorCalibratedForAi = false;
+    if (colorCalibrationGains != null) {
+      resized = ColorCalibrator.applyGainsToImage(
+        resized,
+        colorCalibrationGains,
+      );
+      colorCalibratedForAi = true;
+    }
+
     final jpegBytes = Uint8List.fromList(
       img.encodeJpg(resized, quality: jpegQuality),
     );
@@ -138,7 +194,10 @@ class ImagePreprocessor {
       height: resized.height,
       qualityIssue: quality.issue,
       blurScore: quality.blurScore,
+      tenengradScore: quality.tenengradScore,
+      glareRatio: quality.glareRatio,
       meanLuminance: quality.meanLuminance,
+      colorCalibratedForAi: colorCalibratedForAi,
       contentFingerprint: fingerprint,
     );
   }
@@ -146,6 +205,8 @@ class ImagePreprocessor {
   static ({
     ImageQualityIssue issue,
     double blurScore,
+    double tenengradScore,
+    double glareRatio,
     double meanLuminance,
   }) assessQuality({
     required img.Image decoded,
@@ -205,6 +266,8 @@ class ImagePreprocessor {
       return (
         issue: ImageQualityIssue.tooDark,
         blurScore: 0.0,
+        tenengradScore: 0.0,
+        glareRatio: blownRatio,
         meanLuminance: meanLum,
       );
     }
@@ -214,14 +277,17 @@ class ImagePreprocessor {
       return (
         issue: ImageQualityIssue.overexposed,
         blurScore: 0.0,
+        tenengradScore: 0.0,
+        glareRatio: blownRatio,
         meanLuminance: meanLum,
       );
     }
 
-    // 3. Variance of discrete 4-neighbor Laplacian for focus sharpness
+    // 3. Dual-metric sharpness: 4-neighbor Laplacian variance + Sobel Tenengrad
     double lapSum = 0;
     double lapSum2 = 0;
-    int lapCount = 0;
+    double tenengradSum = 0;
+    int gradCount = 0;
 
     if (w >= 3 && h >= 3) {
       for (int y = 1; y < h - 1; y++) {
@@ -234,21 +300,40 @@ class ImagePreprocessor {
               gray[(y + 1) * w + x];
           lapSum += lap;
           lapSum2 += lap * lap;
-          lapCount++;
+
+          final gx = -gray[(y - 1) * w + (x - 1)] +
+              gray[(y - 1) * w + (x + 1)] -
+              2.0 * gray[y * w + (x - 1)] +
+              2.0 * gray[y * w + (x + 1)] -
+              gray[(y + 1) * w + (x - 1)] +
+              gray[(y + 1) * w + (x + 1)];
+          final gy = -gray[(y - 1) * w + (x - 1)] -
+              2.0 * gray[(y - 1) * w + x] -
+              gray[(y - 1) * w + (x + 1)] +
+              gray[(y + 1) * w + (x - 1)] +
+              2.0 * gray[(y + 1) * w + x] +
+              gray[(y + 1) * w + (x + 1)];
+          tenengradSum += (gx * gx + gy * gy);
+          gradCount++;
         }
       }
     }
 
-    final safeLap = math.max(1, lapCount);
-    final lapMean = lapSum / safeLap;
-    final blurScore = math.max(0.0, (lapSum2 / safeLap) - lapMean * lapMean);
+    final safeGrad = math.max(1, gradCount);
+    final lapMean = lapSum / safeGrad;
+    final blurScore = math.max(0.0, (lapSum2 / safeGrad) - lapMean * lapMean);
+    final tenengradScore = math.sqrt(tenengradSum / safeGrad);
 
     // Trigger blur gate only when a detail-sensitive category has visible
     // tonal contrast (edges exist) yet very low high-frequency sharpness.
-    if (_requiresSharpTexture(category) && lumStd >= 2.5 && blurScore < 18.0) {
+    if (_requiresSharpTexture(category) &&
+        lumStd >= 2.5 &&
+        (blurScore < 18.0 || (blurScore < 28.0 && tenengradScore < 22.0))) {
       return (
         issue: ImageQualityIssue.tooBlurry,
         blurScore: blurScore,
+        tenengradScore: tenengradScore,
+        glareRatio: blownRatio,
         meanLuminance: meanLum,
       );
     }
@@ -256,7 +341,114 @@ class ImagePreprocessor {
     return (
       issue: ImageQualityIssue.none,
       blurScore: blurScore,
+      tenengradScore: tenengradScore,
+      glareRatio: blownRatio,
       meanLuminance: meanLum,
+    );
+  }
+
+  /// Ultra-fast (< 2ms) real-time quality assessment directly on a camera
+  /// preview Y-plane (YUV420 / BGRA luma bytes) for live capture guidance.
+  static LiveCameraQuality assessLiveLuminancePlane({
+    required Uint8List bytes,
+    required int width,
+    required int height,
+    required int bytesPerRow,
+    required int pixelStride,
+    required CheckCategory category,
+  }) {
+    if (width < 24 || height < 24 || bytes.isEmpty) {
+      return const LiveCameraQuality(
+        lightingLevel: LiveQualityLevel.good,
+        sharpnessLevel: LiveQualityLevel.good,
+        glareLevel: LiveQualityLevel.good,
+        meanLuminance: 0.5,
+        tenengradScore: 60.0,
+        blownRatio: 0.0,
+      );
+    }
+
+    // Subsample central 50% ROI onto a compact 48x48 grid (< 2304 ops).
+    const grid = 48;
+    final startX = (width * 0.25).round();
+    final startY = (height * 0.25).round();
+    final roiW = math.max(1, (width * 0.50).round());
+    final roiH = math.max(1, (height * 0.50).round());
+
+    final gray = Float64List(grid * grid);
+    double sumLum = 0;
+    int blown = 0;
+
+    for (int gy = 0; gy < grid; gy++) {
+      final sy = (startY + (gy * roiH) ~/ grid).clamp(0, height - 1);
+      final rowOffset = sy * bytesPerRow;
+      for (int gx = 0; gx < grid; gx++) {
+        final sx = (startX + (gx * roiW) ~/ grid).clamp(0, width - 1);
+        final idx = rowOffset + sx * pixelStride;
+        final yVal = idx < bytes.length ? bytes[idx].toDouble() : 128.0;
+        gray[gy * grid + gx] = yVal;
+        sumLum += yVal;
+        if (yVal >= 248.0) blown++;
+      }
+    }
+
+    const total = grid * grid;
+    final meanLum = (sumLum / total) / 255.0;
+    final blownRatio = blown / total;
+
+    double tenSum = 0;
+    int gradN = 0;
+    for (int y = 1; y < grid - 1; y++) {
+      for (int x = 1; x < grid - 1; x++) {
+        final gx = -gray[(y - 1) * grid + (x - 1)] +
+            gray[(y - 1) * grid + (x + 1)] -
+            2.0 * gray[y * grid + (x - 1)] +
+            2.0 * gray[y * grid + (x + 1)] -
+            gray[(y + 1) * grid + (x - 1)] +
+            gray[(y + 1) * grid + (x + 1)];
+        final gy = -gray[(y - 1) * grid + (x - 1)] -
+            2.0 * gray[(y - 1) * grid + x] -
+            gray[(y - 1) * grid + (x + 1)] +
+            gray[(y + 1) * grid + (x - 1)] +
+            2.0 * gray[(y + 1) * grid + x] +
+            gray[(y + 1) * grid + (x + 1)];
+        tenSum += gx * gx + gy * gy;
+        gradN++;
+      }
+    }
+    final tenengrad = gradN > 0 ? math.sqrt(tenSum / gradN) : 0.0;
+
+    final lightingLevel = category == CheckCategory.stool
+        ? (meanLum > 0.92 ? LiveQualityLevel.poor : LiveQualityLevel.good)
+        : meanLum < 0.18 || meanLum > 0.92
+            ? LiveQualityLevel.poor
+            : (meanLum < 0.28 || meanLum > 0.85)
+                ? LiveQualityLevel.caution
+                : LiveQualityLevel.good;
+
+    final sharpnessLevel = !_requiresSharpTexture(category)
+        ? LiveQualityLevel.good
+        : tenengrad < 22.0
+            ? LiveQualityLevel.poor
+            : tenengrad < 40.0
+                ? LiveQualityLevel.caution
+                : LiveQualityLevel.good;
+
+    final glareLevel = category == CheckCategory.eye
+        ? (blownRatio > 0.45 ? LiveQualityLevel.caution : LiveQualityLevel.good)
+        : blownRatio > 0.25
+            ? LiveQualityLevel.poor
+            : blownRatio > 0.10
+                ? LiveQualityLevel.caution
+                : LiveQualityLevel.good;
+
+    return LiveCameraQuality(
+      lightingLevel: lightingLevel,
+      sharpnessLevel: sharpnessLevel,
+      glareLevel: glareLevel,
+      meanLuminance: meanLum,
+      tenengradScore: tenengrad,
+      blownRatio: blownRatio,
     );
   }
 

@@ -3071,4 +3071,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'مؤسس المنصة ومدير النظام';
+
+  @override
+  String get adminFieldIcon => 'أيقونة الصحة والاحتفال';
+
+  @override
+  String get adminToggleSendPush => 'إرسال إشعار للمستخدمين';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'إرسال إشعار وعرضه في بطاقة المعلومات الصحية المفيدة';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'تم نشر الإعلان وإرسال الإشعار.';
+
+  @override
+  String get cameraLiveLight => 'الإضاءة';
+
+  @override
+  String get cameraLiveFocus => 'التركيز';
+
+  @override
+  String get cameraLiveGlare => 'الوهج';
 }

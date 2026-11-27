@@ -943,5 +943,12 @@
   "sfbViewDetails": "Details bekijken",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "SNELLE ADMINCONSOLE",
-  "sfbAdminFounderBanner": "PLATFORMOPRICHTER & SYSTEEMBEHEERDER"
+  "sfbAdminFounderBanner": "PLATFORMOPRICHTER & SYSTEEMBEHEERDER",
+  "adminFieldIcon": "Gezondheids- & feestpictogram",
+  "adminToggleSendPush": "Melding naar gebruikers sturen",
+  "adminToggleSendPushSubtitle": "Melding sturen en tonen in de kaart Nuttige Gezondheidsinfo",
+  "adminAnnouncementPublishedToast": "Aankondiging gepubliceerd en melding verzonden.",
+  "cameraLiveLight": "Licht",
+  "cameraLiveFocus": "Focus",
+  "cameraLiveGlare": "Glans"
 }

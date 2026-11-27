@@ -46,15 +46,17 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
       throw const FormatException('Görüntü çözümlenemedi.');
     }
 
+    final sample = ColorCalibrator.sampleImage(
+      image: decoded,
+      useWhiteReference: options.useWhiteReference,
+      category: category,
+    );
+
     final preprocessed = ImagePreprocessor.prepare(
       decoded: decoded,
       category: category,
       preserveWhiteRefStrip: options.useWhiteReference,
-    );
-
-    final sample = ColorCalibrator.sampleImage(
-      image: decoded,
-      useWhiteReference: options.useWhiteReference,
+      colorCalibrationGains: sample.gains,
     );
 
     // 0-token local quality gate: never burn Vision AI tokens on unusable shots.
@@ -111,7 +113,21 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
       skinContext: skinContext,
     );
 
+    // Run deterministic on-device analyzer in parallel as a clinical safety
+    // cross-check and quantitative biomarker source.
+    AnalysisResult? localCheck;
+    try {
+      localCheck = await fallbackAnalyzer.analyzeImage(
+        category: category,
+        imageBytes: imageBytes,
+        options: options,
+      );
+    } catch (_) {
+      localCheck = null;
+    }
+
     final aiClinicalMetrics = <String, String>{
+      if (localCheck != null) ...localCheck.clinicalMetrics,
       'CIE L* / a* / b*':
           '${sample.lab.l.toStringAsFixed(0)} / ${sample.lab.a.toStringAsFixed(0)} / ${sample.lab.b.toStringAsFixed(0)}',
       if (category == CheckCategory.face ||
@@ -125,7 +141,7 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
 
     try {
       final rawJson = await client.analyzeWithVisionAi(request);
-      final parsed = AiVisionResponseParser.parse(
+      var parsed = AiVisionResponseParser.parse(
         rawResponse: rawJson,
         category: category,
         dominantColorValue: sample.calibratedColor.toARGB32(),
@@ -135,18 +151,72 @@ class HybridHealthAnalyzer implements HealthAnalyzer {
         baselineComparisonNote: baselineNote,
         clinicalMetrics: aiClinicalMetrics,
       );
+
+      // Two-layer On-Device <-> Vision AI Clinical Safety Consensus (Fusion):
+      if (localCheck != null) {
+        parsed = _fuseWithLocalSafetyCheck(
+          aiResult: parsed,
+          localResult: localCheck,
+        );
+      }
+
       if (cache != null) {
         await cache.saveCachedAiResult(preprocessed.contentFingerprint, parsed);
       }
       return parsed;
     } catch (_) {
       // Graceful offline / API-failure fallback to on-device analyzer.
-      return fallbackAnalyzer.analyzeImage(
-        category: category,
-        imageBytes: imageBytes,
-        options: options,
+      return localCheck ??
+          fallbackAnalyzer.analyzeImage(
+            category: category,
+            imageBytes: imageBytes,
+            options: options,
+          );
+    }
+  }
+
+  /// Combines multimodal Vision AI output with deterministic on-device clinical
+  /// biomarkers so urgent local cues (e.g. melena, strong scleral jaundice,
+  /// high ABCD lesion score) are never silently dismissed as `normal`.
+  AnalysisResult _fuseWithLocalSafetyCheck({
+    required AnalysisResult aiResult,
+    required AnalysisResult localResult,
+  }) {
+    final metrics = <String, String>{...aiResult.clinicalMetrics};
+
+    // Case 1: Full risk agreement -> boost confidence cleanly.
+    if (aiResult.riskLevel == localResult.riskLevel) {
+      metrics['Hibrit Doğrulama'] = 'Cihaz İçi + AI Uyumlu';
+      return aiResult.copyWith(
+        confidence: (aiResult.confidence + 0.06).clamp(0.25, 0.95),
+        clinicalMetrics: metrics,
       );
     }
+
+    // Case 2: Critical safety guard — on-device flagged URGENT while AI said NORMAL.
+    // Never silently downgrade an urgent optical biomarker to normal.
+    if (localResult.riskLevel == RiskLevel.urgent &&
+        aiResult.riskLevel == RiskLevel.normal) {
+      metrics['Hibrit Doğrulama'] = 'Çift Katmanlı Güvenlik Kontrolü';
+      return aiResult.copyWith(
+        riskLevel: RiskLevel.attention,
+        confidence: (aiResult.confidence - 0.14).clamp(0.30, 0.72),
+        observations: [
+          ...aiResult.observations,
+          'Cihaz içi kantitatif renk/yapı ölçümü dikkat gerektiren bir sinyal yakaladı (${localResult.summaryTitle}). Doğal gün ışığında tekrar çekim veya hekim kontrolü önerilir.',
+        ],
+        warningFlags: [
+          ...aiResult.warningFlags,
+          ...localResult.warningFlags,
+        ].toSet().toList(),
+        clinicalMetrics: metrics,
+      );
+    }
+
+    // Case 3: Moderate divergence -> keep higher-detail Vision AI verdict but
+    // expose transparent telemetry note.
+    metrics['Hibrit Doğrulama'] = 'Yapay Zeka + Kantitatif Telemetri';
+    return aiResult.copyWith(clinicalMetrics: metrics);
   }
 
   AnalysisResult _buildQualityGateResult({

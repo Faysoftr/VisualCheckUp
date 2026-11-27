@@ -32,12 +32,13 @@ class GeminiVisionAiClient implements VisionAiClient {
 
   @override
   Future<String> analyzeWithVisionAi(AiVisionRequest request) async {
-    final candidateModels = <String>[
+    final candidateModels = <String>{
       request.recommendedModel,
       request.modelTier == AiModelTier.standard
           ? 'gemini-2.5-flash'
           : 'gemini-2.5-flash-lite',
-    ];
+      'gemini-2.5-flash',
+    }.toList();
 
     Object? lastError;
     for (final model in candidateModels) {

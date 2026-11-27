@@ -27,6 +27,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     final sample = ColorCalibrator.sampleImage(
       image: decoded,
       useWhiteReference: options.useWhiteReference,
+      category: category,
     );
 
     final c = sample.calibratedColor;
@@ -76,6 +77,11 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
       extraObservations.add(
         'Beyaz referans kutusu ile cihaz ve ortam ışığı dengelendi.',
       );
+    } else if (sample.autoColorConstancyApplied) {
+      adjustedConfidence = (adjustedConfidence + 0.02).clamp(0.25, 0.90);
+      if (sample.lightingNote != null) {
+        extraObservations.add(sample.lightingNote!);
+      }
     } else if (sample.lightingCast == LightingCast.warmYellow ||
         sample.lightingCast == LightingCast.coolBlue) {
       adjustedConfidence = (adjustedConfidence - 0.12).clamp(0.25, 0.90);
@@ -1427,6 +1433,9 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
             structural.nailErythemaIndex > 0 ? structural.nailErythemaIndex : ei;
         return {
           'Tırnak Eritem İndeksi (Anemi)': nailEi.toStringAsFixed(1),
+          if (structural.nailSkinEiDelta != 0)
+            'Tırnak–Deri Bağıl ΔEI':
+                structural.nailSkinEiDelta.toStringAsFixed(1),
           'Beyaz Nokta/Çizgi':
               '%${(structural.whiteLineSpotRatio * 100).toStringAsFixed(1)}',
           'Yüzey Pürüzlülük':
@@ -1460,9 +1469,19 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
           'Fitzpatrick Fototip': lab.fitzpatrickPhototype.shortLabel,
           'ITA° Açısı': '${lab.individualTypologyAngle.toStringAsFixed(0)}°',
           'Eritem İndeksi': ei.toStringAsFixed(1),
+          if (structural.faceMalarEiDelta != 0)
+            'Yanak–Alın ΔEI': structural.faceMalarEiDelta.toStringAsFixed(1),
           'CIE b* (Sarı Eksen)': lab.b.toStringAsFixed(1),
         };
       case CheckCategory.urine:
+        final level = armstrongHydrationLevel(lab);
+        return {
+          'Armstrong Hidrasyon Skalası': '$level / 8',
+          'Bulanıklık Skoru':
+              '%${(structural.urineTurbidityScore * 100).toStringAsFixed(0)}',
+          'CIE L* / a* / b*':
+              '${lab.l.toStringAsFixed(0)} / ${lab.a.toStringAsFixed(0)} / ${lab.b.toStringAsFixed(0)}',
+        };
       case CheckCategory.stool:
       case CheckCategory.skinCondition:
         return {
@@ -1470,5 +1489,31 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
               '${lab.l.toStringAsFixed(0)} / ${lab.a.toStringAsFixed(0)} / ${lab.b.toStringAsFixed(0)}',
         };
     }
+  }
+
+  /// Matches a calibrated urine [LabColor] to the 8-step Armstrong Clinical
+  /// Urine Hydration Chart (1 = very pale hydrated .. 8 = dark amber/brownish)
+  /// using ISO/CIE CIEDE2000 perceptual distance.
+  static int armstrongHydrationLevel(LabColor lab) {
+    const prototypes = <LabColor>[
+      LabColor(l: 96, a: -2, b: 8), // 1: Very pale straw (well hydrated)
+      LabColor(l: 94, a: -3, b: 22), // 2: Pale straw (hydrated)
+      LabColor(l: 91, a: -2, b: 38), // 3: Light yellow (normal)
+      LabColor(l: 86, a: 1, b: 54), // 4: Yellow (mild dehydration)
+      LabColor(l: 79, a: 6, b: 64), // 5: Deep yellow (dehydrated)
+      LabColor(l: 69, a: 14, b: 62), // 6: Amber (noticeably dehydrated)
+      LabColor(l: 56, a: 18, b: 50), // 7: Dark amber
+      LabColor(l: 42, a: 16, b: 32), // 8: Brownish dark amber
+    ];
+    var bestIdx = 0;
+    var bestDist = double.infinity;
+    for (var i = 0; i < prototypes.length; i++) {
+      final d = lab.deltaE2000(prototypes[i]);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+    }
+    return bestIdx + 1;
   }
 }

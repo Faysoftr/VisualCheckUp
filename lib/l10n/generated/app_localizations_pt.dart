@@ -3093,4 +3093,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FUNDADOR E ADMINISTRADOR DO SISTEMA';
+
+  @override
+  String get adminFieldIcon => 'Ícone de saúde e celebração';
+
+  @override
+  String get adminToggleSendPush => 'Enviar notificação aos usuários';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Notificar e exibir no cartão de Dicas Úteis de Saúde';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Anúncio publicado e notificação enviada.';
+
+  @override
+  String get cameraLiveLight => 'Luz';
+
+  @override
+  String get cameraLiveFocus => 'Foco';
+
+  @override
+  String get cameraLiveGlare => 'Reflexo';
 }

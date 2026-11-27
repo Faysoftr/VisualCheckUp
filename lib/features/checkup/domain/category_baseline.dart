@@ -45,11 +45,12 @@ class CategoryBaseline {
     );
   }
 
-  /// Compares a newly sampled [currentLab] against this personal baseline.
+  /// Compares a newly sampled [currentLab] against this personal baseline
+  /// using ISO/CIE CIEDE2000 (ΔE00) perceptual color difference.
   ({double deltaE, String note, bool isSignificantShift}) compare(
     LabColor currentLab,
   ) {
-    final deltaE = lab.deltaE(currentLab);
+    final deltaE = lab.deltaE2000(currentLab);
     final dl = currentLab.l - labL;
     final da = currentLab.a - labA;
     final db = currentLab.b - labB;

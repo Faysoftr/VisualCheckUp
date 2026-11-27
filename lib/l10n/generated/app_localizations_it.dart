@@ -3105,4 +3105,27 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FONDATORE E AMMINISTRATORE DI SISTEMA';
+
+  @override
+  String get adminFieldIcon => 'Icona salute e celebrazione';
+
+  @override
+  String get adminToggleSendPush => 'Invia notifica agli utenti';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Notifica e mostra nella scheda Info Salute Utili';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Annuncio pubblicato e notifica inviata.';
+
+  @override
+  String get cameraLiveLight => 'Luce';
+
+  @override
+  String get cameraLiveFocus => 'Fuoco';
+
+  @override
+  String get cameraLiveGlare => 'Riflesso';
 }

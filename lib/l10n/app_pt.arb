@@ -943,5 +943,12 @@
   "sfbViewDetails": "Ver detalhes",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "CONSOLE ADMIN RÁPIDO",
-  "sfbAdminFounderBanner": "FUNDADOR E ADMINISTRADOR DO SISTEMA"
+  "sfbAdminFounderBanner": "FUNDADOR E ADMINISTRADOR DO SISTEMA",
+  "adminFieldIcon": "Ícone de saúde e celebração",
+  "adminToggleSendPush": "Enviar notificação aos usuários",
+  "adminToggleSendPushSubtitle": "Notificar e exibir no cartão de Dicas Úteis de Saúde",
+  "adminAnnouncementPublishedToast": "Anúncio publicado e notificação enviada.",
+  "cameraLiveLight": "Luz",
+  "cameraLiveFocus": "Foco",
+  "cameraLiveGlare": "Reflexo"
 }

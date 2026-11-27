@@ -6,6 +6,7 @@ import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
+import 'package:visualcheckup/features/admin/data/announcement_notification_service.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/admin/presentation/screens/admin_panel_screen.dart';
 import 'package:visualcheckup/features/admin/presentation/widgets/global_announcement_and_promo_banners.dart';
@@ -141,6 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<HealthCommunityProfile> _communityMembers =
       HealthCommunityRepository.starterGlobalProfiles();
   List<WellnessWallPost> _latestWallPosts = WellnessWallRepository.starterPosts();
+  List<GlobalAnnouncement> _activeAnnouncements = const [];
+  int _adminRefreshToken = 0;
 
   @override
   void initState() {
@@ -184,6 +187,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final commRepo = HealthCommunityRepository();
     final members = await commRepo.discoverProfiles(myUid: widget.currentUser.id);
     final wallPosts = await WellnessWallRepository().loadPosts();
+    final adminRepo = widget.adminRepository ?? AdminRepository();
+    final announcements = await adminRepo.loadAnnouncements(activeOnly: true);
+    await AnnouncementNotificationService.instance
+        .notifyLatestActive(announcements);
     if (!mounted) return;
     setState(() {
       _allHistory = history;
@@ -195,6 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _todayMedStatuses = medStatuses;
       _activeDietPlan = activeDiet;
       _dietCompliance = dietSummary;
+      _activeAnnouncements = announcements;
+      _adminRefreshToken++;
       if (doctors.isNotEmpty) _featuredDoctors = doctors;
       if (members.isNotEmpty) _communityMembers = members;
       if (wallPosts.isNotEmpty) _latestWallPosts = wallPosts;
@@ -240,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+    await _loadDashboardData();
   }
 
   Future<void> _openMemberProfile(HealthCommunityProfile member) async {
@@ -279,6 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+    await _loadDashboardData();
   }
 
   Future<void> _openDoctorSearch({String initialCountryCode = 'ALL'}) async {
@@ -835,11 +846,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 0. Admin-managed Global Announcement & Top Health Banner
                       GlobalAnnouncementBanner(
                         repository: widget.adminRepository,
+                        refreshToken: _adminRefreshToken,
                         margin: const EdgeInsets.only(bottom: 10),
                       ),
                       HealthPromotionBanner(
                         placement: PromotionPlacement.homeTop,
                         repository: widget.adminRepository,
+                        refreshToken: _adminRefreshToken,
                         margin: const EdgeInsets.only(bottom: 10),
                       ),
 
@@ -934,11 +947,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 5a. Birthday & Glowing Daily Health Tip Card (SFB "Tarihte Bugün" style)
+                      // 5a. Birthday & Glowing Daily Health Tip + Announcements Card
                       BirthdayCelebrationCard(
                         displayName: widget.currentUser.displayName,
                       ),
-                      const SfbDailyHealthTipCard(),
+                      SfbDailyHealthTipCard(
+                        announcements: _activeAnnouncements,
+                      ),
                       const SizedBox(height: 12),
 
                       // 5b. VisualCheckUp Pro Quick Banner

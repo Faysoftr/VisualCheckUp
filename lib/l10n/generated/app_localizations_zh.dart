@@ -3007,4 +3007,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => '平台创始人与系统管理员';
+
+  @override
+  String get adminFieldIcon => '健康与庆祝图标';
+
+  @override
+  String get adminToggleSendPush => '向用户发送通知';
+
+  @override
+  String get adminToggleSendPushSubtitle => '发送通知并显示在实用健康信息卡片中';
+
+  @override
+  String get adminAnnouncementPublishedToast => '公告已发布并发送通知。';
+
+  @override
+  String get cameraLiveLight => '光线';
+
+  @override
+  String get cameraLiveFocus => '对焦';
+
+  @override
+  String get cameraLiveGlare => '反光';
 }

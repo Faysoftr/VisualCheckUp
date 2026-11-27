@@ -3097,4 +3097,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FONDATEUR & ADMINISTRATEUR SYSTÈME';
+
+  @override
+  String get adminFieldIcon => 'Icône santé et célébration';
+
+  @override
+  String get adminToggleSendPush => 'Envoyer une notification aux utilisateurs';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Notifier et afficher dans la carte Infos Santé Utiles';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Annonce publiée et notification envoyée.';
+
+  @override
+  String get cameraLiveLight => 'Lumière';
+
+  @override
+  String get cameraLiveFocus => 'Netteté';
+
+  @override
+  String get cameraLiveGlare => 'Reflet';
 }

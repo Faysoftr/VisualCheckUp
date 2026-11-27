@@ -94,7 +94,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   }
 
   Future<void> _openCreateAnnouncementSheet() async {
-    final created = await showModalBottomSheet<GlobalAnnouncement>(
+    final result = await showModalBottomSheet<_AnnouncementDraftResult>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -102,9 +102,19 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       builder: (_) => const _CreateAnnouncementSheet(),
     );
 
-    if (created != null) {
-      await widget.repository.saveAnnouncement(created);
+    if (result != null) {
+      await widget.repository.saveAnnouncement(
+        result.announcement,
+        sendPushNotification: result.sendPushNotification,
+      );
       await _refreshAll();
+      if (mounted && result.sendPushNotification) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.adminAnnouncementPublishedToast),
+          ),
+        );
+      }
     }
   }
 
@@ -444,9 +454,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor:
-                              ann.type.accentColor.withValues(alpha: 0.15),
-                          child: Icon(ann.type.icon, color: ann.type.accentColor),
+                          backgroundColor: ann.effectiveAccentColor
+                              .withValues(alpha: 0.16),
+                          child: Text(
+                            ann.effectiveEmoji,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                         ),
                         title: Text(
                           ann.title,
@@ -893,6 +906,16 @@ class _AdminStatCard extends StatelessWidget {
   }
 }
 
+class _AnnouncementDraftResult {
+  const _AnnouncementDraftResult({
+    required this.announcement,
+    required this.sendPushNotification,
+  });
+
+  final GlobalAnnouncement announcement;
+  final bool sendPushNotification;
+}
+
 class _CreateAnnouncementSheet extends StatefulWidget {
   const _CreateAnnouncementSheet();
 
@@ -906,6 +929,9 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
   final TextEditingController _msgCtrl = TextEditingController();
   final TextEditingController _linkCtrl = TextEditingController();
   AnnouncementType _type = AnnouncementType.info;
+  String _selectedEmoji = '❤️';
+  bool _customEmojiPicked = false;
+  bool _sendPushNotification = true;
 
   @override
   void dispose() {
@@ -918,12 +944,15 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        20,
-        4,
-        20,
-        MediaQuery.of(context).viewInsets.bottom + 20,
+        18,
+        0,
+        18,
+        MediaQuery.of(context).viewInsets.bottom + 14,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -932,67 +961,162 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
           children: [
             Text(
               l10n.adminNewAnnouncement,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 8),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: 4,
               children: [
                 for (final t in AnnouncementType.values)
                   ChoiceChip(
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     avatar: Icon(
                       t.icon,
-                      size: 16,
+                      size: 15,
                       color: _type == t ? Colors.white : t.accentColor,
                     ),
                     label: Text(t.localizedLabel(l10n)),
                     selected: _type == t,
                     selectedColor: t.accentColor,
                     labelStyle: TextStyle(
+                      fontSize: 12,
                       color: _type == t ? Colors.white : null,
                       fontWeight: FontWeight.w700,
                     ),
-                    onSelected: (_) => setState(() => _type = t),
+                    onSelected: (_) => setState(() {
+                      _type = t;
+                      if (!_customEmojiPicked) {
+                        _selectedEmoji = t.defaultEmoji;
+                      }
+                    }),
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            Text(
+              l10n.adminFieldIcon,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              height: 40,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: AnnouncementIcons.all.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 6),
+                itemBuilder: (context, index) {
+                  final opt = AnnouncementIcons.all[index];
+                  final selected = _selectedEmoji == opt.emoji;
+                  return InkWell(
+                    key: Key('admin_ann_icon_${opt.id}'),
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => setState(() {
+                      _selectedEmoji = opt.emoji;
+                      _customEmojiPicked = true;
+                    }),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
+                      width: 40,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? opt.accentColor.withValues(
+                                alpha: isDark ? 0.28 : 0.16,
+                              )
+                            : theme.colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: selected
+                              ? opt.accentColor
+                              : theme.colorScheme.outlineVariant
+                                  .withValues(alpha: 0.5),
+                          width: selected ? 2 : 1,
+                        ),
+                      ),
+                      child: Text(
+                        opt.emoji,
+                        style: const TextStyle(fontSize: 19),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
             TextField(
               key: const Key('admin_announcement_title_field'),
               controller: _titleCtrl,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldTitle,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(
+                    _selectedEmoji,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             TextField(
               key: const Key('admin_announcement_message_field'),
               controller: _msgCtrl,
-              maxLines: 3,
+              maxLines: 2,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldMessage,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             TextField(
               controller: _linkCtrl,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldLink,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
+            SwitchListTile(
+              key: const Key('admin_ann_send_push_switch'),
+              contentPadding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
+              dense: true,
+              value: _sendPushNotification,
+              onChanged: (v) => setState(() => _sendPushNotification = v),
+              title: Text(
+                l10n.adminToggleSendPush,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+              subtitle: Text(
+                l10n.adminToggleSendPushSubtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(fontSize: 11.5),
+              ),
+            ),
+            const SizedBox(height: 6),
             FilledButton.icon(
               key: const Key('admin_announcement_save_button'),
               onPressed: () {
@@ -1001,14 +1125,18 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
                   return;
                 }
                 Navigator.of(context).pop(
-                  GlobalAnnouncement(
-                    id: 'ann_${DateTime.now().microsecondsSinceEpoch}',
-                    title: _titleCtrl.text.trim(),
-                    message: _msgCtrl.text.trim(),
-                    type: _type,
-                    linkUrl: _linkCtrl.text.trim(),
-                    isActive: true,
-                    createdAt: DateTime.now(),
+                  _AnnouncementDraftResult(
+                    announcement: GlobalAnnouncement(
+                      id: 'ann_${DateTime.now().microsecondsSinceEpoch}',
+                      title: _titleCtrl.text.trim(),
+                      message: _msgCtrl.text.trim(),
+                      type: _type,
+                      iconEmoji: _selectedEmoji,
+                      linkUrl: _linkCtrl.text.trim(),
+                      isActive: true,
+                      createdAt: DateTime.now(),
+                    ),
+                    sendPushNotification: _sendPushNotification,
                   ),
                 );
               },

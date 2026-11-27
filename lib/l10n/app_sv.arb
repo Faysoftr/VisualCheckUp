@@ -943,5 +943,12 @@
   "sfbViewDetails": "Visa detaljer",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "SNABB ADMINKONSOL",
-  "sfbAdminFounderBanner": "PLATTFORMSGRUNDARE & SYSTEMADMIN"
+  "sfbAdminFounderBanner": "PLATTFORMSGRUNDARE & SYSTEMADMIN",
+  "adminFieldIcon": "Hälso- och firandeikon",
+  "adminToggleSendPush": "Skicka avisering till användare",
+  "adminToggleSendPushSubtitle": "Avisera och visa i kortet Nyttig hälsoinformation",
+  "adminAnnouncementPublishedToast": "Meddelande publicerat och avisering skickad.",
+  "cameraLiveLight": "Ljus",
+  "cameraLiveFocus": "Fokus",
+  "cameraLiveGlare": "Blänk"
 }

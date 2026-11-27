@@ -674,14 +674,6 @@ class AppDrawer extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     _DrawerSectionLabel(l10n.menuSectionSettings),
-                    if (onOpenAdminPanel != null)
-                      _DrawerTile(
-                        key: const Key('drawer_admin_panel_tile'),
-                        icon: Icons.admin_panel_settings_rounded,
-                        label: l10n.adminPanelTitle,
-                        accentColor: const Color(0xFFD97706),
-                        onTap: () => _closeAndRun(context, onOpenAdminPanel!),
-                      ),
                     if (onOpenSettings != null)
                       _DrawerTile(
                         icon: Icons.settings_outlined,
@@ -790,6 +782,27 @@ class AppDrawer extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if (onOpenAdminPanel != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        child: Divider(
+                          height: 1,
+                          color: colorScheme.outlineVariant.withValues(
+                            alpha: isDark ? 0.3 : 0.55,
+                          ),
+                        ),
+                      ),
+                      _DrawerTile(
+                        key: const Key('drawer_admin_panel_tile'),
+                        icon: Icons.admin_panel_settings_rounded,
+                        label: l10n.adminPanelTitle,
+                        accentColor: const Color(0xFFD97706),
+                        onTap: () => _closeAndRun(context, onOpenAdminPanel!),
+                      ),
+                    ],
                   ],
                 ),
               ),

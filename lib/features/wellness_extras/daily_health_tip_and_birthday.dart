@@ -36,12 +36,20 @@ class DailyWellnessExtras {
   }
 
   static String dailyTipForLocale(String languageCode, {DateTime? now}) {
+    final tips = allTipsForLocale(languageCode, now: now);
+    return tips.first;
+  }
+
+  static List<String> allTipsForLocale(String languageCode, {DateTime? now}) {
     final dt = now ?? DateTime.now();
     final dayOfYear = dt.difference(DateTime(dt.year, 1, 1)).inDays;
     final code = languageCode.toLowerCase();
 
     final tips = _tipsByLang[code] ?? _tipsByLang['en']!;
-    return tips[dayOfYear % tips.length];
+    final start = dayOfYear % tips.length;
+    return [
+      for (int i = 0; i < tips.length; i++) tips[(start + i) % tips.length],
+    ];
   }
 
   static const Map<String, List<String>> _tipsByLang = {

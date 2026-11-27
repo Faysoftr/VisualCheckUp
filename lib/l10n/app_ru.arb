@@ -943,5 +943,12 @@
   "sfbViewDetails": "Подробнее",
   "sfbAdminBadge": "АДМИН",
   "sfbAdminConsoleTitle": "БЫСТРАЯ ПАНЕЛЬ АДМИНА",
-  "sfbAdminFounderBanner": "ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР"
+  "sfbAdminFounderBanner": "ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР",
+  "adminFieldIcon": "Значок здоровья и праздника",
+  "adminToggleSendPush": "Отправить уведомление пользователям",
+  "adminToggleSendPushSubtitle": "Уведомить и показать в карточке полезной информации",
+  "adminAnnouncementPublishedToast": "Объявление опубликовано и уведомление отправлено.",
+  "cameraLiveLight": "Свет",
+  "cameraLiveFocus": "Фокус",
+  "cameraLiveGlare": "Блики"
 }

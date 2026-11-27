@@ -34,6 +34,7 @@ class SkinVisualMetrics {
     this.skinPhototype = FitzpatrickPhototype.intermediate,
     this.annularClearingIndex = 0.0,
     this.erythemaIndexDelta = 0.0,
+    this.hairRemovedRatio = 0.0,
   });
 
   final Color centerColor;
@@ -96,6 +97,10 @@ class SkinVisualMetrics {
   /// Collings log-ratio Erythema Index delta (lesion EI - surrounding skin EI).
   final double erythemaIndexDelta;
 
+  /// Fraction (0..1) of ROI hair-strand pixels cleaned by DullRazor before
+  /// lesion segmentation.
+  final double hairRemovedRatio;
+
   bool get hasIrregularBorder => borderIrregularityIndex >= 1.80;
   bool get hasMultiDermoscopicColor =>
       dermoscopicColors.length >= 3 ||
@@ -106,11 +111,11 @@ class SkinVisualMetrics {
 /// On-device dermatological pre-awareness analyzer.
 ///
 /// Compares the central lesion region (35%..65%) with the surrounding border
-/// ring (10%..25% & 75%..90%), applies optional Von Kries white-balance
-/// calibration, performs CIE ΔE lesion segmentation for quantitative ABCD
-/// (Asymmetry, Border compactness, 6-Color dermoscopic palette), estimates
-/// Fitzpatrick ITA° phototype, and detects annular ring clearing.
-/// This is NOT a medical diagnostic tool.
+/// ring (10%..25% & 75%..90%), applies optional Von Kries / Shades-of-Gray
+/// color constancy, runs DullRazor hair removal and Otsu CIEDE2000 lesion
+/// segmentation for quantitative ABCD (Asymmetry, Border compactness, 6-Color
+/// dermoscopic palette), estimates Fitzpatrick ITA° phototype, and detects
+/// annular ring clearing. This is NOT a medical diagnostic tool.
 class SkinConditionAnalyzer implements HealthAnalyzer {
   const SkinConditionAnalyzer({
     this.skinContext = const SkinCheckContext(),
@@ -132,6 +137,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     final calibratedSample = ColorCalibrator.sampleImage(
       image: decoded,
       useWhiteReference: options.useWhiteReference,
+      category: CheckCategory.skinCondition,
     );
 
     final metrics = extractMetrics(decoded, gains: calibratedSample.gains);
@@ -145,12 +151,22 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       extraObservations.add(
         'Beyaz referans kutusu ile cihaz ve ortam ışığı dengelendi.',
       );
+    } else if (calibratedSample.autoColorConstancyApplied) {
+      extraObservations.add(
+        'Ortam ışığı Shades-of-Gray otomatik renk sabitliği ile dengelendi.',
+      );
     } else if (calibratedSample.lightingCast == LightingCast.warmYellow ||
         calibratedSample.lightingCast == LightingCast.coolBlue) {
       confidence = (confidence - 0.10).clamp(0.25, 0.90);
       if (calibratedSample.lightingNote != null) {
         extraObservations.add(calibratedSample.lightingNote!);
       }
+    }
+
+    if (metrics.hairRemovedRatio >= 0.015) {
+      extraObservations.add(
+        'DullRazor kıl/tüy filtresi uygulanarak lezyon sınırları arındırıldı.',
+      );
     }
 
     double? baselineDeltaE;
@@ -428,11 +444,213 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       skinPhototype: skinPhototype,
       annularClearingIndex: abcd.annularClearingIndex,
       erythemaIndexDelta: erythemaIndexDelta,
+      hairRemovedRatio: abcd.hairRemovedRatio,
     );
   }
 
+  /// Lee et al. DullRazor / SharpRazor morphological hair-artifact removal.
+  ///
+  /// Detects thin dark linear hair strands (strong local luminance dip with
+  /// brighter skin on BOTH sides across horizontal, vertical, or diagonal axes)
+  /// and inpaints them from surrounding non-hair neighbors — while strictly
+  /// preserving solid dark moles/lesions whose neighbors are also dark.
+  static ({img.Image cleaned, double hairRatio}) removeHairDullRazor(
+    img.Image roi,
+  ) {
+    final w = roi.width;
+    final h = roi.height;
+    if (w < 9 || h < 9) return (cleaned: roi, hairRatio: 0.0);
+
+    final luma = List<double>.filled(w * h, 0.0);
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final p = roi.getPixel(x, y);
+        luma[y * w + x] = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+      }
+    }
+
+    final hairMask = List<bool>.filled(w * h, false);
+    var hairPixels = 0;
+
+    // Check 4 orientations (0°, 90°, 45°, 135°) at half-width offset r=2..3.
+    const dirs = [
+      (2, 0),
+      (0, 2),
+      (2, 2),
+      (2, -2),
+    ];
+
+    for (var y = 3; y < h - 3; y++) {
+      for (var x = 3; x < w - 3; x++) {
+        final c = luma[y * w + x];
+        if (c > 150.0) continue; // hair strands are noticeably darker than skin
+        var isThinDarkStrand = false;
+        for (final (dx, dy) in dirs) {
+          final l1 = luma[(y - dy) * w + (x - dx)];
+          final l2 = luma[(y + dy) * w + (x + dx)];
+          // Require BOTH opposite sides to be markedly brighter than center
+          // (thin linear strand, NOT a solid dark mole interior or edge!).
+          if ((l1 - c) >= 24.0 && (l2 - c) >= 24.0) {
+            // Also verify longitudinal continuity along the orthogonal axis
+            // so isolated pinpoint wart capillary dots are NOT mistaken for hair.
+            final ox = -dy ~/ 2;
+            final oy = dx ~/ 2;
+            final along1 = luma[(y + oy) * w + (x + ox)];
+            final along2 = luma[(y - oy) * w + (x - ox)];
+            if ((along1 - c).abs() <= 28.0 || (along2 - c).abs() <= 28.0) {
+              isThinDarkStrand = true;
+              break;
+            }
+          }
+        }
+        if (isThinDarkStrand) {
+          hairMask[y * w + x] = true;
+          hairPixels++;
+        }
+      }
+    }
+
+    if (hairPixels == 0) {
+      return (cleaned: roi, hairRatio: 0.0);
+    }
+
+    final out = roi.clone();
+    for (var y = 2; y < h - 2; y++) {
+      for (var x = 2; x < w - 2; x++) {
+        if (!hairMask[y * w + x]) continue;
+        double sr = 0, sg = 0, sb = 0;
+        var cnt = 0;
+        for (var dy = -2; dy <= 2; dy++) {
+          for (var dx = -2; dx <= 2; dx++) {
+            final nx = x + dx;
+            final ny = y + dy;
+            if (hairMask[ny * w + nx]) continue;
+            final np = roi.getPixel(nx, ny);
+            sr += np.r;
+            sg += np.g;
+            sb += np.b;
+            cnt++;
+          }
+        }
+        if (cnt > 0) {
+          out.setPixelRgb(
+            x,
+            y,
+            (sr / cnt).round().clamp(0, 255),
+            (sg / cnt).round().clamp(0, 255),
+            (sb / cnt).round().clamp(0, 255),
+          );
+        }
+      }
+    }
+
+    return (
+      cleaned: out,
+      hairRatio: (hairPixels / (w * h)).clamp(0.0, 1.0),
+    );
+  }
+
+  /// Computes Otsu's optimal between-class variance threshold on a scalar map
+  /// quantized into [bins] over `[0, maxVal]`.
+  static double _computeOtsuThreshold(
+    List<double> values, {
+    double maxVal = 50.0,
+    int bins = 50,
+  }) {
+    if (values.isEmpty) return 13.0;
+    final hist = List<int>.filled(bins, 0);
+    for (final v in values) {
+      final b = ((v / maxVal) * (bins - 1)).round().clamp(0, bins - 1);
+      hist[b]++;
+    }
+    final total = values.length;
+    double sumAll = 0;
+    for (var i = 0; i < bins; i++) {
+      sumAll += i * hist[i];
+    }
+
+    double sumB = 0;
+    var wB = 0;
+    var bestVar = -1.0;
+    var bestBin = 13;
+
+    for (var i = 0; i < bins; i++) {
+      wB += hist[i];
+      if (wB == 0) continue;
+      final wF = total - wB;
+      if (wF == 0) break;
+      sumB += i * hist[i];
+      final mB = sumB / wB;
+      final mF = (sumAll - sumB) / wF;
+      final betweenVar = wB.toDouble() * wF.toDouble() * (mB - mF) * (mB - mF);
+      if (betweenVar > bestVar) {
+        bestVar = betweenVar;
+        bestBin = i;
+      }
+    }
+    return (bestBin / (bins - 1)) * maxVal;
+  }
+
+  /// Retains the single largest 4-connected foreground component that overlaps
+  /// the central target area, eliminating isolated background speckles.
+  static List<bool> _retainLargestCentralComponent(List<bool> rawMask, int n) {
+    final visited = List<bool>.filled(n * n, false);
+    List<int> bestComponent = const [];
+    final queue = <int>[];
+
+    for (var idx = 0; idx < n * n; idx++) {
+      if (!rawMask[idx] || visited[idx]) continue;
+      final comp = <int>[];
+      var touchesCenter = false;
+      queue.clear();
+      queue.add(idx);
+      visited[idx] = true;
+
+      var head = 0;
+      while (head < queue.length) {
+        final cur = queue[head++];
+        comp.add(cur);
+        final cx = cur % n;
+        final cy = cur ~/ n;
+        if (cx >= n * 0.25 &&
+            cx <= n * 0.75 &&
+            cy >= n * 0.25 &&
+            cy <= n * 0.75) {
+          touchesCenter = true;
+        }
+        if (cx > 0 && rawMask[cur - 1] && !visited[cur - 1]) {
+          visited[cur - 1] = true;
+          queue.add(cur - 1);
+        }
+        if (cx < n - 1 && rawMask[cur + 1] && !visited[cur + 1]) {
+          visited[cur + 1] = true;
+          queue.add(cur + 1);
+        }
+        if (cy > 0 && rawMask[cur - n] && !visited[cur - n]) {
+          visited[cur - n] = true;
+          queue.add(cur - n);
+        }
+        if (cy < n - 1 && rawMask[cur + n] && !visited[cur + n]) {
+          visited[cur + n] = true;
+          queue.add(cur + n);
+        }
+      }
+
+      if (touchesCenter && comp.length > bestComponent.length) {
+        bestComponent = comp;
+      }
+    }
+
+    final clean = List<bool>.filled(n * n, false);
+    for (final idx in bestComponent) {
+      clean[idx] = true;
+    }
+    return clean;
+  }
+
   /// Segments the central lesion against surrounding healthy skin [ringLab] via
-  /// CIE76 ΔE thresholding to compute:
+  /// DullRazor hair removal + Otsu CIEDE2000 ΔE00 thresholding + largest
+  /// central connected component to compute:
   /// - Border Irregularity compactness `P^2 / (4 * pi * A)`
   /// - Folding shape asymmetry across centroid axes
   /// - 6-color dermoscopic palette presence
@@ -442,6 +660,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
     double shapeAsymmetryScore,
     List<String> dermoscopicColors,
     double annularClearingIndex,
+    double hairRemovedRatio,
   }) _extractQuantitativeAbcdAndRing({
     required img.Image decoded,
     required LabColor ringLab,
@@ -453,6 +672,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         shapeAsymmetryScore: 0.0,
         dermoscopicColors: const [],
         annularClearingIndex: 0.0,
+        hairRemovedRatio: 0.0,
       );
     }
 
@@ -471,19 +691,19 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       roi = ColorCalibrator.applyGainsToImage(roi, gains);
     }
 
-    final mask = List<bool>.filled(n * n, false);
-    var lesionArea = 0;
-    double sumX = 0, sumY = 0;
+    // 1. DullRazor morphological hair removal prior to lesion segmentation
+    final hairResult = removeHairDullRazor(roi);
+    roi = hairResult.cleaned;
 
-    // 6-color dermoscopic counters inside segmented lesion
-    int cLightBrown = 0;
-    int cDarkBrown = 0;
-    int cBlack = 0;
-    int cRed = 0;
-    int cWhite = 0;
-    int cBlueGray = 0;
+    // 2. Per-pixel CIEDE2000 ΔE00 distance map from healthy surrounding skin
+    final dEMap = List<double>.filled(n * n, 0.0);
+    final rgbCache = List<(int, int, int)>.filled(n * n, (0, 0, 0));
+    final labCache = List<LabColor>.filled(
+      n * n,
+      const LabColor(l: 0, a: 0, b: 0),
+    );
 
-    // Annular ringworm check: inner core (r < 0.22*n) vs outer ring (0.24..0.42*n)
+    // Annular ringworm check: inner core (r < 0.18*n) vs outer ring (0.24..0.40*n)
     double coreRedSum = 0, edgeRedSum = 0;
     int coreN = 0, edgeN = 0;
     const centerF = (n - 1) / 2.0;
@@ -494,8 +714,10 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         final ri = p.r.round().clamp(0, 255);
         final gi = p.g.round().clamp(0, 255);
         final bi = p.b.round().clamp(0, 255);
-        final redness = (ri - gi) / 255.0;
+        final idx = y * n + x;
+        rgbCache[idx] = (ri, gi, bi);
 
+        final redness = (ri - gi) / 255.0;
         final dist = math.sqrt(
           (x - centerF) * (x - centerF) + (y - centerF) * (y - centerF),
         );
@@ -508,34 +730,8 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         }
 
         final lab = LabColor.fromRgb(ri, gi, bi);
-        final dE = lab.deltaE(ringLab);
-        if (dE >= 13.0) {
-          mask[y * n + x] = true;
-          lesionArea++;
-          sumX += x;
-          sumY += y;
-
-          final hsv = HSVColor.fromColor(Color.fromARGB(255, ri, gi, bi));
-          final h = hsv.hue;
-          final s = hsv.saturation;
-          final v = hsv.value;
-
-          if (v < 0.20) {
-            cBlack++;
-          } else if (s < 0.14 && v > 0.78) {
-            cWhite++;
-          } else if ((h >= 185 && h <= 265 && s >= 0.12 && v <= 0.65) ||
-              (lab.b <= -4.0 && lab.l <= 62.0)) {
-            cBlueGray++;
-          } else if (((h <= 14 || h >= 342) && s >= 0.35 && v >= 0.30) ||
-              (lab.a >= 24.0 && lab.b < 24.0)) {
-            cRed++;
-          } else if (h >= 12 && h <= 46 && v < 0.42) {
-            cDarkBrown++;
-          } else if (h >= 14 && h <= 52 && v >= 0.42 && s >= 0.22) {
-            cLightBrown++;
-          }
-        }
+        labCache[idx] = lab;
+        dEMap[idx] = lab.deltaE2000(ringLab);
       }
     }
 
@@ -543,12 +739,69 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
         ? ((edgeRedSum / edgeN) - (coreRedSum / coreN))
         : 0.0;
 
+    // 3. Otsu adaptive threshold bounded safely to prevent noise masks on clear skin
+    final otsuT = _computeOtsuThreshold(dEMap).clamp(10.5, 20.0);
+    final rawMask = List<bool>.filled(n * n, false);
+    for (var i = 0; i < n * n; i++) {
+      if (dEMap[i] >= otsuT) {
+        rawMask[i] = true;
+      }
+    }
+
+    // 4. Keep only the dominant central connected lesion component
+    final mask = _retainLargestCentralComponent(rawMask, n);
+
+    var lesionArea = 0;
+    double sumX = 0, sumY = 0;
+
+    // 6-color dermoscopic counters inside segmented lesion
+    int cLightBrown = 0;
+    int cDarkBrown = 0;
+    int cBlack = 0;
+    int cRed = 0;
+    int cWhite = 0;
+    int cBlueGray = 0;
+
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        final idx = y * n + x;
+        if (!mask[idx]) continue;
+        lesionArea++;
+        sumX += x;
+        sumY += y;
+
+        final (ri, gi, bi) = rgbCache[idx];
+        final lab = labCache[idx];
+        final hsv = HSVColor.fromColor(Color.fromARGB(255, ri, gi, bi));
+        final h = hsv.hue;
+        final s = hsv.saturation;
+        final v = hsv.value;
+
+        if (v < 0.20) {
+          cBlack++;
+        } else if (s < 0.14 && v > 0.78) {
+          cWhite++;
+        } else if ((h >= 185 && h <= 265 && s >= 0.12 && v <= 0.65) ||
+            (lab.b <= -4.0 && lab.l <= 62.0)) {
+          cBlueGray++;
+        } else if (((h <= 14 || h >= 342) && s >= 0.35 && v >= 0.30) ||
+            (lab.a >= 24.0 && lab.b < 24.0)) {
+          cRed++;
+        } else if (h >= 12 && h <= 46 && v < 0.42) {
+          cDarkBrown++;
+        } else if (h >= 14 && h <= 52 && v >= 0.42 && s >= 0.22) {
+          cLightBrown++;
+        }
+      }
+    }
+
     if (lesionArea < 36) {
       return (
         borderIrregularityIndex: 1.0,
         shapeAsymmetryScore: 0.0,
         dermoscopicColors: const [],
         annularClearingIndex: annularClearingIndex,
+        hairRemovedRatio: hairResult.hairRatio,
       );
     }
 
@@ -609,6 +862,7 @@ class SkinConditionAnalyzer implements HealthAnalyzer {
       shapeAsymmetryScore: shapeAsymmetryScore,
       dermoscopicColors: colors,
       annularClearingIndex: annularClearingIndex,
+      hairRemovedRatio: hairResult.hairRatio,
     );
   }
 

@@ -3078,4 +3078,27 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'پلیٹ فارم بانی اور سسٹم ایڈمن';
+
+  @override
+  String get adminFieldIcon => 'صحت اور جشن کا آئیکن';
+
+  @override
+  String get adminToggleSendPush => 'صارفین کو اطلاع بھیجیں';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'اطلاع بھیجیں اور مفید صحت کارڈ میں دکھائیں';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'اعلان شائع کر دیا گیا اور اطلاع بھیج دی گئی۔';
+
+  @override
+  String get cameraLiveLight => 'روشنی';
+
+  @override
+  String get cameraLiveFocus => 'فوکس';
+
+  @override
+  String get cameraLiveGlare => 'چمک';
 }

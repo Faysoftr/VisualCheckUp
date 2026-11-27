@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
+import 'package:visualcheckup/features/admin/data/announcement_notification_service.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/admin/presentation/screens/admin_panel_screen.dart';
 import 'package:visualcheckup/features/admin/presentation/widgets/global_announcement_and_promo_banners.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/app_drawer.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/home_social_showcase.dart';
 import 'package:visualcheckup/features/community/data/community_image_upload_service.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
@@ -694,6 +696,144 @@ void main() {
         find.byKey(const Key('comm_detail_toggle_socials')),
         findsOneWidget,
       );
+    });
+  });
+
+  group('Admin Drawer Bottom Position, Announcement Icons, Notifications & Tip Card', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+      AnnouncementNotificationService.instance.onNotifyForTest = null;
+    });
+
+    tearDown(() {
+      AnnouncementNotificationService.instance.onNotifyForTest = null;
+    });
+
+    testWidgets('AppDrawer places Admin Control Panel at the very bottom below Theme', (tester) async {
+      final themeController = ThemeController();
+
+      await tester.pumpWidget(
+        _wrapApp(
+          Scaffold(
+            body: AppDrawer(
+              currentUser: _adminUser,
+              themeController: themeController,
+              onOpenSkinModule: () {},
+              onOpenHistory: () {},
+              onOpenReferenceGuide: () {},
+              onOpenAiSettings: () {},
+              onOpenDisclaimer: () {},
+              onSignOut: () {},
+              onDeleteAccount: () {},
+              onOpenAdminPanel: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final adminTile = find.byKey(const Key('drawer_admin_panel_tile'));
+      await tester.scrollUntilVisible(
+        adminTile,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
+      final themeWidget = find.byType(SegmentedButton<ThemeMode>);
+      expect(themeWidget, findsOneWidget);
+      expect(adminTile, findsOneWidget);
+
+      final themeBottom = tester.getBottomLeft(themeWidget).dy;
+      final adminTop = tester.getTopLeft(adminTile).dy;
+      expect(adminTop, greaterThanOrEqualTo(themeBottom));
+    });
+
+    testWidgets('AdminPanelScreen saves chosen confetti icon and dispatches notification', (tester) async {
+      final adminRepo = AdminRepository(useFirebase: false);
+      final notified = <GlobalAnnouncement>[];
+      AnnouncementNotificationService.instance.onNotifyForTest =
+          notified.add;
+
+      await tester.pumpWidget(
+        _wrapApp(AdminPanelScreen(repository: adminRepo)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Duyurular'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('admin_add_announcement_button')));
+      await tester.pumpAndSettle();
+
+      // Pick the confetti celebration icon 🎉
+      await tester.tap(find.byKey(const Key('admin_ann_icon_confetti')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('admin_announcement_title_field')),
+        'Sağlık Şenliği Başladı',
+      );
+      await tester.enterText(
+        find.byKey(const Key('admin_announcement_message_field')),
+        'Bugün 8 bardak su ve 20 dakika yürüyüş hedefliyoruz!',
+      );
+      await tester.tap(find.byKey(const Key('admin_announcement_save_button')));
+      await tester.pumpAndSettle();
+
+      final saved = await adminRepo.loadAnnouncements(activeOnly: true);
+      expect(saved.length, 1);
+      expect(saved.first.effectiveEmoji, '🎉');
+      expect(saved.first.title, 'Sağlık Şenliği Başladı');
+
+      // Local notification hook fired immediately with the announcement!
+      expect(notified.length, 1);
+      expect(notified.first.id, saved.first.id);
+      expect(notified.first.effectiveEmoji, '🎉');
+
+      // Deduplication check: calling notifyIfNew again for same ID returns false
+      final secondRun = await AnnouncementNotificationService.instance
+          .notifyIfNew(saved.first);
+      expect(secondRun, isFalse);
+      expect(notified.length, 1);
+    });
+
+    testWidgets('SfbDailyHealthTipCard renders active announcements first with icon & rotates via 1/N counter', (tester) async {
+      final ann = GlobalAnnouncement(
+        id: 'ann_heart_1',
+        title: 'Kalp Sağlığı Günü',
+        message: 'Her gün 30 dakika tempolu yürüyüş kalbi korur.',
+        type: AnnouncementType.healthTip,
+        iconEmoji: '❤️',
+        isActive: true,
+        createdAt: DateTime(2026, 5, 1),
+      );
+
+      await tester.pumpWidget(
+        _wrapApp(
+          Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SfbDailyHealthTipCard(announcements: [ann]),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Kalp Sağlığı Günü'), findsOneWidget);
+      expect(
+        find.text('Her gün 30 dakika tempolu yürüyüş kalbi korur.'),
+        findsOneWidget,
+      );
+      expect(find.text('❤️'), findsOneWidget);
+      expect(find.text('1/7'), findsOneWidget);
+
+      // Tap next button -> advances to 2/7 (daily health tip)
+      await tester.tap(find.byKey(const Key('home_sfb_tip_next_btn')));
+      await tester.pumpAndSettle();
+      expect(find.text('2/7'), findsOneWidget);
+      expect(find.text('Kalp Sağlığı Günü'), findsNothing);
     });
   });
 }

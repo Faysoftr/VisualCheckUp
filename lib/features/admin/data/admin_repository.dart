@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:visualcheckup/features/admin/data/announcement_notification_service.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/community/data/health_community_repository.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
@@ -94,8 +95,9 @@ class AdminRepository {
   }
 
   Future<GlobalAnnouncement> saveAnnouncement(
-    GlobalAnnouncement announcement,
-  ) async {
+    GlobalAnnouncement announcement, {
+    bool sendPushNotification = false,
+  }) async {
     final list = await loadAnnouncements();
     list.removeWhere((a) => a.id == announcement.id);
     list.insert(0, announcement);
@@ -109,6 +111,30 @@ class AdminRepository {
             .set(announcement.toJson(), SetOptions(merge: true));
       } catch (_) {}
     }
+
+    if (sendPushNotification && announcement.isActive) {
+      if (_canUseFirestore) {
+        try {
+          await _db
+              .collection('admin_push_queue')
+              .doc('push_${announcement.id}')
+              .set({
+            'title':
+                '${announcement.effectiveEmoji} ${announcement.title}'.trim(),
+            'body': announcement.message.trim(),
+            'announcementId': announcement.id,
+            'iconEmoji': announcement.effectiveEmoji,
+            'createdAt': DateTime.now().toIso8601String(),
+            'status': 'queued',
+          });
+        } catch (_) {}
+      }
+      await AnnouncementNotificationService.instance.notifyIfNew(
+        announcement,
+        force: true,
+      );
+    }
+
     return announcement;
   }
 

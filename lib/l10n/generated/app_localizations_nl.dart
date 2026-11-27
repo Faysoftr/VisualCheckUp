@@ -3107,4 +3107,27 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATFORMOPRICHTER & SYSTEEMBEHEERDER';
+
+  @override
+  String get adminFieldIcon => 'Gezondheids- & feestpictogram';
+
+  @override
+  String get adminToggleSendPush => 'Melding naar gebruikers sturen';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'Melding sturen en tonen in de kaart Nuttige Gezondheidsinfo';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'Aankondiging gepubliceerd en melding verzonden.';
+
+  @override
+  String get cameraLiveLight => 'Licht';
+
+  @override
+  String get cameraLiveFocus => 'Focus';
+
+  @override
+  String get cameraLiveGlare => 'Glans';
 }

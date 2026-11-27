@@ -943,5 +943,12 @@
   "sfbViewDetails": "Detayı Gör",
   "sfbAdminBadge": "ADMİN",
   "sfbAdminConsoleTitle": "HIZLI YÖNETİM KONSOLU",
-  "sfbAdminFounderBanner": "PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ"
+  "sfbAdminFounderBanner": "PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ",
+  "adminFieldIcon": "Sağlık ve Kutlama İkonu",
+  "adminToggleSendPush": "Kullanıcılara bildirim gönder",
+  "adminToggleSendPushSubtitle": "Yayınlandığında bildirim gönder ve Faydalı Bilgiler kartında göster",
+  "adminAnnouncementPublishedToast": "Duyuru yayınlandı ve bildirim gönderildi.",
+  "cameraLiveLight": "Işık",
+  "cameraLiveFocus": "Odak",
+  "cameraLiveGlare": "Parlama"
 }

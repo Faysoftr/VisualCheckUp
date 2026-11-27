@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:visualcheckup/core/ai/image_preprocessor.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/core/storage/checkup_photo_storage.dart';
@@ -55,6 +56,9 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   double _currentZoom = 1.0;
   Offset? _focusPoint;
   late EyeScanMode _eyeScanMode;
+  LiveCameraQuality? _liveQuality;
+  bool _isStreaming = false;
+  DateTime _lastStreamSample = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void initState() {
@@ -204,10 +208,49 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     }
   }
 
+  Future<void> _stopLiveQualityStream(CameraController? controller) async {
+    if (!_isStreaming || controller == null) return;
+    _isStreaming = false;
+    try {
+      if (controller.value.isStreamingImages) {
+        await controller.stopImageStream();
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _startLiveQualityStream(CameraController controller) async {
+    if (_isStreaming || !controller.value.isInitialized) return;
+    try {
+      _isStreaming = true;
+      await controller.startImageStream((CameraImage image) {
+        if (!mounted || _isProcessing) return;
+        final now = DateTime.now();
+        if (now.difference(_lastStreamSample).inMilliseconds < 450) return;
+        _lastStreamSample = now;
+        if (image.planes.isEmpty) return;
+        final plane = image.planes.first;
+        final q = ImagePreprocessor.assessLiveLuminancePlane(
+          bytes: plane.bytes,
+          width: image.width,
+          height: image.height,
+          bytesPerRow: plane.bytesPerRow,
+          pixelStride: plane.bytesPerPixel ?? 1,
+          category: widget.category,
+        );
+        if (mounted) {
+          setState(() => _liveQuality = q);
+        }
+      });
+    } catch (_) {
+      _isStreaming = false;
+    }
+  }
+
   Future<void> _startController(int index) async {
     final previous = _controller;
     _controller = null;
     _torchEnabled = false;
+    await _stopLiveQualityStream(previous);
     await previous?.dispose();
 
     final preset = switch (widget.category) {
@@ -249,6 +292,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
         _isInitializing = false;
         _hasCameraError = false;
       });
+      await _startLiveQualityStream(controller);
     } on CameraException catch (e) {
       await controller.dispose();
       if (!mounted) return;
@@ -303,6 +347,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
 
     setState(() => _isProcessing = true);
     try {
+      await _stopLiveQualityStream(controller);
       final file = await controller.takePicture();
       final bytes = await file.readAsBytes();
       await _processBytes(bytes);
@@ -312,6 +357,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
         SnackBar(content: Text(context.l10n.cameraAnalysisFailed(e.toString()))),
       );
       setState(() => _isProcessing = false);
+      await _startLiveQualityStream(controller);
     }
   }
 
@@ -426,6 +472,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _stopLiveQualityStream(_controller);
     _controller?.dispose();
     super.dispose();
   }
@@ -735,6 +782,22 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                     onTapDown: (d) => _handleTapToFocus(d, constraints),
                     child: _buildPreviewArea(),
                   ),
+                  if (_liveQuality != null)
+                    Positioned(
+                      top: 10,
+                      left: 16,
+                      right: 16,
+                      child: IgnorePointer(
+                        child: Center(
+                          child: _LiveQualityIndicatorBar(
+                            quality: _liveQuality!,
+                            lightLabel: l10n.cameraLiveLight,
+                            focusLabel: l10n.cameraLiveFocus,
+                            glareLabel: l10n.cameraLiveGlare,
+                          ),
+                        ),
+                      ),
+                    ),
                   if (_focusPoint != null)
                     Positioned(
                       left: (_focusPoint!.dx - 26).clamp(
@@ -1160,5 +1223,89 @@ class _AnatomicalReticlePainter extends CustomPainter {
   bool shouldRepaint(covariant _AnatomicalReticlePainter oldDelegate) {
     return oldDelegate.category != category ||
         oldDelegate.eyeScanMode != eyeScanMode;
+  }
+}
+
+class _LiveQualityIndicatorBar extends StatelessWidget {
+  const _LiveQualityIndicatorBar({
+    required this.quality,
+    required this.lightLabel,
+    required this.focusLabel,
+    required this.glareLabel,
+  });
+
+  final LiveCameraQuality quality;
+  final String lightLabel;
+  final String focusLabel;
+  final String glareLabel;
+
+  Color _dotColor(LiveQualityLevel level) {
+    switch (level) {
+      case LiveQualityLevel.good:
+        return const Color(0xFF22C55E);
+      case LiveQualityLevel.caution:
+        return const Color(0xFFF59E0B);
+      case LiveQualityLevel.poor:
+        return const Color(0xFFEF4444);
+    }
+  }
+
+  Widget _pill(String label, LiveQualityLevel level) {
+    final c = _dotColor(level);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: c,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: c.withValues(alpha: 0.55),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('camera_live_quality_bar'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: quality.isAllGood
+              ? const Color(0xFF22C55E).withValues(alpha: 0.65)
+              : Colors.white24,
+        ),
+      ),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          _pill(lightLabel, quality.lightingLevel),
+          _pill(focusLabel, quality.sharpnessLevel),
+          _pill(glareLabel, quality.glareLevel),
+        ],
+      ),
+    );
   }
 }

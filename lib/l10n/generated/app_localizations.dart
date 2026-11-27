@@ -5787,6 +5787,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PLATFORM FOUNDER & SYSTEM ADMIN'**
   String get sfbAdminFounderBanner;
+
+  /// No description provided for @adminFieldIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Celebration Icon'**
+  String get adminFieldIcon;
+
+  /// No description provided for @adminToggleSendPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Send notification to users'**
+  String get adminToggleSendPush;
+
+  /// No description provided for @adminToggleSendPushSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show notification and display in Useful Health Info card'**
+  String get adminToggleSendPushSubtitle;
+
+  /// No description provided for @adminAnnouncementPublishedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement published and notification sent.'**
+  String get adminAnnouncementPublishedToast;
+
+  /// No description provided for @cameraLiveLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get cameraLiveLight;
+
+  /// No description provided for @cameraLiveFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get cameraLiveFocus;
+
+  /// No description provided for @cameraLiveGlare.
+  ///
+  /// In en, this message translates to:
+  /// **'Glare'**
+  String get cameraLiveGlare;
 }
 
 class _AppLocalizationsDelegate

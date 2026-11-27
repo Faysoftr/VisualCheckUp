@@ -65,6 +65,59 @@ extension AnnouncementTypeX on AnnouncementType {
         return const Color(0xFF7C3AED);
     }
   }
+
+  String get defaultEmoji {
+    switch (this) {
+      case AnnouncementType.info:
+        return '📢';
+      case AnnouncementType.healthTip:
+        return '💚';
+      case AnnouncementType.warning:
+        return '⚠️';
+      case AnnouncementType.campaign:
+        return '🎉';
+    }
+  }
+}
+
+/// Curated health & celebration icon option for announcements (Social Formula Bank style).
+class AnnouncementIconOption {
+  const AnnouncementIconOption({
+    required this.id,
+    required this.emoji,
+    required this.accentColor,
+  });
+
+  final String id;
+  final String emoji;
+  final Color accentColor;
+}
+
+class AnnouncementIcons {
+  AnnouncementIcons._();
+
+  static const List<AnnouncementIconOption> all = [
+    AnnouncementIconOption(id: 'heart', emoji: '❤️', accentColor: Color(0xFFE11D48)),
+    AnnouncementIconOption(id: 'confetti', emoji: '🎉', accentColor: Color(0xFFEC4899)),
+    AnnouncementIconOption(id: 'doctor', emoji: '🩺', accentColor: Color(0xFF0284C7)),
+    AnnouncementIconOption(id: 'pill', emoji: '💊', accentColor: Color(0xFF7C3AED)),
+    AnnouncementIconOption(id: 'water', emoji: '💧', accentColor: Color(0xFF06B6D4)),
+    AnnouncementIconOption(id: 'nutrition', emoji: '🥗', accentColor: Color(0xFF16A34A)),
+    AnnouncementIconOption(id: 'fitness', emoji: '🏃', accentColor: Color(0xFFF59E0B)),
+    AnnouncementIconOption(id: 'sleep', emoji: '😴', accentColor: Color(0xFF6366F1)),
+    AnnouncementIconOption(id: 'mind', emoji: '🧠', accentColor: Color(0xFF8B5CF6)),
+    AnnouncementIconOption(id: 'herbal', emoji: '🌿', accentColor: Color(0xFF10B981)),
+    AnnouncementIconOption(id: 'megaphone', emoji: '📢', accentColor: Color(0xFF0B6E6E)),
+    AnnouncementIconOption(id: 'sparkle', emoji: '✨', accentColor: Color(0xFFD97706)),
+  ];
+
+  static Color accentFor(String emoji, Color fallback) {
+    final trimmed = emoji.trim();
+    for (final opt in all) {
+      if (opt.emoji == trimmed) return opt.accentColor;
+    }
+    return fallback;
+  }
 }
 
 /// Global announcement banner published from the VisualCheckUp Admin Panel.
@@ -74,6 +127,7 @@ class GlobalAnnouncement {
     required this.title,
     required this.message,
     this.type = AnnouncementType.info,
+    this.iconEmoji = '',
     this.linkUrl = '',
     this.isActive = true,
     required this.createdAt,
@@ -83,14 +137,22 @@ class GlobalAnnouncement {
   final String title;
   final String message;
   final AnnouncementType type;
+  final String iconEmoji;
   final String linkUrl;
   final bool isActive;
   final DateTime createdAt;
+
+  String get effectiveEmoji =>
+      iconEmoji.trim().isNotEmpty ? iconEmoji.trim() : type.defaultEmoji;
+
+  Color get effectiveAccentColor =>
+      AnnouncementIcons.accentFor(effectiveEmoji, type.accentColor);
 
   GlobalAnnouncement copyWith({
     String? title,
     String? message,
     AnnouncementType? type,
+    String? iconEmoji,
     String? linkUrl,
     bool? isActive,
   }) {
@@ -99,6 +161,7 @@ class GlobalAnnouncement {
       title: title ?? this.title,
       message: message ?? this.message,
       type: type ?? this.type,
+      iconEmoji: iconEmoji ?? this.iconEmoji,
       linkUrl: linkUrl ?? this.linkUrl,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt,
@@ -110,6 +173,7 @@ class GlobalAnnouncement {
         'title': title.trim(),
         'message': message.trim(),
         'type': type.name,
+        if (iconEmoji.trim().isNotEmpty) 'iconEmoji': iconEmoji.trim(),
         if (linkUrl.trim().isNotEmpty) 'linkUrl': linkUrl.trim(),
         'isActive': isActive,
         'createdAt': createdAt.toIso8601String(),
@@ -124,6 +188,7 @@ class GlobalAnnouncement {
       title: (json['title'] as String?) ?? '',
       message: (json['message'] as String?) ?? '',
       type: AnnouncementTypeX.fromId(json['type'] as String?),
+      iconEmoji: (json['iconEmoji'] as String?) ?? '',
       linkUrl: (json['linkUrl'] as String?) ?? '',
       isActive: (json['isActive'] as bool?) ?? true,
       createdAt: DateTime.tryParse((json['createdAt'] as String?) ?? '') ??

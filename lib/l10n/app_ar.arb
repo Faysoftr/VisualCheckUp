@@ -943,5 +943,12 @@
   "sfbViewDetails": "عرض التفاصيل",
   "sfbAdminBadge": "مشرف",
   "sfbAdminConsoleTitle": "لوحة التحكم السريعة",
-  "sfbAdminFounderBanner": "مؤسس المنصة ومدير النظام"
+  "sfbAdminFounderBanner": "مؤسس المنصة ومدير النظام",
+  "adminFieldIcon": "أيقونة الصحة والاحتفال",
+  "adminToggleSendPush": "إرسال إشعار للمستخدمين",
+  "adminToggleSendPushSubtitle": "إرسال إشعار وعرضه في بطاقة المعلومات الصحية المفيدة",
+  "adminAnnouncementPublishedToast": "تم نشر الإعلان وإرسال الإشعار.",
+  "cameraLiveLight": "الإضاءة",
+  "cameraLiveFocus": "التركيز",
+  "cameraLiveGlare": "الوهج"
 }

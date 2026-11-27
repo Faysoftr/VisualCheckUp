@@ -3082,4 +3082,27 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन';
+
+  @override
+  String get adminFieldIcon => 'स्वास्थ्य और उत्सव आइकन';
+
+  @override
+  String get adminToggleSendPush => 'उपयोगकर्ताओं को सूचना भेजें';
+
+  @override
+  String get adminToggleSendPushSubtitle =>
+      'सूचना भेजें और उपयोगी स्वास्थ्य जानकारी कार्ड में दिखाएँ';
+
+  @override
+  String get adminAnnouncementPublishedToast =>
+      'घोषणा प्रकाशित की गई और सूचना भेजी गई।';
+
+  @override
+  String get cameraLiveLight => 'रोशनी';
+
+  @override
+  String get cameraLiveFocus => 'फ़ोकस';
+
+  @override
+  String get cameraLiveGlare => 'चमक';
 }
