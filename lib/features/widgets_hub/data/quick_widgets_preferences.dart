@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+enum QuickWidgetType {
+  pedometer,
+  sobriety,
+  vitals,
+  alarms,
+}
+
+extension QuickWidgetTypeX on QuickWidgetType {
+  String get title {
+    switch (this) {
+      case QuickWidgetType.pedometer:
+        return 'Adım Sayar & Yürüyüş Widget’ı';
+      case QuickWidgetType.sobriety:
+        return 'Sigara & Alkol Bırakma Widget’ı';
+      case QuickWidgetType.vitals:
+        return 'Şeker & Tansiyon Takip Widget’ı';
+      case QuickWidgetType.alarms:
+        return 'İlaç & Su Alarmı Widget’ı';
+    }
+  }
+
+  String get subtitle {
+    switch (this) {
+      case QuickWidgetType.pedometer:
+        return 'Bugünkü adım, hedef ilerlemesi ve anlık yürüyüş kısayolu';
+      case QuickWidgetType.sobriety:
+        return 'Bugün kazanılan para, kazanılan ömür ve özgürlük günü';
+      case QuickWidgetType.vitals:
+        return 'Son tansiyon/şeker değerleri ve tek tıkla hızlı ölçüm kaydı';
+      case QuickWidgetType.alarms:
+        return 'Sıradaki hatırlatıcı saati ve günlük doz durumu';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case QuickWidgetType.pedometer:
+        return Icons.directions_walk_rounded;
+      case QuickWidgetType.sobriety:
+        return Icons.smoke_free_rounded;
+      case QuickWidgetType.vitals:
+        return Icons.monitor_heart_rounded;
+      case QuickWidgetType.alarms:
+        return Icons.alarm_on_rounded;
+    }
+  }
+
+  Color get accentColor {
+    switch (this) {
+      case QuickWidgetType.pedometer:
+        return const Color(0xFF0D9488);
+      case QuickWidgetType.sobriety:
+        return const Color(0xFF16A34A);
+      case QuickWidgetType.vitals:
+        return const Color(0xFFE11D48);
+      case QuickWidgetType.alarms:
+        return const Color(0xFFD97706);
+    }
+  }
+
+  static QuickWidgetType? fromName(String? raw) {
+    for (final t in QuickWidgetType.values) {
+      if (t.name == raw) return t;
+    }
+    return null;
+  }
+}
+
+class QuickWidgetsPreferences {
+  QuickWidgetsPreferences._();
+
+  static const String _enabledWidgetsKey = 'visualcheckup_enabled_quick_widgets_v1';
+  static const String widgetVitalsSummaryKey = 'vcu_widget_vitals_summary';
+  static const String widgetAlarmSummaryKey = 'vcu_widget_alarm_summary';
+
+  static const MethodChannel _homeWidgetChannel =
+      MethodChannel('com.faysoft.visualcheckup/home_widget');
+
+  static const List<QuickWidgetType> defaultEnabled = [
+    QuickWidgetType.pedometer,
+    QuickWidgetType.sobriety,
+    QuickWidgetType.vitals,
+    QuickWidgetType.alarms,
+  ];
+
+  static Future<List<QuickWidgetType>> loadEnabledWidgets() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getStringList(_enabledWidgetsKey);
+    if (stored == null) {
+      return List<QuickWidgetType>.from(defaultEnabled);
+    }
+    return stored
+        .map(QuickWidgetTypeX.fromName)
+        .whereType<QuickWidgetType>()
+        .toList();
+  }
+
+  static Future<void> saveEnabledWidgets(List<QuickWidgetType> widgets) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _enabledWidgetsKey,
+      widgets.map((w) => w.name).toList(),
+    );
+  }
+
+  static Future<void> syncVitalsAndAlarmWidgetCache({
+    required String vitalsSummary,
+    required String alarmSummary,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(widgetVitalsSummaryKey, vitalsSummary);
+    await prefs.setString(widgetAlarmSummaryKey, alarmSummary);
+    try {
+      await _homeWidgetChannel.invokeMethod<void>('refreshWidget');
+    } catch (_) {}
+  }
+
+  static Future<bool> requestPinNativeHomeWidget() async {
+    try {
+      final pinned =
+          await _homeWidgetChannel.invokeMethod<bool>('requestPinWidget');
+      return pinned ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+}

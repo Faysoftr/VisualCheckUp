@@ -55,12 +55,15 @@ import 'package:visualcheckup/features/medications/data/medication_alarm_schedul
 import 'package:visualcheckup/features/medications/data/medication_reminder_repository.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
 import 'package:visualcheckup/features/medications/presentation/screens/medication_reminders_screen.dart';
+import 'package:visualcheckup/features/pedometer/presentation/screens/step_counter_screen.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
+import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tracker_screen.dart';
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 import 'package:visualcheckup/features/subscription/presentation/screens/pro_paywall_screen.dart';
 import 'package:visualcheckup/features/support/presentation/widgets/donation_support_dialog.dart';
+import 'package:visualcheckup/features/widgets_hub/presentation/widgets/health_quick_widgets_hub.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -323,6 +326,32 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => ProPaywallScreen(
           repository: widget.subscriptionRepository ?? SubscriptionRepository(),
           userId: widget.currentUser.id,
+        ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openPedometer() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => StepCounterScreen(
+          communityRepository: HealthCommunityRepository(),
+          currentUserId: widget.currentUser.id,
+          currentUserDisplayName: widget.currentUser.displayName,
+        ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openSobrietyTracker() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SobrietyTrackerScreen(
+          communityRepository: HealthCommunityRepository(),
+          currentUserId: widget.currentUser.id,
+          currentUserDisplayName: widget.currentUser.displayName,
         ),
       ),
     );
@@ -670,6 +699,8 @@ class _HomeScreenState extends State<HomeScreen> {
             : () => DonationSupportDialog.show(context),
         onOpenGrowthBmi: () => _openGrowthBmi(initialTabIndex: 0),
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
+        onOpenPedometer: _openPedometer,
+        onOpenSobriety: _openSobrietyTracker,
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,
         onOpenHistory: _openHistory,
@@ -907,7 +938,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // 1b. Glowing Daily Health Quote / Tip of the Day Card
                       const SfbDailyHealthTipCard(),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
+
+                      // 1c. Customizable Health Quick Widgets Hub (Pedometer, Sobriety, Vitals, Alarms)
+                      HealthQuickWidgetsHub(
+                        onOpenPedometer: _openPedometer,
+                        onOpenSobriety: _openSobrietyTracker,
+                        onOpenVitals: () => _openVitalsTracker(),
+                        onOpenAlarms: _openMedicationReminders,
+                        vitalsRepository: _labsVitalsRepository,
+                        medicationRepository: _medicationRepository,
+                      ),
+                      const SizedBox(height: 14),
 
                       // 2. Elevated Modern Follow-Up Plan Card
                       _FollowUpModernCard(
@@ -1109,6 +1151,30 @@ class _HomeScreenState extends State<HomeScreen> {
                               title: l10n.dietCalorieQuickTitle,
                               subtitle: l10n.dietCalorieQuickSubtitle,
                               onTap: () => _openDietHub(initialTabIndex: 3),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 13),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.directions_walk_rounded,
+                              accentColor: const Color(0xFF0D9488),
+                              title: 'Adım Sayar',
+                              subtitle: 'Sürekli & anlık yürüyüş tablosu',
+                              onTap: _openPedometer,
+                            ),
+                          ),
+                          const SizedBox(width: 13),
+                          Expanded(
+                            child: _DashboardModuleCard(
+                              icon: Icons.smoke_free_rounded,
+                              accentColor: const Color(0xFF16A34A),
+                              title: 'Sigara & Alkol Bırakma',
+                              subtitle: 'Kazanılan para, ömür & değişimler',
+                              onTap: _openSobrietyTracker,
                             ),
                           ),
                         ],

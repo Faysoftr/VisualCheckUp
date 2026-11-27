@@ -147,8 +147,17 @@ void main() {
         final updated = await repo.loadMyProfile(_testUser.id);
         expect(updated?.mood, HealthMood.energetic);
 
-        // Verify Motivasyon Müziği and Arkadaşlarım cards are present
-        expect(find.byKey(const Key('profile_motivation_music_card')), findsOneWidget);
+        // Verify Hakkımda, Motto, Motivasyon Müziği, and Arkadaşlarım cards are present
+        expect(find.byKey(const Key('profile_bio_card')), findsOneWidget);
+        expect(find.byKey(const Key('profile_motto_card')), findsOneWidget);
+
+        final musicCard = find.byKey(const Key('profile_motivation_music_card'));
+        await tester.scrollUntilVisible(
+          musicCard,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(musicCard, findsOneWidget);
 
         final friendsCard = find.byKey(const Key('profile_friends_card'));
         await tester.scrollUntilVisible(

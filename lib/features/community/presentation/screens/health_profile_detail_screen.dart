@@ -10,6 +10,7 @@ import 'package:visualcheckup/features/community/data/health_community_repositor
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/community/presentation/widgets/profile_wellness_cards.dart';
 import 'package:visualcheckup/features/subscription/data/subscription_repository.dart';
 
 typedef CommunityUrlLauncher = Future<void> Function(Uri uri);
@@ -981,6 +982,37 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   ],
                 ),
               ),
+            ),
+          ],
+
+          // Motto Card (Public visibility)
+          if (_profile.showMotto && _profile.motto.trim().isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ProfileMottoCard(
+              profile: _profile,
+              isOwner: false,
+            ),
+          ],
+
+          // Sobriety Showcase Card (Public visibility)
+          if (_profile.showSobrietyOnProfile &&
+              (_profile.smokeQuitAt != null || _profile.alcoholQuitAt != null)) ...[
+            const SizedBox(height: 12),
+            ProfileSobrietyShowcaseCard(
+              profile: _profile,
+              isOwner: false,
+            ),
+          ],
+
+          // Step Counter Showcase Card (Public visibility)
+          if (_profile.showStepsOnProfile &&
+              (_profile.todayStepsCount > 0 ||
+                  _profile.weekStepsCount > 0 ||
+                  _profile.monthStepsCount > 0)) ...[
+            const SizedBox(height: 12),
+            ProfileStepCounterShowcaseCard(
+              profile: _profile,
+              isOwner: false,
             ),
           ],
         ],

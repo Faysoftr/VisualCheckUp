@@ -489,10 +489,23 @@ class HealthCommunityProfile {
     this.facebook = '',
     this.snapchat = '',
     this.bio = '',
+    this.motto = '',
+    this.showMotto = true,
     this.dailyFocus = '',
     this.hideRealName = false,
     this.hidePhoto = false,
     this.showBio = true,
+    this.showSobrietyOnProfile = true,
+    this.smokeQuitAt,
+    this.alcoholQuitAt,
+    this.dailySmokeCostTry = 75.0,
+    this.dailyCigarettesCount = 20,
+    this.dailyAlcoholCostTry = 120.0,
+    this.showStepsOnProfile = true,
+    this.todayStepsCount = 0,
+    this.weekStepsCount = 0,
+    this.monthStepsCount = 0,
+    this.dailyStepGoal = 10000,
     this.discoverable = true,
     this.allowMessages = true,
     this.requireMessageApproval = true,
@@ -537,10 +550,23 @@ class HealthCommunityProfile {
   final String facebook;
   final String snapchat;
   final String bio;
+  final String motto;
+  final bool showMotto;
   final String dailyFocus;
   final bool hideRealName;
   final bool hidePhoto;
   final bool showBio;
+  final bool showSobrietyOnProfile;
+  final DateTime? smokeQuitAt;
+  final DateTime? alcoholQuitAt;
+  final double dailySmokeCostTry;
+  final int dailyCigarettesCount;
+  final double dailyAlcoholCostTry;
+  final bool showStepsOnProfile;
+  final int todayStepsCount;
+  final int weekStepsCount;
+  final int monthStepsCount;
+  final int dailyStepGoal;
   final bool discoverable;
   final bool allowMessages;
   final bool requireMessageApproval;
@@ -725,10 +751,25 @@ class HealthCommunityProfile {
     String? facebook,
     String? snapchat,
     String? bio,
+    String? motto,
+    bool? showMotto,
     String? dailyFocus,
     bool? hideRealName,
     bool? hidePhoto,
     bool? showBio,
+    bool? showSobrietyOnProfile,
+    DateTime? smokeQuitAt,
+    bool clearSmokeQuitAt = false,
+    DateTime? alcoholQuitAt,
+    bool clearAlcoholQuitAt = false,
+    double? dailySmokeCostTry,
+    int? dailyCigarettesCount,
+    double? dailyAlcoholCostTry,
+    bool? showStepsOnProfile,
+    int? todayStepsCount,
+    int? weekStepsCount,
+    int? monthStepsCount,
+    int? dailyStepGoal,
     bool? discoverable,
     bool? allowMessages,
     bool? requireMessageApproval,
@@ -776,10 +817,26 @@ class HealthCommunityProfile {
       facebook: facebook ?? this.facebook,
       snapchat: snapchat ?? this.snapchat,
       bio: bio ?? this.bio,
+      motto: motto ?? this.motto,
+      showMotto: showMotto ?? this.showMotto,
       dailyFocus: dailyFocus ?? this.dailyFocus,
       hideRealName: hideRealName ?? this.hideRealName,
       hidePhoto: hidePhoto ?? this.hidePhoto,
       showBio: showBio ?? this.showBio,
+      showSobrietyOnProfile:
+          showSobrietyOnProfile ?? this.showSobrietyOnProfile,
+      smokeQuitAt:
+          clearSmokeQuitAt ? null : (smokeQuitAt ?? this.smokeQuitAt),
+      alcoholQuitAt:
+          clearAlcoholQuitAt ? null : (alcoholQuitAt ?? this.alcoholQuitAt),
+      dailySmokeCostTry: dailySmokeCostTry ?? this.dailySmokeCostTry,
+      dailyCigarettesCount: dailyCigarettesCount ?? this.dailyCigarettesCount,
+      dailyAlcoholCostTry: dailyAlcoholCostTry ?? this.dailyAlcoholCostTry,
+      showStepsOnProfile: showStepsOnProfile ?? this.showStepsOnProfile,
+      todayStepsCount: todayStepsCount ?? this.todayStepsCount,
+      weekStepsCount: weekStepsCount ?? this.weekStepsCount,
+      monthStepsCount: monthStepsCount ?? this.monthStepsCount,
+      dailyStepGoal: dailyStepGoal ?? this.dailyStepGoal,
       discoverable: discoverable ?? this.discoverable,
       allowMessages: allowMessages ?? this.allowMessages,
       requireMessageApproval:
@@ -835,10 +892,23 @@ class HealthCommunityProfile {
       if (facebook.trim().isNotEmpty) 'facebook': facebook.trim(),
       if (snapchat.trim().isNotEmpty) 'snapchat': snapchat.trim(),
       'bio': bio.trim(),
+      'motto': motto.trim(),
+      'showMotto': showMotto,
       'dailyFocus': dailyFocus.trim(),
       'hideRealName': hideRealName,
       'hidePhoto': hidePhoto,
       'showBio': showBio,
+      'showSobrietyOnProfile': showSobrietyOnProfile,
+      'smokeQuitAt': smokeQuitAt?.toIso8601String() ?? '',
+      'alcoholQuitAt': alcoholQuitAt?.toIso8601String() ?? '',
+      'dailySmokeCostTry': dailySmokeCostTry,
+      'dailyCigarettesCount': dailyCigarettesCount,
+      'dailyAlcoholCostTry': dailyAlcoholCostTry,
+      'showStepsOnProfile': showStepsOnProfile,
+      'todayStepsCount': todayStepsCount,
+      'weekStepsCount': weekStepsCount,
+      'monthStepsCount': monthStepsCount,
+      'dailyStepGoal': dailyStepGoal,
       'discoverable': discoverable,
       'allowMessages': allowMessages,
       'requireMessageApproval': requireMessageApproval,
@@ -903,6 +973,13 @@ class HealthCommunityProfile {
       parsedLastActive = DateTime.tryParse(rawLastActive);
     }
 
+    DateTime? parseOptDate(dynamic raw) {
+      if (raw is String && raw.trim().isNotEmpty) {
+        return DateTime.tryParse(raw.trim());
+      }
+      return null;
+    }
+
     return HealthCommunityProfile(
       uid: (json['uid'] as String?) ?? fallbackUid ?? '',
       displayName: (json['displayName'] as String?) ?? '',
@@ -928,10 +1005,26 @@ class HealthCommunityProfile {
       facebook: (json['facebook'] as String?) ?? '',
       snapchat: (json['snapchat'] as String?) ?? '',
       bio: (json['bio'] as String?) ?? '',
+      motto: (json['motto'] as String?) ?? '',
+      showMotto: (json['showMotto'] as bool?) ?? true,
       dailyFocus: (json['dailyFocus'] as String?) ?? '',
       hideRealName: (json['hideRealName'] as bool?) ?? false,
       hidePhoto: (json['hidePhoto'] as bool?) ?? false,
       showBio: (json['showBio'] as bool?) ?? true,
+      showSobrietyOnProfile: (json['showSobrietyOnProfile'] as bool?) ?? true,
+      smokeQuitAt: parseOptDate(json['smokeQuitAt']),
+      alcoholQuitAt: parseOptDate(json['alcoholQuitAt']),
+      dailySmokeCostTry:
+          (json['dailySmokeCostTry'] as num?)?.toDouble() ?? 75.0,
+      dailyCigarettesCount:
+          (json['dailyCigarettesCount'] as num?)?.toInt() ?? 20,
+      dailyAlcoholCostTry:
+          (json['dailyAlcoholCostTry'] as num?)?.toDouble() ?? 120.0,
+      showStepsOnProfile: (json['showStepsOnProfile'] as bool?) ?? true,
+      todayStepsCount: (json['todayStepsCount'] as num?)?.toInt() ?? 0,
+      weekStepsCount: (json['weekStepsCount'] as num?)?.toInt() ?? 0,
+      monthStepsCount: (json['monthStepsCount'] as num?)?.toInt() ?? 0,
+      dailyStepGoal: (json['dailyStepGoal'] as num?)?.toInt() ?? 10000,
       discoverable: (json['discoverable'] as bool?) ?? true,
       allowMessages: (json['allowMessages'] as bool?) ?? true,
       requireMessageApproval:
@@ -956,6 +1049,26 @@ class HealthCommunityProfile {
       updatedAt: parsedUpdated,
     );
   }
+}
+
+/// Curated inspiring mottos for healthy living that users can pick or customize.
+class HealthyLivingMottos {
+  HealthyLivingMottos._();
+
+  static const List<String> presets = [
+    'Bedenin ömür boyu yaşayacağın tek evindir; ona en iyi şekilde bak. 🌿',
+    'Bugün attığın her küçük adım, yarının güçlü nefesidir. 🚶‍♂️✨',
+    'Sağlık bir hedef değil, her gün sevgiyle seçtiğin bir yaşam biçimidir. 💚',
+    'İyi uyku, temiz su, hareket ve huzur: En güçlü dört ilaç. 💧☀️',
+    'Yarının enerjisi, bugün kendine gösterdiğin özende saklı. ⚡',
+    'Mükemmel olmak zorunda değilsin; dün olduğundan %1 daha sağlıklı ol yeter. 🌱',
+    'Derin bir nefes al; temiz bir beden berrak bir zihin demektir. 🌬️🧘',
+    'Alışkanlıklarını iyileştir, alışkanlıkların da hayatını iyileştirsin. 🏆',
+    'Her yeni sabah, bedeninle yeniden barışmak için taze bir başlangıçtır. 🌅',
+    'Kendine yaptığın en kârlı yatırım, sağlığına ayırdığın zamandır. 💎',
+    'Zararlı alışkanlıkları geride bırak, özgür ve zinde bir ömre kucak aç. 🕊️',
+    'Hareket berekettir; adımların seni en dinç haline taşısın. 🏃‍♀️🔥',
+  ];
 }
 
 /// Approval state for a 1-on-1 community conversation (protects privacy).

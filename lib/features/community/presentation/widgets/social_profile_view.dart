@@ -16,6 +16,12 @@ import 'package:visualcheckup/features/community/domain/health_community_models.
 import 'package:visualcheckup/features/community/presentation/screens/health_chat_screen.dart';
 import 'package:visualcheckup/features/community/presentation/screens/health_profile_detail_screen.dart';
 import 'package:visualcheckup/features/community/presentation/widgets/community_avatar_and_report.dart';
+import 'package:visualcheckup/features/community/presentation/widgets/profile_wellness_cards.dart';
+import 'package:visualcheckup/features/pedometer/data/pedometer_service.dart';
+import 'package:visualcheckup/features/pedometer/presentation/screens/step_counter_screen.dart';
+import 'package:visualcheckup/features/sobriety/data/sobriety_repository.dart';
+import 'package:visualcheckup/features/sobriety/domain/sobriety_models.dart';
+import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tracker_screen.dart';
 import 'package:visualcheckup/features/wellness_extras/daily_health_tip_and_birthday.dart';
 
 /// Social Formula Bank-inspired My Profile view used both inside the standalone
@@ -47,12 +53,15 @@ class SocialProfileView extends StatefulWidget {
 
 class _SocialProfileViewState extends State<SocialProfileView> {
   late final CommunityImageUploadService _uploadService;
+  final SobrietyRepository _sobrietyRepo = SobrietyRepository();
+  final PedometerService _pedometerService = PedometerService.instance;
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _dailyFocusController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _mottoController = TextEditingController();
   final TextEditingController _customConditionController =
       TextEditingController();
   final TextEditingController _musicTitleController = TextEditingController();
@@ -70,6 +79,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
   bool _editingProfile = false;
 
   HealthCommunityProfile? _myProfile;
+  SobrietyState _localSobriety = const SobrietyState();
   List<MusicListenerRecord> _myMusicListeners = const [];
   List<FriendshipRecord> _friendships = const [];
 
@@ -83,6 +93,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
   bool _showChronicConditions = true;
   bool _showOnlineStatus = true;
   bool _showSocials = true;
+  bool _showBio = true;
+  bool _showMotto = true;
+  bool _showSobrietyOnProfile = true;
+  bool _showStepsOnProfile = true;
   bool _discoverable = true;
   bool _hideRealName = false;
   bool _hidePhoto = false;
@@ -97,16 +111,22 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     super.initState();
     _uploadService =
         widget.uploadService ?? R2CommunityImageUploadService.instance;
+    _pedometerService.addListener(_onWellnessChanged);
+    SobrietyRepository.revisionNotifier.addListener(_reloadSobriety);
+    _pedometerService.ensureLoaded();
     _loadProfileData();
   }
 
   @override
   void dispose() {
+    _pedometerService.removeListener(_onWellnessChanged);
+    SobrietyRepository.revisionNotifier.removeListener(_reloadSobriety);
     _displayNameController.dispose();
     _nicknameController.dispose();
     _cityController.dispose();
     _dailyFocusController.dispose();
     _bioController.dispose();
+    _mottoController.dispose();
     _customConditionController.dispose();
     _musicTitleController.dispose();
     _musicUrlController.dispose();
@@ -118,6 +138,16 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     super.dispose();
   }
 
+  void _onWellnessChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _reloadSobriety() async {
+    final loaded = await _sobrietyRepo.loadState();
+    if (!mounted) return;
+    setState(() => _localSobriety = loaded);
+  }
+
   void _syncFormFromProfile(HealthCommunityProfile? profile) {
     if (profile == null) {
       _displayNameController.text = widget.currentUser.displayName;
@@ -127,6 +157,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       _cityController.text = '';
       _dailyFocusController.text = '';
       _bioController.text = '';
+      _mottoController.text = HealthyLivingMottos.presets.first;
       _customConditionController.text = '';
       _musicTitleController.text = '';
       _musicUrlController.text = '';
@@ -145,6 +176,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       _showChronicConditions = true;
       _showOnlineStatus = true;
       _showSocials = true;
+      _showBio = true;
+      _showMotto = true;
+      _showSobrietyOnProfile = true;
+      _showStepsOnProfile = true;
       _discoverable = true;
       _hideRealName = false;
       _hidePhoto = false;
@@ -158,6 +193,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     _cityController.text = profile.city;
     _dailyFocusController.text = profile.dailyFocus;
     _bioController.text = profile.bio;
+    _mottoController.text = profile.motto;
     _customConditionController.text = profile.customChronicCondition;
     _musicTitleController.text = profile.currentMusicTitle;
     _musicUrlController.text = profile.currentMusicUrl;
@@ -176,6 +212,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     _showChronicConditions = profile.showChronicConditions;
     _showOnlineStatus = profile.showOnlineStatus;
     _showSocials = profile.showSocials;
+    _showBio = profile.showBio;
+    _showMotto = profile.showMotto;
+    _showSobrietyOnProfile = profile.showSobrietyOnProfile;
+    _showStepsOnProfile = profile.showStepsOnProfile;
     _discoverable = profile.discoverable;
     _hideRealName = profile.hideRealName;
     _hidePhoto = profile.hidePhoto;
@@ -186,6 +226,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
   Future<void> _loadProfileData() async {
     final myProfile = await widget.repository.loadMyProfile(_myUid);
+    final sobriety = await _sobrietyRepo.loadState();
     final listeners = myProfile != null
         ? await widget.repository.loadMusicListeners(_myUid)
         : const <MusicListenerRecord>[];
@@ -193,6 +234,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     if (!mounted) return;
     setState(() {
       _myProfile = myProfile;
+      _localSobriety = sobriety;
       _myMusicListeners = listeners;
       _friendships = friendships;
       if (myProfile != null) {
@@ -337,6 +379,21 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     );
   }
 
+  Future<void> _quickPatchMyProfile(
+    HealthCommunityProfile Function(HealthCommunityProfile current) updater,
+  ) async {
+    final current = _myProfile;
+    if (current == null) return;
+    final next = updater(current).copyWith(updatedAt: DateTime.now());
+    final saved = await widget.repository.saveMyProfile(next);
+    if (!mounted) return;
+    setState(() {
+      _myProfile = saved;
+      _syncFormFromProfile(saved);
+    });
+    widget.onProfileChanged?.call();
+  }
+
   Future<void> _saveMyProfile() async {
     if (_savingProfile) return;
     final l10n = context.l10n;
@@ -344,7 +401,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     if (name.isEmpty) return;
 
     final profileTextCheck = ContentSafetyService.checkText(
-      '$name ${_nicknameController.text} ${_bioController.text} ${_dailyFocusController.text} ${_customConditionController.text}',
+      '$name ${_nicknameController.text} ${_bioController.text} ${_mottoController.text} ${_dailyFocusController.text} ${_customConditionController.text}',
     );
     if (!profileTextCheck.isSafe) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -363,6 +420,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
     setState(() => _savingProfile = true);
     final now = DateTime.now();
+    final pedState = _pedometerService.state;
     final profile = HealthCommunityProfile(
       uid: _myUid,
       displayName: name,
@@ -393,11 +451,24 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       isVerified: _myProfile?.isVerified ?? false,
       isSuspended: _myProfile?.isSuspended ?? false,
       bio: _bioController.text.trim(),
+      motto: _mottoController.text.trim(),
+      showMotto: _showMotto,
       dailyFocus: _dailyFocusController.text.trim(),
       mood: _selectedMood,
       hideRealName: _hideRealName,
       hidePhoto: _hidePhoto,
-      showBio: true,
+      showBio: _showBio,
+      showSobrietyOnProfile: _showSobrietyOnProfile,
+      smokeQuitAt: _localSobriety.smokeQuitAt,
+      alcoholQuitAt: _localSobriety.alcoholQuitAt,
+      dailySmokeCostTry: _localSobriety.dailySmokeSpendTry,
+      dailyCigarettesCount: _localSobriety.dailyCigarettes,
+      dailyAlcoholCostTry: _localSobriety.dailyAlcoholCostTry,
+      showStepsOnProfile: _showStepsOnProfile,
+      todayStepsCount: pedState.todayStepsAt(now),
+      weekStepsCount: pedState.thisWeekStepsAt(now),
+      monthStepsCount: pedState.thisMonthStepsAt(now),
+      dailyStepGoal: pedState.dailyStepGoal,
       discoverable: _discoverable,
       allowMessages: _allowMessages,
       requireMessageApproval: _requireMessageApproval,
@@ -405,6 +476,11 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       likedBy: _myProfile?.likedBy ?? const [],
       updatedAt: now,
     );
+
+    await _sobrietyRepo.saveState(
+      _localSobriety.copyWith(showOnProfile: _showSobrietyOnProfile),
+    );
+    await _pedometerService.setShowOnProfile(_showStepsOnProfile);
 
     final saved = await widget.repository.saveMyProfile(profile);
     if (!mounted) return;
@@ -856,7 +932,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final isAdmin = AdminUtils.isAdmin(
       email: widget.currentUser.email,
       uid: widget.currentUser.id,
@@ -1273,13 +1348,48 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                       color: colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      l10n.commFieldBio,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
+                    Expanded(
+                      child: Text(
+                        l10n.commFieldBio,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                    const Spacer(),
+                    if (!profile.showBio)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Text(
+                          'Gizli',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: profile.showBio
+                          ? 'Hakkımda Yazısını Gizle'
+                          : 'Hakkımda Yazısını Göster',
+                      onPressed: () => _quickPatchMyProfile(
+                        (c) => c.copyWith(showBio: !c.showBio),
+                      ),
+                      icon: Icon(
+                        profile.showBio
+                            ? Icons.visibility_rounded
+                            : Icons.visibility_off_outlined,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                     if (profile.bio.trim().isEmpty)
                       TextButton.icon(
                         style: TextButton.styleFrom(
@@ -1312,6 +1422,74 @@ class _SocialProfileViewState extends State<SocialProfileView> {
               ],
             ),
           ),
+        ),
+        const SizedBox(height: 12),
+
+        // Sağlıklı Yaşam Mottosu Kartı (Göster / Gizle & Hazır Motto Seçimi)
+        ProfileMottoCard(
+          profile: profile,
+          isOwner: true,
+          onToggleVisibility: (show) =>
+              _quickPatchMyProfile((c) => c.copyWith(showMotto: show)),
+          onPickOrEditMotto: (newMotto) => _quickPatchMyProfile(
+            (c) => c.copyWith(motto: newMotto, showMotto: true),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Sigara & Alkol Bırakma Takip Kartı (Göster / Gizle & Detay Ekranı)
+        ProfileSobrietyShowcaseCard(
+          profile: profile,
+          isOwner: true,
+          localOverrideState: _localSobriety,
+          onToggleVisibility: (show) async {
+            final updatedSob = _localSobriety.copyWith(showOnProfile: show);
+            setState(() => _localSobriety = updatedSob);
+            await _sobrietyRepo.saveState(updatedSob);
+            await _quickPatchMyProfile(
+              (c) => c.copyWith(showSobrietyOnProfile: show),
+            );
+          },
+          onOpenTracker: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => SobrietyTrackerScreen(
+                  repository: _sobrietyRepo,
+                  communityRepository: widget.repository,
+                  currentUserId: _myUid,
+                  currentUserDisplayName: widget.currentUser.displayName,
+                ),
+              ),
+            );
+            await _loadProfileData();
+          },
+        ),
+        const SizedBox(height: 12),
+
+        // Adım Sayar Özeti Kartı (Bugün / Bu Hafta / Bu Ay & Göster / Gizle)
+        ProfileStepCounterShowcaseCard(
+          profile: profile,
+          isOwner: true,
+          localPedometerState: _pedometerService.state,
+          onToggleVisibility: (show) async {
+            await _pedometerService.setShowOnProfile(show);
+            await _quickPatchMyProfile(
+              (c) => c.copyWith(showStepsOnProfile: show),
+            );
+          },
+          onOpenStepCounter: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => StepCounterScreen(
+                  service: _pedometerService,
+                  communityRepository: widget.repository,
+                  currentUserId: _myUid,
+                  currentUserDisplayName: widget.currentUser.displayName,
+                ),
+              ),
+            );
+            await _loadProfileData();
+          },
         ),
         const SizedBox(height: 12),
 
@@ -2438,6 +2616,75 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         ),
         const SizedBox(height: 10),
 
+        // Healthy Living Motto Section (ComboBox + Custom Input + Show/Hide)
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SwitchListTile(
+                  key: const Key('comm_toggle_show_motto'),
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    'Sağlıklı Yaşam Mottosu (Profilde Göster)',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF0D9488),
+                    ),
+                  ),
+                  value: _showMotto,
+                  onChanged: (v) => setState(() => _showMotto = v),
+                ),
+                DropdownButtonFormField<String>(
+                  key: const Key('comm_profile_motto_dropdown'),
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Hazır Sağlıklı Yaşam Mottosu Seçin',
+                    prefixIcon: const Icon(Icons.auto_awesome_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  items: [
+                    for (final m in HealthyLivingMottos.presets)
+                      DropdownMenuItem<String>(
+                        value: m,
+                        child: Text(
+                          m,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 12.5),
+                        ),
+                      ),
+                  ],
+                  onChanged: (selected) {
+                    if (selected != null) {
+                      setState(() => _mottoController.text = selected);
+                    }
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  key: const Key('comm_profile_motto_field'),
+                  controller: _mottoController,
+                  maxLines: 2,
+                  maxLength: 160,
+                  decoration: InputDecoration(
+                    labelText: 'Özel Mottonuz',
+                    hintText: 'Kendi sağlıklı yaşam mottonuzu yazabilirsiniz...',
+                    prefixIcon: const Icon(Icons.edit_note_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+
         // Concentration Music Section
         Card(
           child: Padding(
@@ -2633,6 +2880,26 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                 title: Text(l10n.commToggleDiscoverable),
                 value: _discoverable,
                 onChanged: (v) => setState(() => _discoverable = v),
+              ),
+              SwitchListTile(
+                title: const Text('Hakkımda Yazısını Profilde Göster'),
+                value: _showBio,
+                onChanged: (v) => setState(() => _showBio = v),
+              ),
+              SwitchListTile(
+                title: const Text('Sağlıklı Yaşam Mottomu Göster'),
+                value: _showMotto,
+                onChanged: (v) => setState(() => _showMotto = v),
+              ),
+              SwitchListTile(
+                title: const Text('Sigara & Alkol Bırakma Kartımı Göster'),
+                value: _showSobrietyOnProfile,
+                onChanged: (v) => setState(() => _showSobrietyOnProfile = v),
+              ),
+              SwitchListTile(
+                title: const Text('Adım Sayar Özeti Kartımı Göster'),
+                value: _showStepsOnProfile,
+                onChanged: (v) => setState(() => _showStepsOnProfile = v),
               ),
               SwitchListTile(
                 title: Text(l10n.commToggleShowConditions),

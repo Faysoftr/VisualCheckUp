@@ -49,6 +49,8 @@ class AppDrawer extends StatelessWidget {
     this.onOpenDonate,
     this.onOpenGrowthBmi,
     this.onOpenChildrenGrowth,
+    this.onOpenPedometer,
+    this.onOpenSobriety,
   });
 
   final AuthUser currentUser;
@@ -83,6 +85,8 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenDonate;
   final VoidCallback? onOpenGrowthBmi;
   final VoidCallback? onOpenChildrenGrowth;
+  final VoidCallback? onOpenPedometer;
+  final VoidCallback? onOpenSobriety;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
     Navigator.of(context).pop();
@@ -600,8 +604,24 @@ class AppDrawer extends StatelessWidget {
                       title: l10n.menuSectionTracking,
                       icon: Icons.monitor_heart_outlined,
                       accentColor: const Color(0xFFEF4444),
-                      badgeText: '13',
+                      badgeText: '15',
                       children: [
+                        if (onOpenPedometer != null)
+                          _DrawerTile(
+                            key: const Key('drawer_pedometer_tile'),
+                            icon: Icons.directions_walk_rounded,
+                            label: 'Adım Sayar & Yürüyüş',
+                            accentColor: const Color(0xFF0D9488),
+                            onTap: () => _closeAndRun(context, onOpenPedometer!),
+                          ),
+                        if (onOpenSobriety != null)
+                          _DrawerTile(
+                            key: const Key('drawer_sobriety_tile'),
+                            icon: Icons.smoke_free_rounded,
+                            label: 'Sigara & Alkol Bırakma',
+                            accentColor: const Color(0xFF16A34A),
+                            onTap: () => _closeAndRun(context, onOpenSobriety!),
+                          ),
                         if (onOpenMedicationReminders != null)
                           _DrawerTile(
                             icon: Icons.alarm_on_rounded,
