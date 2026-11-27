@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -477,12 +478,14 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       updatedAt: now,
     );
 
-    await _sobrietyRepo.saveState(
-      _localSobriety.copyWith(showOnProfile: _showSobrietyOnProfile),
-    );
-    await _pedometerService.setShowOnProfile(_showStepsOnProfile);
-
     final saved = await widget.repository.saveMyProfile(profile);
+    unawaited(
+      _sobrietyRepo.saveState(
+        _localSobriety.copyWith(showOnProfile: _showSobrietyOnProfile),
+      ),
+    );
+    unawaited(_pedometerService.setShowOnProfile(_showStepsOnProfile));
+
     if (!mounted) return;
     setState(() {
       _myProfile = saved;

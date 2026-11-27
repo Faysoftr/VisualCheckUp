@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="vcu_widget_description">Yürüyüş (Adım Sayar), Sigara/Alkol Bırakma Kazancı, Tansiyon/Şeker ve İlaç Alarmları canlı özeti</string>
+    <string name="vcu_widget_description">Yürüyüş (Adım Sayar), Sigara/Alkol Bırakma Kazancı, Tansiyon/Şeker ve İlaç Alarmları tümü bir arada canlı özeti</string>
+    <string name="vcu_widget_pedometer_desc">Adım Sayar ve Yürüyüş günlük hedef takibi</string>
+    <string name="vcu_widget_sobriety_desc">Sigara ve Alkol Bırakma günlük kazanç ve ömür sayacı</string>
+    <string name="vcu_widget_vitals_desc">Son Tansiyon ve Kan Şekeri ölçüm takibi</string>
+    <string name="vcu_widget_alarm_desc">Sıradaki İlaç ve Su Alarmı hatırlatıcısı</string>
 </resources>

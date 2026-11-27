@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/lab_models.dart';
 import 'package:visualcheckup/features/labs_vitals/domain/vital_models.dart';
@@ -11,14 +14,41 @@ class LabsVitalsRepository {
 
   final String profileId;
 
+  static final ValueNotifier<int> revisionNotifier = ValueNotifier<int>(0);
+  static const MethodChannel _homeWidgetChannel =
+      MethodChannel('com.faysoft.visualcheckup/home_widget');
+
   static const String _labReportsBase = 'visualcheckup_lab_reports_v1';
   static const String _bpReadingsBase = 'visualcheckup_bp_readings_v1';
   static const String _sugarReadingsBase = 'visualcheckup_sugar_readings_v1';
+  static const String _widgetVitalsSummaryKey = 'vcu_widget_vitals_summary';
 
   String _scoped(String base) => profileId == 'self' ? base : '${base}_$profileId';
   String get _labReportsKey => _scoped(_labReportsBase);
   String get _bpReadingsKey => _scoped(_bpReadingsBase);
   String get _sugarReadingsKey => _scoped(_sugarReadingsBase);
+
+  Future<void> _notifyAndSyncWidget() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final bps = await loadBloodPressureReadings();
+      final sugars = await loadBloodSugarReadings();
+      final bpText = bps.isNotEmpty ? bps.first.formatted : '--/-- mmHg';
+      final sugarText = sugars.isNotEmpty ? sugars.first.formatted : '-- mg/dL';
+      await prefs.setString(
+        _widgetVitalsSummaryKey,
+        'Tansiyon: $bpText | Şeker: $sugarText',
+      );
+    } catch (_) {}
+    revisionNotifier.value++;
+    unawaited(_refreshNativeWidgetSafe());
+  }
+
+  static Future<void> _refreshNativeWidgetSafe() async {
+    try {
+      await _homeWidgetChannel.invokeMethod<void>('refreshWidget');
+    } catch (_) {}
+  }
 
   Future<List<LabReportRecord>> loadLabReports() async {
     final prefs = await SharedPreferences.getInstance();
@@ -88,6 +118,7 @@ class LabsVitalsRepository {
       _bpReadingsKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
     );
+    await _notifyAndSyncWidget();
   }
 
   Future<void> deleteBloodPressure(String id) async {
@@ -98,6 +129,7 @@ class LabsVitalsRepository {
       _bpReadingsKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
     );
+    await _notifyAndSyncWidget();
   }
 
   Future<List<BloodSugarReading>> loadBloodSugarReadings() async {
@@ -128,6 +160,7 @@ class LabsVitalsRepository {
       _sugarReadingsKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
     );
+    await _notifyAndSyncWidget();
   }
 
   Future<void> deleteBloodSugar(String id) async {
@@ -138,6 +171,7 @@ class LabsVitalsRepository {
       _sugarReadingsKey,
       updated.map((e) => jsonEncode(e.toJson())).toList(),
     );
+    await _notifyAndSyncWidget();
   }
 
   Future<void> clearAll() async {
@@ -145,5 +179,6 @@ class LabsVitalsRepository {
     await prefs.remove(_labReportsKey);
     await prefs.remove(_bpReadingsKey);
     await prefs.remove(_sugarReadingsKey);
+    await _notifyAndSyncWidget();
   }
 }

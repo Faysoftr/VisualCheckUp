@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -58,7 +59,7 @@ class SobrietyRepository {
     );
 
     revisionNotifier.value++;
-    await _notifyNativeHomeWidget();
+    unawaited(_notifyNativeHomeWidget());
   }
 
   static Future<void> _notifyNativeHomeWidget() async {

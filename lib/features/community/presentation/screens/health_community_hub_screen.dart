@@ -792,6 +792,19 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                       ),
                     ],
                   ),
+                  if (profile.showMotto && profile.motto.trim().isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      '“${profile.motto.trim()}”',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF0D9488),
+                      ),
+                    ),
+                  ],
                   if (profile.showBio && profile.bio.trim().isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(

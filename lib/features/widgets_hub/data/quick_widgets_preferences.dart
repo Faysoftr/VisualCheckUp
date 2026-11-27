@@ -119,13 +119,34 @@ class QuickWidgetsPreferences {
     } catch (_) {}
   }
 
-  static Future<bool> requestPinNativeHomeWidget() async {
+  static Future<bool> requestPinNativeHomeWidget({
+    String widgetType = 'all',
+  }) async {
     try {
-      final pinned =
-          await _homeWidgetChannel.invokeMethod<bool>('requestPinWidget');
+      final pinned = await _homeWidgetChannel.invokeMethod<bool>(
+        'requestPinWidget',
+        <String, dynamic>{'widgetType': widgetType},
+      );
       return pinned ?? false;
     } catch (_) {
       return false;
     }
+  }
+
+  static Future<void> bindWidgetDeepLinkHandler(
+    void Function(String target) onTarget,
+  ) async {
+    try {
+      _homeWidgetChannel.setMethodCallHandler((call) async {
+        if (call.method == 'onWidgetTargetOpened' && call.arguments is String) {
+          onTarget(call.arguments as String);
+        }
+      });
+      final initial = await _homeWidgetChannel
+          .invokeMethod<String>('consumeInitialWidgetTarget');
+      if (initial != null && initial.isNotEmpty) {
+        onTarget(initial);
+      }
+    } catch (_) {}
   }
 }

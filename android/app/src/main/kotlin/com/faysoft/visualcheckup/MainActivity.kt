@@ -3,6 +3,7 @@ package com.faysoft.visualcheckup
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -12,6 +13,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -27,6 +29,23 @@ class MainActivity : FlutterActivity() {
     private var alarmPlayer: MediaPlayer? = null
     private var sensorManager: SensorManager? = null
     private var stepListener: SensorEventListener? = null
+    private var homeWidgetMethodChannel: MethodChannel? = null
+    private var pendingWidgetTarget: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        pendingWidgetTarget = intent?.getStringExtra(VisualCheckUpHomeWidgetProvider.EXTRA_WIDGET_TARGET)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val target = intent.getStringExtra(VisualCheckUpHomeWidgetProvider.EXTRA_WIDGET_TARGET)
+        if (!target.isNullOrBlank()) {
+            pendingWidgetTarget = target
+            homeWidgetMethodChannel?.invokeMethod("onWidgetTargetOpened", target)
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -57,23 +76,36 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        MethodChannel(
+        val hwChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             HOME_WIDGET_CHANNEL,
-        ).setMethodCallHandler { call, result ->
+        )
+        homeWidgetMethodChannel = hwChannel
+        hwChannel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "refreshWidget" -> {
                     VisualCheckUpHomeWidgetProvider.refreshAllWidgets(applicationContext)
                     result.success(true)
                 }
 
+                "consumeInitialWidgetTarget" -> {
+                    val current = pendingWidgetTarget
+                    pendingWidgetTarget = null
+                    result.success(current)
+                }
+
                 "requestPinWidget" -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val widgetType = call.argument<String>("widgetType") ?: "all"
+                        val providerClass = when (widgetType) {
+                            "pedometer" -> PedometerHomeWidgetProvider::class.java
+                            "sobriety" -> SobrietyHomeWidgetProvider::class.java
+                            "vitals" -> VitalsHomeWidgetProvider::class.java
+                            "alarms" -> AlarmHomeWidgetProvider::class.java
+                            else -> VisualCheckUpHomeWidgetProvider::class.java
+                        }
                         val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
-                        val provider = ComponentName(
-                            applicationContext,
-                            VisualCheckUpHomeWidgetProvider::class.java,
-                        )
+                        val provider = ComponentName(applicationContext, providerClass)
                         if (appWidgetManager.isRequestPinAppWidgetSupported) {
                             val pinned = appWidgetManager.requestPinAppWidget(provider, null, null)
                             result.success(pinned)

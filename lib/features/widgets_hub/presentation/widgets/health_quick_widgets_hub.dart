@@ -60,15 +60,38 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
     _pedometer.addListener(_onPedometerUpdated);
     SobrietyRepository.revisionNotifier.addListener(_refreshAll);
+    LabsVitalsRepository.revisionNotifier.addListener(_refreshAll);
+    MedicationReminderRepository.revisionNotifier.addListener(_refreshAll);
     _pedometer.ensureLoaded();
     _refreshAll();
+    QuickWidgetsPreferences.bindWidgetDeepLinkHandler(_handleWidgetDeepLink);
   }
 
   @override
   void dispose() {
     _pedometer.removeListener(_onPedometerUpdated);
     SobrietyRepository.revisionNotifier.removeListener(_refreshAll);
+    LabsVitalsRepository.revisionNotifier.removeListener(_refreshAll);
+    MedicationReminderRepository.revisionNotifier.removeListener(_refreshAll);
     super.dispose();
+  }
+
+  void _handleWidgetDeepLink(String target) {
+    if (!mounted) return;
+    switch (target) {
+      case 'pedometer':
+        widget.onOpenPedometer();
+        break;
+      case 'sobriety':
+        widget.onOpenSobriety();
+        break;
+      case 'vitals':
+        widget.onOpenVitals();
+        break;
+      case 'alarms':
+        widget.onOpenAlarms();
+        break;
+    }
   }
 
   void _onPedometerUpdated() {
@@ -115,6 +138,26 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
     });
   }
 
+  Future<void> _pinNativeWidgetWithFeedback(
+    BuildContext ctx,
+    String widgetType,
+    String label,
+  ) async {
+    final pinned = await QuickWidgetsPreferences.requestPinNativeHomeWidget(
+      widgetType: widgetType,
+    );
+    if (!ctx.mounted) return;
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(
+        content: Text(
+          pinned
+              ? '📱 "$label" telefon ana ekranına sabitlenmek üzere gönderildi!'
+              : 'Telefonunuzun ana ekranına basılı tutup Widget’lar menüsünden "$label" widget’ını ekleyebilirsiniz.',
+        ),
+      ),
+    );
+  }
+
   Future<void> _openCustomizeSheet() async {
     await showModalBottomSheet<void>(
       context: context,
@@ -124,112 +167,130 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
         var working = List<QuickWidgetType>.from(_enabled);
         return StatefulBuilder(
           builder: (ctx, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.widgets_rounded, size: 22),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Sağlık Widget’larını Yönet',
-                          style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+            return SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.widgets_rounded, size: 22),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Sağlık Widget’larını Yönet',
+                            style:
+                                Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Yürüyüş, alarm, sigara/alkol bırakma ve şeker/tansiyon takibi için istediğiniz widget’ları ana ekrana ekleyin veya gizleyin.',
-                    style: Theme.of(ctx).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 12),
-                  for (final type in QuickWidgetType.values)
-                    CheckboxListTile(
-                      key: Key('widget_toggle_${type.name}'),
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      secondary: CircleAvatar(
-                        radius: 17,
-                        backgroundColor:
-                            type.accentColor.withValues(alpha: 0.14),
-                        child: Icon(
-                          type.icon,
-                          color: type.accentColor,
-                          size: 18,
-                        ),
-                      ),
-                      title: Text(
-                        type.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13.5,
-                        ),
-                      ),
-                      subtitle: Text(
-                        type.subtitle,
-                        style: const TextStyle(fontSize: 11.5),
-                      ),
-                      value: working.contains(type),
-                      onChanged: (checked) {
-                        setModalState(() {
-                          if (checked == true) {
-                            if (!working.contains(type)) working.add(type);
-                          } else {
-                            working.remove(type);
-                          }
-                        });
-                      },
+                      ],
                     ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      key: const Key('pin_native_home_widget_btn'),
-                      onPressed: () async {
-                        final pinned = await QuickWidgetsPreferences
-                            .requestPinNativeHomeWidget();
-                        if (!ctx.mounted) return;
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              pinned
-                                  ? 'Telefon ana ekranına VisualCheckUp widget isteği gönderildi!'
-                                  : 'Telefonunuzun ana ekranına basılı tutup Widget’lar menüsünden "VisualCheckUp Sağlık" widget’ını da ekleyebilirsiniz.',
+                    const SizedBox(height: 4),
+                    Text(
+                      'Uygulama içi widget’ları açıp kapatabilir veya her birini ayrı ayrı telefonunuzun ana ekranına sabitleyebilirsiniz.',
+                      style: Theme.of(ctx).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 12),
+                    for (final type in QuickWidgetType.values)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CheckboxListTile(
+                              key: Key('widget_toggle_${type.name}'),
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                              secondary: CircleAvatar(
+                                radius: 17,
+                                backgroundColor:
+                                    type.accentColor.withValues(alpha: 0.14),
+                                child: Icon(
+                                  type.icon,
+                                  color: type.accentColor,
+                                  size: 18,
+                                ),
+                              ),
+                              title: Text(
+                                type.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                              subtitle: Text(
+                                type.subtitle,
+                                style: const TextStyle(fontSize: 11.5),
+                              ),
+                              value: working.contains(type),
+                              onChanged: (checked) {
+                                setModalState(() {
+                                  if (checked == true) {
+                                    if (!working.contains(type)) {
+                                      working.add(type);
+                                    }
+                                  } else {
+                                    working.remove(type);
+                                  }
+                                });
+                              },
                             ),
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.add_to_home_screen_rounded),
-                      label: const Text('Telefon Ana Ekranına Widget Sabitle'),
+                          IconButton(
+                            key: Key('pin_widget_${type.name}_btn'),
+                            tooltip: 'Telefon Ana Ekranına Ekle',
+                            onPressed: () => _pinNativeWidgetWithFeedback(
+                              ctx,
+                              type.name,
+                              type.title,
+                            ),
+                            icon: Icon(
+                              Icons.add_to_home_screen_rounded,
+                              size: 20,
+                              color: type.accentColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        key: const Key('pin_native_home_widget_btn'),
+                        onPressed: () => _pinNativeWidgetWithFeedback(
+                          ctx,
+                          'all',
+                          'VisualCheckUp Tümü Bir Arada',
+                        ),
+                        icon: const Icon(Icons.add_to_home_screen_rounded),
+                        label: const Text(
+                          'Tümü Bir Arada Ana Ekran Widget’ı Sabitle',
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      key: const Key('save_quick_widgets_btn'),
-                      onPressed: () async {
-                        await QuickWidgetsPreferences.saveEnabledWidgets(
-                          working,
-                        );
-                        if (!ctx.mounted) return;
-                        Navigator.of(ctx).pop();
-                        if (mounted) {
-                          setState(() => _enabled = working);
-                        }
-                      },
-                      icon: const Icon(Icons.check_rounded),
-                      label: const Text('Widget Düzenini Kaydet'),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        key: const Key('save_quick_widgets_btn'),
+                        onPressed: () async {
+                          await QuickWidgetsPreferences.saveEnabledWidgets(
+                            working,
+                          );
+                          if (!ctx.mounted) return;
+                          Navigator.of(ctx).pop();
+                          if (mounted) {
+                            setState(() => _enabled = working);
+                          }
+                        },
+                        icon: const Icon(Icons.check_rounded),
+                        label: const Text('Widget Düzenini Kaydet'),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -362,20 +423,26 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
             Expanded(
               child: Text(
                 'Hızlı Takip Widget’larım',
-                style: theme.textTheme.titleMedium?.copyWith(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
+            const SizedBox(width: 4),
             TextButton.icon(
               key: const Key('customize_quick_widgets_btn'),
               style: TextButton.styleFrom(
                 visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
               onPressed: _openCustomizeSheet,
-              icon: const Icon(Icons.add_box_outlined, size: 17),
-              label: const Text('Widget Ekle / Düzenle'),
+              icon: const Icon(Icons.add_box_outlined, size: 16),
+              label: const Text(
+                'Widget Düzenle',
+                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),

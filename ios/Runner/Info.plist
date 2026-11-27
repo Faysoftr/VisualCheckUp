@@ -12,6 +12,8 @@
 	<string>VisualCheckUp, göz, tırnak, dil, yüz, cilt lezyonları, idrar ve dışkı renk ön değerlendirmesi yapabilmek için kameranıza erişim ister. Görüntüler yalnızca cihazınızda işlenir.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>VisualCheckUp, galerinizden seçtiğiniz fotoğraf üzerinde görsel ve cilt ön değerlendirmesi yapabilmek için fotoğraf arşivinize erişim ister.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>VisualCheckUp, Adım Sayar özelliğinde günlük ve anlık yürüyüş adımlarınızı sayabilmek için hareket ve fitness sensörüne erişim ister.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

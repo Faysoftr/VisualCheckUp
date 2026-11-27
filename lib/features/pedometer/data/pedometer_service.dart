@@ -75,6 +75,10 @@ class PedometerService extends ChangeNotifier {
     );
 
     notifyListeners();
+    unawaited(_refreshNativeWidgetSafe());
+  }
+
+  static Future<void> _refreshNativeWidgetSafe() async {
     try {
       await _homeWidgetChannel.invokeMethod<void>('refreshWidget');
     } catch (_) {}

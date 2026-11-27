@@ -64,13 +64,57 @@
         <receiver
             android:name=".VisualCheckUpHomeWidgetProvider"
             android:exported="true"
-            android:label="VisualCheckUp Sağlık Takip">
+            android:label="VisualCheckUp • Tümü Bir Arada">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/visualcheckup_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".PedometerHomeWidgetProvider"
+            android:exported="true"
+            android:label="VisualCheckUp • Adım Sayar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/visualcheckup_pedometer_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".SobrietyHomeWidgetProvider"
+            android:exported="true"
+            android:label="VisualCheckUp • Sigara &amp; Alkol Bırakma">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/visualcheckup_sobriety_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".VitalsHomeWidgetProvider"
+            android:exported="true"
+            android:label="VisualCheckUp • Şeker &amp; Tansiyon">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/visualcheckup_vitals_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".AlarmHomeWidgetProvider"
+            android:exported="true"
+            android:label="VisualCheckUp • İlaç &amp; Su Alarmı">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/visualcheckup_alarm_widget_info" />
         </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

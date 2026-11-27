@@ -1,11 +1,15 @@
 import AVFoundation
+import CoreMotion
 import Flutter
 import UIKit
 import UserNotifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate, FlutterStreamHandler {
   private var alarmAudioPlayer: AVAudioPlayer?
+  private let pedometer = CMPedometer()
+  private var stepEventSink: FlutterEventSink?
+  private var lastReportedSteps: Int = 0
 
   override func application(
     _ application: UIApplication,
@@ -20,9 +24,11 @@ import UserNotifications
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
+    let messenger = engineBridge.applicationRegistrar.messenger()
+
     let channel = FlutterMethodChannel(
       name: "com.faysoft.visualcheckup/alarm_audio",
-      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+      binaryMessenger: messenger
     )
     channel.setMethodCallHandler { [weak self] call, result in
       guard let self = self else {
@@ -44,6 +50,40 @@ import UserNotifications
         result(FlutterMethodNotImplemented)
       }
     }
+
+    let stepChannel = FlutterEventChannel(
+      name: "com.faysoft.visualcheckup/step_events",
+      binaryMessenger: messenger
+    )
+    stepChannel.setStreamHandler(self)
+  }
+
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    stepEventSink = events
+    lastReportedSteps = 0
+    if CMPedometer.isStepCountingAvailable() {
+      let startDate = Date()
+      pedometer.startUpdates(from: startDate) { [weak self] data, error in
+        guard let self = self, error == nil, let total = data?.numberOfSteps.intValue else {
+          return
+        }
+        let delta = total - self.lastReportedSteps
+        if delta > 0 {
+          self.lastReportedSteps = total
+          DispatchQueue.main.async {
+            self.stepEventSink?(["delta": delta])
+          }
+        }
+      }
+    }
+    return nil
+  }
+
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    pedometer.stopUpdates()
+    stepEventSink = nil
+    lastReportedSteps = 0
+    return nil
   }
 
   private func playAlarmSound(soundKey: String, loop: Bool) -> Bool {

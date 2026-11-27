@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/core/storage/checkup_photo_storage.dart';
 import 'package:visualcheckup/features/medications/domain/medication_reminder.dart';
@@ -12,8 +14,13 @@ class MedicationReminderRepository {
 
   final String profileId;
 
+  static final ValueNotifier<int> revisionNotifier = ValueNotifier<int>(0);
+  static const MethodChannel _homeWidgetChannel =
+      MethodChannel('com.faysoft.visualcheckup/home_widget');
+
   static const String _baseRemindersKey = 'visualcheckup_med_reminders_v1';
   static const String _baseDoseLogsKey = 'visualcheckup_med_dose_logs_v1';
+  static const String _widgetAlarmSummaryKey = 'vcu_widget_alarm_summary';
 
   String _scoped(String baseKey) =>
       profileId == 'default' ? baseKey : '${baseKey}_$profileId';
@@ -46,6 +53,21 @@ class MedicationReminderRepository {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(reminders.map((r) => r.toJson()).toList());
     await prefs.setString(_remindersKey, encoded);
+
+    final active = reminders.where((r) => r.enabled).toList()
+      ..sort((a, b) => a.minutesFromMidnight.compareTo(b.minutesFromMidnight));
+    final alarmText = active.isNotEmpty
+        ? '${active.first.formattedTime} • ${active.first.title}'
+        : 'Aktif alarm yok';
+    await prefs.setString(_widgetAlarmSummaryKey, alarmText);
+    revisionNotifier.value++;
+    unawaited(_refreshNativeWidgetSafe());
+  }
+
+  static Future<void> _refreshNativeWidgetSafe() async {
+    try {
+      await _homeWidgetChannel.invokeMethod<void>('refreshWidget');
+    } catch (_) {}
   }
 
   Future<void> saveReminder(MedicationReminder reminder) async {

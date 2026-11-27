@@ -1962,61 +1962,71 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                 if (v != null) setState(() => _placement = v);
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             SwitchListTile(
+              dense: true,
+              visualDensity: VisualDensity.compact,
               contentPadding: EdgeInsets.zero,
-              title: const Text('Reklam Durumu',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text(
+                'Reklam Durumu',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+              ),
               subtitle: Text(
                 _isActive
-                    ? '🟢 Yayında (Kullanıcılara gösteriliyor)'
+                    ? '🟢 Yayında (Aktif olarak gösteriliyor)'
                     : '⏸️ Durduruldu (Yayından kaldırıldı)',
                 style: TextStyle(
                   color: _isActive
                       ? const Color(0xFF10B981)
                       : const Color(0xFFEF4444),
                   fontWeight: FontWeight.w700,
-                  fontSize: 12,
+                  fontSize: 11.5,
                 ),
               ),
               value: _isActive,
               onChanged: (v) => setState(() => _isActive = v),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             TextField(
               key: const Key('admin_promo_title_field'),
               controller: _titleCtrl,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldTitle,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             TextField(
               key: const Key('admin_promo_subtitle_field'),
               controller: _subtitleCtrl,
               maxLines: 2,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldMessage,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             TextField(
               controller: _linkCtrl,
               decoration: InputDecoration(
+                isDense: true,
                 labelText: l10n.adminFieldLink,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+              ),
               onPressed: _uploading ? null : _uploadBanner,
               icon: _uploading
                   ? const SizedBox(
@@ -2031,7 +2041,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
                     : l10n.commUploadPhoto,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             FilledButton.icon(
               key: const Key('admin_promo_save_button'),
               onPressed: () {
