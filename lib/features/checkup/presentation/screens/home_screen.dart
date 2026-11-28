@@ -58,6 +58,8 @@ import 'package:visualcheckup/features/medications/presentation/screens/medicati
 import 'package:visualcheckup/features/pedometer/presentation/screens/step_counter_screen.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
 import 'package:visualcheckup/features/breath_lung/presentation/screens/breath_lung_screen.dart';
+import 'package:visualcheckup/features/vein_varicose/presentation/screens/vein_analysis_screen.dart';
+import 'package:visualcheckup/features/water_tracker/presentation/screens/water_tracker_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tracker_screen.dart';
@@ -366,6 +368,24 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => BreathLungScreen(
           currentUser: widget.currentUser,
         ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openVeinAnalysis() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const VeinAnalysisScreen(),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openWaterTracker() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const WaterTrackerScreen(),
       ),
     );
     await _loadDashboardData();
@@ -724,6 +744,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenPedometer: _openPedometer,
         onOpenSobriety: _openSobrietyTracker,
         onOpenBreathLung: _openBreathLung,
+        onOpenWaterTracker: _openWaterTracker,
+        onOpenVeinAnalysis: _openVeinAnalysis,
         onOpenWidgetsManager: _openWidgetsManager,
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,

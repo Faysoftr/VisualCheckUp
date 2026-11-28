@@ -52,6 +52,8 @@ class AppDrawer extends StatelessWidget {
     this.onOpenPedometer,
     this.onOpenSobriety,
     this.onOpenBreathLung,
+    this.onOpenVeinAnalysis,
+    this.onOpenWaterTracker,
     this.onOpenWidgetsManager,
   });
 
@@ -90,6 +92,8 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenPedometer;
   final VoidCallback? onOpenSobriety;
   final VoidCallback? onOpenBreathLung;
+  final VoidCallback? onOpenVeinAnalysis;
+  final VoidCallback? onOpenWaterTracker;
   final VoidCallback? onOpenWidgetsManager;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
@@ -608,7 +612,7 @@ class AppDrawer extends StatelessWidget {
                       title: l10n.menuSectionTracking,
                       icon: Icons.monitor_heart_outlined,
                       accentColor: const Color(0xFFEF4444),
-                      badgeText: '16',
+                      badgeText: '18',
                       children: [
                         if (onOpenPedometer != null)
                           _DrawerTile(
@@ -633,6 +637,22 @@ class AppDrawer extends StatelessWidget {
                             label: 'Nefes & Akciğer Testi',
                             accentColor: const Color(0xFF0D9488),
                             onTap: () => _closeAndRun(context, onOpenBreathLung!),
+                          ),
+                        if (onOpenWaterTracker != null)
+                          _DrawerTile(
+                            key: const Key('drawer_item_water_tracker'),
+                            icon: Icons.water_drop_rounded,
+                            label: 'Su Takibi & Hidrasyon',
+                            accentColor: const Color(0xFF0284C7),
+                            onTap: () => _closeAndRun(context, onOpenWaterTracker!),
+                          ),
+                        if (onOpenVeinAnalysis != null)
+                          _DrawerTile(
+                            key: const Key('drawer_item_vein_analysis'),
+                            icon: Icons.airline_seat_legroom_extra_rounded,
+                            label: 'Damar & Varis Taraması',
+                            accentColor: const Color(0xFF0284C7),
+                            onTap: () => _closeAndRun(context, onOpenVeinAnalysis!),
                           ),
                         if (onOpenWidgetsManager != null)
                           _DrawerTile(
