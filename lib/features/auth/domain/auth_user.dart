@@ -31,6 +31,8 @@ class AuthUser {
     required this.provider,
     this.email,
     this.photoUrl,
+    this.birthDate,
+    this.gender,
   });
 
   final String id;
@@ -38,6 +40,10 @@ class AuthUser {
   final AuthProviderType provider;
   final String? email;
   final String? photoUrl;
+  /// Optional `'dd-MM-yyyy'` birthdate fetched from OAuth login account (e.g. Google People API).
+  final String? birthDate;
+  /// Optional `'Male'` | `'Female'` fetched from OAuth login account if shared.
+  final String? gender;
 
   bool get isGuest => provider == AuthProviderType.guest;
 
@@ -59,6 +65,8 @@ class AuthUser {
         'provider': provider.name,
         if (email != null) 'email': email,
         if (photoUrl != null) 'photoUrl': photoUrl,
+        if (birthDate != null && birthDate!.isNotEmpty) 'birthDate': birthDate,
+        if (gender != null && gender!.isNotEmpty) 'gender': gender,
       };
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
@@ -68,6 +76,8 @@ class AuthUser {
       provider: AuthProviderTypeX.fromName(json['provider'] as String),
       email: json['email'] as String?,
       photoUrl: json['photoUrl'] as String?,
+      birthDate: json['birthDate'] as String?,
+      gender: json['gender'] as String?,
     );
   }
 }

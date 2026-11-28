@@ -576,6 +576,11 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                   children: [
                     if (_profile.isVisibleOnline)
                       _HeaderPill(text: '🟢 ${l10n.commOnlineNow}'),
+                    if (_profile.showBirthDate && _profile.age != null)
+                      _HeaderPill(text: '🎂 ${_profile.age} Yaş'),
+                    if (_profile.showGender &&
+                        _profile.localizedGenderLabel != null)
+                      _HeaderPill(text: _profile.localizedGenderLabel!),
                     if (_profile.mood != null)
                       _HeaderPill(
                         text:

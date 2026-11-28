@@ -521,12 +521,22 @@ class HealthCommunityProfile {
     this.appealTimestamp,
     this.mood,
     this.streakDays = 1,
+    this.birthYear,
     this.birthMonth,
     this.birthDay,
+    this.birthDate,
+    this.showBirthDate = true,
+    this.gender,
+    this.showGender = true,
+    this.nameChangeCount = 0,
+    this.nicknameChangeCount = 0,
     this.likedBy = const [],
     this.isSampleProfile = false,
     required this.updatedAt,
   });
+
+  static const int maxNameChanges = 2;
+  static const int maxNicknameChanges = 3;
 
   final String uid;
   final String displayName;
@@ -582,11 +592,61 @@ class HealthCommunityProfile {
   final DateTime? appealTimestamp;
   final HealthMood? mood;
   final int streakDays;
+  final int? birthYear;
   final int? birthMonth;
   final int? birthDay;
+  final String? birthDate;
+  final bool showBirthDate;
+  final String? gender;
+  final bool showGender;
+  final int nameChangeCount;
+  final int nicknameChangeCount;
   final List<String> likedBy;
   final bool isSampleProfile;
   final DateTime updatedAt;
+
+  /// Computes exact age in years from `birthDate` (`dd-MM-yyyy`) or `birthYear`.
+  int? ageAt(DateTime now) {
+    int? y = birthYear;
+    int? m = birthMonth;
+    int? d = birthDay;
+    if ((y == null || m == null || d == null) &&
+        birthDate != null &&
+        birthDate!.trim().isNotEmpty) {
+      final parts = birthDate!.trim().split(RegExp(r'[-/.]'));
+      if (parts.length == 3) {
+        final p0 = int.tryParse(parts[0]);
+        final p1 = int.tryParse(parts[1]);
+        final p2 = int.tryParse(parts[2]);
+        if (p2 != null && p2 > 1900) {
+          d ??= p0;
+          m ??= p1;
+          y ??= p2;
+        } else if (p0 != null && p0 > 1900) {
+          y ??= p0;
+          m ??= p1;
+          d ??= p2;
+        }
+      }
+    }
+    if (y == null || y < 1900 || y > now.year) return null;
+    int computed = now.year - y;
+    if (m != null) {
+      if (now.month < m || (now.month == m && d != null && now.day < d)) {
+        computed--;
+      }
+    }
+    return computed >= 0 && computed <= 125 ? computed : null;
+  }
+
+  int? get age => ageAt(DateTime.now());
+
+  String? get localizedGenderLabel {
+    final g = gender?.trim().toLowerCase();
+    if (g == 'male' || g == 'erkek') return 'Erkek ♂';
+    if (g == 'female' || g == 'kadın' || g == 'kadin') return 'Kadın ♀';
+    return null;
+  }
 
   int get likesCount => likedBy.length;
 
@@ -786,8 +846,17 @@ class HealthCommunityProfile {
     HealthMood? mood,
     bool clearMood = false,
     int? streakDays,
+    int? birthYear,
     int? birthMonth,
     int? birthDay,
+    String? birthDate,
+    bool clearBirthDate = false,
+    bool? showBirthDate,
+    String? gender,
+    bool clearGender = false,
+    bool? showGender,
+    int? nameChangeCount,
+    int? nicknameChangeCount,
     List<String>? likedBy,
     bool? isSampleProfile,
     DateTime? updatedAt,
@@ -854,8 +923,15 @@ class HealthCommunityProfile {
       appealTimestamp: appealTimestamp ?? this.appealTimestamp,
       mood: clearMood ? null : (mood ?? this.mood),
       streakDays: streakDays ?? this.streakDays,
-      birthMonth: birthMonth ?? this.birthMonth,
-      birthDay: birthDay ?? this.birthDay,
+      birthYear: clearBirthDate ? null : (birthYear ?? this.birthYear),
+      birthMonth: clearBirthDate ? null : (birthMonth ?? this.birthMonth),
+      birthDay: clearBirthDate ? null : (birthDay ?? this.birthDay),
+      birthDate: clearBirthDate ? null : (birthDate ?? this.birthDate),
+      showBirthDate: showBirthDate ?? this.showBirthDate,
+      gender: clearGender ? null : (gender ?? this.gender),
+      showGender: showGender ?? this.showGender,
+      nameChangeCount: nameChangeCount ?? this.nameChangeCount,
+      nicknameChangeCount: nicknameChangeCount ?? this.nicknameChangeCount,
       likedBy: likedBy ?? this.likedBy,
       isSampleProfile: isSampleProfile ?? this.isSampleProfile,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -863,10 +939,12 @@ class HealthCommunityProfile {
   }
 
   Map<String, dynamic> toJson() {
+    final normalizedNick = sanitizeNickname(nickname);
     return {
       'uid': uid,
       'displayName': displayName.trim(),
-      'nickname': sanitizeNickname(nickname),
+      'nickname': normalizedNick,
+      'nicknameLower': normalizedNick,
       if (photoUrl != null && photoUrl!.trim().isNotEmpty)
         'photoUrl': photoUrl!.trim(),
       if (photoKey != null && photoKey!.trim().isNotEmpty)
@@ -927,8 +1005,16 @@ class HealthCommunityProfile {
         'appealTimestamp': appealTimestamp!.toIso8601String(),
       if (mood != null) 'mood': mood!.id,
       'streakDays': streakDays,
+      if (birthYear != null) 'birthYear': birthYear,
       if (birthMonth != null) 'birthMonth': birthMonth,
       if (birthDay != null) 'birthDay': birthDay,
+      if (birthDate != null && birthDate!.trim().isNotEmpty)
+        'birthDate': birthDate!.trim(),
+      'showBirthDate': showBirthDate,
+      if (gender != null && gender!.trim().isNotEmpty) 'gender': gender!.trim(),
+      'showGender': showGender,
+      'nameChangeCount': nameChangeCount,
+      'nicknameChangeCount': nicknameChangeCount,
       'likedBy': likedBy,
       'likesCount': likedBy.length,
       'updatedAt': updatedAt.toIso8601String(),
@@ -1042,8 +1128,15 @@ class HealthCommunityProfile {
       appealTimestamp: DateTime.tryParse((json['appealTimestamp'] as String?) ?? ''),
       mood: HealthMoodX.fromId(json['mood'] as String?),
       streakDays: (json['streakDays'] as num?)?.toInt() ?? 1,
+      birthYear: (json['birthYear'] as num?)?.toInt(),
       birthMonth: (json['birthMonth'] as num?)?.toInt(),
       birthDay: (json['birthDay'] as num?)?.toInt(),
+      birthDate: json['birthDate'] as String?,
+      showBirthDate: (json['showBirthDate'] as bool?) ?? true,
+      gender: json['gender'] as String?,
+      showGender: (json['showGender'] as bool?) ?? true,
+      nameChangeCount: (json['nameChangeCount'] as num?)?.toInt() ?? 0,
+      nicknameChangeCount: (json['nicknameChangeCount'] as num?)?.toInt() ?? 0,
       likedBy: rawLikedBy,
       isSampleProfile: (json['isSampleProfile'] as bool?) ?? false,
       updatedAt: parsedUpdated,

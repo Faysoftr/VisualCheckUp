@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -55,6 +56,78 @@ void main() {
       expect(result.riskLevel, RiskLevel.attention);
       expect(result.summaryTitle, contains('Yarık'));
     });
+
+    test(
+      'does NOT false-positive fissures on a healthy open-mouth tongue with teeth, oral cavity shadows, mouth corners, papillae, or median sulcus',
+      () async {
+        // Build a realistic 200x220 open-mouth healthy tongue photo:
+        // - Beige face outside
+        // - Upper white teeth + dark interdental gaps
+        // - Dark oral/pharyngeal cavity behind & at lateral mouth corners
+        // - Healthy rose-pink tongue dorsum + subtle papillae + mild midline sulcus
+        final photo = img.Image(width: 200, height: 220);
+        for (var y = 0; y < 220; y++) {
+          for (var x = 0; x < 200; x++) {
+            photo.setPixelRgb(x, y, 232, 194, 168); // facial skin
+          }
+        }
+        // Dark mouth opening (x: 38..162, y: 40..175)
+        for (var y = 40; y < 175; y++) {
+          for (var x = 38; x < 162; x++) {
+            photo.setPixelRgb(x, y, 28, 16, 16);
+          }
+        }
+        // Upper white teeth + dark interdental vertical gaps (y: 40..62)
+        for (var y = 40; y < 62; y++) {
+          for (var x = 48; x < 152; x++) {
+            if (x % 18 == 0) {
+              photo.setPixelRgb(x, y, 42, 28, 24);
+            } else {
+              photo.setPixelRgb(x, y, 244, 238, 218);
+            }
+          }
+        }
+        // Healthy pink tongue body (x: 56..144, y: 66..188)
+        for (var y = 66; y < 188; y++) {
+          for (var x = 56; x < 144; x++) {
+            // Subtle natural papillae micro-variation
+            final pap = ((x * 7 + y * 13) % 5 == 0) ? -10 : 0;
+            photo.setPixelRgb(x, y, 224 + pap, 174 + pap, 172 + pap);
+          }
+        }
+        // Mild physiological median lingual sulcus along x = 100
+        for (var y = 85; y < 165; y++) {
+          photo.setPixelRgb(100, y, 192, 142, 142);
+        }
+
+        final syntheticRes = await analyzer.analyzeImage(
+          category: CheckCategory.tongue,
+          imageBytes: Uint8List.fromList(img.encodePng(photo)),
+        );
+        expect(syntheticRes.riskLevel, RiskLevel.normal);
+        expect(syntheticRes.matchedFindingIds, contains('tongue_healthy_pink'));
+        expect(
+          syntheticRes.matchedFindingIds,
+          isNot(contains('tongue_fissured_grooves')),
+        );
+
+        final uploadedSample = File(
+          '/home/antigravity/depositphotos_24782785-stock-photo-healthy-tongue.jpg',
+        );
+        if (uploadedSample.existsSync()) {
+          final realRes = await analyzer.analyzeImage(
+            category: CheckCategory.tongue,
+            imageBytes: uploadedSample.readAsBytesSync(),
+          );
+          expect(realRes.riskLevel, RiskLevel.normal);
+          expect(realRes.matchedFindingIds, contains('tongue_healthy_pink'));
+          expect(
+            realRes.matchedFindingIds,
+            isNot(contains('tongue_fissured_grooves')),
+          );
+        }
+      },
+    );
 
     test('detects fine red capillary blood vessels on white sclera', () async {
       final cleanEye = _solidImage(236, 236, 234);

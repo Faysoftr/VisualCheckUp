@@ -493,12 +493,36 @@ class _HealthQuickWidgetsHubState extends State<HealthQuickWidgetsHub> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_hubVisible) {
-      return const SizedBox.shrink();
-    }
-
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    if (!_hubVisible || _enabled.isEmpty) {
+      return Align(
+        alignment: Alignment.centerRight,
+        child: ActionChip(
+          key: const Key('reopen_quick_widgets_hub_btn'),
+          visualDensity: VisualDensity.compact,
+          avatar: Icon(
+            Icons.widgets_outlined,
+            size: 15,
+            color: colorScheme.primary,
+          ),
+          label: const Text(
+            '+ Hızlı Widget’ları Göster',
+            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+          ),
+          onPressed: () async {
+            await QuickWidgetsPreferences.setHubVisible(true);
+            if (_enabled.isEmpty) {
+              await QuickWidgetsPreferences.saveEnabledWidgets(
+                QuickWidgetsPreferences.defaultEnabled,
+              );
+            }
+          },
+        ),
+      );
+    }
+
     final now = DateTime.now();
 
     return Column(

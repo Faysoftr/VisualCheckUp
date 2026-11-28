@@ -341,6 +341,74 @@ class HealthCommunityRepository {
   // Opt-In Profile CRUD & Discovery
   // ---------------------------------------------------------------------------
 
+  /// Checks whether [rawCandidate] is already used by any other member in
+  /// `community_profiles` (or local/starter profiles), adapted from Social
+  /// Formül Bank's handle uniqueness check.
+  Future<bool> isNicknameTaken(
+    String rawCandidate, {
+    required String excludeUid,
+  }) async {
+    final normalized = HealthCommunityProfile.sanitizeNickname(rawCandidate);
+    if (normalized.isEmpty) return false;
+
+    final localMap = await _loadLocalProfileMap();
+    for (final entry in localMap.entries) {
+      if (entry.key == excludeUid) continue;
+      if (HealthCommunityProfile.sanitizeNickname(entry.value.nickname) ==
+          normalized) {
+        return true;
+      }
+    }
+
+    if (_canUseFirestore) {
+      try {
+        final byLower = await _db
+            .collection('community_profiles')
+            .where('nicknameLower', isEqualTo: normalized)
+            .limit(5)
+            .get();
+        if (byLower.docs.any((d) => d.id != excludeUid)) return true;
+
+        final byExact = await _db
+            .collection('community_profiles')
+            .where('nickname', isEqualTo: normalized)
+            .limit(5)
+            .get();
+        if (byExact.docs.any((d) => d.id != excludeUid)) return true;
+      } catch (_) {
+        // Offline / local fallback already checked above.
+      }
+    }
+    return false;
+  }
+
+  /// Generates up to 3 available nickname alternatives when a handle is taken.
+  Future<List<String>> generateNicknameSuggestions(
+    String rawBase, {
+    required String excludeUid,
+  }) async {
+    String base = HealthCommunityProfile.sanitizeNickname(rawBase);
+    if (base.length < 3) base = '${base}vc';
+    final yearSuffix = (_clock().year % 100).toString().padLeft(2, '0');
+    final candidates = <String>[
+      '${base}_vc',
+      '${base}_saglik',
+      '$base$yearSuffix',
+      '${base}_fit',
+      '${base}_01',
+      '${base}_24',
+    ];
+    final suggestions = <String>[];
+    for (final cand in candidates) {
+      if (suggestions.length >= 3) break;
+      final taken = await isNicknameTaken(cand, excludeUid: excludeUid);
+      if (!taken && !suggestions.contains(cand)) {
+        suggestions.add(cand);
+      }
+    }
+    return suggestions;
+  }
+
   Future<HealthCommunityProfile?> loadMyProfile(String uid) async {
     if (uid.trim().isEmpty) return null;
     if (_canUseFirestore) {

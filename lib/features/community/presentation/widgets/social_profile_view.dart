@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
@@ -59,6 +60,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _dailyFocusController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
@@ -84,6 +86,22 @@ class _SocialProfileViewState extends State<SocialProfileView> {
   List<MusicListenerRecord> _myMusicListeners = const [];
   List<FriendshipRecord> _friendships = const [];
 
+  // Social Formül Bank Identity, Age, Gender & Quota State
+  String _initialRealName = '';
+  String _initialNickname = '';
+  int _nameChangeCount = 0;
+  int _nicknameChangeCount = 0;
+  DateTime? _birthDate;
+  bool _birthDateFromLogin = false;
+  bool _showBirthDate = true;
+  String? _gender;
+  bool _showGender = true;
+
+  Timer? _nickDebounce;
+  bool _checkingNickname = false;
+  bool? _isNicknameAvailable;
+  List<String> _nicknameSuggestions = const [];
+
   String? _photoUrl;
   String? _photoKey;
   String _countryCode = 'TR';
@@ -107,6 +125,65 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
   String get _myUid => widget.currentUser.id;
 
+  bool get _isAdmin => AdminUtils.isAdmin(
+        email: widget.currentUser.email,
+        uid: widget.currentUser.id,
+      );
+
+  bool get _isRealNameLocked =>
+      !_isAdmin &&
+      _myProfile != null &&
+      _initialRealName.isNotEmpty &&
+      _nameChangeCount >= HealthCommunityProfile.maxNameChanges;
+
+  bool get _isNicknameLocked =>
+      !_isAdmin &&
+      _myProfile != null &&
+      _initialNickname.isNotEmpty &&
+      _nicknameChangeCount >= HealthCommunityProfile.maxNicknameChanges;
+
+  int get _remainingNameChanges =>
+      (HealthCommunityProfile.maxNameChanges - _nameChangeCount)
+          .clamp(0, HealthCommunityProfile.maxNameChanges);
+
+  int get _remainingNicknameChanges =>
+      (HealthCommunityProfile.maxNicknameChanges - _nicknameChangeCount)
+          .clamp(0, HealthCommunityProfile.maxNicknameChanges);
+
+  static DateTime? _parseBirthDateString(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    final parts = raw.trim().split(RegExp(r'[-/.]'));
+    if (parts.length != 3) return null;
+    final p0 = int.tryParse(parts[0]);
+    final p1 = int.tryParse(parts[1]);
+    final p2 = int.tryParse(parts[2]);
+    if (p0 == null || p1 == null || p2 == null) return null;
+    if (p2 > 1900) {
+      return DateTime(p2, p1.clamp(1, 12), p0.clamp(1, 31));
+    }
+    if (p0 > 1900) {
+      return DateTime(p0, p1.clamp(1, 12), p2.clamp(1, 31));
+    }
+    return null;
+  }
+
+  static String _formatBirthDate(DateTime dt) {
+    final dd = dt.day.toString().padLeft(2, '0');
+    final mm = dt.month.toString().padLeft(2, '0');
+    return '$dd-$mm-${dt.year}';
+  }
+
+  int? get _calculatedAge {
+    final dt = _birthDate;
+    if (dt == null) return null;
+    final now = DateTime.now();
+    int age = now.year - dt.year;
+    if (now.month < dt.month || (now.month == dt.month && now.day < dt.day)) {
+      age--;
+    }
+    return age >= 0 && age <= 125 ? age : null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -120,10 +197,12 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
   @override
   void dispose() {
+    _nickDebounce?.cancel();
     _pedometerService.removeListener(_onWellnessChanged);
     SobrietyRepository.revisionNotifier.removeListener(_reloadSobriety);
     _displayNameController.dispose();
     _nicknameController.dispose();
+    _birthDateController.dispose();
     _cityController.dispose();
     _dailyFocusController.dispose();
     _bioController.dispose();
@@ -149,12 +228,104 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     setState(() => _localSobriety = loaded);
   }
 
+  void _onNicknameChanged(String raw) {
+    _nickDebounce?.cancel();
+    final clean = HealthCommunityProfile.sanitizeNickname(raw);
+    if (clean.isEmpty || clean == _initialNickname) {
+      setState(() {
+        _checkingNickname = false;
+        _isNicknameAvailable = null;
+        _nicknameSuggestions = const [];
+      });
+      return;
+    }
+    if (clean.length < 3) {
+      setState(() {
+        _checkingNickname = false;
+        _isNicknameAvailable = false;
+        _nicknameSuggestions = const [];
+      });
+      return;
+    }
+
+    setState(() {
+      _checkingNickname = true;
+      _isNicknameAvailable = null;
+      _nicknameSuggestions = const [];
+    });
+
+    _nickDebounce = Timer(const Duration(milliseconds: 400), () async {
+      final taken = await widget.repository.isNicknameTaken(
+        clean,
+        excludeUid: _myUid,
+      );
+      List<String> suggestions = const [];
+      if (taken) {
+        suggestions = await widget.repository.generateNicknameSuggestions(
+          clean,
+          excludeUid: _myUid,
+        );
+      }
+      if (!mounted) return;
+      final latestClean = HealthCommunityProfile.sanitizeNickname(
+        _nicknameController.text,
+      );
+      if (latestClean != clean) return;
+      setState(() {
+        _checkingNickname = false;
+        _isNicknameAvailable = !taken;
+        _nicknameSuggestions = suggestions;
+      });
+    });
+  }
+
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final initial = _birthDate ?? DateTime(now.year - 28, 6, 15);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial.isAfter(now) ? now : initial,
+      firstDate: DateTime(1920, 1, 1),
+      lastDate: now,
+      helpText: 'Doğum Tarihinizi Seçin',
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _birthDate = picked;
+      _birthDateFromLogin = false;
+      _birthDateController.text = _formatBirthDate(picked);
+    });
+  }
+
   void _syncFormFromProfile(HealthCommunityProfile? profile) {
+    _nickDebounce?.cancel();
+    _checkingNickname = false;
+    _isNicknameAvailable = null;
+    _nicknameSuggestions = const [];
+
     if (profile == null) {
+      _initialRealName = '';
+      _initialNickname = '';
+      _nameChangeCount = 0;
+      _nicknameChangeCount = 0;
       _displayNameController.text = widget.currentUser.displayName;
-      _nicknameController.text = HealthCommunityProfile.sanitizeNickname(
+      var defaultNick = HealthCommunityProfile.sanitizeNickname(
         widget.currentUser.displayName,
       );
+      if (defaultNick.isNotEmpty && defaultNick.length < 3) {
+        defaultNick = '${defaultNick}_vc';
+      }
+      _nicknameController.text = defaultNick;
+
+      final loginBirth = _parseBirthDateString(widget.currentUser.birthDate);
+      _birthDate = loginBirth;
+      _birthDateFromLogin = loginBirth != null;
+      _birthDateController.text =
+          loginBirth != null ? _formatBirthDate(loginBirth) : '';
+      _showBirthDate = true;
+      _gender = widget.currentUser.gender;
+      _showGender = true;
+
       _cityController.text = '';
       _dailyFocusController.text = '';
       _bioController.text = '';
@@ -189,8 +360,39 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       _onlyFriendsCanMessage = false;
       return;
     }
+
+    _initialRealName = profile.displayName.trim();
+    _initialNickname = HealthCommunityProfile.sanitizeNickname(profile.nickname);
+    _nameChangeCount = profile.nameChangeCount;
+    _nicknameChangeCount = profile.nicknameChangeCount;
+
     _displayNameController.text = profile.displayName;
     _nicknameController.text = profile.nickname;
+
+    DateTime? resolvedBirth = _parseBirthDateString(profile.birthDate);
+    bool fromLogin = false;
+    if (resolvedBirth == null && profile.birthYear != null) {
+      resolvedBirth = DateTime(
+        profile.birthYear!,
+        profile.birthMonth ?? 1,
+        profile.birthDay ?? 1,
+      );
+    }
+    if (resolvedBirth == null) {
+      final loginBirth = _parseBirthDateString(widget.currentUser.birthDate);
+      if (loginBirth != null) {
+        resolvedBirth = loginBirth;
+        fromLogin = true;
+      }
+    }
+    _birthDate = resolvedBirth;
+    _birthDateFromLogin = fromLogin;
+    _birthDateController.text =
+        resolvedBirth != null ? _formatBirthDate(resolvedBirth) : '';
+    _showBirthDate = profile.showBirthDate;
+    _gender = profile.gender ?? widget.currentUser.gender;
+    _showGender = profile.showGender;
+
     _cityController.text = profile.city;
     _dailyFocusController.text = profile.dailyFocus;
     _bioController.text = profile.bio;
@@ -232,6 +434,25 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         ? await widget.repository.loadMusicListeners(_myUid)
         : const <MusicListenerRecord>[];
     final friendships = await widget.repository.loadFriendships(_myUid);
+    String? nonCollidingInitialNick;
+    if (myProfile == null) {
+      final candidate = HealthCommunityProfile.sanitizeNickname(
+        widget.currentUser.displayName,
+      );
+      if (candidate.isNotEmpty) {
+        final taken = await widget.repository.isNicknameTaken(
+          candidate,
+          excludeUid: _myUid,
+        );
+        if (taken) {
+          final suggestions = await widget.repository
+              .generateNicknameSuggestions(candidate, excludeUid: _myUid);
+          if (suggestions.isNotEmpty) {
+            nonCollidingInitialNick = suggestions.first;
+          }
+        }
+      }
+    }
     if (!mounted) return;
     setState(() {
       _myProfile = myProfile;
@@ -242,6 +463,9 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         _creatingProfile = false;
       }
       _syncFormFromProfile(myProfile);
+      if (myProfile == null && nonCollidingInitialNick != null) {
+        _nicknameController.text = nonCollidingInitialNick;
+      }
       _loading = false;
     });
   }
@@ -401,8 +625,20 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     final name = _displayNameController.text.trim();
     if (name.isEmpty) return;
 
+    final cleanNick = HealthCommunityProfile.sanitizeNickname(
+      _nicknameController.text,
+    );
+    if (cleanNick.isNotEmpty && cleanNick.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kullanıcı adı en az 3 karakter olmalıdır.'),
+        ),
+      );
+      return;
+    }
+
     final profileTextCheck = ContentSafetyService.checkText(
-      '$name ${_nicknameController.text} ${_bioController.text} ${_mottoController.text} ${_dailyFocusController.text} ${_customConditionController.text}',
+      '$name $cleanNick ${_bioController.text} ${_mottoController.text} ${_dailyFocusController.text} ${_customConditionController.text}',
     );
     if (!profileTextCheck.isSafe) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -419,13 +655,145 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       return;
     }
 
+    if (cleanNick.isNotEmpty) {
+      final taken = await widget.repository.isNicknameTaken(
+        cleanNick,
+        excludeUid: _myUid,
+      );
+      if (taken) {
+        final suggestions = await widget.repository.generateNicknameSuggestions(
+          cleanNick,
+          excludeUid: _myUid,
+        );
+        if (!mounted) return;
+        setState(() {
+          _checkingNickname = false;
+          _isNicknameAvailable = false;
+          _nicknameSuggestions = suggestions;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Bu kullanıcı adı (@$cleanNick) başka bir üye tarafından kullanılıyor.',
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    final bool isExistingProfile = _myProfile != null;
+    final bool isNameModified = isExistingProfile &&
+        _initialRealName.isNotEmpty &&
+        name != _initialRealName;
+    final bool isNickModified = isExistingProfile &&
+        _initialNickname.isNotEmpty &&
+        cleanNick != _initialNickname;
+
+    if (!_isAdmin &&
+        isNameModified &&
+        _nameChangeCount >= HealthCommunityProfile.maxNameChanges) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🔒 Ad Soyad değiştirme hakkınız (2/2) dolmuştur.'),
+        ),
+      );
+      return;
+    }
+
+    if (!_isAdmin &&
+        isNickModified &&
+        _nicknameChangeCount >= HealthCommunityProfile.maxNicknameChanges) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '🔒 Kullanıcı adı değiştirme hakkınız (3/3) dolmuştur.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!_isAdmin && (isNameModified || isNickModified)) {
+      if (!mounted) return;
+      final remainingNameAfter =
+          (HealthCommunityProfile.maxNameChanges - (_nameChangeCount + 1))
+              .clamp(0, HealthCommunityProfile.maxNameChanges);
+      final remainingNickAfter = (HealthCommunityProfile.maxNicknameChanges -
+              (_nicknameChangeCount + 1))
+          .clamp(0, HealthCommunityProfile.maxNicknameChanges);
+
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.shield_outlined, color: AppTheme.primaryTeal),
+              SizedBox(width: 8),
+              Expanded(child: Text('Profil Değişikliği Onayı')),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (isNameModified) ...[
+                Text(
+                  'Ad Soyad: "$_initialRealName" → "$name"',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Bu işlemden sonra $remainingNameAfter / ${HealthCommunityProfile.maxNameChanges} ad değiştirme hakkınız kalacaktır.',
+                  style: const TextStyle(fontSize: 12.5),
+                ),
+                const SizedBox(height: 10),
+              ],
+              if (isNickModified) ...[
+                Text(
+                  'Kullanıcı Adı: "@$_initialNickname" → "@$cleanNick"',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Bu işlemden sonra $remainingNickAfter / ${HealthCommunityProfile.maxNicknameChanges} kullanıcı adı değiştirme hakkınız kalacaktır.',
+                  style: const TextStyle(fontSize: 12.5),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Vazgeç'),
+            ),
+            FilledButton(
+              key: const Key('confirm_profile_quota_change_btn'),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Onayla ve Kaydet'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+
+    final int nextNameChangeCount =
+        (!_isAdmin && isNameModified) ? _nameChangeCount + 1 : _nameChangeCount;
+    final int nextNicknameChangeCount = (!_isAdmin && isNickModified)
+        ? _nicknameChangeCount + 1
+        : _nicknameChangeCount;
+
     setState(() => _savingProfile = true);
     final now = DateTime.now();
     final pedState = _pedometerService.state;
+    final resolvedBirth = _birthDate;
     final profile = HealthCommunityProfile(
       uid: _myUid,
       displayName: name,
-      nickname: HealthCommunityProfile.sanitizeNickname(_nicknameController.text),
+      nickname: cleanNick,
       photoUrl: _photoUrl,
       photoKey: _photoKey,
       countryCode: _countryCode,
@@ -456,6 +824,17 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       showMotto: _showMotto,
       dailyFocus: _dailyFocusController.text.trim(),
       mood: _selectedMood,
+      streakDays: _myProfile?.streakDays ?? 1,
+      birthYear: resolvedBirth?.year,
+      birthMonth: resolvedBirth?.month ?? _myProfile?.birthMonth,
+      birthDay: resolvedBirth?.day ?? _myProfile?.birthDay,
+      birthDate:
+          resolvedBirth != null ? _formatBirthDate(resolvedBirth) : null,
+      showBirthDate: _showBirthDate,
+      gender: _gender,
+      showGender: _showGender,
+      nameChangeCount: nextNameChangeCount,
+      nicknameChangeCount: nextNicknameChangeCount,
       hideRealName: _hideRealName,
       hidePhoto: _hidePhoto,
       showBio: _showBio,
@@ -485,10 +864,19 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       ),
     );
     unawaited(_pedometerService.setShowOnProfile(_showStepsOnProfile));
+    if (resolvedBirth != null) {
+      unawaited(
+        SharedPreferences.getInstance().then((prefs) async {
+          await prefs.setInt('vcu_user_birth_month', resolvedBirth.month);
+          await prefs.setInt('vcu_user_birth_day', resolvedBirth.day);
+        }),
+      );
+    }
 
     if (!mounted) return;
     setState(() {
       _myProfile = saved;
+      _syncFormFromProfile(saved);
       _creatingProfile = false;
       _editingProfile = false;
       _savingProfile = false;
@@ -1081,7 +1469,7 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        // 2. Row: Role/Admin Badge + Mood (Ruh Hali) - Exactly like Social Formul Bank
+                        // 2. Row: Role/Admin Badge + Age + Gender + Mood (Ruh Hali) - Social Formul Bank style
                         Wrap(
                           spacing: 6,
                           runSpacing: 4,
@@ -1115,6 +1503,63 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                            if (profile.showBirthDate && profile.age != null)
+                              Container(
+                                key: const Key('profile_showcase_age_badge'),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0EA5E9)
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: const Color(0xFF0EA5E9)
+                                        .withValues(alpha: 0.35),
+                                  ),
+                                ),
+                                child: Text(
+                                  '🎂 ${profile.age} Yaş',
+                                  style: const TextStyle(
+                                    color: Color(0xFF0284C7),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            if (profile.showGender &&
+                                profile.localizedGenderLabel != null)
+                              Container(
+                                key: const Key('profile_showcase_gender_badge'),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: (profile.gender == 'Female'
+                                          ? const Color(0xFFEC4899)
+                                          : const Color(0xFF6366F1))
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: (profile.gender == 'Female'
+                                            ? const Color(0xFFEC4899)
+                                            : const Color(0xFF6366F1))
+                                        .withValues(alpha: 0.35),
+                                  ),
+                                ),
+                                child: Text(
+                                  profile.localizedGenderLabel!,
+                                  style: TextStyle(
+                                    color: profile.gender == 'Female'
+                                        ? const Color(0xFFDB2777)
+                                        : const Color(0xFF4F46E5),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                             if (profile.mood != null)
@@ -2431,13 +2876,30 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         ),
         const SizedBox(height: 12),
 
-        // Identity Fields
+        // Identity Fields (Social Formül Bank Quota & Uniqueness System)
         TextField(
           key: const Key('comm_profile_name_field'),
           controller: _displayNameController,
+          readOnly: _isRealNameLocked,
           decoration: InputDecoration(
             labelText: l10n.commFieldDisplayName,
-            prefixIcon: const Icon(Icons.badge_outlined),
+            prefixIcon: Icon(
+              _isRealNameLocked ? Icons.lock_outline_rounded : Icons.badge_outlined,
+            ),
+            suffixIcon: _isRealNameLocked
+                ? const Tooltip(
+                    message: 'Ad Soyad değiştirme hakkınız dolmuştur',
+                    child: Icon(Icons.lock_rounded, size: 18),
+                  )
+                : null,
+            helperText: _isAdmin
+                ? '👑 Yönetici hesabı: Sınırsız değişiklik hakkı'
+                : _isRealNameLocked
+                    ? '🔒 Ad Soyad değiştirme hakkınız (2/2) dolmuştur.'
+                    : _myProfile == null
+                        ? 'İlk kayıt ücretsizdir • Sonrasında toplam ${HealthCommunityProfile.maxNameChanges} değişiklik hakkınız vardır.'
+                        : 'Kalan Ad Soyad Değişiklik Hakkı: $_remainingNameChanges / ${HealthCommunityProfile.maxNameChanges}',
+            helperMaxLines: 2,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
           ),
         ),
@@ -2445,12 +2907,230 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         TextField(
           key: const Key('comm_profile_nickname_field'),
           controller: _nicknameController,
+          readOnly: _isNicknameLocked,
+          onChanged: _isNicknameLocked ? null : _onNicknameChanged,
           decoration: InputDecoration(
             labelText: l10n.commFieldNickname,
             prefixText: '@',
-            prefixIcon: const Icon(Icons.alternate_email_rounded),
+            prefixIcon: Icon(
+              _isNicknameLocked
+                  ? Icons.lock_outline_rounded
+                  : Icons.alternate_email_rounded,
+            ),
+            suffixIcon: _isNicknameLocked
+                ? const Icon(Icons.lock_rounded, size: 18)
+                : _checkingNickname
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : _isNicknameAvailable == true
+                        ? const Icon(
+                            Icons.check_circle_rounded,
+                            color: Color(0xFF16A34A),
+                          )
+                        : _isNicknameAvailable == false
+                            ? Icon(
+                                Icons.error_outline_rounded,
+                                color: colorScheme.error,
+                              )
+                            : null,
+            helperText: _isAdmin
+                ? '👑 Yönetici hesabı: Sınırsız kullanıcı adı hakkı'
+                : _isNicknameLocked
+                    ? '🔒 Kullanıcı adı değiştirme hakkınız (3/3) dolmuştur.'
+                    : _myProfile == null
+                        ? 'Benzersiz olmalıdır • Sonrasında toplam ${HealthCommunityProfile.maxNicknameChanges} değişiklik hakkınız vardır.'
+                        : 'Kalan Kullanıcı Adı Değişiklik Hakkı: $_remainingNicknameChanges / ${HealthCommunityProfile.maxNicknameChanges}',
+            helperMaxLines: 2,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
           ),
+        ),
+        if (_checkingNickname || _isNicknameAvailable != null) ...[
+          const SizedBox(height: 6),
+          Builder(
+            builder: (context) {
+              final clean = HealthCommunityProfile.sanitizeNickname(
+                _nicknameController.text,
+              );
+              if (_checkingNickname) {
+                return Text(
+                  '⏳ @$clean uygunluğu kontrol ediliyor...',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                );
+              }
+              if (clean.length < 3) {
+                return Text(
+                  '⚠️ Kullanıcı adı en az 3 karakter olmalıdır.',
+                  key: const Key('comm_nickname_status_short'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.w700,
+                  ),
+                );
+              }
+              if (_isNicknameAvailable == true) {
+                return Text(
+                  '✅ @$clean kullanıcı adı uygun!',
+                  key: const Key('comm_nickname_status_available'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: const Color(0xFF16A34A),
+                    fontWeight: FontWeight.w800,
+                  ),
+                );
+              }
+              return Column(
+                key: const Key('comm_nickname_status_taken'),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '❌ @$clean başka bir üye tarafından alınmış! Önerilenler:',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.error,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (_nicknameSuggestions.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        for (final sug in _nicknameSuggestions)
+                          ActionChip(
+                            key: Key('comm_nick_suggestion_$sug'),
+                            visualDensity: VisualDensity.compact,
+                            label: Text(
+                              '@$sug',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _nicknameController.text = sug;
+                                _isNicknameAvailable = true;
+                                _nicknameSuggestions = const [];
+                              });
+                            },
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+        const SizedBox(height: 12),
+
+        // Birth Date & Live Age + Gender (Login Synced + Manual Editable)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: TextField(
+                key: const Key('comm_profile_birthdate_field'),
+                controller: _birthDateController,
+                readOnly: true,
+                onTap: _pickBirthDate,
+                decoration: InputDecoration(
+                  labelText: 'Doğum Tarihi & Yaş',
+                  hintText: 'GG-AA-YYYY seçin',
+                  prefixIcon: const Icon(Icons.cake_outlined),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_calculatedAge != null)
+                        Container(
+                          key: const Key('comm_form_live_age_pill'),
+                          margin: const EdgeInsets.only(right: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryTeal.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '$_calculatedAge Yaş',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.primaryTeal,
+                            ),
+                          ),
+                        ),
+                      if (_birthDate != null)
+                        IconButton(
+                          key: const Key('comm_clear_birthdate_btn'),
+                          tooltip: 'Temizle',
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.close_rounded, size: 18),
+                          onPressed: () => setState(() {
+                            _birthDate = null;
+                            _birthDateFromLogin = false;
+                            _birthDateController.clear();
+                          }),
+                        )
+                      else
+                        const Padding(
+                          padding: EdgeInsets.only(right: 10),
+                          child: Icon(Icons.calendar_month_rounded, size: 18),
+                        ),
+                    ],
+                  ),
+                  helperText: _birthDateFromLogin
+                      ? '✨ Giriş hesabınızdan otomatik çekildi (dokunarak değiştirebilirsiniz)'
+                      : 'Dokunarak doğum tarihinizi seçebilir veya güncelleyebilirsiniz',
+                  helperMaxLines: 2,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              'Cinsiyet:',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            ChoiceChip(
+              key: const Key('comm_gender_chip_male'),
+              label: const Text('Erkek ♂'),
+              selected: _gender == 'Male',
+              onSelected: (_) => setState(() => _gender = 'Male'),
+            ),
+            ChoiceChip(
+              key: const Key('comm_gender_chip_female'),
+              label: const Text('Kadın ♀'),
+              selected: _gender == 'Female',
+              onSelected: (_) => setState(() => _gender = 'Female'),
+            ),
+            ChoiceChip(
+              key: const Key('comm_gender_chip_none'),
+              label: const Text('Belirtilmedi'),
+              selected: _gender == null || _gender!.trim().isEmpty,
+              onSelected: (_) => setState(() => _gender = null),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         Row(
@@ -2642,6 +3322,12 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                 DropdownButtonFormField<String>(
                   key: const Key('comm_profile_motto_dropdown'),
                   isExpanded: true,
+                  hint: const Text(
+                    'Listeden motto seçin...',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12.5),
+                  ),
                   decoration: InputDecoration(
                     labelText: 'Hazır Sağlıklı Yaşam Mottosu Seçin',
                     prefixIcon: const Icon(Icons.auto_awesome_rounded),
@@ -2653,11 +3339,14 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                     for (final m in HealthyLivingMottos.presets)
                       DropdownMenuItem<String>(
                         value: m,
-                        child: Text(
-                          m,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 12.5),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 260),
+                          child: Text(
+                            m,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                       ),
                   ],
@@ -2903,6 +3592,18 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                 title: const Text('Adım Sayar Özeti Kartımı Göster'),
                 value: _showStepsOnProfile,
                 onChanged: (v) => setState(() => _showStepsOnProfile = v),
+              ),
+              SwitchListTile(
+                key: const Key('comm_toggle_show_birthdate'),
+                title: const Text('Doğum Tarihi ve Yaşımı Profilde Göster'),
+                value: _showBirthDate,
+                onChanged: (v) => setState(() => _showBirthDate = v),
+              ),
+              SwitchListTile(
+                key: const Key('comm_toggle_show_gender'),
+                title: const Text('Cinsiyetimi Profilde Göster'),
+                value: _showGender,
+                onChanged: (v) => setState(() => _showGender = v),
               ),
               SwitchListTile(
                 title: Text(l10n.commToggleShowConditions),

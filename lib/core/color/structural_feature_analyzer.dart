@@ -203,19 +203,30 @@ class StructuralFeatureAnalyzer {
     final w = roi.width;
     final h = roi.height;
     final luma = List<double>.filled(w * h, 0);
+    final isTongueTissue = List<bool>.filled(w * h, false);
     // Pixel class tags for geographic tongue boundary analysis:
     // 0 = other, 1 = deep red depapillated patch, 2 = pale/white rim
     final pixelClass = List<int>.filled(w * h, 0);
+
+    // Restrict coating & fissure analysis to the interior tongue dorsum so
+    // upper teeth, interdental gaps, dark pharyngeal throat cavity, and outer
+    // mouth corners / lips are never miscounted as coating or fissures.
+    final marginX = (w * 0.17).round();
+    final marginTop = (h * 0.18).round();
+    final marginBot = (h * 0.12).round();
+
     var coatingCount = 0;
     var yellowCoatingCount = 0;
-    var validCount = 0;
+    var validDorsumCount = 0;
     var redPatchCount = 0;
     var whiteRimCount = 0;
     var mucosaEiSum = 0.0;
     var mucosaEiCount = 0;
 
     for (var y = 0; y < h; y++) {
+      final inDorsumY = y >= marginTop && y < h - marginBot;
       for (var x = 0; x < w; x++) {
+        final inDorsum = inDorsumY && x >= marginX && x < w - marginX;
         final p = roi.getPixel(x, y);
         final ri = p.r.round().clamp(0, 255);
         final gi = p.g.round().clamp(0, 255);
@@ -227,14 +238,37 @@ class StructuralFeatureAnalyzer {
         final idx = y * w + x;
         luma[idx] = l;
 
-        // Ignore specular wet glare highlights
+        // Ignore specular wet glare highlights and deep oral-cavity shadows
         if (l > 246) continue;
-        validCount++;
 
         final maxC = math.max(r, math.max(g, b));
         final minC = math.min(r, math.min(g, b));
         final sat = maxC > 0 ? (maxC - minC) / maxC : 0.0;
         final redExcess = r - g;
+        final gbDiff = g - b;
+
+        // Pink/rose tongue mucosa (distinguished from ivory teeth & beige skin)
+        final isPinkMucosa = l >= 80 &&
+            l <= 240 &&
+            r >= 120 &&
+            redExcess >= 18.0 &&
+            (r - b) >= 12.0 &&
+            gbDiff <= (redExcess * 0.85 + 10.0);
+
+        // Matte coated tongue dorsum inside interior tongue zone
+        final isCoatedDorsum = inDorsum &&
+            l >= 155 &&
+            l <= 240 &&
+            sat <= 0.26 &&
+            r >= g &&
+            gbDiff <= 24.0;
+
+        if (isPinkMucosa || isCoatedDorsum) {
+          isTongueTissue[idx] = true;
+        }
+
+        if (!inDorsum || l < 45) continue;
+        validDorsumCount++;
 
         // Whitish matte coating: high luminance, low redness excess
         if (l >= 165 && sat <= 0.24 && redExcess < 22) {
@@ -265,12 +299,12 @@ class StructuralFeatureAnalyzer {
     // Geographic tongue signature: significant red islands AND white rims
     // with frequent spatial adjacency (red patches directly rimmed by white).
     var geographicScore = 0.0;
-    if (validCount > 0 &&
-        redPatchCount >= (validCount * 0.06) &&
-        whiteRimCount >= (validCount * 0.03)) {
+    if (validDorsumCount > 0 &&
+        redPatchCount >= (validDorsumCount * 0.06) &&
+        whiteRimCount >= (validDorsumCount * 0.03)) {
       var borderHits = 0;
-      for (var y = 2; y < h - 2; y++) {
-        for (var x = 2; x < w - 2; x++) {
+      for (var y = marginTop + 2; y < h - marginBot - 2; y++) {
+        for (var x = marginX + 2; x < w - marginX - 2; x++) {
           if (pixelClass[y * w + x] != 1) continue;
           var nearWhite = false;
           for (var dy = -2; dy <= 2 && !nearWhite; dy++) {
@@ -285,56 +319,132 @@ class StructuralFeatureAnalyzer {
         }
       }
       geographicScore = (borderHits / math.max(1, redPatchCount) * 0.75 +
-              (whiteRimCount / validCount).clamp(0.0, 0.25))
+              (whiteRimCount / validDorsumCount).clamp(0.0, 0.25))
           .clamp(0.0, 1.0);
-      // Require meaningful actual border length
-      if (borderHits < 20) {
+      if (borderHits < 16) {
         geographicScore = 0.0;
       }
     }
 
-    // Detect dark linear valleys (fissures/grooves):
-    var fissurePixels = 0;
-    var interiorPixels = 0;
-    const radius = 3;
+    // Detect true intra-lingual dark linear grooves (fissures):
+    // 1. Must lie within the interior tongue dorsum (away from teeth, throat
+    //    shadow, and lateral mouth corners).
+    // 2. BOTH opposing flanks (±3..4 px) MUST be actual tongue tissue AND
+    //    `min(flankA, flankB) - center >= 28`, completely rejecting one-sided
+    //    organ-border shadows (e.g., tongue/teeth meeting dark oral cavity).
+    // 3. Must form elongated connected linear furrows (size >= 6, span >= 5),
+    //    rejecting normal 1-2 px fungiform/filiform papillae micro-dots.
+    // 4. Discounts a single mild midline sulcus (physiological median lingual
+    //    sulcus) when no lateral or off-center grooves exist.
+    var dorsumMucosaPixels = 0;
+    final rawFissureCand = List<bool>.filled(w * h, false);
 
-    for (var y = radius; y < h - radius; y++) {
-      for (var x = radius; x < w - radius; x++) {
-        final center = luma[y * w + x];
-        if (center > 235) continue; // glare
-        interiorPixels++;
+    for (var y = marginTop; y < h - marginBot; y++) {
+      for (var x = marginX; x < w - marginX; x++) {
+        final idx = y * w + x;
+        if (isTongueTissue[idx]) dorsumMucosaPixels++;
 
-        var ringSum = 0.0;
-        var ringCount = 0;
-        for (var dy = -radius; dy <= radius; dy += radius) {
-          for (var dx = -radius; dx <= radius; dx += radius) {
-            if (dx == 0 && dy == 0) continue;
-            ringSum += luma[(y + dy) * w + (x + dx)];
-            ringCount++;
-          }
-        }
-        final localMean = ringSum / ringCount;
+        final center = luma[idx];
+        if (center < 22 || center > 165) continue;
 
-        if (localMean >= 75 && (localMean - center) >= 22.0) {
-          final hDip =
-              ((luma[y * w + (x - 2)] + luma[y * w + (x + 2)]) * 0.5) - center;
-          final vDip =
-              ((luma[(y - 2) * w + x] + luma[(y + 2) * w + x]) * 0.5) - center;
-          if (hDip >= 18.0 || vDip >= 18.0) {
-            fissurePixels++;
-          }
+        final leftTissue =
+            isTongueTissue[y * w + (x - 3)] && isTongueTissue[y * w + (x - 4)];
+        final rightTissue =
+            isTongueTissue[y * w + (x + 3)] && isTongueTissue[y * w + (x + 4)];
+        final leftL = math.max(luma[y * w + (x - 3)], luma[y * w + (x - 4)]);
+        final rightL = math.max(luma[y * w + (x + 3)], luma[y * w + (x + 4)]);
+        final bilateralHDip = leftTissue && rightTissue
+            ? (math.min(leftL, rightL) - center)
+            : 0.0;
+
+        final topTissue = isTongueTissue[(y - 3) * w + x] &&
+            isTongueTissue[(y - 4) * w + x];
+        final botTissue = isTongueTissue[(y + 3) * w + x] &&
+            isTongueTissue[(y + 4) * w + x];
+        final topL =
+            math.max(luma[(y - 3) * w + x], luma[(y - 4) * w + x]);
+        final botL =
+            math.max(luma[(y + 3) * w + x], luma[(y + 4) * w + x]);
+        final bilateralVDip =
+            topTissue && botTissue ? (math.min(topL, botL) - center) : 0.0;
+
+        if (bilateralHDip >= 28.0 || bilateralVDip >= 28.0) {
+          rawFissureCand[idx] = true;
         }
       }
     }
 
+    final visited = List<bool>.filled(w * h, false);
+    var confirmedFissurePixels = 0;
+    var grooveComponentCount = 0;
+    var globalMinX = w;
+    var globalMaxX = 0;
+
+    for (var i = 0; i < w * h; i++) {
+      if (!rawFissureCand[i] || visited[i]) continue;
+      final queue = <int>[i];
+      visited[i] = true;
+      var head = 0;
+      var minX = w;
+      var maxX = 0;
+      var minY = h;
+      var maxY = 0;
+
+      while (head < queue.length) {
+        final cur = queue[head++];
+        final cx = cur % w;
+        final cy = cur ~/ w;
+        if (cx < minX) minX = cx;
+        if (cx > maxX) maxX = cx;
+        if (cy < minY) minY = cy;
+        if (cy > maxY) maxY = cy;
+
+        for (var dy = -1; dy <= 1; dy++) {
+          for (var dx = -1; dx <= 1; dx++) {
+            if (dx == 0 && dy == 0) continue;
+            final nx = cx + dx;
+            final ny = cy + dy;
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+            final ni = ny * w + nx;
+            if (rawFissureCand[ni] && !visited[ni]) {
+              visited[ni] = true;
+              queue.add(ni);
+            }
+          }
+        }
+      }
+
+      final span = math.max(maxX - minX + 1, maxY - minY + 1);
+      if (queue.length >= 6 && span >= 5) {
+        confirmedFissurePixels += queue.length;
+        grooveComponentCount++;
+        if (minX < globalMinX) globalMinX = minX;
+        if (maxX > globalMaxX) globalMaxX = maxX;
+      }
+    }
+
+    // Physiological median lingual sulcus guard: a single narrow vertical line
+    // confined strictly to the central midline [41%..59%] without lateral
+    // branches is normal anatomy, not pathological fissured tongue.
+    double effectiveFissurePixels = confirmedFissurePixels.toDouble();
+    final midLeft = (w * 0.41).round();
+    final midRight = (w * 0.59).round();
+    if (grooveComponentCount == 1 &&
+        globalMinX >= midLeft &&
+        globalMaxX <= midRight &&
+        (globalMaxX - globalMinX) <= 10) {
+      effectiveFissurePixels *= 0.40;
+    }
+
+    final denom = math.max(dorsumMucosaPixels + confirmedFissurePixels, 1200);
+
     return StructuralFeatures(
-      fissureGrooveRatio: interiorPixels > 0
-          ? (fissurePixels / interiorPixels).clamp(0.0, 1.0)
+      fissureGrooveRatio: (effectiveFissurePixels / denom).clamp(0.0, 1.0),
+      coatingPatchRatio: validDorsumCount > 0
+          ? (coatingCount / validDorsumCount).clamp(0.0, 1.0)
           : 0.0,
-      coatingPatchRatio:
-          validCount > 0 ? (coatingCount / validCount).clamp(0.0, 1.0) : 0.0,
-      yellowCoatingRatio: validCount > 0
-          ? (yellowCoatingCount / validCount).clamp(0.0, 1.0)
+      yellowCoatingRatio: validDorsumCount > 0
+          ? (yellowCoatingCount / validDorsumCount).clamp(0.0, 1.0)
           : 0.0,
       geographicPatchScore: geographicScore,
       mucosalErythemaIndex:

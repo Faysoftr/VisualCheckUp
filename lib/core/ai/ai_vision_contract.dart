@@ -159,9 +159,13 @@ class AiVisionPromptBuilder {
       );
     }
 
-    final categorySpecialRule = category == CheckCategory.nail
-        ? 'Önemli: Tırnak üstündeki flaş parlaması, tepe ışığı şeridi veya doğal yansımayı asla dikey çizgi, oluk ya da melanoniki sayma. Gerçek pigmentli bant yoksa nail_healthy_pink seç.\n'
-        : '';
+    final categorySpecialRule = switch (category) {
+      CheckCategory.nail =>
+        'Önemli: Tırnak üstündeki flaş parlaması, tepe ışığı şeridi veya doğal yansımayı asla dikey çizgi, oluk ya da melanoniki sayma. Gerçek pigmentli bant yoksa nail_healthy_pink seç.\n',
+      CheckCategory.tongue =>
+        'Önemli: Dilin tam ortasındaki doğal anatomik orta çizgiyi (median sulcus), normal papilla pütürlerini, diş aralarını, boğaz/ağız köşesi gölgelerini veya görsel filigranları asla çatlak/yarık (tongue_fissured_grooves) sayma. Dil dokusu içinde belirgin derin ve çoklu yarıklar yoksa tongue_healthy_pink seç.\n',
+      _ => '',
+    };
 
     final userPrompt = '''
 Modül: ${category.title} (${category.id})

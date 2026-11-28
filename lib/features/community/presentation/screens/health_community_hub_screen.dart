@@ -744,7 +744,15 @@ class _HealthCommunityHubScreenState extends State<HealthCommunityHubScreen>
                               children: [
                                 Flexible(
                                   child: Text(
-                                    '${profile.country.flag} ${profile.city.isNotEmpty ? '${profile.city} • ' : ''}${profile.country.label}',
+                                    [
+                                      '${profile.country.flag} ${profile.city.isNotEmpty ? '${profile.city} • ' : ''}${profile.country.label}',
+                                      if (profile.showBirthDate &&
+                                          profile.age != null)
+                                        '${profile.age} Yaş',
+                                      if (profile.showGender &&
+                                          profile.localizedGenderLabel != null)
+                                        profile.localizedGenderLabel!,
+                                    ].join(' • '),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: theme.textTheme.labelSmall?.copyWith(
