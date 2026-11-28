@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:visualcheckup/core/color/organ_isolator.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/services/camera_permission_service.dart';
 import 'package:visualcheckup/core/storage/checkup_photo_storage.dart';
@@ -14,6 +15,7 @@ import 'package:visualcheckup/features/checkup/domain/health_analyzer.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/quick_color_card_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/screens/result_screen.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/module_reference_sheet.dart';
+import 'package:visualcheckup/features/checkup/presentation/widgets/organ_scanner_overlay.dart';
 
 class CameraCheckScreen extends StatefulWidget {
   const CameraCheckScreen({
@@ -24,6 +26,8 @@ class CameraCheckScreen extends StatefulWidget {
     this.permissionService = const PermissionHandlerCameraService(),
     this.initialEyeScanMode = EyeScanMode.sclera,
     this.autoPickFromGallery = false,
+    this.minScanDuration = const Duration(milliseconds: 2200),
+    this.galleryImageBytesProvider,
   });
 
   final CheckCategory category;
@@ -32,6 +36,8 @@ class CameraCheckScreen extends StatefulWidget {
   final CameraPermissionService permissionService;
   final EyeScanMode initialEyeScanMode;
   final bool autoPickFromGallery;
+  final Duration minScanDuration;
+  final Future<Uint8List?> Function()? galleryImageBytesProvider;
 
   @override
   State<CameraCheckScreen> createState() => _CameraCheckScreenState();
@@ -44,6 +50,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
   int _selectedCameraIndex = 0;
   bool _isInitializing = true;
   bool _isProcessing = false;
+  IsolatedOrganResult? _isolatedScanPreview;
   bool _torchEnabled = false;
   bool _openedSettings = false;
   late bool _useWhiteReference;
@@ -319,23 +326,38 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
     try {
-      final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1280,
-      );
-      if (picked == null) {
-        if (mounted) setState(() => _isProcessing = false);
+      Uint8List? bytes;
+      if (widget.galleryImageBytesProvider != null) {
+        bytes = await widget.galleryImageBytesProvider!();
+      } else {
+        final picker = ImagePicker();
+        final picked = await picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1280,
+        );
+        if (picked != null) {
+          bytes = await picked.readAsBytes();
+        }
+      }
+      if (bytes == null) {
+        if (mounted) {
+          setState(() {
+            _isProcessing = false;
+            _isolatedScanPreview = null;
+          });
+        }
         return;
       }
-      final bytes = await picked.readAsBytes();
       await _processBytes(bytes);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.cameraAnalysisFailed(e.toString()))),
       );
-      setState(() => _isProcessing = false);
+      setState(() {
+        _isProcessing = false;
+        _isolatedScanPreview = null;
+      });
     }
   }
 
@@ -376,23 +398,42 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
 
   Future<void> _processBytes(Uint8List bytes) async {
     try {
+      // 1. Isolate & magnify ONLY the target organ (strip face/neck/hand/bg)
+      final isolated = OrganIsolatorService.isolate(
+        imageBytes: bytes,
+        category: widget.category,
+        eyeScanMode: _eyeScanMode,
+      );
+      if (mounted) {
+        setState(() => _isolatedScanPreview = isolated);
+      }
+
       final allowCloudAi = await widget.historyRepository.isCloudAiEnabled();
       final langCode =
           mounted ? Localizations.localeOf(context).languageCode : 'tr';
-      final analyzed = await widget.analyzer.analyzeImage(
-        category: widget.category,
-        imageBytes: bytes,
-        options: AnalysisOptions(
-          useWhiteReference: _useWhiteReference,
-          baseline: _baseline,
-          allowCloudAi: allowCloudAi,
-          languageCode: langCode,
-          eyeScanMode: _eyeScanMode,
+
+      // 2. Run clinical analysis concurrently with the up/down laser scan animation
+      final results = await Future.wait<dynamic>([
+        widget.analyzer.analyzeImage(
+          category: widget.category,
+          imageBytes: bytes,
+          options: AnalysisOptions(
+            useWhiteReference: _useWhiteReference,
+            baseline: _baseline,
+            allowCloudAi: allowCloudAi,
+            languageCode: langCode,
+            eyeScanMode: _eyeScanMode,
+          ),
         ),
-      );
+        if (widget.minScanDuration > Duration.zero)
+          Future<void>.delayed(widget.minScanDuration),
+      ]);
+      final analyzed = results.first as AnalysisResult;
+
+      // 3. Persist the isolated, body-free organ image for the report & history
       final savedPhotoPath = await CheckupPhotoStorage.savePhoto(
         resultId: analyzed.id,
-        imageBytes: bytes,
+        imageBytes: isolated.isolatedImageBytes,
       );
       final result = savedPhotoPath != null
           ? analyzed.copyWith(imagePath: savedPhotoPath)
@@ -405,14 +446,20 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
           content: Text(context.l10n.cameraAnalysisFailed(e.toString())),
         ),
       );
-      setState(() => _isProcessing = false);
+      setState(() {
+        _isProcessing = false;
+        _isolatedScanPreview = null;
+      });
     }
   }
 
   Future<void> _openResult(AnalysisResult result) async {
     await widget.historyRepository.saveResult(result);
     if (!mounted) return;
-    setState(() => _isProcessing = false);
+    setState(() {
+      _isProcessing = false;
+      _isolatedScanPreview = null;
+    });
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (_) => ResultScreen(
@@ -640,7 +687,13 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
             ),
         ],
       ),
-      body: Column(
+      body: _isProcessing && _isolatedScanPreview != null
+          ? OrganScannerOverlay(
+              category: widget.category,
+              isolatedOrgan: _isolatedScanPreview!,
+              isTurkish: Localizations.localeOf(context).languageCode == 'tr',
+            )
+          : Column(
         children: [
           // Top guidance & calibration bar
           Container(
@@ -1121,6 +1174,7 @@ class _CameraCheckScreenState extends State<CameraCheckScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton.filledTonal(
+                    key: const Key('camera_pick_gallery_button'),
                     onPressed: _isProcessing ? null : _pickFromGallery,
                     tooltip: l10n.cameraPickGalleryBtn,
                     icon: const Icon(Icons.photo_library_outlined),
