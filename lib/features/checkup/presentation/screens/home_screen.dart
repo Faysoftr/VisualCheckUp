@@ -57,6 +57,7 @@ import 'package:visualcheckup/features/medications/domain/medication_reminder.da
 import 'package:visualcheckup/features/medications/presentation/screens/medication_reminders_screen.dart';
 import 'package:visualcheckup/features/pedometer/presentation/screens/step_counter_screen.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
+import 'package:visualcheckup/features/breath_lung/presentation/screens/breath_lung_screen.dart';
 import 'package:visualcheckup/features/skin/domain/skin_check_context.dart';
 import 'package:visualcheckup/features/skin/presentation/screens/skin_check_screen.dart';
 import 'package:visualcheckup/features/sobriety/presentation/screens/sobriety_tracker_screen.dart';
@@ -353,6 +354,17 @@ class _HomeScreenState extends State<HomeScreen> {
           communityRepository: HealthCommunityRepository(),
           currentUserId: widget.currentUser.id,
           currentUserDisplayName: widget.currentUser.displayName,
+        ),
+      ),
+    );
+    await _loadDashboardData();
+  }
+
+  Future<void> _openBreathLung() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BreathLungScreen(
+          currentUser: widget.currentUser,
         ),
       ),
     );
@@ -711,6 +723,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onOpenChildrenGrowth: () => _openGrowthBmi(initialTabIndex: 1),
         onOpenPedometer: _openPedometer,
         onOpenSobriety: _openSobrietyTracker,
+        onOpenBreathLung: _openBreathLung,
         onOpenWidgetsManager: _openWidgetsManager,
         onOpenQuickColorCard: _openQuickColorCardPicker,
         onOpenFollowUpPlan: _openFollowUpPlan,

@@ -51,6 +51,7 @@ class AppDrawer extends StatelessWidget {
     this.onOpenChildrenGrowth,
     this.onOpenPedometer,
     this.onOpenSobriety,
+    this.onOpenBreathLung,
     this.onOpenWidgetsManager,
   });
 
@@ -88,6 +89,7 @@ class AppDrawer extends StatelessWidget {
   final VoidCallback? onOpenChildrenGrowth;
   final VoidCallback? onOpenPedometer;
   final VoidCallback? onOpenSobriety;
+  final VoidCallback? onOpenBreathLung;
   final VoidCallback? onOpenWidgetsManager;
 
   void _closeAndRun(BuildContext context, VoidCallback action) {
@@ -606,7 +608,7 @@ class AppDrawer extends StatelessWidget {
                       title: l10n.menuSectionTracking,
                       icon: Icons.monitor_heart_outlined,
                       accentColor: const Color(0xFFEF4444),
-                      badgeText: '15',
+                      badgeText: '16',
                       children: [
                         if (onOpenPedometer != null)
                           _DrawerTile(
@@ -623,6 +625,14 @@ class AppDrawer extends StatelessWidget {
                             label: 'Sigara & Alkol Bırakma',
                             accentColor: const Color(0xFF16A34A),
                             onTap: () => _closeAndRun(context, onOpenSobriety!),
+                          ),
+                        if (onOpenBreathLung != null)
+                          _DrawerTile(
+                            key: const Key('drawer_item_breath_lung'),
+                            icon: Icons.air_rounded,
+                            label: 'Nefes & Akciğer Testi',
+                            accentColor: const Color(0xFF0D9488),
+                            onTap: () => _closeAndRun(context, onOpenBreathLung!),
                           ),
                         if (onOpenWidgetsManager != null)
                           _DrawerTile(
