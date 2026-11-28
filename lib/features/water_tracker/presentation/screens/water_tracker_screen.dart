@@ -277,7 +277,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: summary.entries.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 6),
+                      separatorBuilder: (_, _) => const SizedBox(height: 6),
                       itemBuilder: (ctx, idx) {
                         final entry = summary.entries[idx];
                         final timeStr =

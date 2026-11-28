@@ -540,7 +540,7 @@ class _DoctorApplicationScreenState extends State<DoctorApplicationScreen> {
                   if (ok && mounted) setState(() => _isPaid = true);
                 },
               );
-              if (success && mounted) {
+              if (success && context.mounted) {
                 setState(() => _isPaid = true);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

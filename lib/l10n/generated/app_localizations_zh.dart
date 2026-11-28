@@ -3007,4 +3007,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => '平台创始人与系统管理员';
+
+  @override
+  String get splashTagline => 'AI 智能驱动\n全方位健康追踪';
 }

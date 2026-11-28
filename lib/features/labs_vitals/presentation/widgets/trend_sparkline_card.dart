@@ -132,8 +132,8 @@ class _TrendPainter extends CustomPainter {
       for (final p in points) p.value,
       for (final p in points)
         if (p.secondaryValue != null) p.secondaryValue!,
-      if (normalMin != null) normalMin!,
-      if (normalMax != null) normalMax!,
+      ?normalMin,
+      ?normalMax,
     ];
 
     var minY = allValues.reduce(math.min);

@@ -147,6 +147,19 @@ void main() {
         final updated = await repo.loadMyProfile(_testUser.id);
         expect(updated?.mood, HealthMood.energetic);
 
+        // Verify Likes, Friends, and Listeners pills sit side-by-side on the exact same row
+        final likesY = tester
+            .getCenter(find.byKey(const Key('comm_my_profile_likers_btn')))
+            .dy;
+        final friendsY = tester
+            .getCenter(find.byKey(const Key('comm_my_profile_friends_btn')))
+            .dy;
+        final listenersY = tester
+            .getCenter(find.byKey(const Key('comm_my_profile_listeners_btn')))
+            .dy;
+        expect((likesY - friendsY).abs(), lessThan(1.0));
+        expect((friendsY - listenersY).abs(), lessThan(1.0));
+
         // Verify Hakkımda, Motto, Motivasyon Müziği, and Arkadaşlarım cards are present
         expect(find.byKey(const Key('profile_bio_card')), findsOneWidget);
         expect(find.byKey(const Key('profile_motto_card')), findsOneWidget);
@@ -318,13 +331,12 @@ void main() {
           ),
         );
 
-        var adminOpened = false;
         await tester.pumpWidget(
           _wrapApp(
             MyHealthProfileScreen(
               currentUser: adminUser,
               repository: repo,
-              onOpenAdminPanel: () => adminOpened = true,
+              onOpenAdminPanel: () {},
             ),
           ),
         );

@@ -1,8 +1,204 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/community/domain/health_community_models.dart';
 import 'package:visualcheckup/features/pedometer/domain/pedometer_models.dart';
 import 'package:visualcheckup/features/sobriety/domain/sobriety_models.dart';
+
+/// Full-screen theme-adaptive wellness & botanical background for Profile screens.
+class ProfileAmbientBackground extends StatelessWidget {
+  const ProfileAmbientBackground({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Stack(
+      key: const Key('profile_ambient_background'),
+      fit: StackFit.expand,
+      children: [
+        // 1. Primary VisualCheckUp wellness artwork backdrop
+        Image.asset(
+          'assets/images/app_bg.jpg',
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => ColoredBox(
+            color: isDark ? AppTheme.darkCanvas : AppTheme.lightCanvas,
+          ),
+        ),
+        // 2. Subtle botanical & ECG motif overlay for extra profile richness
+        Opacity(
+          opacity: isDark ? 0.28 : 0.24,
+          child: Image.asset(
+            isDark
+                ? 'assets/images/drawer_bg_dark.jpg'
+                : 'assets/images/drawer_bg_light.jpg',
+            fit: BoxFit.cover,
+            alignment: Alignment.topRight,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+          ),
+        ),
+        // 3. Soft frosted gradient readability veil (keeps artwork visible!)
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF0B1819).withValues(alpha: 0.78),
+                      const Color(0xFF0D1617).withValues(alpha: 0.86),
+                    ]
+                  : [
+                      const Color(0xFFE6F4F2).withValues(alpha: 0.62),
+                      const Color(0xFFF0F8F7).withValues(alpha: 0.72),
+                    ],
+            ),
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+}
+
+/// Richly styled card backdrop for Profile sections: combines subtle wellness
+/// artwork texture, accent-tinted directional gradient, radial glow orb, and
+/// optional corner watermark icon while preserving AAA text contrast.
+class ProfileThemedCard extends StatelessWidget {
+  const ProfileThemedCard({
+    super.key,
+    required this.child,
+    this.accentColor = AppTheme.primaryTeal,
+    this.watermarkIcon,
+    this.padding = const EdgeInsets.all(16),
+    this.borderRadius = 22,
+  });
+
+  final Widget child;
+  final Color accentColor;
+  final IconData? watermarkIcon;
+  final EdgeInsetsGeometry padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF132324).withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.90),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: accentColor.withValues(alpha: isDark ? 0.38 : 0.30),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withValues(alpha: isDark ? 0.18 : 0.11),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Stack(
+          children: [
+            // Subtle organic botanical/ECG illustration texture on right side
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: isDark ? 0.18 : 0.22,
+                  child: Image.asset(
+                    isDark
+                        ? 'assets/images/drawer_bg_dark.jpg'
+                        : 'assets/images/drawer_bg_light.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.centerRight,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+            // Soft directional color wash from accent tint into clean surface
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: const [0.0, 0.55, 1.0],
+                      colors: isDark
+                          ? [
+                              accentColor.withValues(alpha: 0.18),
+                              const Color(0xFF132324).withValues(alpha: 0.84),
+                              const Color(0xFF101E1F).withValues(alpha: 0.90),
+                            ]
+                          : [
+                              accentColor.withValues(alpha: 0.13),
+                              Colors.white.withValues(alpha: 0.84),
+                              accentColor.withValues(alpha: 0.06),
+                            ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Ambient corner glow orb
+            Positioned(
+              top: -28,
+              right: -24,
+              child: IgnorePointer(
+                child: Container(
+                  width: 108,
+                  height: 108,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        accentColor.withValues(alpha: isDark ? 0.26 : 0.18),
+                        accentColor.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (watermarkIcon != null)
+              Positioned(
+                right: -8,
+                bottom: -10,
+                child: IgnorePointer(
+                  child: Icon(
+                    watermarkIcon,
+                    size: 76,
+                    color: accentColor.withValues(alpha: isDark ? 0.09 : 0.07),
+                  ),
+                ),
+              ),
+            Padding(
+              padding: padding,
+              child: child,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// Displays the user's Healthy Living Motto on their profile, with instant
 /// show/hide & preset/custom motto selection for the owner.
@@ -123,29 +319,13 @@ class ProfileMottoCard extends StatelessWidget {
         ? profile.motto.trim()
         : HealthyLivingMottos.presets.first;
 
-    return Card(
+    return ProfileThemedCard(
       key: const Key('profile_motto_card'),
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: const Color(0xFF0D9488).withValues(alpha: 0.35),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF0D9488).withValues(alpha: 0.10),
-              colorScheme.surface,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        padding: const EdgeInsets.all(15),
-        child: Column(
+      accentColor: const Color(0xFF0D9488),
+      watermarkIcon: Icons.auto_awesome_rounded,
+      borderRadius: 20,
+      padding: const EdgeInsets.all(15),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -224,8 +404,7 @@ class ProfileMottoCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -280,18 +459,13 @@ class ProfileSobrietyShowcaseCard extends StatelessWidget {
     final BodyRecoveryMilestone? activeMilestone =
         active ? SobrietyKnowledgeBase.changeForExactDay(maxDay) : null;
 
-    return Card(
+    return ProfileThemedCard(
       key: const Key('profile_sobriety_card'),
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: const Color(0xFF16A34A).withValues(alpha: 0.35),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
+      accentColor: const Color(0xFF16A34A),
+      watermarkIcon: Icons.smoke_free_rounded,
+      borderRadius: 20,
+      padding: const EdgeInsets.all(15),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -439,7 +613,6 @@ class ProfileSobrietyShowcaseCard extends StatelessWidget {
             ],
           ],
         ),
-      ),
     );
   }
 }
@@ -491,18 +664,13 @@ class ProfileStepCounterShowcaseCard extends StatelessWidget {
     final fmt = NumberFormat.decimalPattern('tr');
     final ratio = (today / goal).clamp(0.0, 1.0);
 
-    return Card(
+    return ProfileThemedCard(
       key: const Key('profile_steps_card'),
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: const Color(0xFF0284C7).withValues(alpha: 0.35),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
+      accentColor: const Color(0xFF0284C7),
+      watermarkIcon: Icons.directions_walk_rounded,
+      borderRadius: 20,
+      padding: const EdgeInsets.all(15),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -621,7 +789,6 @@ class ProfileStepCounterShowcaseCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

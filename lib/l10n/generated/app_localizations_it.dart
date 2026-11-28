@@ -98,7 +98,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get menuLabReports => 'Referti di laboratorio';
 
   @override
-  String get menuQuickColorCard => 'Camera-Free Color Card';
+  String get menuQuickColorCard => 'Scheda Colore senza Fotocamera';
 
   @override
   String get menuHistory => 'Cronologia';
@@ -3105,4 +3105,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FONDATORE E AMMINISTRATORE DI SISTEMA';
+
+  @override
+  String get splashTagline => 'Monitoraggio della Salute\nBasato sull\'IA';
 }

@@ -68,6 +68,7 @@ class _ProPaywallScreenState extends State<ProPaywallScreen> {
         uid: widget.userId,
         tier: _selectedTier,
       );
+      if (!mounted) return;
       setState(() {
         _current = updated;
         _submitting = false;

@@ -6,7 +6,9 @@ import 'package:visualcheckup/core/cloud/cloud_backup_service.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
 import 'package:visualcheckup/core/notifications/reminder_service.dart';
+import 'package:visualcheckup/core/preferences/feature_preferences_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
+import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/checkup/data/history_repository.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/ai_settings_sheet.dart';
@@ -15,6 +17,7 @@ import 'package:visualcheckup/features/growth/data/growth_repository.dart';
 import 'package:visualcheckup/features/labs_vitals/data/lab_report_pdf_generator.dart';
 import 'package:visualcheckup/features/labs_vitals/data/labs_vitals_repository.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/privacy_policy_screen.dart';
+import 'package:visualcheckup/features/settings/presentation/widgets/feature_selection_wizard.dart';
 
 enum _PermUiState {
   checking,
@@ -32,6 +35,7 @@ class SettingsScreen extends StatefulWidget {
     required this.historyRepository,
     this.labsVitalsRepository,
     this.profileController,
+    this.featurePreferencesController,
     this.cloudBackupService = const CloudBackupService(),
   });
 
@@ -40,6 +44,7 @@ class SettingsScreen extends StatefulWidget {
   final HistoryRepository historyRepository;
   final LabsVitalsRepository? labsVitalsRepository;
   final FamilyProfileController? profileController;
+  final FeaturePreferencesController? featurePreferencesController;
   final CloudBackupService cloudBackupService;
 
   @override
@@ -368,6 +373,104 @@ class _SettingsScreenState extends State<SettingsScreen>
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          // 0. Feature Personalization Wizard Card
+          ValueListenableBuilder<Set<PersonalHealthFeature>>(
+            valueListenable: widget.featurePreferencesController ??
+                FeaturePreferencesController.instance,
+            builder: (context, enabledSet, _) {
+              final controller = widget.featurePreferencesController ??
+                  FeaturePreferencesController.instance;
+              final isTr = resolvedCode == 'tr';
+              final totalCount = PersonalHealthFeature.values.length;
+              return Card(
+                key: const Key('settings_feature_wizard_card'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryTeal.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.tune_rounded,
+                              color: AppTheme.primaryTeal,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              isTr
+                                  ? 'Özellik & Menü Seçim Sihirbazı'
+                                  : 'Feature & Menu Selection Wizard',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryTeal.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${enabledSet.length}/$totalCount',
+                              style: const TextStyle(
+                                color: AppTheme.primaryTeal,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isTr
+                            ? 'Ana ekran ve sol menüde kalabalık olmaması için yalnızca kullanmak istediğiniz sağlık takip modüllerini seçin veya gizleyin.'
+                            : 'Select or hide optional health tracking modules to keep your home screen and menu clean and focused.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonalIcon(
+                          key: const Key('settings_open_wizard_btn'),
+                          onPressed: () => FeatureSelectionWizard.show(
+                            context,
+                            controller: controller,
+                            isInitialSetup: false,
+                          ),
+                          icon: const Icon(Icons.checklist_rounded, size: 19),
+                          label: Text(
+                            isTr
+                                ? 'Kullanılan Özellikleri Seç / Düzenle'
+                                : 'Choose Active Features',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+
           // 1. Language Card
           Card(
             child: Padding(

@@ -366,11 +366,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                     const SizedBox(height: 12),
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        doc.documentUrl!,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Text('Belge görseli açılamadı.'),
-                                      ),
+                                        child: Image.network(
+                                          doc.documentUrl!,
+                                          errorBuilder: (_, _, _) =>
+                                              const Text('Belge görseli açılamadı.'),
+                                        ),
                                     ),
                                     const SizedBox(height: 12),
                                     TextButton(
@@ -602,6 +602,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                   ann.copyWith(isActive: next),
                                 );
                                 await _refreshAll();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(next
@@ -687,6 +688,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                   ann.copyWith(isActive: next),
                                 );
                                 await _refreshAll();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(next
@@ -822,6 +824,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                       onPressed: () async {
                         final next = !adManager.isEnabled;
                         await adManager.setEnabled(next);
+                        if (!context.mounted) return;
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -848,6 +851,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                         value: adManager.isEnabled,
                         onChanged: (val) async {
                           await adManager.setEnabled(val);
+                          if (!context.mounted) return;
                           setState(() {});
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -1002,6 +1006,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                   promo.copyWith(isActive: next),
                                 );
                                 await _refreshAll();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(next
@@ -1068,6 +1073,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                                   promo.copyWith(isActive: next),
                                 );
                                 await _refreshAll();
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(next
@@ -1628,7 +1634,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               key: const Key('admin_announcement_color_dropdown'),
-              value: (_selectedColorHex != null &&
+              initialValue: (_selectedColorHex != null &&
                       GlobalAnnouncement.presetColors
                           .any((c) => c['hex'] == _selectedColorHex))
                   ? _selectedColorHex
@@ -1699,7 +1705,7 @@ class _CreateAnnouncementSheetState extends State<_CreateAnnouncementSheet> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               key: const Key('admin_announcement_shape_dropdown'),
-              value: GlobalAnnouncement.availableEffectShapes
+              initialValue: GlobalAnnouncement.availableEffectShapes
                       .contains(_effectShape)
                   ? _effectShape
                   : 'Konfeti',
@@ -1944,7 +1950,7 @@ class _CreatePromotionSheetState extends State<_CreatePromotionSheet> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<PromotionPlacement>(
-              value: _placement,
+              initialValue: _placement,
               decoration: InputDecoration(
                 labelText: l10n.adminFieldPlacement,
                 border: OutlineInputBorder(

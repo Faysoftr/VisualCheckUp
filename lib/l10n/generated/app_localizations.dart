@@ -5787,6 +5787,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PLATFORM FOUNDER & SYSTEM ADMIN'**
   String get sfbAdminFounderBanner;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-Powered\nHealth Tracking'**
+  String get splashTagline;
 }
 
 class _AppLocalizationsDelegate

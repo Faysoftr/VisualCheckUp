@@ -54,13 +54,50 @@ class SfbGradientBorderCard extends StatelessWidget {
         ],
       ),
       padding: EdgeInsets.all(borderWidth),
-      child: Container(
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.circular(borderRadius - borderWidth),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius - borderWidth),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ColoredBox(color: surfaceColor),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: isDark ? 0.20 : 0.24,
+                  child: Image.asset(
+                    isDark
+                        ? 'assets/images/drawer_bg_dark.jpg'
+                        : 'assets/images/drawer_bg_light.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topRight,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        effectiveGlow.withValues(alpha: isDark ? 0.16 : 0.10),
+                        surfaceColor.withValues(alpha: isDark ? 0.84 : 0.86),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: padding,
+              child: child,
+            ),
+          ],
         ),
-        padding: padding,
-        child: child,
       ),
     );
   }

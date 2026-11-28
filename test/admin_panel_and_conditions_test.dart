@@ -500,6 +500,8 @@ void main() {
         240,
         scrollable: listScrollable,
       );
+      await tester.ensureVisible(hypChip);
+      await tester.pumpAndSettle();
       await tester.tap(hypChip);
       await tester.pumpAndSettle();
 

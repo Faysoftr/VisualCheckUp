@@ -283,3 +283,110 @@ exports.onAdminPushQueued = functions
     }
     return null;
   });
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const ALLOWED_GEMINI_MODELS = new Set([
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+]);
+
+/**
+ * Server-side Gemini Vision proxy so GEMINI_API_KEY stays strictly in
+ * Cloud Functions environment variables (`process.env.GEMINI_API_KEY`) and
+ * never needs to be embedded in client APK/IPA binaries.
+ */
+exports.analyzeVisualHealth = functions
+  .region('europe-west1')
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        'unauthenticated',
+        'Authentication required for cloud visual analysis.'
+      );
+    }
+    if (!GEMINI_API_KEY) {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'Server Gemini Vision API key is not configured.'
+      );
+    }
+
+    const imageBase64 = String((data && data.imageBase64) || '');
+    const mimeType = String((data && data.mimeType) || 'image/jpeg');
+    const systemInstruction = String((data && data.systemInstruction) || '');
+    const userPrompt = String((data && data.userPrompt) || '');
+    const maxOutputTokens = Math.min(
+      Math.max(Number(data && data.maxOutputTokens) || 400, 64),
+      1024
+    );
+    const requestedModel = String((data && data.model) || 'gemini-2.5-flash-lite');
+    const model = ALLOWED_GEMINI_MODELS.has(requestedModel)
+      ? requestedModel
+      : 'gemini-2.5-flash-lite';
+
+    if (!imageBase64 || imageBase64.length > 2 * 1024 * 1024) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Invalid or oversized image payload.'
+      );
+    }
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    const payload = {
+      ...(systemInstruction
+        ? { systemInstruction: { parts: [{ text: systemInstruction }] } }
+        : {}),
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { inlineData: { mimeType, data: imageBase64 } },
+            { text: userPrompt },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens,
+        responseMimeType: 'application/json',
+      },
+    };
+
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const errBody = await resp.text();
+      console.error('Gemini Vision upstream HTTP error:', resp.status, errBody);
+      throw new functions.https.HttpsError(
+        'internal',
+        `Gemini Vision HTTP ${resp.status}`
+      );
+    }
+
+    const json = await resp.json();
+    const text =
+      json &&
+      json.candidates &&
+      json.candidates[0] &&
+      json.candidates[0].content &&
+      json.candidates[0].content.parts &&
+      json.candidates[0].content.parts[0] &&
+      json.candidates[0].content.parts[0].text;
+
+    if (!text || !String(text).trim()) {
+      throw new functions.https.HttpsError(
+        'internal',
+        'Gemini Vision returned empty content.'
+      );
+    }
+
+    return { text: String(text) };
+  });
+

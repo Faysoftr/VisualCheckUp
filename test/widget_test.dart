@@ -2,8 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/app.dart';
+import 'package:visualcheckup/core/l10n/locale_controller.dart';
 
 void main() {
+  testWidgets(
+    'SplashScreen dynamically localizes tagline by phone locale and selected app language',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      // 1. Phone system language = English -> "AI-Powered\nHealth Tracking"
+      tester.platformDispatcher.localesTestValue = const [Locale('en')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      await tester.pumpWidget(const VisualCheckUpApp(showSplash: true));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const Key('splash_tagline_text')), findsOneWidget);
+      expect(find.text('AI-Powered\nHealth Tracking'), findsOneWidget);
+
+      // Finish splash timer cleanly
+      await tester.pump(const Duration(milliseconds: 2500));
+      await tester.pumpAndSettle();
+
+      // 2. App-selected language = German overrides English phone locale
+      final deController = LocaleController(const Locale('de'));
+      addTearDown(deController.dispose);
+      await tester.pumpWidget(
+        VisualCheckUpApp(
+          key: const ValueKey('de_app'),
+          localeController: deController,
+          showSplash: true,
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(
+        find.text('KI-gestützte\nGesundheitsverfolgung'),
+        findsOneWidget,
+      );
+
+      await tester.pump(const Duration(milliseconds: 2500));
+      await tester.pumpAndSettle();
+    },
+  );
+
   testWidgets(
     'VisualCheckUpApp boots to login, enters home screen with 7 categories, and opens skin module',
     (tester) async {

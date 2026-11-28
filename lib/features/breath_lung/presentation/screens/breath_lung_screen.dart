@@ -1002,7 +1002,7 @@ class _BreathLungScreenState extends State<BreathLungScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _history.length > 5 ? 5 : _history.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (ctx, index) {
             final rec = _history[index];
             final color = rec.level.color;
@@ -1153,7 +1153,7 @@ class _BreathLungScreenState extends State<BreathLungScreen>
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: kGuidedBreathingExercises.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (ctx, i) {
                 final ex = kGuidedBreathingExercises[i];
                 final isSelected = ex.id == _selectedExercise.id;

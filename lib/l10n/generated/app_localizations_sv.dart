@@ -98,7 +98,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get menuLabReports => 'Labbrapporter';
 
   @override
-  String get menuQuickColorCard => 'Camera-Free Color Card';
+  String get menuQuickColorCard => 'Färgkort utan Kamera';
 
   @override
   String get menuHistory => 'Historik';
@@ -3108,4 +3108,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATTFORMSGRUNDARE & SYSTEMADMIN';
+
+  @override
+  String get splashTagline => 'AI-Driven\nHälsoövervakning';
 }

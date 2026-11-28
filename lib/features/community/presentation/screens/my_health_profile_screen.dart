@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
-import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/features/admin/data/admin_repository.dart';
 import 'package:visualcheckup/features/admin/domain/admin_models.dart';
 import 'package:visualcheckup/features/admin/presentation/screens/admin_panel_screen.dart';
@@ -78,51 +77,64 @@ class MyHealthProfileScreen extends StatelessWidget {
       uid: currentUser.id,
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 20,
-                ),
-            children: [
-              const TextSpan(
-                text: '{ ',
-                style: TextStyle(color: AppTheme.primaryTeal),
+        centerTitle: false,
+        titleSpacing: 6,
+        backgroundColor:
+            isDark ? const Color(0xFF0C1A1B) : const Color(0xFFE7F5F3),
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          l10n.commTabMyProfile,
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                fontSize: 19,
+                letterSpacing: -0.3,
               ),
-              TextSpan(text: l10n.commTabMyProfile),
-              const TextSpan(
-                text: ' }',
-                style: TextStyle(color: Color(0xFF06B6D4)),
-              ),
-            ],
-          ),
         ),
         actions: [
           if (!kIsWeb && !Platform.isIOS)
             IconButton(
+              visualDensity: VisualDensity.compact,
               tooltip: l10n.donateTooltip,
               onPressed: () => DonationSupportDialog.show(context),
               icon: const Icon(
                 Icons.volunteer_activism_rounded,
                 color: Color(0xFFE11D48),
-                size: 21,
+                size: 20,
               ),
             ),
           IconButton(
             key: const Key('my_profile_messages_btn'),
+            visualDensity: VisualDensity.compact,
             tooltip: l10n.sfbMyMessages,
             onPressed: () => _openCommunity(context, initialTabIndex: 3),
-            icon: const Icon(Icons.mail_outline_rounded, size: 22),
+            icon: const Icon(Icons.mail_outline_rounded, size: 21),
           ),
           Padding(
-            padding: const EdgeInsetsDirectional.only(end: 8),
+            padding: const EdgeInsetsDirectional.only(end: 6),
             child: TextButton.icon(
               key: const Key('my_profile_open_community_btn'),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              ),
               onPressed: () => _openCommunity(context, initialTabIndex: 0),
-              icon: const Icon(Icons.public_rounded, size: 17),
-              label: Text(l10n.commOpenCommunityCta),
+              icon: const Icon(Icons.public_rounded, size: 16),
+              label: Text(
+                l10n.commOpenCommunityCta,
+                maxLines: 1,
+                softWrap: false,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
         ],

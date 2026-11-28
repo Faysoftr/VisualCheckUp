@@ -943,5 +943,6 @@
   "sfbViewDetails": "Подробнее",
   "sfbAdminBadge": "АДМИН",
   "sfbAdminConsoleTitle": "БЫСТРАЯ ПАНЕЛЬ АДМИНА",
-  "sfbAdminFounderBanner": "ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР"
+  "sfbAdminFounderBanner": "ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР",
+  "splashTagline": "Мониторинг здоровья\nна базе ИИ"
 }

@@ -1,13 +1,49 @@
 import 'dart:convert';
 
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:visualcheckup/core/ai/ai_vision_contract.dart';
 
-/// Production Gemini Vision REST client implementing [VisionAiClient].
+/// Server-side Cloud Function Vision AI client (`analyzeVisualHealth` in
+/// `europe-west1`) that keeps `GEMINI_API_KEY` strictly on the backend.
+class CloudFunctionVisionAiClient implements VisionAiClient {
+  const CloudFunctionVisionAiClient({
+    this.region = 'europe-west1',
+  });
+
+  final String region;
+
+  @override
+  Future<String> analyzeWithVisionAi(AiVisionRequest request) async {
+    final callable = FirebaseFunctions.instanceFor(region: region)
+        .httpsCallable(
+          'analyzeVisualHealth',
+          options: HttpsCallableOptions(timeout: const Duration(seconds: 25)),
+        );
+    final result = await callable.call<Map<dynamic, dynamic>>(<String, dynamic>{
+      'model': request.recommendedModel,
+      'mimeType': request.mimeType,
+      'imageBase64': base64Encode(request.imageBytes),
+      'systemInstruction': request.systemInstruction,
+      'userPrompt': request.userPrompt,
+      'maxOutputTokens': request.maxOutputTokens,
+    });
+    final data = result.data;
+    final text = data['text']?.toString();
+    if (text == null || text.trim().isEmpty) {
+      throw Exception('Cloud Function analyzeVisualHealth returned empty text.');
+    }
+    return text;
+  }
+}
+
+/// Production Gemini Vision client implementing [VisionAiClient].
 ///
-/// Reads `GEMINI_API_KEY` from `--dart-define=GEMINI_API_KEY=...` (or
-/// `--dart-define-from-file=dart_defines.local.json`) so no API key is ever
-/// hardcoded in tracked source files.
+/// Prefers the secure server-side [CloudFunctionVisionAiClient] in production
+/// when Firebase is initialized and no local dev `--dart-define=GEMINI_API_KEY`
+/// is supplied; also supports direct REST calls for local development/testing.
 class GeminiVisionAiClient implements VisionAiClient {
   GeminiVisionAiClient({
     required this.apiKey,
@@ -16,12 +52,26 @@ class GeminiVisionAiClient implements VisionAiClient {
 
   static const String envApiKey = String.fromEnvironment('GEMINI_API_KEY');
 
-  /// Returns a configured client when `GEMINI_API_KEY` is provided at build/run
-  /// time, or `null` so [HybridHealthAnalyzer] runs in 0-cost on-device mode.
-  static GeminiVisionAiClient? fromEnvironment({http.Client? httpClient}) {
+  /// Returns a configured [VisionAiClient]:
+  /// 1. Direct [GeminiVisionAiClient] when `GEMINI_API_KEY` is provided via
+  ///    `--dart-define` for local development.
+  /// 2. Server-side [CloudFunctionVisionAiClient] when Firebase is initialized
+  ///    so no API key is ever shipped in production binaries.
+  /// 3. `null` offline/in unit tests so [HybridHealthAnalyzer] runs in 0-cost
+  ///    on-device mode.
+  static VisionAiClient? fromEnvironment({http.Client? httpClient}) {
     final trimmed = envApiKey.trim();
-    if (trimmed.isEmpty) return null;
-    return GeminiVisionAiClient(apiKey: trimmed, httpClient: httpClient);
+    if (trimmed.isNotEmpty) {
+      return GeminiVisionAiClient(apiKey: trimmed, httpClient: httpClient);
+    }
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        return const CloudFunctionVisionAiClient();
+      }
+    } catch (e) {
+      debugPrint('VisionAiClient Firebase check skipped: $e');
+    }
+    return null;
   }
 
   final String apiKey;
@@ -32,18 +82,20 @@ class GeminiVisionAiClient implements VisionAiClient {
 
   @override
   Future<String> analyzeWithVisionAi(AiVisionRequest request) async {
-    final candidateModels = <String>[
+    final fallbackModel = request.modelTier == AiModelTier.standard
+        ? 'gemini-2.5-flash'
+        : 'gemini-2.5-flash-lite';
+    final candidateModels = <String>{
       request.recommendedModel,
-      request.modelTier == AiModelTier.standard
-          ? 'gemini-2.5-flash'
-          : 'gemini-2.5-flash-lite',
-    ];
+      fallbackModel,
+    }.toList();
 
     Object? lastError;
     for (final model in candidateModels) {
       try {
         return await _callModel(model: model, request: request);
       } catch (e) {
+        debugPrint('GeminiVisionAiClient model $model error: $e');
         lastError = e;
       }
     }

@@ -3078,4 +3078,7 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'پلیٹ فارم بانی اور سسٹم ایڈمن';
+
+  @override
+  String get splashTagline => 'مصنوعی ذہانت سے چلنے والی\nصحت کی نگرانی';
 }

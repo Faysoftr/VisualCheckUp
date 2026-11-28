@@ -943,5 +943,6 @@
   "sfbViewDetails": "Ver detalles",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "CONSOLA RÁPIDA DE ADMIN",
-  "sfbAdminFounderBanner": "FUNDADOR Y ADMINISTRADOR DEL SISTEMA"
+  "sfbAdminFounderBanner": "FUNDADOR Y ADMINISTRADOR DEL SISTEMA",
+  "splashTagline": "Seguimiento de Salud\nImpulsado por IA"
 }

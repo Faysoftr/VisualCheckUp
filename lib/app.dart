@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visualcheckup/core/cloud/cloud_backup_service.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/preferences/feature_preferences_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
@@ -31,9 +32,11 @@ class VisualCheckUpApp extends StatefulWidget {
     this.medicationRepository,
     this.dietRepository,
     this.alarmScheduler,
+    this.featurePreferencesController,
     this.analyzer,
     this.initialUser,
     this.showSplash,
+    this.autoShowFeatureWizard,
   });
 
   final AuthService? authService;
@@ -44,9 +47,11 @@ class VisualCheckUpApp extends StatefulWidget {
   final MedicationReminderRepository? medicationRepository;
   final DietRepository? dietRepository;
   final MedicationAlarmScheduler? alarmScheduler;
+  final FeaturePreferencesController? featurePreferencesController;
   final ColorHealthAnalyzer? analyzer;
   final AuthUser? initialUser;
   final bool? showSplash;
+  final bool? autoShowFeatureWizard;
 
   @override
   State<VisualCheckUpApp> createState() => _VisualCheckUpAppState();
@@ -60,6 +65,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
   late final LocaleController _localeController;
   late final bool _ownsLocaleController;
   late final FamilyProfileController _profileController;
+  late final FeaturePreferencesController _featurePreferencesController;
   late final HistoryRepository? _injectedHistoryRepository;
   late final LabsVitalsRepository? _injectedLabsVitalsRepository;
   late final MedicationReminderRepository? _injectedMedicationRepository;
@@ -98,6 +104,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
     _ownsLocaleController = widget.localeController == null;
     _localeController = widget.localeController ?? LocaleController();
     _profileController = FamilyProfileController();
+    _featurePreferencesController = widget.featurePreferencesController ??
+        FeaturePreferencesController.instance;
     _injectedHistoryRepository = widget.historyRepository;
     _injectedLabsVitalsRepository = widget.labsVitalsRepository;
     _injectedMedicationRepository = widget.medicationRepository;
@@ -122,6 +130,7 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
         _themeController.load(),
         _localeController.load(),
         _profileController.load(),
+        _featurePreferencesController.load(),
       ]).timeout(const Duration(seconds: 3));
     } catch (_) {}
 
@@ -276,6 +285,8 @@ class _VisualCheckUpAppState extends State<VisualCheckUpApp> {
                     themeController: _themeController,
                     localeController: _localeController,
                     profileController: _profileController,
+                    featurePreferencesController: _featurePreferencesController,
+                    autoShowFeatureWizard: widget.autoShowFeatureWizard,
                     onSignOut: _handleSignOut,
                     onDeleteAccount: _handleDeleteAccount,
                   );

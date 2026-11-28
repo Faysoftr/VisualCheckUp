@@ -3082,4 +3082,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'प्लेटफ़ॉर्म संस्थापक एवं सिस्टम एडमिन';
+
+  @override
+  String get splashTagline => 'AI-संचालित\nस्वास्थ्य ट्रैकिंग';
 }

@@ -3071,4 +3071,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'مؤسس المنصة ومدير النظام';
+
+  @override
+  String get splashTagline => 'متابعة صحية مدعومة\nبالذكاء الاصطناعي';
 }

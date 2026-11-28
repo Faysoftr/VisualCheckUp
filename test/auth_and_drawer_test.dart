@@ -134,6 +134,21 @@ void main() {
       expect(find.text('Göz (Sklera)'), findsAtLeastNWidgets(1));
       expect(find.text('Dil'), findsAtLeastNWidgets(1));
       expect(find.text('Tırnak'), findsAtLeastNWidgets(1));
+      expect(
+        find.byKey(const Key('drawer_item_vein_analysis')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('drawer_quick_color_card_tile')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text('Kamerasız Renk Kartı'),
+        ),
+        findsOneWidget,
+      );
 
       // Switch theme mode live from Drawer.
       final drawerScrollable = find.descendant(
@@ -148,6 +163,8 @@ void main() {
         150,
         scrollable: drawerScrollable,
       );
+      await tester.ensureVisible(trackingAccordion);
+      await tester.pumpAndSettle();
       await tester.tap(trackingAccordion);
       await tester.pumpAndSettle();
 
@@ -186,6 +203,8 @@ void main() {
         150,
         scrollable: drawerScrollable,
       );
+      await tester.ensureVisible(settingsAccordion);
+      await tester.pumpAndSettle();
       await tester.tap(settingsAccordion);
       await tester.pumpAndSettle();
 
@@ -270,10 +289,21 @@ void main() {
 
       expect(find.text('Merhaba, Ahmet'), findsOneWidget);
 
-      // Open drawer and tap Delete Account.
+      // Open drawer and scroll to Delete Account inside scrollable drawer list.
       await tester.tap(find.byTooltip('Hesap ve Menü'));
       await tester.pumpAndSettle();
 
+      final drawerScroll = find
+          .descendant(
+            of: find.byType(Drawer),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      await tester.scrollUntilVisible(
+        find.text('Hesabı Sil'),
+        150,
+        scrollable: drawerScroll,
+      );
       await tester.ensureVisible(find.text('Hesabı Sil'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Hesabı Sil'));

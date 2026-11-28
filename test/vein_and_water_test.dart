@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visualcheckup/features/auth/domain/auth_user.dart';
 import 'package:visualcheckup/features/checkup/presentation/widgets/app_drawer.dart';
 import 'package:visualcheckup/core/theme/theme_controller.dart';
 import 'package:visualcheckup/features/vein_varicose/data/vein_repository.dart';
+import 'package:visualcheckup/features/vein_varicose/data/vein_visual_analyzer.dart';
 import 'package:visualcheckup/features/vein_varicose/domain/vein_models.dart';
 import 'package:visualcheckup/features/vein_varicose/presentation/screens/vein_analysis_screen.dart';
 import 'package:visualcheckup/features/water_tracker/data/water_repository.dart';
@@ -154,6 +157,54 @@ void main() {
       expect(find.textContaining('Baldır Kası Pompası'), findsOneWidget);
       expect(find.textContaining('Bacak Elevasyonu'), findsOneWidget);
     });
+
+    testWidgets('camera scan analyzes leg photo, displays visual metrics, and updates CEAP stage', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      SharedPreferences.setMockInitialValues({});
+      final repo = VeinRepository();
+
+      // Build synthetic leg skin image with prominent bluish-teal vein streaks
+      final synthetic = img.Image(width: 120, height: 120);
+      for (int y = 0; y < 120; y++) {
+        for (int x = 0; x < 120; x++) {
+          final isVeinBand = (x >= 35 && x <= 48) || (x >= 72 && x <= 84);
+          if (isVeinBand && y >= 20 && y <= 100) {
+            synthetic.setPixelRgb(x, y, 75, 118, 148);
+          } else {
+            synthetic.setPixelRgb(x, y, 224, 188, 168);
+          }
+        }
+      }
+      final pngBytes = img.encodePng(synthetic);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: VeinAnalysisScreen(
+            repository: repo,
+            visualAnalyzer: VeinVisualAnalyzer(aiClient: null),
+            imageBytesPickerOverride: (ImageSource source) async {
+              expect(source, ImageSource.camera);
+              return pngBytes;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('vein_camera_scan_card')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('vein_camera_capture_btn')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('vein_visual_scan_result_card')), findsOneWidget);
+      expect(find.textContaining('Önerilen Evre: C2'), findsOneWidget);
+      expect(find.textContaining('Orta Düzey Venöz Yetmezlik Riski'), findsOneWidget);
+    });
   });
 
   group('WaterTrackerScreen Widget Tests', () {
@@ -236,24 +287,38 @@ void main() {
       scaffoldState.openDrawer();
       await tester.pumpAndSettle();
 
-      // Expand tracking accordion
+      // 1. Vein Analysis is inside Visual Checks accordion (Görsel Kontroller)
+      final visualAccordion = find.byKey(const Key('drawer_group_visual'));
+      await tester.ensureVisible(visualAccordion);
+      await tester.pumpAndSettle();
+      await tester.tap(visualAccordion);
+      await tester.pumpAndSettle();
+
+      final veinTile = find.byKey(const Key('drawer_item_vein_analysis'));
+      expect(veinTile, findsOneWidget);
+      await tester.ensureVisible(veinTile);
+      await tester.pumpAndSettle();
+      await tester.tap(veinTile);
+      await tester.pumpAndSettle();
+      expect(veinTapped, isTrue);
+
+      // 2. Re-open drawer and verify Water Tracker inside Tracking accordion
+      scaffoldState.openDrawer();
+      await tester.pumpAndSettle();
+
       final trackingAccordion = find.byKey(const Key('drawer_group_tracking'));
+      await tester.ensureVisible(trackingAccordion);
+      await tester.pumpAndSettle();
       await tester.tap(trackingAccordion);
       await tester.pumpAndSettle();
 
       final waterTile = find.byKey(const Key('drawer_item_water_tracker'));
-      final veinTile = find.byKey(const Key('drawer_item_vein_analysis'));
-
       expect(waterTile, findsOneWidget);
-      expect(veinTile, findsOneWidget);
-
+      await tester.ensureVisible(waterTile);
+      await tester.pumpAndSettle();
       await tester.tap(waterTile);
       await tester.pumpAndSettle();
       expect(waterTapped, isTrue);
-
-      await tester.tap(veinTile);
-      await tester.pumpAndSettle();
-      expect(veinTapped, isTrue);
 
       themeController.dispose();
     });

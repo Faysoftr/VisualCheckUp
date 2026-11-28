@@ -3106,4 +3106,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATFORM FOUNDER & SYSTEM ADMIN';
+
+  @override
+  String get splashTagline => 'AI-Powered\nHealth Tracking';
 }

@@ -447,6 +447,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor:
+            isDark ? const Color(0xFF0C1A1B) : const Color(0xFFE7F5F3),
+        surfaceTintColor: Colors.transparent,
         title: Text(_profile.visibleName),
         actions: [
           if (!_isOwnProfile)
@@ -500,8 +503,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
             ),
         ],
       ),
-      body: ListView(
-        key: const Key('comm_profile_detail_list'),
+      body: ProfileAmbientBackground(
+        child: ListView(
+          key: const Key('comm_profile_detail_list'),
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
           // Header Card
@@ -1021,6 +1025,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
             ),
           ],
         ],
+      ),
       ),
     );
   }

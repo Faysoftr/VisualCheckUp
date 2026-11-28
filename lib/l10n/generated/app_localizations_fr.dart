@@ -3097,4 +3097,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FONDATEUR & ADMINISTRATEUR SYSTÈME';
+
+  @override
+  String get splashTagline => 'Suivi de Santé\nPropulsé par l\'IA';
 }

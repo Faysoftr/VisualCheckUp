@@ -192,34 +192,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 20),
                           Center(
                             child: Container(
-                              width: 92,
-                              height: 92,
-                              padding: const EdgeInsets.all(2.5),
+                              width: 96,
+                              height: 96,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(26),
-                                border: Border.all(
-                                  color: const Color(0xFF2EFFD6).withValues(
-                                    alpha: isDark ? 0.65 : 0.45,
-                                  ),
-                                  width: 1.6,
-                                ),
+                                borderRadius: BorderRadius.circular(22),
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFF17A398).withValues(
-                                      alpha: isDark ? 0.45 : 0.30,
+                                      alpha: isDark ? 0.40 : 0.26,
                                     ),
                                     blurRadius: 24,
-                                    spreadRadius: 2,
+                                    spreadRadius: 1,
                                     offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(23),
-                                child: Image.asset(
-                                  'assets/images/app_logo.jpg',
-                                  fit: BoxFit.cover,
-                                ),
+                              child: Image.asset(
+                                'assets/images/app_logo.png',
+                                fit: BoxFit.contain,
                               ),
                             ),
                           ),

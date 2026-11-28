@@ -26,7 +26,7 @@
   "menuFollowUpPlan": "Personal Follow-Up Plan",
   "menuVitalsTracker": "Pressione e Glicemia",
   "menuLabReports": "Referti di laboratorio",
-  "menuQuickColorCard": "Camera-Free Color Card",
+  "menuQuickColorCard": "Scheda Colore senza Fotocamera",
   "menuHistory": "Cronologia",
   "menuReferenceGuide": "Visual Reference Guide",
   "menuSectionSettings": "SETTINGS & PRIVACY",
@@ -943,5 +943,6 @@
   "sfbViewDetails": "Vedi dettagli",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "CONSOLE ADMIN RAPIDA",
-  "sfbAdminFounderBanner": "FONDATORE E AMMINISTRATORE DI SISTEMA"
+  "sfbAdminFounderBanner": "FONDATORE E AMMINISTRATORE DI SISTEMA",
+  "splashTagline": "Monitoraggio della Salute\nBasato sull'IA"
 }

@@ -65,8 +65,8 @@ abstract class VisionAiClient {
 class AiVisionPromptBuilder {
   AiVisionPromptBuilder._();
 
-  static const String liteModelId = 'gemini-3.5-flash-lite';
-  static const String standardModelId = 'gemini-3.8-flash';
+  static const String liteModelId = 'gemini-2.5-flash-lite';
+  static const String standardModelId = 'gemini-2.5-flash';
 
   /// Constant system instruction kept identical across all calls so Gemini's
   /// automatic implicit context caching maximizes input-token savings.

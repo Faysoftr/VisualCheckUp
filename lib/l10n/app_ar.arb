@@ -943,5 +943,6 @@
   "sfbViewDetails": "عرض التفاصيل",
   "sfbAdminBadge": "مشرف",
   "sfbAdminConsoleTitle": "لوحة التحكم السريعة",
-  "sfbAdminFounderBanner": "مؤسس المنصة ومدير النظام"
+  "sfbAdminFounderBanner": "مؤسس المنصة ومدير النظام",
+  "splashTagline": "متابعة صحية مدعومة\nبالذكاء الاصطناعي"
 }

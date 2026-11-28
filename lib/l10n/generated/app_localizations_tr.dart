@@ -3113,4 +3113,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'PLATFORM KURUCUSU & SİSTEM YÖNETİCİSİ';
+
+  @override
+  String get splashTagline => 'Yapay Zeka Destekli\nSağlık Takibi';
 }

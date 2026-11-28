@@ -26,7 +26,7 @@
   "menuFollowUpPlan": "Personal Follow-Up Plan",
   "menuVitalsTracker": "Bloeddruk & Bloedsuiker",
   "menuLabReports": "Labrapporten",
-  "menuQuickColorCard": "Camera-Free Color Card",
+  "menuQuickColorCard": "Kleurkaart zonder Camera",
   "menuHistory": "Geschiedenis",
   "menuReferenceGuide": "Visual Reference Guide",
   "menuSectionSettings": "SETTINGS & PRIVACY",
@@ -943,5 +943,6 @@
   "sfbViewDetails": "Details bekijken",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "SNELLE ADMINCONSOLE",
-  "sfbAdminFounderBanner": "PLATFORMOPRICHTER & SYSTEEMBEHEERDER"
+  "sfbAdminFounderBanner": "PLATFORMOPRICHTER & SYSTEEMBEHEERDER",
+  "splashTagline": "AI-Aangedreven\nGezondheidsmonitoring"
 }

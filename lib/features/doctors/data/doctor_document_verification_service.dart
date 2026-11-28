@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 /// Result of AI-based verification of doctor credentials (diploma, license).

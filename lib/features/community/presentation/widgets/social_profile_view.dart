@@ -1161,22 +1161,21 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget content;
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      content = const Center(child: CircularProgressIndicator());
+    } else if (_myProfile == null && !_creatingProfile) {
+      // 1. Not opted in yet -> Clean Social Onboarding Hero
+      content = _buildOptInHero(context);
+    } else if (_creatingProfile || _editingProfile) {
+      // 2. Creating or Editing -> Structured Edit Form
+      content = _buildEditForm(context);
+    } else {
+      // 3. Opted in -> Sleek Social Formula Bank-style Profile Showcase!
+      content = _buildProfileShowcase(context, _myProfile!);
     }
 
-    // 1. Not opted in yet -> Clean Social Onboarding Hero
-    if (_myProfile == null && !_creatingProfile) {
-      return _buildOptInHero(context);
-    }
-
-    // 2. Creating or Editing -> Structured Edit Form
-    if (_creatingProfile || _editingProfile) {
-      return _buildEditForm(context);
-    }
-
-    // 3. Opted in -> Sleek Social Formula Bank-style Profile Showcase!
-    return _buildProfileShowcase(context, _myProfile!);
+    return ProfileAmbientBackground(child: content);
   }
 
   Widget _buildOptInHero(BuildContext context) {
@@ -1257,56 +1256,54 @@ class _SocialProfileViewState extends State<SocialProfileView> {
           ),
         ),
         const SizedBox(height: 12),
-        Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer.withValues(alpha: 0.65),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.diversity_1_rounded,
-                    size: 32,
-                    color: colorScheme.primary,
-                  ),
+        ProfileThemedCard(
+          accentColor: AppTheme.primaryTeal,
+          watermarkIcon: Icons.diversity_1_rounded,
+          borderRadius: 22,
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.65),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  l10n.commOptInTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: Icon(
+                  Icons.diversity_1_rounded,
+                  size: 32,
+                  color: colorScheme.primary,
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.commOptInBody,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.4,
-                  ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                l10n.commOptInTitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton.icon(
-                    key: const Key('comm_opt_in_button'),
-                    onPressed: () => setState(() => _creatingProfile = true),
-                    icon: const Icon(Icons.add_reaction_outlined),
-                    label: Text(l10n.commOptInButton),
-                  ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                l10n.commOptInBody,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.4,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton.icon(
+                  key: const Key('comm_opt_in_button'),
+                  onPressed: () => setState(() => _creatingProfile = true),
+                  icon: const Icon(Icons.add_reaction_outlined),
+                  label: Text(l10n.commOptInButton),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 12),
@@ -1469,13 +1466,10 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        // 2. Row: Role/Admin Badge + Age + Gender + Mood (Ruh Hali) - Social Formul Bank style
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
+                        // Row 1: ADMIN badge + Mood ("Enerjik hissediyor") side-by-side on the same line!
+                        Row(
                           children: [
-                            if (isAdmin)
+                            if (isAdmin) ...[
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 7,
@@ -1505,240 +1499,279 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                                   ],
                                 ),
                               ),
-                            if (profile.showBirthDate && profile.age != null)
-                              Container(
-                                key: const Key('profile_showcase_age_badge'),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 2.5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0EA5E9)
-                                      .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: const Color(0xFF0EA5E9)
-                                        .withValues(alpha: 0.35),
-                                  ),
-                                ),
-                                child: Text(
-                                  '🎂 ${profile.age} Yaş',
-                                  style: const TextStyle(
-                                    color: Color(0xFF0284C7),
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            if (profile.showGender &&
-                                profile.localizedGenderLabel != null)
-                              Container(
-                                key: const Key('profile_showcase_gender_badge'),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 2.5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: (profile.gender == 'Female'
-                                          ? const Color(0xFFEC4899)
-                                          : const Color(0xFF6366F1))
-                                      .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: (profile.gender == 'Female'
-                                            ? const Color(0xFFEC4899)
-                                            : const Color(0xFF6366F1))
-                                        .withValues(alpha: 0.35),
-                                  ),
-                                ),
-                                child: Text(
-                                  profile.localizedGenderLabel!,
-                                  style: TextStyle(
-                                    color: profile.gender == 'Female'
-                                        ? const Color(0xFFDB2777)
-                                        : const Color(0xFF4F46E5),
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            if (profile.mood != null)
-                              GestureDetector(
-                                key: const Key('comm_mood_pill_trigger'),
-                                onTap: _showMoodSelectionModal,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: profile.mood!.accentColor
-                                        .withValues(alpha: 0.10),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: profile.mood!.accentColor
-                                          .withValues(alpha: 0.32),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        profile.mood!.emoji,
-                                        style: const TextStyle(fontSize: 12.5),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Flexible(
-                                        child: Text(
-                                          '${profile.mood!.localizedLabel(l10n)} hissediyor',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: colorScheme.onSurface
-                                                .withValues(alpha: 0.85),
-                                            fontSize: 10.5,
-                                            fontWeight: FontWeight.w600,
+                              const SizedBox(width: 6),
+                            ],
+                            Flexible(
+                              child: profile.mood != null
+                                  ? GestureDetector(
+                                      key: const Key('comm_mood_pill_trigger'),
+                                      onTap: _showMoodSelectionModal,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2.5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: profile.mood!.accentColor
+                                              .withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: profile.mood!.accentColor
+                                                .withValues(alpha: 0.35),
+                                            width: 0.9,
                                           ),
                                         ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              profile.mood!.emoji,
+                                              style: const TextStyle(
+                                                fontSize: 12.5,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                '${profile.mood!.localizedLabel(l10n)} hissediyor',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: colorScheme.onSurface
+                                                      .withValues(alpha: 0.9),
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            else
-                              GestureDetector(
-                                key: const Key('comm_mood_pill_trigger'),
-                                onTap: _showMoodSelectionModal,
-                                child: Container(
+                                    )
+                                  : GestureDetector(
+                                      key: const Key('comm_mood_pill_trigger'),
+                                      onTap: _showMoodSelectionModal,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 2.5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primaryTeal
+                                              .withValues(alpha: 0.10),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: AppTheme.primaryTeal
+                                                .withValues(alpha: 0.30),
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.add_reaction_outlined,
+                                              size: 13,
+                                              color: AppTheme.primaryTeal,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'Mod Seç',
+                                              style: TextStyle(
+                                                color: AppTheme.primaryTeal,
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                        // Row 2: Optional Age & Gender badges
+                        if ((profile.showBirthDate && profile.age != null) ||
+                            (profile.showGender &&
+                                profile.localizedGenderLabel != null)) ...[
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              if (profile.showBirthDate && profile.age != null)
+                                Container(
+                                  key: const Key('profile_showcase_age_badge'),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 7,
                                     vertical: 2.5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primaryTeal
-                                        .withValues(alpha: 0.08),
+                                    color: const Color(0xFF0EA5E9)
+                                        .withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                      color: AppTheme.primaryTeal
-                                          .withValues(alpha: 0.28),
+                                      color: const Color(0xFF0EA5E9)
+                                          .withValues(alpha: 0.35),
                                     ),
                                   ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.add_reaction_outlined,
-                                        size: 13,
-                                        color: AppTheme.primaryTeal,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Mod Seç',
-                                        style: TextStyle(
-                                          color: AppTheme.primaryTeal,
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    '🎂 ${profile.age} Yaş',
+                                    style: const TextStyle(
+                                      color: Color(0xFF0284C7),
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        // Compact Stat Pills (Likes, Friends, Listeners)
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: [
-                            InkWell(
-                              key: const Key('comm_my_profile_likers_btn'),
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: _openLikersSheet,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 9,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE11D48)
-                                      .withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: const Color(0xFFE11D48)
-                                        .withValues(alpha: 0.25),
+                              if (profile.showGender &&
+                                  profile.localizedGenderLabel != null)
+                                Container(
+                                  key:
+                                      const Key('profile_showcase_gender_badge'),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: (profile.gender == 'Female'
+                                            ? const Color(0xFFEC4899)
+                                            : const Color(0xFF6366F1))
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: (profile.gender == 'Female'
+                                              ? const Color(0xFFEC4899)
+                                              : const Color(0xFF6366F1))
+                                          .withValues(alpha: 0.35),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    profile.localizedGenderLabel!,
+                                    style: TextStyle(
+                                      color: profile.gender == 'Female'
+                                          ? const Color(0xFFDB2777)
+                                          : const Color(0xFF4F46E5),
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
                                   ),
                                 ),
-                                child: Text(
-                                  '❤️ ${l10n.commLikesCount(profile.likesCount)}',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              key: const Key('comm_my_profile_friends_btn'),
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: _openFriendsSheet,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 9,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryTeal
-                                      .withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: AppTheme.primaryTeal
-                                        .withValues(alpha: 0.25),
-                                  ),
-                                ),
-                                child: Text(
-                                  pendingIncomingCount > 0
-                                      ? '👥 $acceptedFriendsCount (+$pendingIncomingCount)'
-                                      : '👥 $acceptedFriendsCount ${l10n.commFriendsStat}',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              key: const Key('comm_my_profile_listeners_btn'),
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: _openListenersSheet,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 9,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF7C3AED)
-                                      .withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: const Color(0xFF7C3AED)
-                                        .withValues(alpha: 0.25),
-                                  ),
-                                ),
-                                child: Text(
-                                  '🎧 ${_myMusicListeners.length}',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Full-width Side-by-Side Stat Pills Row: Beğeni · Arkadaş · Dinleme
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      key: const Key('comm_my_profile_likers_btn'),
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: _openLikersSheet,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              const Color(0xFFE11D48).withValues(alpha: 0.09),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color:
+                                const Color(0xFFE11D48).withValues(alpha: 0.28),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '❤️ ${l10n.commLikesCount(profile.likesCount)}',
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: InkWell(
+                      key: const Key('comm_my_profile_friends_btn'),
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: _openFriendsSheet,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryTeal.withValues(alpha: 0.09),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppTheme.primaryTeal.withValues(alpha: 0.28),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            pendingIncomingCount > 0
+                                ? '👥 $acceptedFriendsCount (+$pendingIncomingCount)'
+                                : '👥 $acceptedFriendsCount ${l10n.commFriendsStat}',
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: InkWell(
+                      key: const Key('comm_my_profile_listeners_btn'),
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: _openListenersSheet,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              const Color(0xFF7C3AED).withValues(alpha: 0.09),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color:
+                                const Color(0xFF7C3AED).withValues(alpha: 0.28),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '🎧 ${_myMusicListeners.length} Dinleme',
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1780,95 +1813,95 @@ class _SocialProfileViewState extends State<SocialProfileView> {
         ),
         const SizedBox(height: 12),
 
-        // Hakkımda (Bio) Card - 100% harmonious with HealthProfileDetailScreen and Edit Profile
-        Card(
+        // Hakkımda (Bio) Card - Rich background & watermark
+        ProfileThemedCard(
           key: const Key('profile_bio_card'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.format_quote_rounded,
-                      size: 20,
+          accentColor: AppTheme.primaryTeal,
+          watermarkIcon: Icons.format_quote_rounded,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.format_quote_rounded,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.commFieldBio,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  if (!profile.showBio)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Text(
+                        'Gizli',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    tooltip: profile.showBio
+                        ? 'Hakkımda Yazısını Gizle'
+                        : 'Hakkımda Yazısını Göster',
+                    onPressed: () => _quickPatchMyProfile(
+                      (c) => c.copyWith(showBio: !c.showBio),
+                    ),
+                    icon: Icon(
+                      profile.showBio
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_outlined,
+                      size: 18,
                       color: colorScheme.primary,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.commFieldBio,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    if (!profile.showBio)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: const Text(
-                          'Gizli',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      tooltip: profile.showBio
-                          ? 'Hakkımda Yazısını Gizle'
-                          : 'Hakkımda Yazısını Göster',
-                      onPressed: () => _quickPatchMyProfile(
-                        (c) => c.copyWith(showBio: !c.showBio),
-                      ),
-                      icon: Icon(
-                        profile.showBio
-                            ? Icons.visibility_rounded
-                            : Icons.visibility_off_outlined,
-                        size: 18,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                    if (profile.bio.trim().isEmpty)
-                      TextButton.icon(
-                        style: TextButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        onPressed: () => setState(() => _editingProfile = true),
-                        icon: const Icon(Icons.edit_note_rounded, size: 16),
-                        label: const Text(
-                          'Biyografi Ekle',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  profile.bio.trim().isNotEmpty
-                      ? profile.bio.trim()
-                      : 'Henüz bir biyografi eklemediniz. Kendinizden, sağlık yolculuğunuzdan ve hedeflerinizden bahsedebilirsiniz.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    height: 1.45,
-                    fontStyle:
-                        profile.bio.trim().isEmpty ? FontStyle.italic : null,
-                    color: profile.bio.trim().isEmpty
-                        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
-                        : null,
                   ),
+                  if (profile.bio.trim().isEmpty)
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onPressed: () => setState(() => _editingProfile = true),
+                      icon: const Icon(Icons.edit_note_rounded, size: 16),
+                      label: const Text(
+                        'Biyografi Ekle',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                profile.bio.trim().isNotEmpty
+                    ? profile.bio.trim()
+                    : 'Henüz bir biyografi eklemediniz. Kendinizden, sağlık yolculuğunuzdan ve hedeflerinizden bahsedebilirsiniz.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.45,
+                  fontStyle:
+                      profile.bio.trim().isEmpty ? FontStyle.italic : null,
+                  color: profile.bio.trim().isEmpty
+                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
+                      : null,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 12),
@@ -1945,50 +1978,17 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
         // 5. Chronic Conditions & Health Goals Showcase
         if (profile.hasAnyChronicCondition || profile.healthGoals.isNotEmpty)
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (profile.hasAnyChronicCondition) ...[
-                    Text(
-                      l10n.commFieldChronicConditions,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        for (final cond in profile.chronicConditions)
-                          Chip(
-                            avatar: Icon(
-                              cond.icon,
-                              size: 15,
-                              color: cond.accentColor,
-                            ),
-                            label: Text(cond.localizedLabel(l10n)),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        if (profile.customChronicCondition.trim().isNotEmpty)
-                          Chip(
-                            label: Text(
-                              '🩺 ${profile.customChronicCondition.trim()}',
-                            ),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+          ProfileThemedCard(
+            accentColor: const Color(0xFF7C3AED),
+            watermarkIcon: Icons.favorite_border_rounded,
+            borderRadius: 20,
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (profile.hasAnyChronicCondition) ...[
                   Text(
-                    l10n.commFieldGoals,
+                    l10n.commFieldChronicConditions,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -1998,20 +1998,51 @@ class _SocialProfileViewState extends State<SocialProfileView> {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      for (final goal in profile.healthGoals)
+                      for (final cond in profile.chronicConditions)
                         Chip(
                           avatar: Icon(
-                            goal.icon,
+                            cond.icon,
                             size: 15,
-                            color: goal.accentColor,
+                            color: cond.accentColor,
                           ),
-                          label: Text(goal.localizedLabel(l10n)),
+                          label: Text(cond.localizedLabel(l10n)),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      if (profile.customChronicCondition.trim().isNotEmpty)
+                        Chip(
+                          label: Text(
+                            '🩺 ${profile.customChronicCondition.trim()}',
+                          ),
                           visualDensity: VisualDensity.compact,
                         ),
                     ],
                   ),
+                  const SizedBox(height: 12),
                 ],
-              ),
+                Text(
+                  l10n.commFieldGoals,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final goal in profile.healthGoals)
+                      Chip(
+                        avatar: Icon(
+                          goal.icon,
+                          size: 15,
+                          color: goal.accentColor,
+                        ),
+                        label: Text(goal.localizedLabel(l10n)),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         const SizedBox(height: 12),
@@ -2030,54 +2061,52 @@ class _SocialProfileViewState extends State<SocialProfileView> {
 
         // 5. Social Media Links Card
         if (profile.allSocialHandles.isNotEmpty) ...[
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
+          ProfileThemedCard(
+            accentColor: const Color(0xFFEC4899),
+            watermarkIcon: Icons.share_outlined,
+            borderRadius: 20,
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      l10n.commSocialsSectionTitle,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (!profile.showSocials)
                       Text(
-                        l10n.commSocialsSectionTitle,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
+                        l10n.commSocialsHiddenHint,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.error,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const Spacer(),
-                      if (!profile.showSocials)
-                        Text(
-                          l10n.commSocialsHiddenHint,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: colorScheme.error,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final entry in profile.allSocialHandles.entries)
-                        ActionChip(
-                          label: Text('${entry.key}: @${entry.value}'),
-                          onPressed: () {
-                            final url = SocialLinksHelper.buildProfileUrl(
-                              entry.key,
-                              entry.value,
-                            );
-                            if (url != null) _launchExternalUrl(url);
-                          },
-                        ),
-                    ],
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final entry in profile.allSocialHandles.entries)
+                      ActionChip(
+                        label: Text('${entry.key}: @${entry.value}'),
+                        onPressed: () {
+                          final url = SocialLinksHelper.buildProfileUrl(
+                            entry.key,
+                            entry.value,
+                          );
+                          if (url != null) _launchExternalUrl(url);
+                        },
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 12),
@@ -2144,14 +2173,13 @@ class _SocialProfileViewState extends State<SocialProfileView> {
       (sum, r) => sum + r.listenCount,
     );
 
-    return Card(
+    return ProfileThemedCard(
       key: const Key('profile_motivation_music_card'),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      accentColor: musicAccent,
+      watermarkIcon: Icons.music_note_rounded,
+      borderRadius: 22,
+      padding: const EdgeInsets.all(16),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Row: Music Note + Motivasyon Müziği Title + Kimler Dinledi Button
@@ -2492,7 +2520,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
             ],
           ],
         ),
-      ),
     );
   }
 
@@ -2505,14 +2532,13 @@ class _SocialProfileViewState extends State<SocialProfileView> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Card(
+    return ProfileThemedCard(
       key: const Key('profile_friends_card'),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      accentColor: const Color(0xFF06B6D4),
+      watermarkIcon: Icons.people_alt_rounded,
+      borderRadius: 22,
+      padding: const EdgeInsets.all(16),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Row: Icon + Title + Count Badge + Manage Button
@@ -2791,7 +2817,6 @@ class _SocialProfileViewState extends State<SocialProfileView> {
               ),
           ],
         ),
-      ),
     );
   }
 

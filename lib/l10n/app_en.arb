@@ -1476,5 +1476,6 @@
   "sfbViewDetails": "View Details",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "QUICK ADMIN CONSOLE",
-  "sfbAdminFounderBanner": "PLATFORM FOUNDER & SYSTEM ADMIN"
+  "sfbAdminFounderBanner": "PLATFORM FOUNDER & SYSTEM ADMIN",
+  "splashTagline": "AI-Powered\nHealth Tracking"
 }

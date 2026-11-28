@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import 'package:visualcheckup/core/ai/hybrid_health_analyzer.dart';
 import 'package:visualcheckup/core/color/color_calibrator.dart';
 import 'package:visualcheckup/core/color/structural_feature_analyzer.dart';
 import 'package:visualcheckup/features/checkup/domain/analysis_result.dart';
@@ -59,6 +60,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
         g: g,
         b: b,
         baseline: options.baseline,
+        languageCode: options.languageCode,
       );
       result = _applyStructuralFindings(
         result: result,
@@ -120,6 +122,7 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
     required int g,
     required int b,
     CategoryBaseline? baseline,
+    String languageCode = 'tr',
   }) {
     final color = Color.fromARGB(255, r, g, b);
     final hsv = HSVColor.fromColor(color);
@@ -133,21 +136,26 @@ class ColorHealthAnalyzer implements HealthAnalyzer {
 
     // Lighting quality guard (except stool where dark tones are clinically relevant)
     if (category != CheckCategory.stool && v < 0.18) {
+      final isTr = languageCode.toLowerCase() == 'tr';
       return AnalysisResult(
         id: id,
         category: category,
         riskLevel: RiskLevel.attention,
-        summaryTitle: 'Ortam Işığı Yetersiz',
-        summaryDetail:
-            'Görüntü çok karanlık olduğu için renk tonu güvenilir şekilde okunamadı.',
+        summaryTitle: QualityGateLocalizedCopy.lowLightTitle(languageCode),
+        summaryDetail: QualityGateLocalizedCopy.lowLightDetail(languageCode),
         dominantColorValue: color.toARGB32(),
-        observations: const [
-          'Örneklenen merkez bölgede parlaklık çok düşük.',
+        observations: [
+          QualityGateLocalizedCopy.lowLightObs(languageCode),
         ],
-        recommendations: const [
-          'Doğal gün ışığı alan aydınlık bir ortamda çekimi tekrarlayın.',
-          'Gölge düşmemesine ve kameranın odaklanmasına dikkat edin.',
-        ],
+        recommendations: isTr
+            ? const [
+                'Doğal gün ışığı alan aydınlık bir ortamda çekimi tekrarlayın.',
+                'Gölge düşmemesine ve kameranın odaklanmasına dikkat edin.',
+              ]
+            : const [
+                'Retake the photo in a well-lit area with natural daylight.',
+                'Avoid casting shadows and ensure the camera is focused.',
+              ],
         warningFlags: const [],
         confidence: 0.25,
         createdAt: now,

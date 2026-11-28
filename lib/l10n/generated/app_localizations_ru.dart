@@ -3090,4 +3090,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'ОСНОВАТЕЛЬ И СИСТЕМНЫЙ АДМИНИСТРАТОР';
+
+  @override
+  String get splashTagline => 'Мониторинг здоровья\nна базе ИИ';
 }

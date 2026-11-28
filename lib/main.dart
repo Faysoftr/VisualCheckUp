@@ -12,9 +12,13 @@ void main() {
   // Initialize Firebase asynchronously with a safety timeout so it never blocks
   // runApp or causes the native splash screen to hang/freeze.
   unawaited(
-    Firebase.initializeApp()
-        .timeout(const Duration(seconds: 4))
-        .catchError((_) => Firebase.app()),
+    Firebase.initializeApp().timeout(const Duration(seconds: 4)).catchError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
+      debugPrint('Firebase initialization skipped/failed: $error');
+      return Firebase.app();
+    }),
   );
 
   runApp(

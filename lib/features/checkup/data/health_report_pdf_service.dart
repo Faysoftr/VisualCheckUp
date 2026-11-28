@@ -212,9 +212,17 @@ class HealthReportPdfService {
 
       final nowFormatted = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
       // Open share dialog
-      await Share.shareXFiles(
-        [XFile(file.path, mimeType: 'application/pdf', name: 'VisualCheckUp_Saglik_Karnesi.pdf')],
-        text: 'VisualCheckUp Saglik Karnesi — $patientName ($nowFormatted)',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile(
+              file.path,
+              mimeType: 'application/pdf',
+              name: 'VisualCheckUp_Saglik_Karnesi.pdf',
+            ),
+          ],
+          text: 'VisualCheckUp Saglik Karnesi — $patientName ($nowFormatted)',
+        ),
       );
 
       return file.path;

@@ -3093,4 +3093,8 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get sfbAdminFounderBanner => 'FUNDADOR E ADMINISTRADOR DO SISTEMA';
+
+  @override
+  String get splashTagline =>
+      'Monitoramento de Saúde\ncom Inteligência Artificial';
 }

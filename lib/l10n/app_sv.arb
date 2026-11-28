@@ -26,7 +26,7 @@
   "menuFollowUpPlan": "Personal Follow-Up Plan",
   "menuVitalsTracker": "Blodtryck & Blodsocker",
   "menuLabReports": "Labbrapporter",
-  "menuQuickColorCard": "Camera-Free Color Card",
+  "menuQuickColorCard": "Färgkort utan Kamera",
   "menuHistory": "Historik",
   "menuReferenceGuide": "Visual Reference Guide",
   "menuSectionSettings": "SETTINGS & PRIVACY",
@@ -943,5 +943,6 @@
   "sfbViewDetails": "Visa detaljer",
   "sfbAdminBadge": "ADMIN",
   "sfbAdminConsoleTitle": "SNABB ADMINKONSOL",
-  "sfbAdminFounderBanner": "PLATTFORMSGRUNDARE & SYSTEMADMIN"
+  "sfbAdminFounderBanner": "PLATTFORMSGRUNDARE & SYSTEMADMIN",
+  "splashTagline": "AI-Driven\nHälsoövervakning"
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:visualcheckup/core/l10n/l10n_extensions.dart';
 import 'package:visualcheckup/core/l10n/locale_controller.dart';
+import 'package:visualcheckup/core/preferences/feature_preferences_controller.dart';
 import 'package:visualcheckup/core/profile/family_profile_controller.dart';
 import 'package:visualcheckup/core/theme/app_theme.dart';
 import 'package:visualcheckup/core/theme/health_drawer_background.dart';
@@ -57,6 +58,7 @@ import 'package:visualcheckup/features/medications/domain/medication_reminder.da
 import 'package:visualcheckup/features/medications/presentation/screens/medication_reminders_screen.dart';
 import 'package:visualcheckup/features/pedometer/presentation/screens/step_counter_screen.dart';
 import 'package:visualcheckup/features/settings/presentation/screens/settings_screen.dart';
+import 'package:visualcheckup/features/settings/presentation/widgets/feature_selection_wizard.dart';
 import 'package:visualcheckup/features/breath_lung/presentation/screens/breath_lung_screen.dart';
 import 'package:visualcheckup/features/vein_varicose/presentation/screens/vein_analysis_screen.dart';
 import 'package:visualcheckup/features/water_tracker/presentation/screens/water_tracker_screen.dart';
@@ -80,6 +82,8 @@ class HomeScreen extends StatefulWidget {
     required this.onDeleteAccount,
     this.localeController,
     this.profileController,
+    this.featurePreferencesController,
+    this.autoShowFeatureWizard,
     this.labsVitalsRepository,
     this.medicationRepository,
     this.dietRepository,
@@ -102,6 +106,8 @@ class HomeScreen extends StatefulWidget {
   final ThemeController themeController;
   final LocaleController? localeController;
   final FamilyProfileController? profileController;
+  final FeaturePreferencesController? featurePreferencesController;
+  final bool? autoShowFeatureWizard;
   final VoidCallback onSignOut;
   final VoidCallback onDeleteAccount;
 
@@ -114,6 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late final LabsVitalsRepository _labsVitalsRepository;
   late final MedicationReminderRepository _medicationRepository;
   late final DietRepository _dietRepository;
+  late final FeaturePreferencesController _featurePrefs;
+  int _bottomTabIndex = 0;
   List<AnalysisResult> _allHistory = const [];
   List<LabReportRecord> _labReports = const [];
   List<BloodPressureReading> _bpReadings = const [];
@@ -161,6 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _medicationRepository =
         widget.medicationRepository ?? MedicationReminderRepository();
     _dietRepository = widget.dietRepository ?? DietRepository();
+    _featurePrefs = widget.featurePreferencesController ??
+        FeaturePreferencesController.instance;
     _bootstrap();
   }
 
@@ -172,19 +182,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _bootstrap() async {
+    await _featurePrefs.load();
     await _loadDashboardData();
     final accepted = await widget.historyRepository.isDisclaimerAccepted();
-    if (!accepted && mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
+    final shouldAutoWizard = widget.autoShowFeatureWizard ??
+        !(!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'));
+
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      if (!accepted) {
         final ok = await DisclaimerDialog.show(context, initiallyAgreed: false);
-        if (ok) {
-          await widget.historyRepository.setDisclaimerAccepted();
-        } else {
+        if (!ok) {
           widget.onSignOut();
+          return;
         }
-      });
-    }
+        await widget.historyRepository.setDisclaimerAccepted();
+      }
+      if (!mounted) return;
+      if (shouldAutoWizard && !_featurePrefs.isWizardCompleted) {
+        await FeatureSelectionWizard.show(
+          context,
+          controller: _featurePrefs,
+          isInitialSetup: true,
+        );
+      }
+    });
+  }
+
+  Future<void> _openFeatureWizard() async {
+    await FeatureSelectionWizard.show(
+      context,
+      controller: _featurePrefs,
+      isInitialSetup: false,
+    );
   }
 
   Future<void> _loadDashboardData() async {
@@ -575,6 +606,7 @@ class _HomeScreenState extends State<HomeScreen> {
           historyRepository: widget.historyRepository,
           labsVitalsRepository: _labsVitalsRepository,
           profileController: widget.profileController,
+          featurePreferencesController: _featurePrefs,
         ),
       ),
     );
@@ -705,15 +737,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l10n = context.l10n;
+    final langCode = Localizations.localeOf(context).languageCode;
+    final isTr = langCode == 'tr';
     final nextTrack = _nextHighlightedTrack();
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: AppDrawer(
-        currentUser: widget.currentUser,
-        themeController: widget.themeController,
-        localeController: widget.localeController,
-        onOpenSettings: _openSettings,
+    return ValueListenableBuilder<Set<PersonalHealthFeature>>(
+      valueListenable: _featurePrefs,
+      builder: (context, enabledFeatures, _) {
+        bool isFeatureOn(PersonalHealthFeature f) =>
+            enabledFeatures.contains(f);
+
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: AppDrawer(
+            currentUser: widget.currentUser,
+            themeController: widget.themeController,
+            localeController: widget.localeController,
+            featurePreferencesController: _featurePrefs,
+            onOpenFeatureWizard: _openFeatureWizard,
+            onOpenSettings: _openSettings,
         onOpenCategory: _openCategory,
         onOpenSkinConcern: _openSkinSubModule,
         onOpenSkinModule: () => _openCategory(CheckCategory.skinCondition),
@@ -822,14 +864,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  'assets/images/app_logo.jpg',
-                  width: 28,
-                  height: 28,
-                  fit: BoxFit.cover,
-                ),
+              child: Image.asset(
+                'assets/images/app_logo.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(width: 8),
@@ -941,6 +980,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          if (_bottomTabIndex == 1)
+            _buildTrackingCenterBody(
+              context: context,
+              isDark: isDark,
+              isTr: isTr,
+              langCode: langCode,
+              enabledFeatures: enabledFeatures,
+            )
+          else if (_bottomTabIndex == 2)
+            _buildCommunityCenterBody(
+              context: context,
+              isDark: isDark,
+              isTr: isTr,
+            )
+          else if (_bottomTabIndex == 3)
+            _buildProfileAndHistoryBody(
+              context: context,
+              isDark: isDark,
+              isTr: isTr,
+              enabledFeatures: enabledFeatures,
+            )
+          else
           CustomScrollView(
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
@@ -998,42 +1059,46 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 14),
 
                       // 2. Elevated Modern Follow-Up Plan Card
-                      _FollowUpModernCard(
-                        title: l10n.followUpCardTitle,
-                        editLabel: l10n.followUpSelectEdit,
-                        startLabel: l10n.followUpStart,
-                        emptyHint: l10n.followUpEmptyHint,
-                        nextTrack: nextTrack,
-                        trackTitle: nextTrack?.track.localizedTitle(l10n),
-                        statusLabel: nextTrack?.localizedStatusLabel(l10n),
-                        onEdit: _openFollowUpPlan,
-                        onStart: nextTrack == null
-                            ? null
-                            : () => _startTrack(nextTrack.track),
-                      ),
-                      const SizedBox(height: 12),
+                      if (isFeatureOn(PersonalHealthFeature.followUpPlan)) ...[
+                        _FollowUpModernCard(
+                          title: l10n.followUpCardTitle,
+                          editLabel: l10n.followUpSelectEdit,
+                          startLabel: l10n.followUpStart,
+                          emptyHint: l10n.followUpEmptyHint,
+                          nextTrack: nextTrack,
+                          trackTitle: nextTrack?.track.localizedTitle(l10n),
+                          statusLabel: nextTrack?.localizedStatusLabel(l10n),
+                          onEdit: _openFollowUpPlan,
+                          onStart: nextTrack == null
+                              ? null
+                              : () => _startTrack(nextTrack.track),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
 
                       // 2b. Prominent Medication & Alarm Reminder Banner Card
-                      _MedicationQuickBanner(
-                        title: l10n.medTitle,
-                        subtitle: _activeMedCount == 0
-                            ? l10n.medHomeCardEmpty
-                            : _todayMedReminders.isNotEmpty
-                                ? l10n.medHomeCardTodaySummary(
-                                    _todayMedTakenCount,
-                                    _todayMedReminders.length,
-                                  )
-                                : l10n.medHomeCardActiveCount(_activeMedCount),
-                        badgeCount: _activeMedCount,
-                        onTap: _openMedicationReminders,
-                      ),
-                      const SizedBox(height: 18),
+                      if (isFeatureOn(PersonalHealthFeature.medicationAlarms)) ...[
+                        _MedicationQuickBanner(
+                          title: l10n.medTitle,
+                          subtitle: _activeMedCount == 0
+                              ? l10n.medHomeCardEmpty
+                              : _todayMedReminders.isNotEmpty
+                                  ? l10n.medHomeCardTodaySummary(
+                                      _todayMedTakenCount,
+                                      _todayMedReminders.length,
+                                    )
+                                  : l10n.medHomeCardActiveCount(_activeMedCount),
+                          badgeCount: _activeMedCount,
+                          onTap: _openMedicationReminders,
+                        ),
+                        const SizedBox(height: 18),
+                      ],
 
                       // 3. Editorial Section Header for Categories
                       _SectionHeader(
                         title: l10n.homeCategoriesTitle,
                         subtitle: l10n.homeCategoriesSubtitle,
-                        badgeText: '${CheckCategory.values.length}',
+                        badgeText: '${CheckCategory.values.length + 1}',
                       ),
                     ],
                   ),
@@ -1046,13 +1111,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
+                      if (index == CheckCategory.values.length) {
+                        return _VeinVisualCategoryCard(
+                          key: const Key('home_vein_category_card'),
+                          onTap: _openVeinAnalysis,
+                        );
+                      }
                       final category = CheckCategory.values[index];
                       return CategoryCard(
                         category: category,
                         onTap: () => _openCategory(category),
                       );
                     },
-                    childCount: CheckCategory.values.length,
+                    childCount: CheckCategory.values.length + 1,
                   ),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -1111,128 +1182,166 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      _SectionHeader(
-                        title: l10n.homeLabsVitalsTitle,
-                        subtitle: l10n.homeLabsVitalsSubtitle,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.biotech_outlined,
-                              accentColor: AppTheme.primaryTeal,
-                              title: l10n.homeLabsCardTitle,
-                              subtitle: _labReportCount == 0
-                                  ? l10n.homeLabsCardEmpty
-                                  : l10n.homeLabsCardCount(_labReportCount),
-                              onTap: _openLabReports,
-                            ),
-                          ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.monitor_heart_outlined,
-                              accentColor: const Color(0xFFC8553D),
-                              title: l10n.homeVitalsCardTitle,
-                              subtitle: _vitalsCount == 0
-                                  ? l10n.homeVitalsCardEmpty
-                                  : l10n.homeVitalsCardCount(_vitalsCount),
-                              onTap: () => _openVitalsTracker(),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 13),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.monitor_weight_outlined,
-                              accentColor: const Color(0xFF2B7BBA),
-                              title: 'Boy, Kilo & VKİ',
-                              subtitle: 'Vücut kitle indeksi & ideal kilo',
-                              onTap: () => _openGrowthBmi(initialTabIndex: 0),
-                            ),
-                          ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.child_care_outlined,
-                              accentColor: const Color(0xFF7B5EA7),
-                              title: 'Çocuklarım',
-                              subtitle: '0–18 yaş boy & kilo skalası',
-                              onTap: () => _openGrowthBmi(initialTabIndex: 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 13),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.restaurant_menu_rounded,
-                              accentColor: const Color(0xFF16A34A),
-                              title: l10n.dietHomeCardTitle,
-                              subtitle: _activeDietPlan == null
-                                  ? l10n.dietHomeCardEmpty
-                                  : l10n.dietHomeCardActive(
-                                      _activeDietPlan!
-                                          .currentDayNumber(DateTime.now()),
-                                      _activeDietPlan!.totalDays,
-                                      _dietCompliance.compliancePercent,
-                                    ),
-                              onTap: () => _openDietHub(
-                                initialTabIndex:
-                                    _activeDietPlan == null ? 1 : 0,
+                      if (isFeatureOn(PersonalHealthFeature.labReports) ||
+                          isFeatureOn(PersonalHealthFeature.vitalsTracker)) ...[
+                        _SectionHeader(
+                          title: l10n.homeLabsVitalsTitle,
+                          subtitle: l10n.homeLabsVitalsSubtitle,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            if (isFeatureOn(PersonalHealthFeature.labReports))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.biotech_outlined,
+                                  accentColor: AppTheme.primaryTeal,
+                                  title: l10n.homeLabsCardTitle,
+                                  subtitle: _labReportCount == 0
+                                      ? l10n.homeLabsCardEmpty
+                                      : l10n.homeLabsCardCount(_labReportCount),
+                                  onTap: _openLabReports,
+                                ),
+                              ),
+                            if (isFeatureOn(PersonalHealthFeature.labReports) &&
+                                isFeatureOn(PersonalHealthFeature.vitalsTracker))
+                              const SizedBox(width: 13),
+                            if (isFeatureOn(PersonalHealthFeature.vitalsTracker))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.monitor_heart_outlined,
+                                  accentColor: const Color(0xFFC8553D),
+                                  title: l10n.homeVitalsCardTitle,
+                                  subtitle: _vitalsCount == 0
+                                      ? l10n.homeVitalsCardEmpty
+                                      : l10n.homeVitalsCardCount(_vitalsCount),
+                                  onTap: () => _openVitalsTracker(),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 13),
+                      ],
+                      if (isFeatureOn(PersonalHealthFeature.growthBmi) ||
+                          isFeatureOn(PersonalHealthFeature.childrenGrowth)) ...[
+                        Row(
+                          children: [
+                            if (isFeatureOn(PersonalHealthFeature.growthBmi))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.monitor_weight_outlined,
+                                  accentColor: const Color(0xFF2B7BBA),
+                                  title: PersonalHealthFeature.growthBmi
+                                      .localizedTitle(langCode),
+                                  subtitle: isTr
+                                      ? 'Vücut kitle indeksi & ideal kilo'
+                                      : 'Body mass index & target weight',
+                                  onTap: () => _openGrowthBmi(initialTabIndex: 0),
+                                ),
+                              ),
+                            if (isFeatureOn(PersonalHealthFeature.growthBmi) &&
+                                isFeatureOn(
+                                  PersonalHealthFeature.childrenGrowth,
+                                ))
+                              const SizedBox(width: 13),
+                            if (isFeatureOn(
+                              PersonalHealthFeature.childrenGrowth,
+                            ))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.child_care_outlined,
+                                  accentColor: const Color(0xFF7B5EA7),
+                                  title: isTr ? 'Çocuklarım' : 'Child Growth',
+                                  subtitle: isTr
+                                      ? '0–18 yaş boy & kilo skalası'
+                                      : '0–18 yrs WHO growth curves',
+                                  onTap: () => _openGrowthBmi(initialTabIndex: 1),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 13),
+                      ],
+                      if (isFeatureOn(PersonalHealthFeature.dietAndCalorie)) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _DashboardModuleCard(
+                                icon: Icons.restaurant_menu_rounded,
+                                accentColor: const Color(0xFF16A34A),
+                                title: l10n.dietHomeCardTitle,
+                                subtitle: _activeDietPlan == null
+                                    ? l10n.dietHomeCardEmpty
+                                    : l10n.dietHomeCardActive(
+                                        _activeDietPlan!
+                                            .currentDayNumber(DateTime.now()),
+                                        _activeDietPlan!.totalDays,
+                                        _dietCompliance.compliancePercent,
+                                      ),
+                                onTap: () => _openDietHub(
+                                  initialTabIndex:
+                                      _activeDietPlan == null ? 1 : 0,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.camera_enhance_rounded,
-                              accentColor: const Color(0xFFD97706),
-                              title: l10n.dietCalorieQuickTitle,
-                              subtitle: l10n.dietCalorieQuickSubtitle,
-                              onTap: () => _openDietHub(initialTabIndex: 3),
+                            const SizedBox(width: 13),
+                            Expanded(
+                              child: _DashboardModuleCard(
+                                icon: Icons.camera_enhance_rounded,
+                                accentColor: const Color(0xFFD97706),
+                                title: l10n.dietCalorieQuickTitle,
+                                subtitle: l10n.dietCalorieQuickSubtitle,
+                                onTap: () => _openDietHub(initialTabIndex: 3),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 13),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.directions_walk_rounded,
-                              accentColor: const Color(0xFF0D9488),
-                              title: 'Adım Sayar',
-                              subtitle: 'Sürekli & anlık yürüyüş tablosu',
-                              onTap: _openPedometer,
-                            ),
-                          ),
-                          const SizedBox(width: 13),
-                          Expanded(
-                            child: _DashboardModuleCard(
-                              icon: Icons.smoke_free_rounded,
-                              accentColor: const Color(0xFF16A34A),
-                              title: 'Sigara & Alkol Bırakma',
-                              subtitle: 'Kazanılan para, ömür & değişimler',
-                              onTap: _openSobrietyTracker,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 13),
-                      _DashboardModuleCard(
-                        icon: Icons.public_rounded,
-                        accentColor: AppTheme.primaryTeal,
-                        title: l10n.commMenuTitle,
-                        subtitle: l10n.commHomeSubtitle,
-                        onTap: () => _openHealthCommunity(initialTabIndex: 0),
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 13),
+                      ],
+                      if (isFeatureOn(PersonalHealthFeature.pedometer) ||
+                          isFeatureOn(PersonalHealthFeature.sobriety)) ...[
+                        Row(
+                          children: [
+                            if (isFeatureOn(PersonalHealthFeature.pedometer))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.directions_walk_rounded,
+                                  accentColor: const Color(0xFF0D9488),
+                                  title: isTr ? 'Adım Sayar' : 'Step Counter',
+                                  subtitle: isTr
+                                      ? 'Sürekli & anlık yürüyüş tablosu'
+                                      : 'Daily steps, distance & calories',
+                                  onTap: _openPedometer,
+                                ),
+                              ),
+                            if (isFeatureOn(PersonalHealthFeature.pedometer) &&
+                                isFeatureOn(PersonalHealthFeature.sobriety))
+                              const SizedBox(width: 13),
+                            if (isFeatureOn(PersonalHealthFeature.sobriety))
+                              Expanded(
+                                child: _DashboardModuleCard(
+                                  icon: Icons.smoke_free_rounded,
+                                  accentColor: const Color(0xFF16A34A),
+                                  title: PersonalHealthFeature.sobriety
+                                      .localizedTitle(langCode),
+                                  subtitle: isTr
+                                      ? 'Kazanılan para, ömür & değişimler'
+                                      : 'Money saved & recovery milestones',
+                                  onTap: _openSobrietyTracker,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 13),
+                      ],
+                      if (isFeatureOn(PersonalHealthFeature.communitySocial))
+                        _DashboardModuleCard(
+                          icon: Icons.public_rounded,
+                          accentColor: AppTheme.primaryTeal,
+                          title: l10n.commMenuTitle,
+                          subtitle: l10n.commHomeSubtitle,
+                          onTap: () => _openHealthCommunity(initialTabIndex: 0),
+                        ),
                     ],
                   ),
                 ),
@@ -1359,44 +1468,411 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
               // 7. Social Formula Bank Community & Doctors Live Showcase Feed
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SfbVerifiedDoctorsSection(
-                        doctors: _featuredDoctors,
-                        onSeeAll: () => _openDoctorSearch(),
-                        onApplyDoctor: _openDoctorApplication,
-                        onTapCountry: (code) =>
-                            _openDoctorSearch(initialCountryCode: code),
+              if (isFeatureOn(PersonalHealthFeature.communitySocial))
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SfbVerifiedDoctorsSection(
+                          doctors: _featuredDoctors,
+                          onSeeAll: () => _openDoctorSearch(),
+                          onApplyDoctor: _openDoctorApplication,
+                          onTapCountry: (code) =>
+                              _openDoctorSearch(initialCountryCode: code),
+                        ),
+                        const SizedBox(height: 14),
+                        SfbNewMembersSection(
+                          members: _communityMembers,
+                          onTapMember: _openMemberProfile,
+                          onSeeAll: () =>
+                              _openHealthCommunity(initialTabIndex: 0),
+                        ),
+                        const SizedBox(height: 14),
+                        SfbActiveMembersSection(
+                          members: _communityMembers,
+                          onTapMember: _openMemberProfile,
+                        ),
+                        const SizedBox(height: 14),
+                        SfbLatestPostsSection(
+                          posts: _latestWallPosts,
+                          onOpenWall: () =>
+                              _openHealthCommunity(initialTabIndex: 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        key: const Key('home_bottom_nav_bar'),
+        selectedIndex: _bottomTabIndex,
+        height: 66,
+        backgroundColor:
+            isDark ? const Color(0xFF0E1D1E) : Colors.white.withValues(alpha: 0.96),
+        indicatorColor: AppTheme.primaryTeal.withValues(alpha: isDark ? 0.28 : 0.14),
+        onDestinationSelected: (idx) => setState(() => _bottomTabIndex = idx),
+        destinations: [
+          NavigationDestination(
+            key: const Key('bottom_nav_visual'),
+            icon: const Icon(Icons.camera_enhance_outlined),
+            selectedIcon: const Icon(
+              Icons.camera_enhance_rounded,
+              color: AppTheme.primaryTeal,
+            ),
+            label: isTr ? 'Görsel Tarama' : 'Visual Scan',
+          ),
+          NavigationDestination(
+            key: const Key('bottom_nav_tracking'),
+            icon: const Icon(Icons.monitor_heart_outlined),
+            selectedIcon: const Icon(
+              Icons.monitor_heart_rounded,
+              color: AppTheme.primaryTeal,
+            ),
+            label: isTr ? 'Takip Merkezi' : 'Tracking Hub',
+          ),
+          NavigationDestination(
+            key: const Key('bottom_nav_community'),
+            icon: const Icon(Icons.groups_outlined),
+            selectedIcon: const Icon(
+              Icons.groups_rounded,
+              color: AppTheme.primaryTeal,
+            ),
+            label: isTr ? 'Topluluk' : 'Community',
+          ),
+          NavigationDestination(
+            key: const Key('bottom_nav_profile'),
+            icon: const Icon(Icons.folder_shared_outlined),
+            selectedIcon: const Icon(
+              Icons.folder_shared_rounded,
+              color: AppTheme.primaryTeal,
+            ),
+            label: isTr ? 'Geçmiş & Ayar' : 'History & Prefs',
+          ),
+        ],
+      ),
+    );
+      },
+    );
+  }
+
+  void _openModuleForFeature(PersonalHealthFeature feature) {
+    switch (feature) {
+      case PersonalHealthFeature.labReports:
+        _openLabReports();
+      case PersonalHealthFeature.vitalsTracker:
+        _openVitalsTracker();
+      case PersonalHealthFeature.medicationAlarms:
+        _openMedicationReminders();
+      case PersonalHealthFeature.followUpPlan:
+        _openFollowUpPlan();
+      case PersonalHealthFeature.waterTracker:
+        _openWaterTracker();
+      case PersonalHealthFeature.pedometer:
+        _openPedometer();
+      case PersonalHealthFeature.dietAndCalorie:
+        _openDietHub();
+      case PersonalHealthFeature.growthBmi:
+        _openGrowthBmi(initialTabIndex: 0);
+      case PersonalHealthFeature.breathLung:
+        _openBreathLung();
+      case PersonalHealthFeature.sobriety:
+        _openSobrietyTracker();
+      case PersonalHealthFeature.childrenGrowth:
+        _openGrowthBmi(initialTabIndex: 1);
+      case PersonalHealthFeature.communitySocial:
+        _openHealthCommunity(initialTabIndex: 0);
+    }
+  }
+
+  Widget _buildTrackingCenterBody({
+    required BuildContext context,
+    required bool isDark,
+    required bool isTr,
+    required String langCode,
+    required Set<PersonalHealthFeature> enabledFeatures,
+  }) {
+    final trackingFeatures = PersonalHealthFeature.values
+        .where(
+          (f) =>
+              f != PersonalHealthFeature.communitySocial &&
+              enabledFeatures.contains(f),
+        )
+        .toList();
+    final hiddenCount = PersonalHealthFeature.values
+        .where((f) => f != PersonalHealthFeature.communitySocial)
+        .length -
+        trackingFeatures.length;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppTheme.primaryTeal, Color(0xFF0284C7)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.tune_rounded, color: Colors.white, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr
+                          ? 'Kişisel Sağlık Takip Merkezi'
+                          : 'Personal Health Tracking Hub',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15.5,
                       ),
-                      const SizedBox(height: 14),
-                      SfbNewMembersSection(
-                        members: _communityMembers,
-                        onTapMember: _openMemberProfile,
-                        onSeeAll: () => _openHealthCommunity(initialTabIndex: 0),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      hiddenCount > 0
+                          ? (isTr
+                              ? '${trackingFeatures.length} aktif araç gösteriliyor · $hiddenCount araç gizlendi'
+                              : '${trackingFeatures.length} active tools · $hiddenCount hidden')
+                          : (isTr
+                              ? 'Tüm sağlık takip araçlarınız aktif'
+                              : 'All health tracking tools enabled'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 14),
-                      SfbActiveMembersSection(
-                        members: _communityMembers,
-                        onTapMember: _openMemberProfile,
-                      ),
-                      const SizedBox(height: 14),
-                      SfbLatestPostsSection(
-                        posts: _latestWallPosts,
-                        onOpenWall: () =>
-                            _openHealthCommunity(initialTabIndex: 1),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              FilledButton(
+                key: const Key('tracking_tab_customize_btn'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppTheme.primaryTeal,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                onPressed: _openFeatureWizard,
+                child: Text(
+                  isTr ? 'Düzenle' : 'Customize',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12.5,
                   ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        if (trackingFeatures.isEmpty)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.playlist_add_check_circle_outlined,
+                    size: 44,
+                    color: AppTheme.primaryTeal,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isTr
+                        ? 'Şu an yalnızca Kameralı Görsel Tarama modu seçili.'
+                        : 'Currently in Camera-Only mode.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 10),
+                  FilledButton.tonalIcon(
+                    onPressed: _openFeatureWizard,
+                    icon: const Icon(Icons.add_rounded),
+                    label: Text(
+                      isTr ? 'Takip Aracı Ekle' : 'Add Tracking Tools',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          for (final group in FeatureGroupCategory.values) ...[
+            if (trackingFeatures.any((f) => f.group == group)) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(group.icon, size: 18, color: group.color),
+                    const SizedBox(width: 6),
+                    Text(
+                      group.localizedTitle(langCode),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: group.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              for (final f in trackingFeatures.where((x) => x.group == group))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _DashboardModuleCard(
+                    icon: f.icon,
+                    accentColor: f.accentColor,
+                    title: f.localizedTitle(langCode),
+                    subtitle: f.localizedSubtitle(langCode),
+                    onTap: () => _openModuleForFeature(f),
+                  ),
+                ),
+            ],
+          ],
+      ],
+    );
+  }
+
+  Widget _buildCommunityCenterBody({
+    required BuildContext context,
+    required bool isDark,
+    required bool isTr,
+  }) {
+    final l10n = context.l10n;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _DashboardModuleCard(
+                icon: Icons.forum_outlined,
+                accentColor: const Color(0xFFEC4899),
+                title: l10n.commWallTitle,
+                subtitle: isTr
+                    ? 'Deneyim ve motivasyon paylaşımları'
+                    : 'Wellness wall & community posts',
+                onTap: () => _openHealthCommunity(initialTabIndex: 1),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _DashboardModuleCard(
+                icon: Icons.groups_outlined,
+                accentColor: const Color(0xFF14B8A6),
+                title: l10n.commGroupsTitle,
+                subtitle: isTr
+                    ? 'Konuya özel destek grupları'
+                    : 'Topic-based health support groups',
+                onTap: () => _openHealthCommunity(initialTabIndex: 2),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _DashboardModuleCard(
+                icon: Icons.workspace_premium_outlined,
+                accentColor: const Color(0xFFEAB308),
+                title: l10n.doctorSearchTitle,
+                subtitle: isTr
+                    ? 'Ülke ve branşa göre doğrulanmış hekimler'
+                    : 'Verified doctors by specialty',
+                onTap: () => _openDoctorSearch(),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _DashboardModuleCard(
+                icon: Icons.mail_outline_rounded,
+                accentColor: const Color(0xFFF59E0B),
+                title: l10n.sfbMyMessages,
+                subtitle: isTr
+                    ? 'Özel mesajlar ve arkadaş çevresi'
+                    : 'Direct messages & friends',
+                onTap: () => _openHealthCommunity(initialTabIndex: 3),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SfbVerifiedDoctorsSection(
+          doctors: _featuredDoctors,
+          onSeeAll: () => _openDoctorSearch(),
+          onApplyDoctor: _openDoctorApplication,
+          onTapCountry: (code) => _openDoctorSearch(initialCountryCode: code),
+        ),
+        const SizedBox(height: 14),
+        SfbLatestPostsSection(
+          posts: _latestWallPosts,
+          onOpenWall: () => _openHealthCommunity(initialTabIndex: 1),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileAndHistoryBody({
+    required BuildContext context,
+    required bool isDark,
+    required bool isTr,
+    required Set<PersonalHealthFeature> enabledFeatures,
+  }) {
+    final l10n = context.l10n;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+      children: [
+        _DashboardModuleCard(
+          icon: Icons.history_rounded,
+          accentColor: AppTheme.primaryTeal,
+          title: l10n.menuHistory,
+          subtitle: isTr
+              ? '${_allHistory.length} kayıtlı görsel tarama sonucu'
+              : '${_allHistory.length} saved visual check-up records',
+          onTap: _openHistory,
+        ),
+        const SizedBox(height: 12),
+        _DashboardModuleCard(
+          icon: Icons.tune_rounded,
+          accentColor: const Color(0xFF0284C7),
+          title: isTr
+              ? 'Özellik & Menü Sihirbazı (${enabledFeatures.length}/${PersonalHealthFeature.values.length})'
+              : 'Feature Selection Wizard (${enabledFeatures.length}/${PersonalHealthFeature.values.length})',
+          subtitle: isTr
+              ? 'Kullanmak istediğiniz sağlık araçlarını seçin veya gizleyin'
+              : 'Choose which optional health modules appear in your app',
+          onTap: _openFeatureWizard,
+        ),
+        const SizedBox(height: 12),
+        _DashboardModuleCard(
+          icon: Icons.settings_outlined,
+          accentColor: const Color(0xFF64748B),
+          title: l10n.menuSettings,
+          subtitle: isTr
+              ? 'Dil, tema, bulut yedekleme, PDF doktor raporu ve izinler'
+              : 'Language, theme, cloud backup, doctor PDF & permissions',
+          onTap: _openSettings,
+        ),
+        const SizedBox(height: 12),
+        _DashboardModuleCard(
+          icon: Icons.menu_book_rounded,
+          accentColor: const Color(0xFF0F766E),
+          title: l10n.menuReferenceGuide,
+          subtitle: l10n.referenceGuideSubtitle,
+          onTap: _openReferenceGuidePicker,
+        ),
+      ],
     );
   }
 }
@@ -2173,6 +2649,42 @@ class _DashboardModuleCard extends StatelessWidget {
             splashColor: accentColor.withValues(alpha: 0.12),
             child: Stack(
               children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: isDark ? 0.16 : 0.20,
+                      child: Image.asset(
+                        isDark
+                            ? 'assets/images/drawer_bg_dark.jpg'
+                            : 'assets/images/drawer_bg_light.jpg',
+                        fit: BoxFit.cover,
+                        alignment: Alignment.centerRight,
+                        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isDark
+                              ? [
+                                  accentColor.withValues(alpha: 0.15),
+                                  const Color(0xFF162323).withValues(alpha: 0.86),
+                                ]
+                              : [
+                                  accentColor.withValues(alpha: 0.10),
+                                  Colors.white.withValues(alpha: 0.85),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Positioned(
                   top: -24,
                   right: -24,
@@ -2395,6 +2907,249 @@ class _MedicationQuickBanner extends StatelessWidget {
     );
   }
 }
+
+class _VeinVisualCategoryCard extends StatelessWidget {
+  const _VeinVisualCategoryCard({
+    super.key,
+    required this.onTap,
+  });
+
+  final VoidCallback onTap;
+
+  static String _titleFor(String langCode) {
+    switch (langCode) {
+      case 'tr':
+        return 'Damar & Varis Analizi';
+      case 'de':
+        return 'Venen & Krampfadern';
+      case 'es':
+        return 'Venas y Varices';
+      case 'fr':
+        return 'Veines et Varices';
+      case 'it':
+        return 'Vene e Varici';
+      case 'nl':
+        return 'Aderen & Spataderen';
+      case 'sv':
+        return 'Vener & Åderbråck';
+      case 'pt':
+        return 'Veias e Varizes';
+      case 'ru':
+        return 'Вены и варикоз';
+      case 'ar':
+        return 'الأوردة والدوالي';
+      case 'zh':
+        return '静脉与静脉曲张';
+      case 'hi':
+        return 'नस और वैरिकोज़';
+      case 'bn':
+        return 'শিরা ও ভেরিকোজ';
+      case 'ur':
+        return 'رگیں اور ویریکوز';
+      default:
+        return 'Vein & Varicose';
+    }
+  }
+
+  static String _subtitleFor(String langCode) {
+    switch (langCode) {
+      case 'tr':
+        return 'Kılcal damar, CEAP varis evrelemesi ve dolaşım ön taraması';
+      case 'de':
+        return 'Besenreiser, CEAP-Stadien & Venendurchblutung prüfen';
+      case 'es':
+        return 'Evaluación visual CEAP de capilares, varices y circulación';
+      case 'fr':
+        return 'Évaluation visuelle CEAP des capillaires et varices';
+      case 'it':
+        return 'Valutazione visiva CEAP di capillari, varici e circolazione';
+      case 'nl':
+        return 'Visuele CEAP-screening van haarvaten en spataderen';
+      case 'sv':
+        return 'Visuell CEAP-kontroll av ytliga kärl och åderbråck';
+      case 'pt':
+        return 'Avaliação visual CEAP de vasinhos, varizes e circulação';
+      case 'ru':
+        return 'Визуальная оценка капилляров и стадий варикоза (CEAP)';
+      case 'ar':
+        return 'فحص بصري للشعيرات الدموية ومراحل الدوالي (CEAP)';
+      case 'zh':
+        return '毛细血管、CEAP静脉曲张分级与下肢循环筛查';
+      case 'hi':
+        return 'केशिका, CEAP वैरिकोज़ स्टेजिंग और रक्त संचार जांच';
+      case 'bn':
+        return 'কৈশিক নালী, CEAP ভেরিকোজ পর্যায় ও রক্ত সঞ্চালন স্ক্রিনিং';
+      case 'ur':
+        return 'کیپیلریز، CEAP ویریکوز مرحلہ بندی اور دورانِ خون کا معائنہ';
+      default:
+        return 'Spider veins, CEAP varicose staging & leg circulation check';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final langCode = Localizations.localeOf(context).languageCode;
+    const accent = Color(0xFF0284C7);
+    const lighterAccent = Color(0xFF38BDF8);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF162323).withValues(alpha: 0.94)
+            : Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark
+              ? accent.withValues(alpha: 0.22)
+              : Colors.white.withValues(alpha: 0.95),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: isDark ? 0.14 : 0.09),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.035),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            splashColor: accent.withValues(alpha: 0.12),
+            highlightColor: accent.withValues(alpha: 0.06),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          stops: const [0.0, 0.55, 1.0],
+                          colors: isDark
+                              ? [
+                                  const Color(0xFF101D1D)
+                                      .withValues(alpha: 0.94),
+                                  const Color(0xFF14262E)
+                                      .withValues(alpha: 0.80),
+                                  accent.withValues(alpha: 0.22),
+                                ]
+                              : [
+                                  Colors.white.withValues(alpha: 0.95),
+                                  const Color(0xFFF0F9FF)
+                                      .withValues(alpha: 0.82),
+                                  accent.withValues(alpha: 0.12),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [accent, lighterAccent],
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accent.withValues(
+                                    alpha: isDark ? 0.35 : 0.30,
+                                  ),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.airline_seat_legroom_extra_rounded,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                          ),
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.42)
+                                  : Colors.white.withValues(alpha: 0.82),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: accent.withValues(alpha: 0.28),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 15,
+                              color: accent,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(
+                        _titleFor(langCode),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15.5,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _subtitleFor(langCode),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.84)
+                              : colorScheme.onSurface.withValues(alpha: 0.78),
+                          height: 1.28,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 
 
